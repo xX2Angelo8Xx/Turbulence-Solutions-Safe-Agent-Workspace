@@ -4,6 +4,7 @@
       {
         "type": "command",
         "command": "bash .github/hooks/scripts/require-approval.sh",
+        "windows": "powershell -NoProfile -ExecutionPolicy Bypass -File .github/hooks/scripts/require-approval.ps1",
         "timeout": 15
       }
     ]

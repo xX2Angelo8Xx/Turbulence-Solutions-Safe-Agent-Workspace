@@ -101,7 +101,16 @@
     "denyRead": [],
     "allowWrite": ["."],
     "denyWrite": []
-  }
+  },
+
+  // ----------------------------------------------------------
+  //  11. COPILOT INSTRUCTION FILES
+  //      Explicitly enable loading of .github/copilot-instructions.md
+  //      and any .github/instructions/*.instructions.md files.
+  //      Required in newer Copilot builds that no longer auto-discover
+  //      instruction files when the .github folder is in files.exclude.
+  // ----------------------------------------------------------
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true
 
   // ----------------------------------------------------------
   //  NOTE: BUILT-IN TOOLS (read_file, search, etc.)
