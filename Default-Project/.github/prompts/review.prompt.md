@@ -1,5 +1,6 @@
 ---
-mode: agent
+agent: TestingAgent
+model: GPT-5 mini (copilot)
 description: Perform a structured review of a file with actionable feedback.
 ---
 

@@ -2,50 +2,34 @@
 
 ## Safety-First Mandate
 
-This project has the highest security classification. Every decision — code, config, architecture — must prioritize safety over convenience. When in doubt, choose the more restrictive option.
+This project has the highest security classification. Prioritize safety over convenience. When in doubt, choose the more restrictive option.
 
-## File Conventions
+## Non-Negotiable Rules
 
-- `README.md` (root): Project overview, architecture summary, dev setup. Do NOT put task tracking here.
-- `WORKPACKAGES.md` (root): Single source of truth for all tasks. Every code change MUST reference a workpackage ID.
-- `Default-Project/`: Template shipped to end users. NEVER modify it for testing or experimentation — copy it first.
-
-## Workpackage Discipline
-
-- IDs use category prefixes: `INS-xxx` (Installer), `SAF-xxx` (Safety), `GUI-xxx` (GUI).
-- Statuses: `Open` → `In Progress` → `Review` → `Done`. No skipping states.
-- Before starting work: set the workpackage to `In Progress` and assign yourself.
-- After finishing: set to `Review`. Only a reviewer may set `Done`.
-- Do NOT create, rename, or re-scope workpackages without approval. Propose changes in Comments.
-
-## Commit & Branch Rules
-
-- Branch naming: `<WP-ID>/<short-description>` (e.g., `SAF-003/fix-grep-bypass`).
-- Every commit message MUST start with the workpackage ID: `SAF-003: block includeIgnoredFiles parameter`.
-- One workpackage per branch. Do not bundle unrelated changes.
-
-## Scope Discipline
-
-- Only implement what the assigned workpackage specifies. No bonus features, no drive-by refactors.
-- Do not add comments, docstrings, or type annotations to code you did not change.
-- Do not refactor or "improve" adjacent code unless it is broken and blocking your workpackage.
-
-## Security Rules
-
+- Every code change **MUST** reference a workpackage ID.
 - No secrets, credentials, or API keys in source code — ever.
-- Validate all external inputs at system boundaries (user input, file paths, JSON from VS Code hooks).
-- Never disable, bypass, or weaken safety controls, even temporarily.
-- Never use absolute paths in code or documentation. Use relative paths only.
-- Never reference documents outside this repository that may be altered independently.
+- Never access `.github/`, `.vscode/`, or `NoAgentZone/` in `Default-Project/` unless your workpackage explicitly requires it.
+- One agent/person per workpackage. One workpackage per branch.
+- When uncertain, stop and ask — do not guess.
 
-## Code Standards
+## Key Files
 
-- All security-critical code requires a test that validates the protection and a test that attempts the bypass.
-- Cross-platform compatibility (Windows, macOS, Linux) is mandatory for all safety features.
-- Prefer failing closed (deny) over failing open (allow) in all security decisions.
+| File | Purpose |
+|------|---------|
+| `docs/architecture.md` | Project overview and repository structure |
+| `docs/project-scope.md` | Vision, capabilities, technology stack |
+| `docs/workpackages/workpackages.csv` | Task tracking — single source of truth |
+| `docs/user-stories/user-stories.csv` | User stories |
+| `docs/bugs/bugs.csv` | Bug tracking |
+| `docs/test-results/test-results.csv` | Test execution records |
+| `Default-Project/` | Template shipped to users — **never modify for testing** |
+
+## Rules & Workflows
+
+All detailed rules, workflows, and protocols are in **`docs/work-rules/index.md`** — the central hub. Read it to find the specific rule file for your task.
 
 ## For AI Agents
 
-- Read `WORKPACKAGES.md` at the start of every session to understand current project state.
-- Do not explore, read, or modify files in `.github/`, `.vscode/`, or `NoAgentZone/` within `Default-Project/` unless explicitly required by your assigned workpackage.
-- When uncertain about scope, stop and ask — do not guess.
+1. Read `docs/work-rules/agent-workflow.md` for your onboarding checklist and execution protocol.
+2. Read `docs/workpackages/workpackages.csv` to see current project state.
+3. Read the rule file(s) relevant to your assigned task (find them via `docs/work-rules/index.md`).
