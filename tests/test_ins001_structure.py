@@ -155,3 +155,40 @@ def test_project_creator_rejects_path_traversal() -> None:
             assert False, "Expected ValueError was not raised"
         except ValueError as exc:
             assert "path traversal" in str(exc).lower()
+
+
+def test_project_creator_rejects_prefix_match_bypass() -> None:
+    """BUG-001 regression: create_project() must block the sibling-prefix bypass.
+
+    A naive str.startswith() guard can be fooled when the resolved target begins
+    with the destination string but is NOT inside it.  For example:
+        destination = /tmp/tmpXXX/foo
+        folder_name = ../foobar
+        resolved target = /tmp/tmpXXX/foobar
+        '/tmp/tmpXXX/foobar'.startswith('/tmp/tmpXXX/foo') → True  ← exploitable!
+
+    The correct guard is Path.is_relative_to() which checks genuine containment.
+    """
+    import tempfile  # noqa: PLC0415
+
+    from launcher.core.project_creator import create_project  # noqa: PLC0415
+
+    with tempfile.TemporaryDirectory() as base:
+        base_path = Path(base)
+        dest = base_path / "foo"
+        dest.mkdir()
+        template = base_path / "tpl"
+        template.mkdir()
+
+        # '../foobar' resolves to a sibling that shares the 'foo' prefix.
+        # startswith() incorrectly allows this; is_relative_to() correctly blocks it.
+        try:
+            create_project(template, dest, "../foobar")
+            assert False, (
+                "Expected ValueError was not raised — BUG-001 path-traversal "
+                "prefix-match bypass is still present in project_creator.py. "
+                "Replace str(target).startswith(str(destination.resolve())) "
+                "with target.is_relative_to(destination.resolve())."
+            )
+        except ValueError as exc:
+            assert "path traversal" in str(exc).lower()
