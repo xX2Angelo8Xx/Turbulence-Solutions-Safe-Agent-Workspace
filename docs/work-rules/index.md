@@ -44,5 +44,6 @@ Central hub for all project rules, workflows, and protocols. Every rule in this 
 | **Developer** | Implements a single WP, writes tests, hands off to Tester | Assigned a workpackage to implement |
 | **Tester** | Reviews code, runs tests, marks Done or returns to Developer | WP is in `Review` status and needs verification |
 | **Maintenance** | Runs integrity checks, creates audit log, proposes fixes | Periodic project health checks |
+| **Story Writer** | Generates user stories from user input, requires human approval before saving | User wants to create or refine a user story |
 
 Agent definitions are in `.github/agents/`. See [agent-workflow.md](agent-workflow.md) for the full execution protocol.
