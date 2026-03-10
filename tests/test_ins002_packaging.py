@@ -74,3 +74,36 @@ def test_pyproject_build_system(pyproject: dict) -> None:
 def test_pyproject_src_layout(pyproject: dict) -> None:
     where = pyproject["tool"]["setuptools"]["packages"]["find"]["where"]
     assert "src" in where, "setuptools packages.find.where must include 'src'"
+
+
+# --- Tester edge-case tests (INS-002 re-review) ---
+
+def test_pyproject_build_system_requires(pyproject: dict) -> None:
+    """[build-system] requires must contain a setuptools entry with version bounds."""
+    requires = pyproject["build-system"]["requires"]
+    assert any("setuptools" in r for r in requires), (
+        "setuptools not found in [build-system] requires"
+    )
+    setuptools_req = next(r for r in requires if "setuptools" in r)
+    assert ">=" in setuptools_req, (
+        f"setuptools requirement '{setuptools_req}' has no lower bound"
+    )
+
+
+def test_pyproject_requires_python_exact(pyproject: dict) -> None:
+    """requires-python must be at least Python 3.11, not a looser bound."""
+    requires_python = pyproject["project"]["requires-python"]
+    # Must specify 3.11 or higher, not merely 3.0 or 3.9 etc.
+    assert "3.11" in requires_python or "3.12" in requires_python or "3.13" in requires_python, (
+        f"requires-python '{requires_python}' is too broad; expected >=3.11"
+    )
+
+
+def test_pyproject_customtkinter_upper_bound(pyproject: dict) -> None:
+    """customtkinter dependency must have an upper bound to prevent silent breaking upgrades."""
+    deps = pyproject["project"]["dependencies"]
+    ctk_dep = next((d for d in deps if "customtkinter" in d), None)
+    assert ctk_dep is not None, "customtkinter dependency not found"
+    assert "<" in ctk_dep, (
+        f"customtkinter dep '{ctk_dep}' has no upper bound; major-version pin required"
+    )
