@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68,<69"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "agent-environment-launcher"
+version = "0.1.0"
+description = "Cross-platform launcher that creates pre-configured, safety-hardened VS Code workspaces."
+requires-python = ">=3.11"
+dependencies = [
+    "customtkinter>=5,<6",
+]
+
+[project.scripts]
+agent-launcher = "launcher.main:main"
+
+[project.optional-dependencies]
+dev = [
+    "pyinstaller>=6,<7",
+    "pytest>=8,<9",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
