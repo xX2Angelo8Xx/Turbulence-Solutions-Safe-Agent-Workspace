@@ -66,7 +66,9 @@ def test_pyproject_entry_point(pyproject: dict) -> None:
 def test_pyproject_build_system(pyproject: dict) -> None:
     build = pyproject["build-system"]
     assert "build-backend" in build
-    assert "setuptools" in build["build-backend"]
+    assert build["build-backend"] == "setuptools.build_meta", (
+        f"build-backend is '{build['build-backend']}' but must be 'setuptools.build_meta'"
+    )
 
 
 def test_pyproject_src_layout(pyproject: dict) -> None:

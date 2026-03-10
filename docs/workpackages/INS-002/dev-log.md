@@ -41,3 +41,29 @@ No runtime or security logic was changed. Only the packaging metadata file was c
 ## Known Limitations
 
 - Version is currently hard-coded in both `pyproject.toml` and `config.py`. A future WP could unify these by reading `importlib.metadata.version()` in `config.py`, but that requires `pip install -e .` to have been run first — a bootstrapping issue beyond this WP's scope.
+
+---
+
+## Iteration 2
+
+**Date:** 2026-03-10
+**Reason for iteration:** Tester returned WP with BUG-002 — invalid `build-backend` in `pyproject.toml` caused `BackendUnavailable` at `pip install -e .`. Test TST-031 was also identified as insufficiently strict (only checked that backend contained "setuptools", not the exact value).
+
+### Changes Made
+
+1. **`pyproject.toml`** — Changed `build-backend` from `"setuptools.backends.legacy:build"` (non-existent module) to `"setuptools.build_meta"` (the correct PEP 517 backend for setuptools).
+
+2. **`tests/test_ins002_packaging.py`** — Strengthened `test_pyproject_build_system` (TST-031) to assert the exact backend string `"setuptools.build_meta"` instead of merely checking that `"setuptools"` appears anywhere in the value. This ensures any future regression of this type is caught before handoff.
+
+### Test Results
+
+Full suite: **86 passed, 0 failed** (Windows 11 + Python 3.11)
+
+- TST-031 `test_pyproject_build_system` — now enforces exact value, **Pass**
+- TST-083 `test_pyproject_build_backend_exact_value` — BUG-002 fixed, **Pass**
+- TST-087 `pip install -e .` integration — backend is now importable, **Pass**
+- All 83 remaining tests — no regressions, **Pass**
+
+### Root Cause
+
+The original `build-backend` value (`setuptools.backends.legacy:build`) was a fabricated string that does not correspond to any real Python module. The setuptools project has never exposed a `backends.legacy` subpackage. The correct backend for PEP 517 editable installs with setuptools has always been `setuptools.build_meta`.
