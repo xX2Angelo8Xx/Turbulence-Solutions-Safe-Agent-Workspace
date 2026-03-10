@@ -2,7 +2,154 @@
 
 **Tester:** Tester Agent
 **Date:** 2026-03-10
-**Iteration:** 1
+**Iteration:** 2
+
+---
+
+## Summary
+
+All five issues raised in Iteration 1 (BUG-005, BUG-006, BUG-007, BUG-008, TODO-5) have been
+correctly addressed. The design document is now internally consistent, normatively complete,
+and safe to hand to an implementer. The full test suite (96/96) passes with no regressions.
+
+**Verdict: PASS — SAF-004 marked Done.**
+
+---
+
+## Verification of Iteration 1 Issues
+
+### BUG-005 — Stage 4 chain-splitting (HIGH-SEC)
+**Status: FIXED ✅**
+
+Section 5 Stage 4 block now explicitly reads:
+
+> Before whitespace-splitting, split the normalized command on `;`, `&&`, and `||` to produce
+> a list of command segments. Apply Stages 4 and 5 to EACH segment. If ANY segment returns
+> deny → the overall result is deny. The primary verb check and allowlist lookup operate on
+> each segment independently.
+
+The requirement is now normative in the pipeline specification, not buried in Section 9.6.
+
+---
+
+### BUG-006 — Escape hatch residual checks cover P-01 to P-28 (HIGH-SEC)
+**Status: FIXED ✅**
+
+Section 12.4 now reads:
+
+> **Full obfuscation pre-scan (P-01 to P-28)** — ALL patterns in `_OBFUSCATION_PATTERNS` are
+> applied to the exception-matched command. No exception can override any pre-scan pattern.
+> This subsumes the former P-01–P-09 (interpreter-chaining) and P-10 (encoded commands)
+> restrictions and extends coverage to `eval`, `exec`, `source`, IEX, `$()`, backtick
+> subshell, pipe-to-interpreter, process substitution, PowerShell execution-policy bypass,
+> `Invoke-Item`, `Set-Alias`, `New-Alias`, and all other patterns defined in Sections 6 and 10.
+
+Patterns P-11 to P-28 can no longer be bypassed via an exception entry.
+
+---
+
+### BUG-007 — P-10 code block includes -e short flag (MEDIUM)
+**Status: FIXED ✅**
+
+Section 6 implementation reference code block P-10 now reads:
+
+```python
+re.compile(r"(?:powershell|pwsh)[^\n]*?-e(?:nc(?:odedcommand)?)?\s+[A-Za-z0-9+/=]{10,}"),  # P-10 — extended to catch -e (abbreviation of -EncodedCommand)
+```
+
+The `-e` short flag abbreviation of `-EncodedCommand` is now covered by the authoritative
+implementation reference.
+
+---
+
+### BUG-008 — Pattern count corrected to 28 (MEDIUM)
+**Status: FIXED ✅**
+
+Section 5 Stage 3 block now states:
+
+> Apply all obfuscation pre-scan patterns from `_OBFUSCATION_PATTERNS` (Section 6 and
+> Section 10 platform patterns; 28 patterns total)
+
+Count verified: P-01 to P-23 (Section 6) = 23 + P-24 to P-28 (Section 10) = 5 → **28 total**.
+
+---
+
+### TODO-5 — python3.x / pip3.x version-alias matching (MEDIUM)
+**Status: FIXED ✅**
+
+Section 7.2 Category A now includes:
+
+> **Version-alias matching (Category A):** The implementation MUST normalize version-specific
+> verb variants using `re.match(r'^python3?\.\d+$', verb)` → treated as `python`. Any other
+> version scheme (e.g., `python2`, `python27`) is NOT in the allowlist → deny. The literal
+> string `"python3.x"` in the table above is a documentation placeholder; the allowlist
+> dictionary must NOT have a key `"python3.x"`.
+
+Section 7.2 Category B includes the equivalent for pip:
+
+> **Version-alias matching (Category B):** The implementation MUST normalize `pip3.<N>` verb
+> variants using `re.match(r'^pip3\.\d+$', verb)` → treated as `pip`. Any other version
+> scheme (e.g., `pip2`, `pip2.7`) is NOT in the allowlist → deny.
+
+---
+
+## Tests Executed
+
+| Test ID | Test | Type | Result | Notes |
+|---------|------|------|--------|-------|
+| TST-119 | Stage 4 chain-separator coverage (re-review) | Design Review | Pass | BUG-005 fix confirmed |
+| TST-120 | Escape hatch residual checks cover P-01 to P-28 (re-review) | Security | Pass | BUG-006 fix confirmed |
+| TST-121 | P-10 -e short flag in Section 6 code block (re-review) | Design Review | Pass | BUG-007 fix confirmed |
+| TST-122 | Pre-scan pattern count = 28 (re-review) | Design Review | Pass | BUG-008 fix confirmed |
+| TST-123 | python3.x / pip3.x matching mechanism (re-review) | Design Review | Pass | TODO-5 fix confirmed |
+| TST-124 | Full regression suite (96 tests) | Regression | Pass | 96/96 pass — no regressions |
+
+---
+
+## Additional Observations (Non-Blocking)
+
+**Observation 1 — Section 6 code block is incomplete (23/28 patterns)**
+
+The `_OBFUSCATION_PATTERNS` list in Section 6 contains only P-01 to P-23. Patterns P-24 to
+P-28 are defined separately in Section 10. Section 5 correctly directs the implementer to
+use "Section 6 and Section 10 platform patterns; 28 patterns total", so the split is not a
+defect. However, an implementer who copies the Section 6 list verbatim without reading
+Section 10 would produce an incomplete list. This is a documentation structure risk. It does
+NOT block this WP but should be consolidated in SAF-005 (all 28 patterns in one list).
+
+**Observation 2 — Section 9.4 prose shows the old P-10 pattern**
+
+The opening of Section 9.4 "How the design prevents it" still cites the old P-10 pattern
+`(?:powershell|pwsh)[^\n]*?-enc(?:odedcommand)?\b` before going on to identify the `-e` gap
+and provide the fix. This is intentionally narrative (describing the old state then fixing
+it), but could confuse an implementer skimming the section. The Section 6 code block is
+authoritative and is correct. Not a blocking issue.
+
+**Observation 3 — python regex allows `python.X` (no digit-3 required)**
+
+The specified pattern `r'^python3?\.\d+$'` matches `python.9` (the `3?` makes the `3`
+optional). The executable `python.9` does not exist in practice, so this is an extremely
+low-risk edge case. If matched, the verb is normalized as `python` and all Category A
+constraints still apply. Not an exploitable vector.
+
+---
+
+## Bugs Found
+
+None in Iteration 2.
+
+---
+
+## TODOs for Developer
+
+None — all Iteration 1 TODOs resolved.
+
+---
+
+## Verdict
+
+**PASS — SAF-004 is marked Done. SAF-005 (implementation) is unblocked.**
+
 
 ---
 
