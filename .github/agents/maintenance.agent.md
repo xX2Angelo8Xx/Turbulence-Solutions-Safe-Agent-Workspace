@@ -1,7 +1,7 @@
 ---
 description: "Use when performing project maintenance, integrity checks, or housekeeping. Runs the 9-point maintenance checklist, creates a timestamped maintenance log, and proposes fixes for human approval. Never implements fixes directly. Use for: maintenance, audit, health check, cleanup, consistency check."
 tools: [read, search, execute, todo]
-model: ['Claude Sonnet 4 (copilot)', 'GPT-5 (copilot)']
+model: ['Claude Sonnet 4.6 (copilot)']
 argument-hint: "Run a full maintenance check"
 ---
 

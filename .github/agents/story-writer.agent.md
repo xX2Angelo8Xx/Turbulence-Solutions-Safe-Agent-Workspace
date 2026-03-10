@@ -1,7 +1,7 @@
 ---
 description: "Use when creating or refining user stories from user input. Generates well-structured, acceptance-criteria-rich user stories aligned with the project vision. Requires human approval before writing to the CSV. Use for: user story creation, story refinement, acceptance criteria definition."
 tools: [read, edit, search, todo]
-model: ['Claude Opus 4.6 (copilot)']
+model: ['Gemini 2.5 Pro (copilot)']
 argument-hint: "Describe the feature or need you want turned into a user story (e.g., 'users should be able to reset their password')"
 ---
 
@@ -44,7 +44,7 @@ Produce a well-formed user story in this format:
 - [ ] The story fits within the project scope defined in `docs/project-scope.md`
 
 ### Step 3 — Present and Await Approval
-- Present the full draft clearly in Markdown.
+- Present the full draft clearly in chat.
 - Explicitly state: **"Please review this user story. Reply 'approve' to save it, or provide feedback for revision."**
 - **Do NOT write anything to any file until you receive explicit human approval.**
 - If the human provides feedback, revise the draft and re-present it. Repeat until approved.
