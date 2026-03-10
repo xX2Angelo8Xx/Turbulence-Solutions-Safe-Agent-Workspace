@@ -66,6 +66,47 @@ Key decisions:
 - `test_launcher_config_importable` — Imports `launcher.config` and checks APP_NAME and VERSION attributes
 - `test_os_utils_get_platform` — Calls `get_platform()` and asserts result is one of the three known OS strings
 
+---
+
+## Iteration 3 — 2026-03-10
+
+### Summary
+
+Applied BUG-001 fix that was claimed but never actually applied in Iteration 2. Replaced
+the vulnerable `str(target).startswith(str(destination.resolve()))` path-traversal guard
+with `target.is_relative_to(destination.resolve())` in `src/launcher/core/project_creator.py`.
+
+### Root Cause of BUG-001
+
+`str.startswith()` performs a textual prefix match, not a filesystem containment check.
+When `destination` ends in a string that is a prefix of a sibling directory name (e.g.
+`/tmp/foo` and a sibling `/tmp/foobar`), a `folder_name` of `../foobar` resolves to
+`/tmp/foobar` which passes `startswith('/tmp/foo')` — bypassing the guard entirely.
+`Path.is_relative_to()` checks genuine path containment and is not deceived by this.
+
+### Fix Applied
+
+| File | Line | Before | After |
+|------|------|--------|-------|
+| `src/launcher/core/project_creator.py` | 35 | `if not str(target).startswith(str(destination.resolve())):` | `if not target.is_relative_to(destination.resolve()):` |
+
+### Test Results
+
+```
+platform win32 -- Python 3.11.9, pytest-9.0.2
+collected 93 items
+
+tests/test_ins001_structure.py   23 PASSED
+tests/test_ins002_packaging.py   10 PASSED
+tests/test_saf001_security_gate.py   60 PASSED
+
+93 passed in 0.54s
+```
+
+TST-111 (`test_project_creator_rejects_prefix_match_bypass`) now passes.
+
+---
+
 ## Known Limitations
 
 - All module implementations are stubs; full logic is deferred to downstream WPs (GUI-001–GUI-007 for gui/, INS-009–INS-011 for updater.py, INS-005–INS-007 for installer scripts).

@@ -33,7 +33,7 @@ def create_project(
 
     # Guard against path-traversal in folder_name (e.g. "../../etc").
     target = (destination / folder_name).resolve()
-    if not str(target).startswith(str(destination.resolve())):
+    if not target.is_relative_to(destination.resolve()):
         raise ValueError(
             "Invalid folder name: path traversal attempt detected"
         )
