@@ -11,6 +11,9 @@ This project has the highest security classification. Prioritize safety over con
 - Never access `.github/`, `.vscode/`, or `NoAgentZone/` in `Default-Project/` unless your workpackage explicitly requires it.
 - One agent/person per workpackage. One workpackage per branch.
 - When uncertain, stop and ask — do not guess.
+- **All agent operations are fully autonomous once kicked off by the Orchestrator.** Never prompt for user input, never run interactive commands, never require human approval during WP execution. Exceptions: Story Writer (human approval before saving stories), Maintenance agent (human approval before implementing fixes).
+- **No global Python package installs.** All dependencies go into the workspace-local `.venv`. Ask the user before any global install.
+- **Test scripts are permanent.** The final test script for each workpackage lives in `tests/<WP-ID>/` and must never be deleted.
 
 ## Key Files
 

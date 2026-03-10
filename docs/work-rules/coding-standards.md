@@ -23,7 +23,8 @@ Rules for code quality, scope discipline, and implementation practices.
 - Follow PEP 8 for formatting and style.
 - Use type hints for all new function signatures.
 - Use `pytest` as the test framework.
-- Use virtual environments for dependency isolation.
+- **Virtual environments are mandatory.** Always use the workspace `.venv` for all development, testing, and tooling. Run commands via `.venv\Scripts\python` (Windows) or `.venv/bin/python` (macOS/Linux).
+- **No global Python installs.** Never install packages globally (`pip install <pkg>` at system level). Always use `.venv\Scripts\pip install`. If a global install is unavoidable, stop and ask the user for explicit approval first.
 
 ## Security in Code
 
@@ -37,3 +38,9 @@ Rules for code quality, scope discipline, and implementation practices.
 - All dependencies must be declared in `requirements.txt` or `pyproject.toml`.
 - Pin major versions for stability.
 - Do not introduce new dependencies without justification in the workpackage comments.
+
+## Code Permanence
+
+- **Test scripts are permanent.** The final test file for each workpackage (`tests/<WP-ID>/`) must never be deleted after the WP is `Done`. It serves as the regression baseline for all future versions.
+- **Minimize one-time code.** Avoid creating throwaway scripts that are discarded after use. If temporary scaffolding is genuinely needed, label it clearly and remove it before WP handoff.
+- The committed test script must be clean, self-contained, and runnable without modification.

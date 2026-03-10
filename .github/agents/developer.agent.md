@@ -55,3 +55,7 @@ If the Tester sets the WP back to `In Progress`:
 - **DO NOT** mark your own work as `Done` — only the Tester can do that.
 - **DO NOT** skip testing. Every WP with code changes needs tests.
 - **DO NOT** add comments, docstrings, or type annotations to code you did not change.
+- **DO NOT** run commands that require user input. Use `--yes`, `--no-input`, or equivalent non-interactive flags.
+- **DO NOT** use `input()` or any interactive prompts in test scripts.
+- **DO NOT** install packages globally. Use `.venv\Scripts\pip` for all installs.
+- **DO NOT** delete or modify the final test script for a completed workpackage — test scripts under `tests/<WP-ID>/` are permanent.

@@ -47,6 +47,8 @@ The following checks are executed in order. Each item produces a **Pass**, **War
 ### 7. Test Coverage Gaps
 - Are there workpackages in `Done` status with code changes but no corresponding test results in `docs/test-results/test-results.csv`?
 - Are there `Done` WPs without a `test-report.md` in their folder?
+- Does every `Done` WP have a corresponding test subfolder at `tests/<WP-ID>/` with at least one test file?
+- Are all test files in `tests/<WP-ID>/` still present and unmodified (permanent artifacts — must not be deleted)?
 
 ### 8. Bug Tracking
 - Are there open bugs without an assigned workpackage?

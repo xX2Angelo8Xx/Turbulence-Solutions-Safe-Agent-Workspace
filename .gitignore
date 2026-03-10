@@ -1,0 +1,29 @@
+# Python bytecache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Eggs / packaging artifacts
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# PyInstaller generated spec files (auto-generated; source specs live in src/installer/)
+*.spec
+
+# pytest cache
+.pytest_cache/
+
+# Virtual environment (workspace-local — never commit)
+.venv/
+env/
+venv/
+
+# VS Code workspace-level settings (developer local)
+.vscode/
+
+# OS artifacts
+.DS_Store
+Thumbs.db

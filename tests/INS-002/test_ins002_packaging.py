@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-REPO_ROOT = Path(__file__).parent.parent
+REPO_ROOT = Path(__file__).parent.parent.parent
 PYPROJECT_PATH = REPO_ROOT / "pyproject.toml"
 
 

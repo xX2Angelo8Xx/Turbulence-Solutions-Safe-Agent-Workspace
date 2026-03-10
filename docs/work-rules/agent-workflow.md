@@ -25,7 +25,7 @@ Every agent follows this exact workflow when implementing a workpackage. No step
 | 2 | **Claim** | Set WP status to `In Progress`. Fill in `Assigned To`. |
 | 3 | **Prepare** | Create the WP folder: `docs/workpackages/<WP-ID>/`. Create `dev-log.md` inside it (see format below). |
 | 4 | **Implement** | Write code following `coding-standards.md` and `security-rules.md`. Stay within WP scope. |
-| 5 | **Test** | Write and run tests per `testing-protocol.md`. All tests must pass. Log results in `docs/test-results/test-results.csv`. |
+| 5 | **Test** | Create `tests/<WP-ID>/` folder if it doesn't exist. Write and run tests per `testing-protocol.md`. All tests must pass. Log results in `docs/test-results/test-results.csv`. |
 | 6 | **Document** | Update `dev-log.md` with implementation summary, decisions made, tests written, and known limitations. |
 | 7 | **Handoff** | Set WP status to `Review`. Commit per `commit-branch-rules.md`. Hand off to Tester Agent. |
 
@@ -93,6 +93,18 @@ For subsequent iterations (after Tester feedback), append a new section:
 - **When uncertain:** Stop and ask — do not guess.
 - **Context discipline:** Read only what you need. Do not preemptively load all documentation.
 - **No self-review:** The agent who implements a WP must NOT be the one who reviews it.
+
+---
+
+## Autonomy Rules
+
+These rules apply to all agents in the autonomous pipeline. Once the Orchestrator kicks off a workpackage, the entire Dev → Test → Done cycle runs without human intervention.
+
+- **Never prompt for user input.** No `input()`, no `--prompt`, no `[y/n]` confirmations, no "Should I try again?" queries to the terminal.
+- **All terminal commands must be non-interactive.** Use `--yes`, `--no-input`, `--force`, `--quiet`, or equivalent flags where available. If a command requires interaction and no flag exists, find an alternative approach.
+- **Never run a command that causes the terminal to await input.** If a command hangs waiting for stdin, it will block the pipeline indefinitely.
+- **The Orchestrator finalizes WPs autonomously.** After a Tester PASS, the Orchestrator proceeds to the next WP without asking the user for confirmation.
+- **Exceptions:** The Story Writer agent awaits human approval before saving a user story. The Maintenance agent awaits human approval before implementing any proposed fix. All other agents run autonomously.
 
 ---
 

@@ -39,9 +39,9 @@ You may **only** edit these files:
 - `docs/workpackages/<WP-ID>/test-report.md` — to write your findings
 - `docs/test-results/test-results.csv` — to log test results
 - `docs/bugs/bugs.csv` — to log bugs found during testing
-- Test files in `Project/tests/` — to add edge-case tests
+- Test files in `tests/<WP-ID>/` — to add edge-case tests for the WP under review
 
-You must **NOT** edit source code in `Project/` (outside `tests/`). If code changes are needed, return the WP to the Developer with detailed instructions.
+You must **NOT** edit source code outside of `tests/`. If code changes are needed, return the WP to the Developer with detailed instructions.
 
 ## Constraints
 
@@ -50,5 +50,6 @@ You must **NOT** edit source code in `Project/` (outside `tests/`). If code chan
 - **DO NOT** approve work that fails any existing test.
 - **DO NOT** lower the testing bar — the protocol is the **minimum** standard.
 - **DO NOT** review your own work — a different agent must have implemented the WP.
+- **DO NOT** run tests or commands that require user input — all test execution must be non-interactive.
 - **ALWAYS** log bugs in `docs/bugs/bugs.csv` when found, even if minor.
 - The testing protocol is the **floor**, not the ceiling. Exceed it.

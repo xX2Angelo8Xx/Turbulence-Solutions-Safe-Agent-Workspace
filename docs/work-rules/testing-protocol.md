@@ -6,10 +6,12 @@ Comprehensive testing standards for all workpackages. This protocol defines the 
 
 ## Test Structure
 
-- Tests live in `Project/tests/`, mirroring the source structure under `Project/`.
+- Tests live in `tests/<WP-ID>/`, one subfolder per workpackage.
+  - Example: `tests/INS-001/test_ins001_structure.py`, `tests/SAF-001/test_saf001_security_gate.py`
 - Naming convention: `test_<module>.py` or `test_<module>_<function>.py`.
 - Use `pytest` as the test framework.
 - Each test function should test **one specific behaviour**.
+- Run tests using the workspace virtual environment: `.venv\Scripts\python -m pytest tests/`
 
 ## Test Categories
 
@@ -27,20 +29,23 @@ Every workpackage with code changes must include tests from the applicable categ
 
 ### For Developers (during implementation)
 
-1. Write tests **alongside** implementation, not after.
-2. All new tests must pass before setting the WP to `Review`.
-3. All **existing** tests must still pass (no regressions).
-4. Log test runs in `docs/test-results/test-results.csv`.
-5. Document test approach and results in the WP's `dev-log.md`.
+1. Create `tests/<WP-ID>/` folder at the start of every workpackage.
+2. Write tests **alongside** implementation, not after.
+3. All new tests must pass before setting the WP to `Review`.
+4. All **existing** tests must still pass (no regressions).
+5. Log test runs in `docs/test-results/test-results.csv`.
+6. Document test approach and results in the WP's `dev-log.md`.
+7. **Never use interactive constructs** — no `input()`, no commands that await stdin, no `[y/n]` prompts.
 
 ### For Testers (during review)
 
 1. Read the Developer's `dev-log.md` in the WP folder.
-2. Run the full test suite — not just the new tests.
-3. Add edge-case tests the Developer may have missed.
+2. Run the full test suite — not just the new tests: `.venv\Scripts\python -m pytest tests/`
+3. Add edge-case tests the Developer may have missed — place them in `tests/<WP-ID>/`.
 4. **Think beyond the protocol**: consider attack vectors, boundary conditions, race conditions, concurrency issues, invalid inputs, and platform-specific quirks.
 5. Log all test runs in `docs/test-results/test-results.csv`.
 6. Write findings in the WP's `test-report.md` (see format below).
+7. **Never run commands that require user input** — all test execution must be non-interactive.
 
 ## Test Result CSV
 
@@ -94,3 +99,15 @@ The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages
 - **Security WPs** require both protection tests and bypass-attempt tests — no exceptions.
 - **Every bug fix** requires a regression test proving the bug is fixed and cannot recur.
 - The testing protocol is the **floor**, not the ceiling. Always seek additional failure modes.
+
+---
+
+## Test Script Preservation
+
+Test scripts are **permanent project artifacts**. They are not throw-away code.
+
+- The final test script for each workpackage (`tests/<WP-ID>/test_<name>.py`) **must never be deleted** after the WP reaches `Done`.
+- These scripts serve as regression tests for every future version of the project.
+- Minimize one-time / disposable code. If temporary test scaffolding is needed during development, remove it before handoff — the committed test script must be clean and reusable.
+- The results produced by the final test script are what is archived in `docs/test-results/test-results.csv`. Future releases run the same scripts; if output changes, it is a regression.
+- When adding edge-case tests during Tester review, add them to the same `tests/<WP-ID>/` file — do not create separate throw-away scripts.
