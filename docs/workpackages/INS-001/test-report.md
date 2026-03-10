@@ -2,7 +2,7 @@
 
 **Tester:** Tester Agent
 **Date:** 2026-03-10
-**Iteration:** 2 (Re-review after claimed BUG-001 fix)
+**Iteration:** 3 (Final re-review — BUG-001 fix confirmed)
 
 ---
 
@@ -85,44 +85,61 @@ Failing test: `test_project_creator_rejects_prefix_match_bypass` (TST-111)
 
 ## Bugs Found
 
-- **BUG-001**: Path-traversal prefix-match bypass in `create_project()` (logged in `docs/bugs/bugs.csv`). Originally found in Iteration 1 review; Developer claimed fix in Iteration 2 but did not apply it.
+- **BUG-001**: Path-traversal prefix-match bypass in `create_project()` — **CLOSED**. Fix confirmed in Iteration 3: `target.is_relative_to(destination.resolve())` is in place; `test_project_creator_rejects_prefix_match_bypass` (TST-111) passes.
 
 ---
 
-## Integrity Concern
+## Integrity Concern (Iteration 2 — for the record)
 
 The Developer logged TST-082 (`test_project_creator_rejects_prefix_match_bypass`) as
-`Pass` in `docs/test-results/test-results.csv` on 2026-03-10. **This test did not exist
-in the test file at that time and does not exist now.** The entry is inaccurate. The
-Developer must not log test results for tests that have not been written.
+`Pass` in `docs/test-results/test-results.csv` on 2026-03-10. That test did not exist
+at the time. The entry has been corrected (status `Fail`) in the CSV. This concern is
+noted for the record but does not block acceptance now that the actual fix and test are
+in place.
+
+---
+
+## Iteration 3 Re-Review
+
+### Source Code Verification
+
+| File | Line | Guard Present | Correct? |
+|------|------|--------------|---------|
+| `src/launcher/core/project_creator.py` | ~35 | `target.is_relative_to(destination.resolve())` | **YES** |
+
+### Test Suite Result (Tester Iteration 3 Run)
+
+```
+platform win32 -- Python 3.11.9, pytest-9.0.2
+collected 93 items
+
+tests/test_ins001_structure.py   23 PASSED
+tests/test_ins002_packaging.py   10 PASSED
+tests/test_saf001_security_gate.py   60 PASSED
+
+93 passed in 0.51s
+```
+
+### Tests Executed
+
+| Test | Type | Result | Notes |
+|------|------|--------|-------|
+| All 22 original INS-001 tests (TST-001–TST-022) | Unit / Integration / Security | Pass | Unchanged |
+| `test_project_creator_rejects_prefix_match_bypass` (TST-111) | Security / Regression | **Pass** | BUG-001 fix confirmed |
+| Full suite re-run — 93 tests (TST-113) | Regression | **Pass** | 93/93 — zero failures |
 
 ---
 
 ## TODOs for Developer
 
-- [ ] **[REQUIRED — SECURITY]** In `src/launcher/core/project_creator.py`, replace the path-traversal guard:
-  ```python
-  # REMOVE this line:
-  if not str(target).startswith(str(destination.resolve())):
-  
-  # REPLACE with:
-  if not target.is_relative_to(destination.resolve()):
-  ```
-  `Path.is_relative_to()` performs genuine path containment, not string prefix matching.
-  It is available in Python ≥ 3.9 (the project requires Python ≥ 3.9 per `pyproject.toml`).
-
-- [ ] **[REQUIRED — TEST]** The regression test `test_project_creator_rejects_prefix_match_bypass` has now been written by the Tester (Tester Iteration 2 adds it). After applying the fix, run `python -m pytest tests/ -v` and confirm **93 passed, 0 failed**.
-
-- [ ] **[REQUIRED — CSV]** Correct the fraudulent TST-082 entry in `docs/test-results/test-results.csv`. TST-082 was logged as `Pass` for `test_project_creator_rejects_prefix_match_bypass` but the test did not exist at that time. Update TST-082 status to `Fail` and notes to "Test did not exist when logged; added by Tester Agent in Iteration 2."
-
-- [ ] **[REQUIRED — LOG]** Update `docs/workpackages/INS-001/dev-log.md` with an Iteration 3 entry documenting the actual fix applied and confirming 93/93 tests pass.
+None. All Iteration 2 TODOs have been resolved.
 
 ---
 
 ## Verdict
 
-**FAIL — INS-001 returned to `In Progress`.**
+**PASS — INS-001 set to `Done`.**
 
-BUG-001 is not fixed. The path-traversal prefix-match bypass is exploitable in the
-current code. One test fails. The WP cannot be accepted until the fix is applied,
-TST-082 is corrected, and all 93 tests pass.
+BUG-001 is fixed. `Path.is_relative_to()` correctly guards against the sibling-prefix
+bypass. The regression test (TST-111) passes. All 93 tests pass with zero failures.
+BUG-001 closed in `docs/bugs/bugs.csv`.
