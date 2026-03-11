@@ -40,7 +40,7 @@ Templates (bundled inside Launcher)
 │   │   ├── core/                     # Business logic
 │   │   └── config.py                 # Constants
 │   └── installer/                    # Per-platform installer scripts
-├── templates/                        # Bundled project templates (planned)
+├── templates/                        # Bundled project templates (planned — INS-004)
 ├── tests/                            # Permanent test scripts (per workpackage)
 │   ├── conftest.py                   # pytest configuration — src/ path setup
 │   ├── __init__.py
@@ -48,8 +48,17 @@ Templates (bundled inside Launcher)
 │   │   └── test_ins001_structure.py
 │   ├── INS-002/                      # Tests for INS-002 (Python Packaging)
 │   │   └── test_ins002_packaging.py
-│   └── SAF-001/                      # Tests for SAF-001 (Security Gate Core)
-│       └── test_saf001_security_gate.py
+│   ├── SAF-001/                      # Tests for SAF-001 (Security Gate Core)
+│   │   └── test_saf001_security_gate.py
+│   ├── SAF-002/                      # Tests for SAF-002 (Zone Enforcement Logic)
+│   │   └── test_saf002_zone_classifier.py
+│   ├── SAF-005/                      # Tests for SAF-005 (Terminal Command Sanitization)
+│   │   ├── test_saf005_terminal_sanitization.py
+│   │   └── test_saf005_edge_cases.py
+│   ├── GUI-001/                      # Tests for GUI-001 (Main Window Layout)
+│   │   └── test_gui001_main_window.py
+│   └── INS-012/                      # Tests for INS-012 (.gitignore Configuration)
+│       └── test_ins012_gitignore.py
 ├── docs/
 │   ├── architecture.md               # Project overview and structure (this file)
 │   ├── project-scope.md              # Project scope and vision
