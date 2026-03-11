@@ -21,6 +21,7 @@ A cross-platform desktop tool that lets developers spin up a pre-configured, saf
 | 2 | **Template Engine** | Copies a pre-built, safety-hardened project template to the destination |
 | 3 | **Safety Gate** | Python-based `security_gate.py` enforces zone-based access control on every AI tool call |
 | 4 | **Native Installer** | Packages the Launcher for Windows (.exe), macOS (.dmg), and Linux (.AppImage) |
+| 5 | **Auto-Update** | Checks for newer versions on launch; downloads and applies updates from within the app |
 
 ---
 
@@ -65,6 +66,14 @@ Key workpackages: GUI-001 through GUI-007.
 
 ---
 
+### Auto-Update (UPD)
+
+The launcher checks for newer versions on startup by querying the GitHub Releases API. When an update is available, a non-blocking banner notifies the user. The user can also trigger a manual check. Updates are downloaded and applied from within the app — the launcher downloads the correct platform installer and hands off to it.
+
+Key workpackages: GUI-008, GUI-009, GUI-010, INS-009, INS-010, INS-011.
+
+---
+
 ## Templates
 
 | Template | Folder | Description |
@@ -94,5 +103,5 @@ Key workpackages: GUI-001 through GUI-007.
 - Cloud sync or remote storage
 - Multi-user / team collaboration features
 - IDE support outside VS Code
-- Template marketplace or automatic updates
+- Template marketplace
 - AI model selection or configuration
