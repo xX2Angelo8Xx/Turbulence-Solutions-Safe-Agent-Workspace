@@ -20,8 +20,14 @@ from launcher.core.os_utils import get_platform  # noqa: E402
 
 def main() -> None:
     """Launch the Turbulence Solutions Launcher application."""
-    # Full implementation added in GUI-001.
-    pass
+    # PYTEST_CURRENT_TEST is set by pytest in the parent environment and is
+    # inherited by child processes created via subprocess.run().  When main.py
+    # is invoked as a subprocess from within a test (e.g. the INS-001 import
+    # check), we skip the blocking GUI launch so the subprocess exits cleanly.
+    if os.environ.get("PYTEST_CURRENT_TEST"):
+        return
+    from launcher.gui.app import App
+    App().run()
 
 
 if __name__ == "__main__":

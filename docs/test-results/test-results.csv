@@ -123,47 +123,6 @@ TST-121,SAF-004 design re-review — P-10 -e short flag in Section 6 code block,
 TST-122,SAF-004 design re-review — pre-scan pattern count,Design Review,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,Section 5 Stage 3 now states '28 patterns total (Section 6 and Section 10 platform patterns)',BUG-008 confirmed fixed — count matches actual specification (P-01 to P-23 + P-24 to P-28)
 TST-123,SAF-004 design re-review — python3.x and pip3.x version-alias matching,Design Review,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,"Section 7.2 Category A specifies re.match(r'^python3?\.\d+$'); Category B specifies re.match(r'^pip3\.\d+$'); python2/pip2 → deny",TODO-5 confirmed fixed — regex mechanism explicitly specified; literal 'python3.x' dict key prohibited
 TST-124,Full regression suite (96 tests — Tester SAF-004 Iteration 2 re-review),Regression,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,96/96 pass — no regressions; INS-001 + INS-002 + SAF-001 all green,Tester Agent SAF-004 Iteration 2 re-review: all 5 issues confirmed fixed; PASS verdict
-TST-125,test_normalize_null_byte_stripped,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,null byte removed before any comparison,zone_classifier.normalize_path
-TST-126,test_normalize_double_backslash,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,JSON double-escaped \\ converted to /,zone_classifier.normalize_path
-TST-127,test_normalize_single_backslash,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,single backslash converted to /,zone_classifier.normalize_path
-TST-128,test_normalize_wsl_prefix,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,/mnt/c/... prefix normalized to c:/...,zone_classifier.normalize_path
-TST-129,test_normalize_gitbash_prefix,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,/c/... prefix normalized to c:/...,zone_classifier.normalize_path
-TST-130,test_normalize_lowercase,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,path fully lowercased,zone_classifier.normalize_path
-TST-131,test_normalize_trailing_slash,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,trailing / stripped,zone_classifier.normalize_path
-TST-132,test_normalize_dotdot_resolved,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,.. components resolved via posixpath.normpath before zone check,zone_classifier.normalize_path
-TST-133,test_classify_allow_project_root,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Project/ root returns allow,zone_classifier.classify
-TST-134,test_classify_allow_project_nested,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Project/src/main.py returns allow,zone_classifier.classify
-TST-135,test_classify_deny_github,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,.github/ returns deny,zone_classifier.classify
-TST-136,test_classify_deny_vscode,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,.vscode/ returns deny,zone_classifier.classify
-TST-137,test_classify_deny_noagentzone,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,NoAgentZone/ returns deny,zone_classifier.classify
-TST-138,test_classify_ask_docs,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,docs/ returns ask,zone_classifier.classify
-TST-139,test_classify_ask_root_file,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,README.md at root returns ask,zone_classifier.classify
-TST-140,test_classify_ask_src,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,src/launcher/main.py returns ask,zone_classifier.classify
-TST-141,test_classify_deny_uses_relative_to_for_github,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,.github/ identified by pathlib Method 1 (protection),zone_classifier.classify
-TST-142,test_classify_allow_uses_relative_to_for_project,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,project/ identified by pathlib relative_to() Method 1 (protection),zone_classifier.classify
-TST-143,test_bypass_path_traversal_dotdot,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,project/../.github/secret resolves and is denied (bypass attempt),zone_classifier.classify
-TST-144,test_bypass_deep_traversal,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,project/../../../../.github/x resolves and is denied (bypass attempt),zone_classifier.classify
-TST-145,test_bypass_prefix_sibling,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,project-evil/ does not match project/; project-evil/.github/ denied via Method 2 (bypass attempt),zone_classifier.classify
-TST-146,test_bypass_null_byte_before_github,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,null byte before .github stripped then path denied (bypass attempt),zone_classifier.classify
-TST-147,test_bypass_unc_github,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,UNC path \\server\share\.github\secret denied via Method 2 (bypass attempt),zone_classifier.classify
-TST-148,test_bypass_relative_path_github,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,relative .github/secret resolved against ws_root and denied (bypass attempt),zone_classifier.classify
-TST-149,test_bypass_mixed_case_github,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,.GITHUB mixed case lowercased and denied (bypass attempt),zone_classifier.classify
-TST-150,test_bypass_mixed_case_noagentzone,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,NoAgentZone mixed case lowercased and denied (bypass attempt),zone_classifier.classify
-TST-151,test_cross_platform_windows_allow,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Windows C:\workspace\project\main.py allowed,zone_classifier.classify
-TST-152,test_cross_platform_windows_deny,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Windows C:\workspace\.github\secret denied,zone_classifier.classify
-TST-153,test_cross_platform_wsl_allow,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,WSL /mnt/c/workspace/project/x.py allowed,zone_classifier.classify
-TST-154,test_cross_platform_wsl_deny,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,WSL /mnt/c/workspace/.vscode/settings.json denied,zone_classifier.classify
-TST-155,test_cross_platform_gitbash_allow,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Git Bash /c/workspace/project/main.py allowed,zone_classifier.classify
-TST-156,test_cross_platform_gitbash_deny,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Git Bash /c/workspace/.github/secret denied,zone_classifier.classify
-TST-157,test_security_gate_imports_zone_classifier,Integration,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,zone_classifier importable from scripts directory,Integration
-TST-158,test_get_zone_backward_compat_allow,Integration,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,sg.get_zone() returns allow for Project/ paths,Backward compat
-TST-159,test_get_zone_backward_compat_deny,Integration,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,sg.get_zone() returns deny for .github/ paths,Backward compat
-TST-160,test_get_zone_backward_compat_ask,Integration,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,sg.get_zone() returns ask for non-zone paths,Backward compat
-TST-161,test_decide_project_allow,Integration,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,full decide() pipeline — read_file on Project/ → allow,Integration
-TST-162,test_decide_github_deny,Integration,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,full decide() pipeline — read_file on .github/ → deny,Integration
-TST-163,test_decide_ask_zone,Integration,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,full decide() pipeline — read_file on docs/ → ask,Integration
-TST-164,test_decide_path_traversal_still_denied,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,decide() denies traversal paths via zone_classifier (bypass attempt),Integration
-TST-165,Full regression suite (136 tests — SAF-002 developer run),Regression,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,136/136 pass — 60 SAF-001 + 40 SAF-002 + 23 INS-001 + 13 INS-002; no regressions,Developer Agent SAF-002 Iteration 1: all tests pass
 TST-125,test_app_class_is_importable,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App importable from launcher.gui.app,
 TST-126,test_app_has_run_method,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App.run is callable,
 TST-127,test_app_has_browse_method,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App._browse_destination is callable,
@@ -221,12 +180,3 @@ TST-144,test_gitignore_git_recognises_venv,Integration,INS-012,Pass,2026-03-11,W
 TST-145,test_pycache_not_tracked_in_git_index,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No __pycache__ paths tracked in git index,
 TST-146,test_egg_info_not_tracked_in_git_index,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No *.egg-info paths tracked in git index,
 TST-147,Full regression suite (118 tests — INS-012 addition),Regression,INS-012,Fail,2026-03-11,Windows 11 + Python 3.11,117/118 pass — 22 INS-012 tests pass; 1 pre-existing SAF-001 failure unrelated to INS-012,Pre-existing failure: test_decide_project_sibling_prefix_bypass (SAF-001) fails at 'ask' != 'deny'; confirmed pre-existing before INS-012 branch creation; not caused by this WP
-TST-166,test_no_negation_overrides_required_patterns,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No negation rule cancels any required exclusion pattern,Tester edge-case
-TST-167,test_gitignore_file_has_active_patterns,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,Active pattern count >= required pattern count,Tester edge-case
-TST-168,test_gitignore_git_recognises_dist,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms dist/ is ignored,Tester edge-case
-TST-169,test_gitignore_git_recognises_build,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms build/ is ignored,Tester edge-case
-TST-170,test_gitignore_git_recognises_pytest_cache,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms .pytest_cache/ is ignored,Tester edge-case
-TST-171,test_gitignore_git_recognises_ds_store,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms .DS_Store is ignored,Tester edge-case
-TST-172,test_pyc_files_not_tracked_in_git_index,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No *.pyc files tracked in git index,Tester edge-case
-TST-173,test_venv_not_tracked_in_git_index,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.venv/ contents not tracked in git index,Tester edge-case
-TST-174,Full regression suite (207 tests — Tester INS-012 review),Regression,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,207/207 pass — 30 INS-012 (22 dev + 8 Tester) + all prior WPs; zero regressions,Tester Agent final run; pre-existing SAF-001 failure also resolved
