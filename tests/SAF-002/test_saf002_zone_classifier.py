@@ -429,3 +429,68 @@ def test_edge_no_exception_on_unusual_input():
             raise AssertionError(
                 f"classify({path!r}) raised an unhandled exception: {exc!r}"
             ) from exc
+
+
+# ===========================================================================
+# Tester Iteration 2 edge-case tests  (TST-196 to TST-200)
+# Targeted regression tests for BUG-010 (C0 control char strip) and
+# BUG-011 (Method 2 allow workspace-containment guard).
+# ===========================================================================
+
+def test_security_cr_before_deny_dir():
+    # TST-196 — REGRESSION: carriage return (\r) before .github must be stripped then denied
+    # Verifies BUG-010 fix extends beyond tab/newline to the full C0 range including CR.
+    raw = f"{WS}/\r.github/secret"
+    assert zc.classify(raw, WS) == "deny", (
+        "BUG-010 regression: CR before .github must be stripped (\\x0d in C0 range); "
+        "classify must return deny"
+    )
+
+
+def test_security_soh_before_deny_dir():
+    # TST-197 — REGRESSION: SOH (\x01) before .github must be stripped then denied
+    # Verifies the BUG-010 fix covers the lower end of the C0 range (\x01–\x08).
+    raw = f"{WS}/\x01.github/secret"
+    assert zc.classify(raw, WS) == "deny", (
+        "BUG-010 regression: SOH (\\x01) before .github must be stripped; "
+        "the fix must cover the full \\x00–\\x1f C0 range, not just common whitespace"
+    )
+
+
+def test_security_c0_before_all_deny_dirs():
+    # TST-198 — REGRESSION: BUG-010 fix must apply to all deny dirs, not just .github
+    # Tests tab before .vscode and newline before noagentzone.
+    assert zc.classify(f"{WS}/\t.vscode/settings.json", WS) == "deny", (
+        "BUG-010 regression: tab before .vscode must be stripped and path classified deny"
+    )
+    assert zc.classify(f"{WS}/\nnoagentzone/file.md", WS) == "deny", (
+        "BUG-010 regression: newline before noagentzone must be stripped and path classified deny"
+    )
+
+
+def test_security_workspace_sibling_no_allow():
+    # TST-199 — REGRESSION: workspace-sibling path containing /project/ must NOT return allow
+    # A path like c:/workspace-evil/project/file.py shares the start of ws_clean ("c:/workspace")
+    # but is NOT inside ws_clean.  The BUG-011 fix gates Method 2 allow on
+    # norm.startswith(ws_clean + "/"), which rejects this sibling prefix.
+    ws = "c:/workspace"
+    raw = "C:\\workspace-evil\\project\\sensitive.py"
+    result = zc.classify(raw, ws)
+    assert result != "allow", (
+        "BUG-011 regression: c:/workspace-evil/project/sensitive.py must NOT return allow; "
+        "the workspace-containment guard must use ws_clean + '/' as the prefix, not ws_clean alone"
+    )
+
+
+def test_security_traversal_outside_workspace_no_allow():
+    # TST-200 — REGRESSION: traversal that escapes ws_root and then enters /project/ must NOT allow
+    # posixpath.normpath("c:/workspace/project/../../../../c:/project/file.py") resolves to a
+    # path outside ws_root.  Method 1 raises ValueError; Method 2 allow guard must reject it.
+    ws = "c:/workspace"
+    raw = "C:\\workspace\\project\\..\\..\\..\\..\\c:\\project\\file.py"
+    result = zc.classify(raw, ws)
+    assert result != "allow", (
+        "BUG-011 regression: traversal escaping ws_root then targeting /project/ must NOT allow; "
+        "the workspace-containment guard catches paths whose normalised form does not "
+        "start with ws_clean + '/'"
+    )

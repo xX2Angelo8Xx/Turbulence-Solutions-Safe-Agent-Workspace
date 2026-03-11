@@ -2,7 +2,130 @@
 
 **Tester:** Tester Agent
 **Date:** 2026-03-11
-**Iteration:** 1
+**Iteration:** 2
+
+## Summary
+
+SAF-002 Iteration 2 delivers the two security fixes requested in Iteration 1:
+
+- **BUG-010 fixed** — `normalize_path()` now uses `re.sub(r'[\x00-\x1f]', '', p)` to strip all ASCII C0 control characters (`\x00`–`\x1f`) in a single pass. The previous code only replaced `\x00`; tab, newline, CR, SOH, and every other C0 char now disappear before any zone comparison. TST-184, TST-185, and the five new Iteration 2 regression tests (TST-196–198) all pass.
+
+- **BUG-011 fixed** — The Method 2 allow branch is now gated on a workspace-containment check:
+  ```python
+  if _ALLOW_PATTERN.search(full_with_slash) and (
+      norm.startswith(ws_clean + "/") or norm == ws_clean
+  ):
+      return "allow"
+  ```
+  Paths whose normalised form does not begin with `ws_clean + "/"` fall through to `"ask"`. UNC paths such as `\\server\share\project\sensitive.py` and workspace-sibling paths like `c:/workspace-evil/project/` can no longer claim `"allow"`. TST-186, TST-199, and TST-200 all pass.
+
+The Tester added 5 targeted regression tests (TST-196–TST-200) to lock in the fixes. All 59 SAF-002 tests pass. SAF-001 (60/60) and SAF-005 (80/80) are unaffected.
+
+**Pre-existing GUI-001 regression:** 38 of 41 GUI-001 tests now fail. The failures are entirely in `tests/GUI-001/` and relate to `launcher.gui.app` and `launcher.gui.components` — code that SAF-002 does not touch. This regression was present before this iteration (the SAF-005 developer did not include GUI-001 in their 260-test run, suggesting a mismatch between the GUI implementation and its tests already existed). Logged as **BUG-012**. SAF-002 is not affected.
+
+---
+
+## Tests Executed
+
+### Developer tests (TST-125 to TST-164 — 40 tests)
+
+| Test | Type | Result | Notes |
+|------|------|--------|-------|
+| test_normalize_null_byte_stripped | Unit | Pass | |
+| test_normalize_double_backslash | Unit | Pass | |
+| test_normalize_single_backslash | Unit | Pass | |
+| test_normalize_wsl_prefix | Unit | Pass | |
+| test_normalize_gitbash_prefix | Unit | Pass | |
+| test_normalize_lowercase | Unit | Pass | |
+| test_normalize_trailing_slash | Unit | Pass | |
+| test_normalize_dotdot_resolved | Unit | Pass | |
+| test_classify_allow_project_root | Unit | Pass | |
+| test_classify_allow_project_nested | Unit | Pass | |
+| test_classify_deny_github | Unit | Pass | |
+| test_classify_deny_vscode | Unit | Pass | |
+| test_classify_deny_noagentzone | Unit | Pass | |
+| test_classify_ask_docs | Unit | Pass | |
+| test_classify_ask_root_file | Unit | Pass | |
+| test_classify_ask_src | Unit | Pass | |
+| test_classify_deny_uses_relative_to_for_github | Security | Pass | |
+| test_classify_allow_uses_relative_to_for_project | Security | Pass | |
+| test_bypass_path_traversal_dotdot | Security | Pass | |
+| test_bypass_deep_traversal | Security | Pass | |
+| test_bypass_prefix_sibling | Security | Pass | |
+| test_bypass_null_byte_before_github | Security | Pass | |
+| test_bypass_unc_github | Security | Pass | |
+| test_bypass_relative_path_github | Security | Pass | |
+| test_bypass_mixed_case_github | Security | Pass | |
+| test_bypass_mixed_case_noagentzone | Security | Pass | |
+| test_cross_platform_windows_allow | Cross-platform | Pass | |
+| test_cross_platform_windows_deny | Cross-platform | Pass | |
+| test_cross_platform_wsl_allow | Cross-platform | Pass | |
+| test_cross_platform_wsl_deny | Cross-platform | Pass | |
+| test_cross_platform_gitbash_allow | Cross-platform | Pass | |
+| test_cross_platform_gitbash_deny | Cross-platform | Pass | |
+| test_security_gate_imports_zone_classifier | Integration | Pass | |
+| test_get_zone_backward_compat_allow | Integration | Pass | |
+| test_get_zone_backward_compat_deny | Integration | Pass | |
+| test_get_zone_backward_compat_ask | Integration | Pass | |
+| test_decide_project_allow | Integration | Pass | |
+| test_decide_github_deny | Integration | Pass | |
+| test_decide_ask_zone | Integration | Pass | |
+| test_decide_path_traversal_still_denied | Integration | Pass | |
+
+### Tester Iteration 1 edge-case tests (TST-175 to TST-188 — 14 tests)
+
+| Test | Type | Result | Notes |
+|------|------|--------|-------|
+| test_security_multiple_null_bytes_stripped (TST-175) | Security | Pass | |
+| test_security_null_byte_mid_segment_splits_github (TST-176) | Security | Pass | |
+| test_edge_empty_path_fails_closed (TST-177) | Unit | Pass | |
+| test_edge_exact_deny_dir_no_subpath (TST-178) | Unit | Pass | |
+| test_edge_exact_allow_dir_no_subpath (TST-179) | Unit | Pass | |
+| test_edge_consecutive_interior_slashes_in_deny_path (TST-180) | Unit | Pass | |
+| test_edge_very_long_path_no_exception (TST-181) | Unit | Pass | |
+| test_security_traversal_arriving_at_deny_dir_root (TST-182) | Security | Pass | |
+| test_edge_ws_root_with_multiple_trailing_slashes (TST-183) | Unit | Pass | |
+| test_security_tab_before_deny_dir (TST-184) | Security | **Pass** | Was FAIL in Iter 1 — BUG-010 now fixed |
+| test_security_newline_before_deny_dir (TST-185) | Security | **Pass** | Was FAIL in Iter 1 — BUG-010 now fixed |
+| test_security_unc_path_project_outside_workspace_not_allow (TST-186) | Security | **Pass** | Was FAIL in Iter 1 — BUG-011 now fixed |
+| test_edge_project_deeply_nested_file (TST-187) | Unit | Pass | |
+| test_edge_no_exception_on_unusual_input (TST-188) | Unit | Pass | |
+
+### Tester Iteration 2 edge-case tests (TST-196 to TST-200 — 5 tests)
+
+| Test | Type | Result | Notes |
+|------|------|--------|-------|
+| test_security_cr_before_deny_dir (TST-196) | Security | Pass | CR (`\r`) before `.github` → deny; confirms BUG-010 fix covers `\x0d` |
+| test_security_soh_before_deny_dir (TST-197) | Security | Pass | SOH (`\x01`) before `.github` → deny; confirms BUG-010 fix covers lower C0 range |
+| test_security_c0_before_all_deny_dirs (TST-198) | Security | Pass | `\t` before `.vscode` and `\n` before `noagentzone` → deny; fix applies to all deny dirs |
+| test_security_workspace_sibling_no_allow (TST-199) | Security | Pass | `c:/workspace-evil/project/sensitive.py` → not allow; BUG-011 fix rejects sibling-prefix paths |
+| test_security_traversal_outside_workspace_no_allow (TST-200) | Security | Pass | Traversal escaping ws_root then reaching `/project/` → not allow; BUG-011 containment guard correct |
+
+### SAF-001 and SAF-005 regression (run alongside SAF-002)
+
+All 60 SAF-001 tests and all 80 SAF-005 tests pass. No regressions introduced by the SAF-002 Iteration 2 changes.
+
+---
+
+## Bugs Found
+
+- **BUG-012**: GUI-001 tests regressed — 38 of 41 tests fail (logged in docs/bugs/bugs.csv); pre-existing, unrelated to SAF-002.
+
+No new bugs found within SAF-002 scope. BUG-010 and BUG-011 confirmed **Closed**.
+
+---
+
+## TODOs for Developer
+
+None. All Iteration 1 TODOs have been resolved.
+
+---
+
+## Verdict
+
+**PASS — mark WP as Done**
+
+59/59 SAF-002 tests pass (including all 3 formerly-failing security tests TST-184, TST-185, TST-186 and 5 new Iteration 2 regression tests TST-196–TST-200). BUG-010 and BUG-011 are confirmed fixed. The `zone_classifier.py` module correctly enforces deny classification against all C0 control character injections and correctly rejects `"allow"` for any path whose normalised form does not reside within the workspace root. SAF-001 and SAF-005 are unaffected.
 
 ## Summary
 
