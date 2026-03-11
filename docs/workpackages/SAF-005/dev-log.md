@@ -88,3 +88,42 @@ Key design decisions:
   denied by P-05 in Stage 3.
 - `ls -R` (capital R) is denied because tokens are lowercased before validation, matching
   the denied flag `-r`.
+
+---
+
+## Iteration 2 — 2026-03-11
+
+### Tester Feedback Addressed
+
+- **BUG-013 (BLOCKING)** — Shell redirect to restricted zone returns `ask`: Added step 6 to
+  `_validate_args` that scans all arg tokens for `>` and `>>` redirect operators and
+  zone-checks the immediately following token via `_check_path_arg`, regardless of the
+  primary verb's `path_args_restricted` or `allow_arbitrary_paths` setting. Commands like
+  `echo evil > .github/security_gate.py` now correctly return `deny`.
+
+- **BUG-014 (BLOCKING)** — `npm --prefix` path to restricted zone not zone-checked: Resolved
+  as a consequence of the BUG-015 fix. Since `npm` has `allow_arbitrary_paths=False`, the
+  updated step 5 zone-checks all path-like args including `.github/node_modules` which
+  follows `--prefix`.
+
+- **BUG-015 (MEDIUM)** — `allow_arbitrary_paths` field never enforced: Changed step 5
+  condition in `_validate_args` from `if rule.path_args_restricted:` to
+  `if rule.path_args_restricted or not rule.allow_arbitrary_paths:`. Commands with
+  `allow_arbitrary_paths=False` (npm, yarn, pnpm, hatch, build, twine, code) now have
+  their path-like arguments zone-checked.
+
+- **Advisory — `_GIT_DENIED_COMBOS` dead code**: Removed the inner `if denied_flag:` guard
+  in the git combo check. The entry `("filter-branch", "")` now correctly returns `False`
+  (deny) when subcmd matches and denied_flag is empty-string (meaning deny any usage of that
+  subcommand regardless of flags). Previously this path was unreachable.
+
+### Additional Changes
+
+- Restored `zone_classifier.py` to `Default-Project/.github/hooks/scripts/` from the
+  SAF-002 branch (it was a missing dependency not committed to the SAF-005 branch).
+
+### Tests Run
+
+- **SAF-005 developer tests (T-001 to T-080):** 80/80 pass
+- **SAF-005 tester edge-case tests (ET-001 to ET-026):** 26/26 pass (was 21/26)
+- **Full SAF/INS regression (excluding pre-existing GUI-001 and SAF-002 failures):** 232/232 pass
