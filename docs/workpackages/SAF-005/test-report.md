@@ -342,3 +342,109 @@ shell redirect operator (`>`). An AI agent could use these commands to write dir
 **FAIL — return to In Progress.**
 
 The 5 new security-blocking tests in `tests/SAF-005/test_saf005_edge_cases.py` must all pass before the WP can be approved. The three BLOCKING TODOs (redirect zone check, npm prefix zone check, allow_arbitrary_paths enforcement) must be addressed. Run the full test suite (including the Tester edge-case file) after each fix to confirm no regressions.
+
+---
+
+---
+
+# Test Report — SAF-005
+
+**Tester:** Tester Agent
+**Date:** 2026-03-11
+**Iteration:** 3
+
+## Summary
+
+All three blocking bugs from previous iterations are confirmed fixed and holding. The BUG-016
+no-space / fd-prefixed redirect bypass (Iteration 2 finding) is now correctly resolved. The
+Developer replaced the brittle `_REDIRECT_TOKENS = frozenset({'>', '>>'})`  membership test in
+Step 6 of `_validate_args` with two regex-based checks:
+
+- `_REDIRECT_OP_RE = re.compile(r'^[0-9]*>>?$')` — matches standalone redirect operators
+  including fd-prefixed forms (`1>`, `2>`, `1>>`, `2>>`). When matched, the next token is
+  zone-checked.
+- `_EMBEDDED_REDIRECT_RE = re.compile(r'>>?(.+)$')` — applied to every non-operator token;
+  if the token itself embeds a `>` suffix (e.g. `evil>.github/file`), the right-hand portion
+  is extracted and zone-checked.
+
+All 112 SAF-005 tests pass (80 developer + 26 Tester Iteration 1/2 + 6 Tester Iteration 3
+BUG-016 edge-cases ET-027 to ET-032). Full regression of 238 tests (all non-SAF-002/GUI-001
+suites) confirms zero regressions. No new bypass vectors were found during deep analysis of
+the updated redirect logic.
+
+**Verdict: PASS.**
+
+---
+
+## Tests Executed
+
+### Full SAF-005 suite — Tester Iteration 3 confirmation (TST-210)
+
+| Test Group | Type | Count | Result | Notes |
+|------------|------|-------|--------|-------|
+| T-001 – T-080: developer tests | Unit / Security / Cross-platform / Regression | 80 | 80 Pass | No regressions |
+| ET-001 – ET-026: Tester Iteration 1 & 2 edge-cases | Security | 26 | 26 Pass | All holding from Iteration 2 |
+| ET-027 – ET-032: Tester Iteration 3 BUG-016 edge-cases | Security | 6 | 6 Pass | All previously failing — now pass |
+| **Total** | | **112** | **112 Pass** | |
+
+### Full regression suite (TST-211 — all non-SAF-002/GUI-001 tests)
+
+| Suite | Count | Result | Notes |
+|-------|-------|--------|-------|
+| INS-001, INS-002, INS-012, SAF-001, SAF-004, SAF-005 (238 tests) | 238 | 238 Pass | Zero regressions introduced by BUG-016 fix |
+
+---
+
+## BUG-016 Fix Verification — CONFIRMED
+
+`_validate_args` Step 6 now handles all three redirect forms:
+
+**Form a — standalone `>` / `>>`:**
+- `echo evil > .github/security_gate.py` → `>` matches `_REDIRECT_OP_RE`; next token zone-checked → `deny` ✓
+
+**Form b — fd-prefixed operator embedded in one token (`1>.github/file`):**
+- `echo evil 1>.github/file` → shlex token `1>.github/file`; `_REDIRECT_OP_RE` fails (trailing content after `>`); `_EMBEDDED_REDIRECT_RE` captures `.github/file` → zone-checked → `deny` ✓
+
+**Form c — no-space embedded (`evil>.github/file`):**
+- `echo evil>.github/security_gate.py` → shlex token `evil>.github/security_gate.py`; `_EMBEDDED_REDIRECT_RE` captures `.github/security_gate.py` → zone-checked → `deny` ✓
+
+ET-027 to ET-032 all pass:
+- `echo evil>.github/security_gate.py` → `deny` ✓
+- `echo evil>>.github/security_gate.py` → `deny` ✓
+- `echo evil 1>.github/file` → `deny` ✓
+- `echo evil 2>.github/file` → `deny` ✓
+- `echo evil 1>>.github/file` → `deny` ✓
+- `cat README.md 1>.github/stolen` → `deny` ✓
+
+---
+
+## Deep Analysis — No New Bypass Vectors Found
+
+| Scenario | Analysis | Result |
+|----------|----------|--------|
+| `echo result>0` (numeric non-path) | Captures `0`; `_is_path_like('0')` → False (no `/`, `\`, `..`, no `.` prefix) → not zone-checked | Safe ✓ |
+| `echo hello>world` (bare word) | Captures `world`; not path-like → no false denial | Safe ✓ |
+| `echo >.github/file` (no content before `>`) | `>.github/file` token; `_EMBEDDED_REDIRECT_RE` captures `.github/file` → `deny` | Safe ✓ |
+| `cat a 2>&1 >.github/f` (combined redirection) | `2>&1` captures `&1`; not path-like → skipped; `>.github/f` captures `.github/f` → `deny` | Safe ✓ |
+| `echo a << EOF > .github/f` (heredoc + redirect) | `<<` has no `>`; `>` token → `_REDIRECT_OP_RE` matches; next token zone-checked → `deny` | Safe ✓ |
+| `.GITHUB` mixed-case embedded redirect | zone_classifier lowercases in `normalize_path`; `.GITHUB` → `.github` → deny | Safe ✓ |
+| `echo evil > ./output.txt` (safe redirect) | `./output.txt` is path-like; workspace root-relative ask zone → `ask` (correct) | Safe ✓ |
+
+---
+
+## Bugs Found
+
+None. All previously reported bugs (BUG-013, BUG-014, BUG-015, BUG-016) are confirmed closed.
+
+---
+
+## Verdict
+
+**PASS — WP set to Done.**
+
+The full 5-stage terminal sanitization pipeline is correctly implemented. All 112 SAF-005
+tests pass and zero regressions appear in the 238-test regression suite. All four blocking
+security bugs (BUG-013 through BUG-016) are closed. The implementation correctly handles every
+known shell redirect form (standalone, fd-prefixed, embedded no-space) and the zone check is
+unconditionally applied regardless of the primary verb's `path_args_restricted` or
+`allow_arbitrary_paths` settings.
