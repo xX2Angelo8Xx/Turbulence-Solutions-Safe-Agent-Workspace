@@ -127,3 +127,49 @@ Key design decisions:
 - **SAF-005 developer tests (T-001 to T-080):** 80/80 pass
 - **SAF-005 tester edge-case tests (ET-001 to ET-026):** 26/26 pass (was 21/26)
 - **Full SAF/INS regression (excluding pre-existing GUI-001 and SAF-002 failures):** 232/232 pass
+
+---
+
+## Iteration 3 — 2026-03-11
+
+### Tester Feedback Addressed
+
+- **BUG-016 (BLOCKING)** — No-space and fd-prefixed shell redirect variants bypass zone
+  check in `_validate_args` Step 6 (ET-027 to ET-032). Two bypass forms were discovered:
+
+  1. **No-space redirect** — `echo evil>.github/file`: shlex produces a single token
+     `evil>.github/file`; the old `tok in _REDIRECT_TOKENS` check requires an exact match
+     of `>` or `>>` and misses the embedded `>`.
+
+  2. **fd-prefixed redirect** — `echo evil 1>.github/file`: shlex produces token
+     `1>.github/file`; `1>` ≠ `>` so the old frozenset membership test fails.
+
+  **Fix applied** — Replaced the `_REDIRECT_TOKENS` frozenset and membership test in Step 6
+  with two regex-based checks:
+
+  - `_REDIRECT_OP_RE = re.compile(r'^[0-9]*>>?$')` — matches standalone redirect operators
+    (plain `>`, `>>`, and fd-prefixed `1>`, `2>`, `1>>`, `2>>` etc.). When a token matches,
+    the next token is zone-checked as the redirect destination (same behaviour as before,
+    now extended to fd-prefixed operators).
+
+  - `_EMBEDDED_REDIRECT_RE = re.compile(r'>>?(.+)$')` — applied to every token that does
+    NOT match `_REDIRECT_OP_RE`. If the token itself contains `>` or `>>` followed by a
+    non-empty suffix (e.g. `evil>.github/file` or `1>.github/file`), the suffix is
+    extracted and zone-checked as the redirect destination.
+
+  Both fixes are applied together in the same loop so all three redirect forms are handled:
+  a) standalone `>` / `>>`, b) standalone fd-prefixed `1>` / `2>`, c) embedded.
+
+### Files Changed
+
+- `Default-Project/.github/hooks/scripts/security_gate.py` — Step 6 of `_validate_args`
+  updated: removed `_REDIRECT_TOKENS` frozenset; added `_REDIRECT_OP_RE` and
+  `_EMBEDDED_REDIRECT_RE` compiled patterns; expanded loop to handle both standalone
+  fd-prefixed operators and embedded redirects within a single token.
+
+### Tests Run
+
+- **SAF-005 full suite (112 tests):** 112/112 pass
+  - T-001 to T-080 (developer tests): 80 pass
+  - ET-001 to ET-026 (Tester Iteration 1 & 2 edge-cases): 26 pass
+  - ET-027 to ET-032 (Tester Iteration 3 BUG-016 edge-cases): 6 pass (all previously failing)

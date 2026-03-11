@@ -759,20 +759,33 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                 if not _check_path_arg(stripped, ws_root):
                     return False
 
-    # 6. Shell redirect zone check (BUG-013).
-    # Scan every segment for ">" and ">>" tokens and zone-check the argument
-    # immediately following them, regardless of path_args_restricted or
-    # allow_arbitrary_paths.  This prevents redirect-based zone bypasses such
-    # as "echo evil > .github/security_gate.py".
-    _REDIRECT_TOKENS = frozenset({">>", ">"})
+    # 6. Shell redirect zone check (BUG-013 / BUG-016).
+    # Three redirect forms are handled:
+    #   a) standalone ">" / ">>"            → next token is the destination
+    #   b) fd-prefixed operator "1>" / "2>" → next token is the destination
+    #   c) embedded "evil>.github/f" or "1>.github/f" → right side of ">"
+    _REDIRECT_OP_RE = re.compile(r'^[0-9]*>>?$')
+    _EMBEDDED_REDIRECT_RE = re.compile(r'>>?(.+)$')
     for i, tok in enumerate(args):
-        if tok in _REDIRECT_TOKENS and i + 1 < len(args):
-            target = args[i + 1].strip("\"'")
-            if "$" in target:
-                return False
-            if _is_path_like(target):
-                if not _check_path_arg(target, ws_root):
+        if _REDIRECT_OP_RE.match(tok):
+            # Standalone redirect operator (plain or fd-prefixed); target is next token.
+            if i + 1 < len(args):
+                target = args[i + 1].strip("\"'")
+                if "$" in target:
                     return False
+                if _is_path_like(target):
+                    if not _check_path_arg(target, ws_root):
+                        return False
+        else:
+            # Embedded redirect: ">>" or ">" is part of the token itself.
+            m = _EMBEDDED_REDIRECT_RE.search(tok)
+            if m:
+                target = m.group(1).strip("\"'")
+                if "$" in target:
+                    return False
+                if _is_path_like(target):
+                    if not _check_path_arg(target, ws_root):
+                        return False
 
     return True
 
