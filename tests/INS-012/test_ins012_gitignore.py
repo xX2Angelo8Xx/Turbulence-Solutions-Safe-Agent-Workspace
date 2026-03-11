@@ -198,3 +198,108 @@ def test_egg_info_not_tracked_in_git_index():
         f"The following .egg-info paths are still tracked in the git index:\n{tracked}\n"
         "Run: git rm -r --cached <path>"
     )
+
+
+# ── Tester edge-case tests ─────────────────────────────────────────────────────
+
+def test_no_negation_overrides_required_patterns():
+    """No negation rule (!pattern) should cancel out any required exclusion."""
+    lines = _gitignore_lines()
+    negations = [ln.strip() for ln in lines if ln.strip().startswith("!")]
+    # None of the negations should un-ignore a required pattern
+    negated_targets = {n.lstrip("!") for n in negations}
+    collisions = [p for p in REQUIRED_PATTERNS if p in negated_targets]
+    assert not collisions, (
+        f"Negation rules cancel required exclusions: {collisions}"
+    )
+
+
+def test_gitignore_file_has_active_patterns():
+    """The file must contain meaningful (non-comment, non-blank) lines."""
+    patterns = _active_patterns()
+    assert len(patterns) >= len(REQUIRED_PATTERNS), (
+        f"Expected at least {len(REQUIRED_PATTERNS)} active patterns, "
+        f"found {len(patterns)}"
+    )
+
+
+def test_gitignore_git_recognises_dist():
+    """git check-ignore must report a dist/ directory as ignored."""
+    result = subprocess.run(
+        ["git", "check-ignore", "-q", "dist/"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+    )
+    assert result.returncode == 0, (
+        "git check-ignore did not recognise 'dist/' as ignored — "
+        "dist/ rule may be missing or malformed"
+    )
+
+
+def test_gitignore_git_recognises_build():
+    """git check-ignore must report a build/ directory as ignored."""
+    result = subprocess.run(
+        ["git", "check-ignore", "-q", "build/"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+    )
+    assert result.returncode == 0, (
+        "git check-ignore did not recognise 'build/' as ignored — "
+        "build/ rule may be missing or malformed"
+    )
+
+
+def test_gitignore_git_recognises_pytest_cache():
+    """git check-ignore must report a .pytest_cache/ directory as ignored."""
+    result = subprocess.run(
+        ["git", "check-ignore", "-q", ".pytest_cache/"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+    )
+    assert result.returncode == 0, (
+        "git check-ignore did not recognise '.pytest_cache/' as ignored — "
+        ".pytest_cache/ rule may be missing or malformed"
+    )
+
+
+def test_gitignore_git_recognises_ds_store():
+    """git check-ignore must report a .DS_Store file as ignored."""
+    result = subprocess.run(
+        ["git", "check-ignore", "-q", ".DS_Store"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+    )
+    assert result.returncode == 0, (
+        "git check-ignore did not recognise '.DS_Store' as ignored — "
+        ".DS_Store rule may be missing or malformed"
+    )
+
+
+def test_pyc_files_not_tracked_in_git_index():
+    """No *.pyc files should currently be tracked in the git index."""
+    result = subprocess.run(
+        ["git", "ls-files", "--", "*.pyc"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    tracked = result.stdout.strip()
+    assert not tracked, (
+        f"The following *.pyc files are still tracked in the git index:\n{tracked}\n"
+        "Run: git rm --cached <path>"
+    )
+
+
+def test_venv_not_tracked_in_git_index():
+    """No .venv/ paths should currently be tracked in the git index."""
+    result = subprocess.run(
+        ["git", "ls-files", "--", ".venv/*"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    tracked = result.stdout.strip()
+    assert not tracked, (
+        f"The following .venv/ paths are still tracked in the git index:\n{tracked}\n"
+        "Run: git rm -r --cached .venv/"
+    )
