@@ -272,3 +272,47 @@ def test_pipe_no_space_bash_blocked():
 def test_pipe_no_space_python_blocked():
     """echo x|python (no space around pipe) must be caught by P-16."""
     assert is_deny("echo x|python")
+
+
+# ---------------------------------------------------------------------------
+# ET-027 to ET-032: No-space and fd-prefixed shell redirect bypasses (BUG-016)
+# ---------------------------------------------------------------------------
+# Step 6 of _validate_args detects redirect operators by checking for standalone
+# ">" or ">>" tokens in the arg list.  Shell syntax allows two additional forms:
+#
+#  1. No-space redirect:    "echo evil>.github/file"   → one token "evil>.github/file"
+#  2. fd-prefixed redirect: "echo evil 1>.github/file" → one token "1>.github/file"
+#
+# Neither form produces a bare ">" or ">>" token, so _REDIRECT_TOKENS matching
+# in Step 6 misses them entirely.  The redirect destination (.github/...) is
+# therefore never zone-checked and the command returns "ask" instead of "deny".
+# All six tests below FAIL against the Iteration 2 implementation.
+
+def test_redirect_no_space_basic_bypasses_gate():
+    """echo evil>.github/file (no space around >) must be denied — BUG-016."""
+    assert is_deny("echo evil>.github/security_gate.py")
+
+
+def test_redirect_no_space_append_bypasses_gate():
+    """echo evil>>.github/file (no space, append >>) must be denied — BUG-016."""
+    assert is_deny("echo evil>>.github/security_gate.py")
+
+
+def test_redirect_fd_prefixed_basic_bypasses_gate():
+    """echo evil 1>.github/file (stdout fd redirect) must be denied — BUG-016."""
+    assert is_deny("echo evil 1>.github/file")
+
+
+def test_redirect_fd_prefixed_stderr_bypasses_gate():
+    """echo evil 2>.github/file (stderr fd redirect) must be denied — BUG-016."""
+    assert is_deny("echo evil 2>.github/file")
+
+
+def test_redirect_fd_prefixed_append_bypasses_gate():
+    """echo evil 1>>.github/file (fd-prefixed append) must be denied — BUG-016."""
+    assert is_deny("echo evil 1>>.github/file")
+
+
+def test_redirect_cat_fd_to_restricted_zone():
+    """cat README.md 1>.github/stolen — fd redirect bypasses zone check — BUG-016."""
+    assert is_deny("cat README.md 1>.github/stolen")
