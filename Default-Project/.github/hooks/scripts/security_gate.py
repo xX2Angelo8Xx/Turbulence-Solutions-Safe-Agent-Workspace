@@ -713,8 +713,7 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
         for denied_sub, denied_flag in _GIT_DENIED_COMBOS:
             if subcmd == denied_sub:
                 if not denied_flag or denied_flag in remaining_lower:
-                    if denied_flag:
-                        return False
+                    return False
 
     # 3. Check allowed subcommands (if non-empty, first non-flag arg must be one of them)
     if rule.allowed_subcommands:
@@ -741,7 +740,10 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                 break
 
     # 5. Path argument zone checks
-    if rule.path_args_restricted:
+    # Enforce when path_args_restricted=True OR allow_arbitrary_paths=False (BUG-015).
+    # Commands like npm/yarn/pnpm with allow_arbitrary_paths=False will zone-check
+    # any path-like argument even though path_args_restricted is False.
+    if rule.path_args_restricted or not rule.allow_arbitrary_paths:
         for tok in args:
             stripped = tok.strip("\"'")
             # Skip pure flags
@@ -756,6 +758,34 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
             if _is_path_like(stripped):
                 if not _check_path_arg(stripped, ws_root):
                     return False
+
+    # 6. Shell redirect zone check (BUG-013 / BUG-016).
+    # Three redirect forms are handled:
+    #   a) standalone ">" / ">>"            → next token is the destination
+    #   b) fd-prefixed operator "1>" / "2>" → next token is the destination
+    #   c) embedded "evil>.github/f" or "1>.github/f" → right side of ">"
+    _REDIRECT_OP_RE = re.compile(r'^[0-9]*>>?$')
+    _EMBEDDED_REDIRECT_RE = re.compile(r'>>?(.+)$')
+    for i, tok in enumerate(args):
+        if _REDIRECT_OP_RE.match(tok):
+            # Standalone redirect operator (plain or fd-prefixed); target is next token.
+            if i + 1 < len(args):
+                target = args[i + 1].strip("\"'")
+                if "$" in target:
+                    return False
+                if _is_path_like(target):
+                    if not _check_path_arg(target, ws_root):
+                        return False
+        else:
+            # Embedded redirect: ">>" or ">" is part of the token itself.
+            m = _EMBEDDED_REDIRECT_RE.search(tok)
+            if m:
+                target = m.group(1).strip("\"'")
+                if "$" in target:
+                    return False
+                if _is_path_like(target):
+                    if not _check_path_arg(target, ws_root):
+                        return False
 
     return True
 

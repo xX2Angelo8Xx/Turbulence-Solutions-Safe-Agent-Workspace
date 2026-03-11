@@ -164,63 +164,63 @@ TST-162,test_decide_github_deny,Integration,SAF-002,Pass,2026-03-11,Windows 11 +
 TST-163,test_decide_ask_zone,Integration,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,full decide() pipeline — read_file on docs/ → ask,Integration
 TST-164,test_decide_path_traversal_still_denied,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,decide() denies traversal paths via zone_classifier (bypass attempt),Integration
 TST-165,Full regression suite (136 tests — SAF-002 developer run),Regression,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,136/136 pass — 60 SAF-001 + 40 SAF-002 + 23 INS-001 + 13 INS-002; no regressions,Developer Agent SAF-002 Iteration 1: all tests pass
-TST-125,test_app_class_is_importable,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App importable from launcher.gui.app,
-TST-126,test_app_has_run_method,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App.run is callable,
-TST-127,test_app_has_browse_method,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App._browse_destination is callable,
-TST-128,test_app_has_on_create_method,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App._on_create_project is callable,
-TST-129,test_ctk_window_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App() calls ctk.CTk() exactly once,
-TST-130,test_window_title_set,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,Window title set to APP_NAME constant,
-TST-131,test_window_geometry_called,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,geometry() called with WxH string during init,
-TST-132,test_appearance_mode_set_to_dark,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,ctk.set_appearance_mode('dark') called on init,
-TST-133,test_color_theme_set_to_blue,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,ctk.set_default_color_theme('blue') called on init,
-TST-134,test_project_name_entry_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkEntry created at least once for project name,
-TST-135,test_destination_entry_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkEntry created at least twice (name + destination),
-TST-136,test_project_type_dropdown_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkOptionMenu created exactly once for project type,
-TST-137,test_browse_button_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkButton count >= 2 (Browse + Create Project),
-TST-138,test_create_project_button_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkButton called with text='Create Project',
-TST-139,test_open_in_vscode_checkbox_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkCheckBox created exactly once,
-TST-140,test_open_in_vscode_checkbox_text,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkCheckBox receives text 'Open in VS Code',
-TST-141,test_project_name_entry_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.project_name_entry attribute exists,
-TST-142,test_destination_entry_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.destination_entry attribute exists,
-TST-143,test_project_type_dropdown_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.project_type_dropdown attribute exists,
-TST-144,test_browse_button_not_directly_stored,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkButton().grid() called at least twice verifying browse button placement,
-TST-145,test_open_in_vscode_checkbox_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.open_in_vscode_checkbox attribute exists,
-TST-146,test_create_button_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.create_button attribute exists,
-TST-147,test_browse_sets_destination_entry,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,_browse_destination populates entry when folder selected,
-TST-148,test_browse_noop_on_cancel,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,_browse_destination does nothing on empty string cancel,
-TST-149,test_browse_noop_on_none,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,_browse_destination does nothing when dialog returns None,
-TST-150,test_browse_dialog_title,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,filedialog.askdirectory called with title kwarg,
-TST-151,test_run_calls_mainloop,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,run() delegates to window.mainloop(),
-TST-152,test_make_label_entry_row_returns_entry,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,make_label_entry_row returns the CTkEntry instance,
-TST-153,test_make_label_entry_row_creates_label,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,make_label_entry_row creates exactly one CTkLabel,
-TST-154,test_make_browse_row_returns_entry,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,make_browse_row returns the CTkEntry instance,
-TST-155,test_make_browse_row_creates_button,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,make_browse_row creates exactly one CTkButton,
-TST-156,test_make_browse_row_wires_command,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,Browse button command kwarg matches supplied callback,
-TST-157,test_main_creates_app_and_calls_run,Integration,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,launcher.main.main() creates App and calls run(),
-TST-158,Full regression suite 129 tests — INS-001+INS-002+SAF-001+GUI-001,Regression,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,129/129 pass — 96 existing + 33 new GUI-001; zero regressions,Developer Agent final run before handoff
-TST-125,test_gitignore_exists,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.gitignore file exists at repository root,
-TST-126,test_pycache_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,__pycache__/ pattern present in .gitignore,
-TST-127,test_pyc_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,*.pyc pattern present in .gitignore,
-TST-128,test_pyo_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,*.pyo pattern present in .gitignore,
-TST-129,test_eggs_dir_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.eggs/ pattern present in .gitignore,
-TST-130,test_egg_info_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,*.egg-info/ pattern present in .gitignore,
-TST-131,test_dist_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,dist/ pattern present in .gitignore,
-TST-132,test_build_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,build/ pattern present in .gitignore,
-TST-133,test_pytest_cache_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.pytest_cache/ pattern present in .gitignore,
-TST-134,test_venv_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.venv/ pattern present in .gitignore,
-TST-135,test_env_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,env/ pattern present in .gitignore,
-TST-136,test_venv_plain_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,venv/ pattern present in .gitignore,
-TST-137,test_spec_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,*.spec pattern present in .gitignore,
-TST-138,test_ds_store_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.DS_Store pattern present in .gitignore,
-TST-139,test_thumbs_db_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,Thumbs.db pattern present in .gitignore,
-TST-140,test_no_duplicate_patterns,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No duplicate active patterns in .gitignore,
-TST-141,test_gitignore_git_recognises_pyc,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms *.pyc files are ignored,
-TST-142,test_gitignore_git_recognises_pycache,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms __pycache__/ directories are ignored,
-TST-143,test_gitignore_git_recognises_spec,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms *.spec files are ignored,
-TST-144,test_gitignore_git_recognises_venv,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms .venv/ is ignored,
-TST-145,test_pycache_not_tracked_in_git_index,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No __pycache__ paths tracked in git index,
-TST-146,test_egg_info_not_tracked_in_git_index,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No *.egg-info paths tracked in git index,
-TST-147,Full regression suite (118 tests — INS-012 addition),Regression,INS-012,Fail,2026-03-11,Windows 11 + Python 3.11,117/118 pass — 22 INS-012 tests pass; 1 pre-existing SAF-001 failure unrelated to INS-012,Pre-existing failure: test_decide_project_sibling_prefix_bypass (SAF-001) fails at 'ask' != 'deny'; confirmed pre-existing before INS-012 branch creation; not caused by this WP
+TST-212,test_app_class_is_importable,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App importable from launcher.gui.app,
+TST-213,test_app_has_run_method,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App.run is callable,
+TST-214,test_app_has_browse_method,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App._browse_destination is callable,
+TST-215,test_app_has_on_create_method,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App._on_create_project is callable,
+TST-216,test_ctk_window_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,App() calls ctk.CTk() exactly once,
+TST-217,test_window_title_set,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,Window title set to APP_NAME constant,
+TST-218,test_window_geometry_called,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,geometry() called with WxH string during init,
+TST-219,test_appearance_mode_set_to_dark,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,ctk.set_appearance_mode('dark') called on init,
+TST-220,test_color_theme_set_to_blue,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,ctk.set_default_color_theme('blue') called on init,
+TST-221,test_project_name_entry_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkEntry created at least once for project name,
+TST-222,test_destination_entry_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkEntry created at least twice (name + destination),
+TST-223,test_project_type_dropdown_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkOptionMenu created exactly once for project type,
+TST-224,test_browse_button_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkButton count >= 2 (Browse + Create Project),
+TST-225,test_create_project_button_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkButton called with text='Create Project',
+TST-226,test_open_in_vscode_checkbox_created,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkCheckBox created exactly once,
+TST-227,test_open_in_vscode_checkbox_text,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkCheckBox receives text 'Open in VS Code',
+TST-228,test_project_name_entry_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.project_name_entry attribute exists,
+TST-229,test_destination_entry_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.destination_entry attribute exists,
+TST-230,test_project_type_dropdown_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.project_type_dropdown attribute exists,
+TST-231,test_browse_button_not_directly_stored,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,CTkButton().grid() called at least twice verifying browse button placement,
+TST-232,test_open_in_vscode_checkbox_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.open_in_vscode_checkbox attribute exists,
+TST-233,test_create_button_is_accessible_as_attribute,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,app.create_button attribute exists,
+TST-234,test_browse_sets_destination_entry,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,_browse_destination populates entry when folder selected,
+TST-235,test_browse_noop_on_cancel,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,_browse_destination does nothing on empty string cancel,
+TST-236,test_browse_noop_on_none,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,_browse_destination does nothing when dialog returns None,
+TST-237,test_browse_dialog_title,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,filedialog.askdirectory called with title kwarg,
+TST-238,test_run_calls_mainloop,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,run() delegates to window.mainloop(),
+TST-239,test_make_label_entry_row_returns_entry,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,make_label_entry_row returns the CTkEntry instance,
+TST-240,test_make_label_entry_row_creates_label,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,make_label_entry_row creates exactly one CTkLabel,
+TST-241,test_make_browse_row_returns_entry,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,make_browse_row returns the CTkEntry instance,
+TST-242,test_make_browse_row_creates_button,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,make_browse_row creates exactly one CTkButton,
+TST-243,test_make_browse_row_wires_command,Unit,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,Browse button command kwarg matches supplied callback,
+TST-244,test_main_creates_app_and_calls_run,Integration,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,launcher.main.main() creates App and calls run(),
+TST-245,Full regression suite 129 tests — INS-001+INS-002+SAF-001+GUI-001,Regression,GUI-001,Pass,2026-03-11,Windows 11 + Python 3.11,129/129 pass — 96 existing + 33 new GUI-001; zero regressions,Developer Agent final run before handoff
+TST-246,test_gitignore_exists,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.gitignore file exists at repository root,
+TST-247,test_pycache_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,__pycache__/ pattern present in .gitignore,
+TST-248,test_pyc_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,*.pyc pattern present in .gitignore,
+TST-249,test_pyo_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,*.pyo pattern present in .gitignore,
+TST-250,test_eggs_dir_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.eggs/ pattern present in .gitignore,
+TST-251,test_egg_info_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,*.egg-info/ pattern present in .gitignore,
+TST-252,test_dist_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,dist/ pattern present in .gitignore,
+TST-253,test_build_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,build/ pattern present in .gitignore,
+TST-254,test_pytest_cache_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.pytest_cache/ pattern present in .gitignore,
+TST-255,test_venv_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.venv/ pattern present in .gitignore,
+TST-256,test_env_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,env/ pattern present in .gitignore,
+TST-257,test_venv_plain_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,venv/ pattern present in .gitignore,
+TST-258,test_spec_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,*.spec pattern present in .gitignore,
+TST-259,test_ds_store_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,.DS_Store pattern present in .gitignore,
+TST-260,test_thumbs_db_excluded,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,Thumbs.db pattern present in .gitignore,
+TST-261,test_no_duplicate_patterns,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No duplicate active patterns in .gitignore,
+TST-262,test_gitignore_git_recognises_pyc,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms *.pyc files are ignored,
+TST-263,test_gitignore_git_recognises_pycache,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms __pycache__/ directories are ignored,
+TST-264,test_gitignore_git_recognises_spec,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms *.spec files are ignored,
+TST-265,test_gitignore_git_recognises_venv,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms .venv/ is ignored,
+TST-266,test_pycache_not_tracked_in_git_index,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No __pycache__ paths tracked in git index,
+TST-267,test_egg_info_not_tracked_in_git_index,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No *.egg-info paths tracked in git index,
+TST-268,Full regression suite (118 tests — INS-012 addition),Regression,INS-012,Fail,2026-03-11,Windows 11 + Python 3.11,117/118 pass — 22 INS-012 tests pass; 1 pre-existing SAF-001 failure unrelated to INS-012,Pre-existing failure: test_decide_project_sibling_prefix_bypass (SAF-001) fails at 'ask' != 'deny'; confirmed pre-existing before INS-012 branch creation; not caused by this WP
 TST-166,test_no_negation_overrides_required_patterns,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,No negation rule cancels any required exclusion pattern,Tester edge-case
 TST-167,test_gitignore_file_has_active_patterns,Unit,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,Active pattern count >= required pattern count,Tester edge-case
 TST-168,test_gitignore_git_recognises_dist,Integration,INS-012,Pass,2026-03-11,Windows 11 + Python 3.11,git check-ignore confirms dist/ is ignored,Tester edge-case
@@ -246,25 +246,12 @@ TST-192,SAF-005 cross-platform tests T-062 to T-070,Cross-platform,SAF-005,Pass,
 TST-193,SAF-005 exception / escape hatch tests T-071 to T-076,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,6/6 pass — missing file; invalid json; unanchored pattern; valid exception → ask; exception still blocks interpreter chain; exception still blocks zone path,Developer Agent SAF-005
 TST-194,SAF-005 regression tests T-077 to T-080,Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,4/4 pass — .github/.vscode/noagentzone paths blocked; empty command fail-closed,Developer Agent SAF-005
 TST-195,Full regression suite (257 tests — SAF-005 developer run),Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,257/260 pass — 80 new SAF-005 + 177 prior; 3 pre-existing SAF-002 tester failures unrelated to SAF-005,Developer Agent SAF-005; pre-existing SAF-002 bugs not caused by this WP
-TST-175,test_security_multiple_null_bytes_stripped,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Multiple consecutive null bytes before .github stripped correctly ? deny,Tester edge-case
-TST-176,test_security_null_byte_mid_segment_splits_github,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,.gi\x00t\x00hub collapses to .github after null removal ? deny,Tester edge-case
-TST-177,test_edge_empty_path_fails_closed,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Empty path string returns ask (fail-closed),Tester edge-case
-TST-178,test_edge_exact_deny_dir_no_subpath,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Path equal to deny dir root with no subpath returns deny for all three deny dirs,Tester edge-case
-TST-179,test_edge_exact_allow_dir_no_subpath,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Path equal to allow dir root with no subpath returns allow,Tester edge-case
-TST-180,test_edge_consecutive_interior_slashes_in_deny_path,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Consecutive interior slashes normalised correctly; deny and allow remain correct,Tester edge-case
-TST-181,test_edge_very_long_path_no_exception,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,500-level deep path returns ask without raising any exception,Tester edge-case
-TST-182,test_security_traversal_arriving_at_deny_dir_root,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Traversal resolving exactly to deny dir root (no subpath) returns deny for all three deny dirs,Tester edge-case
-TST-183,test_edge_ws_root_with_multiple_trailing_slashes,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,ws_root with multiple trailing slashes does not affect allow/deny/ask classifications,Tester edge-case
-TST-184,test_security_tab_before_deny_dir,Security,SAF-002,Fail,2026-03-11,Windows 11 + Python 3.11,Tab before .github returns ask instead of deny — BUG-010,Security bypass: normalize_path does not strip C0 control chars other than null byte
-TST-185,test_security_newline_before_deny_dir,Security,SAF-002,Fail,2026-03-11,Windows 11 + Python 3.11,Newline before .github returns ask instead of deny — BUG-010,Same root cause as TST-184
-TST-186,test_security_unc_path_project_outside_workspace_not_allow,Security,SAF-002,Fail,2026-03-11,Windows 11 + Python 3.11,UNC path to project on external server returns allow instead of ask — BUG-011,Method 2 _ALLOW_PATTERN matches /project/ anywhere; not gated on ws_root
-TST-187,test_edge_project_deeply_nested_file,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,8-level deep nesting inside project/ classified as allow,Tester edge-case
-TST-188,test_edge_no_exception_on_unusual_input,Unit,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,9 unusual inputs (dot; dotdot; bare slash; ws_root; bare drive; UNC prefix etc) all return valid zone without exception,Tester edge-case
-TST-189,Full SAF-002 tester run (54 tests) — Iteration 1,Regression,SAF-002,Fail,2026-03-11,Windows 11 + Python 3.11,51/54 pass; 3 new tester security tests fail (TST-184 TST-185 TST-186); no regressions in SAF-001 (49/49 pass),Verdict: FAIL — return to Developer for BUG-010 and BUG-011 fixes
-TST-196,test_security_cr_before_deny_dir,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,CR (\r) before .github stripped and classified deny — BUG-010 regression,Tester Iteration 2 edge-case
-TST-197,test_security_soh_before_deny_dir,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,SOH (\x01) before .github stripped and classified deny — BUG-010 regression,Tester Iteration 2 edge-case
-TST-198,test_security_c0_before_all_deny_dirs,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Tab before .vscode and newline before noagentzone both stripped and classified deny — BUG-010 regression all deny dirs,Tester Iteration 2 edge-case
-TST-199,test_security_workspace_sibling_no_allow,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,c:/workspace-evil/project/sensitive.py does NOT return allow — BUG-011 regression workspace-sibling prefix,Tester Iteration 2 edge-case
-TST-200,test_security_traversal_outside_workspace_no_allow,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,Traversal escaping ws_root then targeting /project/ does NOT return allow — BUG-011 regression deep traversal,Tester Iteration 2 edge-case
-TST-201,Full SAF-002 tester run (59 tests) — Iteration 2,Regression,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,59/59 pass — 40 Developer + 14 Tester Iter-1 + 5 Tester Iter-2; BUG-010 and BUG-011 confirmed fixed,Verdict: PASS — SAF-002 approved for Done
-TST-202,Full non-GUI test suite (260 tests) — SAF-002 Iteration 2 Tester run,Regression,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,260/260 pass — INS-001(23) INS-002(13) INS-012(30) SAF-001(60) SAF-002(59) SAF-005(80); 38 pre-existing GUI-001 failures unrelated to SAF-002 (BUG-012),Pre-existing GUI-001 regression logged as BUG-012; SAF-002 scope unaffected
+TST-203,SAF-005 Tester edge-case run (26 tests — test_saf005_edge_cases.py),Security,SAF-005,Fail,2026-03-11,Windows 11 + Python 3.11,21 pass / 5 fail — BUG-013 (echo/write-host/write-output redirect to .github returns ask) and BUG-014 (npm --prefix to .github returns ask) confirmed,"Failing: test_bypass_echo_redirect_to_restricted_zone, test_bypass_write_output_redirect_to_restricted_zone, test_bypass_write_host_redirect_to_restricted_zone, test_bypass_echo_redirect_to_vscode, test_bypass_npm_prefix_to_restricted_zone"
+TST-204,Full regression suite (332 tests — Tester SAF-005 review),Regression,SAF-005,Fail,2026-03-11,Windows 11 + Python 3.11,289 pass / 43 fail — 38 pre-existing GUI-001 (BUG-012) + 5 new SAF-005 security failures (BUG-013 BUG-014),Verdict: FAIL — return to Developer. Security gaps: shell redirect bypass and npm --prefix bypass. See test-report.md.
+TST-205,SAF-005 developer tests Iteration 2 (T-001 to T-080),Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,80/80 pass — no regressions from BUG-013/014/015 fixes,Developer Agent SAF-005 Iteration 2
+TST-206,SAF-005 tester edge-case tests Iteration 2 (ET-001 to ET-026),Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,26/26 pass — all 5 previously failing tests now pass,BUG-013 fixed (redirect zone check); BUG-014 fixed (allow_arbitrary_paths covers --prefix paths); BUG-015 fixed; advisory git combo dead code removed
+TST-207,Full SAF/INS regression suite Iteration 2 (excluding pre-existing GUI-001 and SAF-002 failures),Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,232/232 pass — zero new failures introduced,Pre-existing GUI-001 (BUG-012) and SAF-002 failures unrelated to SAF-005
+TST-208,SAF-005 full 106-test suite — Tester Iteration 2 confirmation run,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,106/106 pass — BUG-013/014/015 fixes confirmed; all ET-001 to ET-026 pass,Tester Agent re-review; 26/26 edge-case tests (including previously failing ET-001 to ET-005) all pass
+TST-209,SAF-005 Tester new BUG-016 edge-case tests (ET-027 to ET-032 — 6 tests),Security,SAF-005,Fail,2026-03-11,Windows 11 + Python 3.11,0/6 pass — no-space and fd-prefixed shell redirect variants bypass zone check,"All 6 fail: test_redirect_no_space_basic_bypasses_gate, test_redirect_no_space_append_bypasses_gate, test_redirect_fd_prefixed_basic_bypasses_gate, test_redirect_fd_prefixed_stderr_bypasses_gate, test_redirect_fd_prefixed_append_bypasses_gate, test_redirect_cat_fd_to_restricted_zone"
+TST-210,SAF-005 full 112-test suite — Tester Iteration 3 confirmation run,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,112/112 pass — BUG-016 fix confirmed; ET-027 to ET-032 all pass,"Tester Agent Iteration 3 re-review; _REDIRECT_OP_RE (^[0-9]*>>?$) handles fd-prefixed operators; _EMBEDDED_REDIRECT_RE (>>?(.+)$) handles no-space embedded redirects; all 3 bypass forms now zone-checked"
+TST-211,Full regression suite Iteration 3 (excluding pre-existing SAF-002 and GUI-001 failures),Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,238/238 pass — zero new failures introduced by BUG-016 fix,Tester Agent Iteration 3: all INS-001 + INS-002 + INS-012 + SAF-001 + SAF-004 + SAF-005 tests pass; no regressions

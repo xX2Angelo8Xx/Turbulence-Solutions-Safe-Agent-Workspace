@@ -88,3 +88,88 @@ Key design decisions:
   denied by P-05 in Stage 3.
 - `ls -R` (capital R) is denied because tokens are lowercased before validation, matching
   the denied flag `-r`.
+
+---
+
+## Iteration 2 — 2026-03-11
+
+### Tester Feedback Addressed
+
+- **BUG-013 (BLOCKING)** — Shell redirect to restricted zone returns `ask`: Added step 6 to
+  `_validate_args` that scans all arg tokens for `>` and `>>` redirect operators and
+  zone-checks the immediately following token via `_check_path_arg`, regardless of the
+  primary verb's `path_args_restricted` or `allow_arbitrary_paths` setting. Commands like
+  `echo evil > .github/security_gate.py` now correctly return `deny`.
+
+- **BUG-014 (BLOCKING)** — `npm --prefix` path to restricted zone not zone-checked: Resolved
+  as a consequence of the BUG-015 fix. Since `npm` has `allow_arbitrary_paths=False`, the
+  updated step 5 zone-checks all path-like args including `.github/node_modules` which
+  follows `--prefix`.
+
+- **BUG-015 (MEDIUM)** — `allow_arbitrary_paths` field never enforced: Changed step 5
+  condition in `_validate_args` from `if rule.path_args_restricted:` to
+  `if rule.path_args_restricted or not rule.allow_arbitrary_paths:`. Commands with
+  `allow_arbitrary_paths=False` (npm, yarn, pnpm, hatch, build, twine, code) now have
+  their path-like arguments zone-checked.
+
+- **Advisory — `_GIT_DENIED_COMBOS` dead code**: Removed the inner `if denied_flag:` guard
+  in the git combo check. The entry `("filter-branch", "")` now correctly returns `False`
+  (deny) when subcmd matches and denied_flag is empty-string (meaning deny any usage of that
+  subcommand regardless of flags). Previously this path was unreachable.
+
+### Additional Changes
+
+- Restored `zone_classifier.py` to `Default-Project/.github/hooks/scripts/` from the
+  SAF-002 branch (it was a missing dependency not committed to the SAF-005 branch).
+
+### Tests Run
+
+- **SAF-005 developer tests (T-001 to T-080):** 80/80 pass
+- **SAF-005 tester edge-case tests (ET-001 to ET-026):** 26/26 pass (was 21/26)
+- **Full SAF/INS regression (excluding pre-existing GUI-001 and SAF-002 failures):** 232/232 pass
+
+---
+
+## Iteration 3 — 2026-03-11
+
+### Tester Feedback Addressed
+
+- **BUG-016 (BLOCKING)** — No-space and fd-prefixed shell redirect variants bypass zone
+  check in `_validate_args` Step 6 (ET-027 to ET-032). Two bypass forms were discovered:
+
+  1. **No-space redirect** — `echo evil>.github/file`: shlex produces a single token
+     `evil>.github/file`; the old `tok in _REDIRECT_TOKENS` check requires an exact match
+     of `>` or `>>` and misses the embedded `>`.
+
+  2. **fd-prefixed redirect** — `echo evil 1>.github/file`: shlex produces token
+     `1>.github/file`; `1>` ≠ `>` so the old frozenset membership test fails.
+
+  **Fix applied** — Replaced the `_REDIRECT_TOKENS` frozenset and membership test in Step 6
+  with two regex-based checks:
+
+  - `_REDIRECT_OP_RE = re.compile(r'^[0-9]*>>?$')` — matches standalone redirect operators
+    (plain `>`, `>>`, and fd-prefixed `1>`, `2>`, `1>>`, `2>>` etc.). When a token matches,
+    the next token is zone-checked as the redirect destination (same behaviour as before,
+    now extended to fd-prefixed operators).
+
+  - `_EMBEDDED_REDIRECT_RE = re.compile(r'>>?(.+)$')` — applied to every token that does
+    NOT match `_REDIRECT_OP_RE`. If the token itself contains `>` or `>>` followed by a
+    non-empty suffix (e.g. `evil>.github/file` or `1>.github/file`), the suffix is
+    extracted and zone-checked as the redirect destination.
+
+  Both fixes are applied together in the same loop so all three redirect forms are handled:
+  a) standalone `>` / `>>`, b) standalone fd-prefixed `1>` / `2>`, c) embedded.
+
+### Files Changed
+
+- `Default-Project/.github/hooks/scripts/security_gate.py` — Step 6 of `_validate_args`
+  updated: removed `_REDIRECT_TOKENS` frozenset; added `_REDIRECT_OP_RE` and
+  `_EMBEDDED_REDIRECT_RE` compiled patterns; expanded loop to handle both standalone
+  fd-prefixed operators and embedded redirects within a single token.
+
+### Tests Run
+
+- **SAF-005 full suite (112 tests):** 112/112 pass
+  - T-001 to T-080 (developer tests): 80 pass
+  - ET-001 to ET-026 (Tester Iteration 1 & 2 edge-cases): 26 pass
+  - ET-027 to ET-032 (Tester Iteration 3 BUG-016 edge-cases): 6 pass (all previously failing)
