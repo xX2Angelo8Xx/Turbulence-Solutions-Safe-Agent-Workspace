@@ -258,6 +258,26 @@ class TestValidateFolderNameSecurity:
 # check_duplicate_folder
 # ---------------------------------------------------------------------------
 
+class TestValidateFolderNameTesterEdgeCases:
+    """Additional edge-case tests added by Tester Agent in Iteration 2."""
+
+    def test_digits_only_name_valid(self):
+        """A name composed entirely of digits is a legal folder name."""
+        ok, msg = validate_folder_name("123")
+        assert ok is True
+        assert msg == ""
+
+    def test_carriage_return_invalid(self):
+        """Carriage return (0x0D) is a control character and must be rejected."""
+        ok, _ = validate_folder_name("my\rproject")
+        assert ok is False
+
+    def test_newline_char_invalid(self):
+        """Newline (0x0A) is a control character and must be rejected."""
+        ok, _ = validate_folder_name("my\nproject")
+        assert ok is False
+
+
 class TestCheckDuplicateFolder:
     def test_nonexistent_folder_returns_false(self, tmp_path):
         ok = check_duplicate_folder("does-not-exist", str(tmp_path))
