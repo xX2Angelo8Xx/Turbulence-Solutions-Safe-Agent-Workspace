@@ -8,10 +8,10 @@ import customtkinter as ctk
 
 from launcher.config import APP_NAME
 from launcher.gui.components import make_browse_row, make_label_entry_row
-from launcher.gui.validation import check_duplicate_folder, validate_folder_name
+from launcher.gui.validation import check_duplicate_folder, validate_destination_path, validate_folder_name
 
 _WINDOW_WIDTH: int = 580
-_WINDOW_HEIGHT: int = 370
+_WINDOW_HEIGHT: int = 390
 
 
 class App:
@@ -71,6 +71,18 @@ class App:
             row=3,
         )
 
+        # Inline error label for destination validation feedback
+        self.destination_error_label = ctk.CTkLabel(
+            self._window,
+            text="",
+            text_color="red",
+            anchor="w",
+            height=16,
+        )
+        self.destination_error_label.grid(
+            row=4, column=1, columnspan=2, padx=(0, 16), pady=(0, 4), sticky="w"
+        )
+
         # Open in VS Code checkbox
         self.open_in_vscode_var = ctk.BooleanVar(value=True)
         self.open_in_vscode_checkbox = ctk.CTkCheckBox(
@@ -79,7 +91,7 @@ class App:
             variable=self.open_in_vscode_var,
         )
         self.open_in_vscode_checkbox.grid(
-            row=4, column=0, columnspan=2, padx=16, pady=8, sticky="w"
+            row=5, column=0, columnspan=2, padx=16, pady=8, sticky="w"
         )
 
         # Create Project button
@@ -89,7 +101,7 @@ class App:
             command=self._on_create_project,
         )
         self.create_button.grid(
-            row=5, column=0, columnspan=3, padx=16, pady=(16, 20)
+            row=6, column=0, columnspan=3, padx=16, pady=(16, 20)
         )
 
     def _browse_destination(self) -> None:

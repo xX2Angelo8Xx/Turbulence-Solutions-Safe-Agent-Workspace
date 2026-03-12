@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -50,3 +51,27 @@ def check_duplicate_folder(name: str, destination: str) -> bool:
         return False
     target = Path(destination) / name
     return target.exists()
+
+
+def validate_destination_path(path: str) -> tuple[bool, str]:
+    """Validate a destination folder path for project creation.
+
+    Returns:
+        (True, "") if the path is valid and writable.
+        (False, error_message) if the path is invalid.
+    """
+    if not path or not path.strip():
+        return False, "Destination path cannot be empty."
+
+    resolved = Path(path)
+
+    if not resolved.exists():
+        return False, "Destination path does not exist."
+
+    if not resolved.is_dir():
+        return False, "Destination path is not a directory."
+
+    if not os.access(resolved, os.W_OK):
+        return False, "Destination path is not writable."
+
+    return True, ""
