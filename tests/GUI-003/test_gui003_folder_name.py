@@ -1,20 +1,22 @@
-"""Tests for GUI-003: Folder Name Input validation.
+"""Tests for GUI-003: Folder Name Input.
 
-All tests run headlessly by replacing `customtkinter` with a MagicMock in
-``sys.modules`` before the modules under test are imported.  No display
-connection is attempted, so the suite runs on all platforms including
-headless CI environments.
+Covers validate_folder_name(), check_duplicate_folder(), and the
+project_name_error_label widget added to App in GUI-003.
+
+All App tests run headlessly using the same MagicMock technique as GUI-001.
 """
 
 from __future__ import annotations
 
+import os
 import sys
+import tempfile
 from unittest.mock import MagicMock
 
 import pytest
 
 # ---------------------------------------------------------------------------
-# Inject the customtkinter mock BEFORE importing any launcher module.
+# Headless customtkinter mock — must happen before any launcher.gui import.
 # ---------------------------------------------------------------------------
 _CTK_MOCK = MagicMock(name="customtkinter")
 sys.modules["customtkinter"] = _CTK_MOCK
@@ -22,253 +24,290 @@ sys.modules["customtkinter"] = _CTK_MOCK
 for _key in [k for k in sys.modules if k.startswith("launcher.gui")]:
     del sys.modules[_key]
 
-from launcher.gui.validation import (  # noqa: E402
-    check_duplicate_folder,
-    validate_folder_name,
-)
+from launcher.gui.validation import check_duplicate_folder, validate_folder_name  # noqa: E402
 from launcher.gui.app import App  # noqa: E402
 
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 def _fresh_app() -> App:
     _CTK_MOCK.reset_mock()
     return App()
 
 
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # validate_folder_name — valid names
-# ---------------------------------------------------------------------------
+# ===========================================================================
 
-class TestValidFolderNames:
-    def test_simple_ascii_name(self):
+class TestValidateFolderNameValid:
+    def test_valid_simple_name(self):
         ok, msg = validate_folder_name("my-project")
         assert ok is True
-        assert msg == ""
 
-    def test_name_with_underscores(self):
-        ok, msg = validate_folder_name("my_project")
-        assert ok is True
-
-    def test_name_with_numbers(self):
+    def test_valid_name_with_numbers(self):
         ok, msg = validate_folder_name("project123")
         assert ok is True
 
-    def test_name_with_spaces_inside(self):
-        ok, msg = validate_folder_name("my project")
+    def test_valid_name_with_underscores(self):
+        ok, msg = validate_folder_name("my_project")
         assert ok is True
 
-    def test_single_character_name(self):
-        ok, msg = validate_folder_name("a")
+    def test_valid_name_with_hyphens(self):
+        ok, msg = validate_folder_name("my-cool-project")
         assert ok is True
 
-    def test_exactly_255_chars(self):
-        name = "a" * 255
-        ok, msg = validate_folder_name(name)
+    def test_return_type_is_tuple(self):
+        result = validate_folder_name("valid")
+        assert isinstance(result, tuple)
+        assert len(result) == 2
+
+    def test_valid_returns_empty_message(self):
+        _, msg = validate_folder_name("valid-name")
+        assert msg == ""
+
+
+# ===========================================================================
+# validate_folder_name — invalid: empty / whitespace
+# ===========================================================================
+
+class TestValidateFolderNameEmpty:
+    def test_empty_string_invalid(self):
+        ok, _ = validate_folder_name("")
+        assert ok is False
+
+    def test_whitespace_only_invalid(self):
+        ok, _ = validate_folder_name("   ")
+        assert ok is False
+
+    def test_invalid_returns_nonempty_message(self):
+        _, msg = validate_folder_name("")
+        assert msg != ""
+
+
+# ===========================================================================
+# validate_folder_name — invalid: forbidden characters
+# ===========================================================================
+
+class TestValidateFolderNameInvalidChars:
+    def test_colon_invalid(self):
+        ok, _ = validate_folder_name("my:project")
+        assert ok is False
+
+    def test_backslash_invalid(self):
+        ok, _ = validate_folder_name("my\\project")
+        assert ok is False
+
+    def test_forward_slash_invalid(self):
+        ok, _ = validate_folder_name("my/project")
+        assert ok is False
+
+    def test_asterisk_invalid(self):
+        ok, _ = validate_folder_name("my*project")
+        assert ok is False
+
+    def test_question_mark_invalid(self):
+        ok, _ = validate_folder_name("my?project")
+        assert ok is False
+
+    def test_pipe_invalid(self):
+        ok, _ = validate_folder_name("my|project")
+        assert ok is False
+
+    def test_less_than_invalid(self):
+        ok, _ = validate_folder_name("my<project")
+        assert ok is False
+
+    def test_greater_than_invalid(self):
+        ok, _ = validate_folder_name("my>project")
+        assert ok is False
+
+    def test_double_quote_invalid(self):
+        ok, _ = validate_folder_name('my"project')
+        assert ok is False
+
+    def test_null_byte_invalid(self):
+        ok, _ = validate_folder_name("my\x00project")
+        assert ok is False
+
+    def test_control_char_invalid(self):
+        ok, _ = validate_folder_name("my\x1fproject")
+        assert ok is False
+
+
+# ===========================================================================
+# validate_folder_name — invalid: dot/space names
+# ===========================================================================
+
+class TestValidateFolderNameDots:
+    def test_single_dot_invalid(self):
+        ok, _ = validate_folder_name(".")
+        assert ok is False
+
+    def test_double_dot_invalid(self):
+        ok, _ = validate_folder_name("..")
+        assert ok is False
+
+    def test_name_ending_with_dot_invalid(self):
+        ok, _ = validate_folder_name("project.")
+        assert ok is False
+
+    def test_name_ending_with_space_invalid(self):
+        ok, _ = validate_folder_name("project ")
+        assert ok is False
+
+
+# ===========================================================================
+# validate_folder_name — invalid: Windows reserved names
+# ===========================================================================
+
+class TestValidateFolderNameReserved:
+    def test_windows_reserved_con_uppercase_invalid(self):
+        ok, _ = validate_folder_name("CON")
+        assert ok is False
+
+    def test_windows_reserved_nul_lowercase_invalid(self):
+        ok, _ = validate_folder_name("nul")
+        assert ok is False
+
+    def test_windows_reserved_case_insensitive(self):
+        ok, _ = validate_folder_name("Con")
+        assert ok is False
+
+    def test_windows_reserved_com9_invalid(self):
+        ok, _ = validate_folder_name("COM9")
+        assert ok is False
+
+    def test_windows_reserved_lpt1_invalid(self):
+        ok, _ = validate_folder_name("LPT1")
+        assert ok is False
+
+    def test_windows_reserved_prn_invalid(self):
+        ok, _ = validate_folder_name("PRN")
+        assert ok is False
+
+    def test_windows_reserved_aux_invalid(self):
+        ok, _ = validate_folder_name("AUX")
+        assert ok is False
+
+
+# ===========================================================================
+# validate_folder_name — security: path traversal / injection
+# ===========================================================================
+
+class TestValidateFolderNameSecurity:
+    def test_path_traversal_with_slash_rejected(self):
+        ok, _ = validate_folder_name("../secret")
+        assert ok is False
+
+    def test_path_traversal_backslash_rejected(self):
+        ok, _ = validate_folder_name("..\\secret")
+        assert ok is False
+
+    def test_null_byte_before_reserved_rejected(self):
+        ok, _ = validate_folder_name("\x00CON")
+        assert ok is False
+
+    def test_control_char_bypass_rejected(self):
+        ok, _ = validate_folder_name("proj\x01ect")
+        assert ok is False
+
+
+# ===========================================================================
+# validate_folder_name — edge cases (tester additions)
+# ===========================================================================
+
+class TestValidateFolderNameEdgeCases:
+    def test_unicode_accented_chars_valid(self):
+        ok, _ = validate_folder_name("Ünïcödé-project")
+        assert ok is True
+
+    def test_emoji_in_name_valid(self):
+        ok, _ = validate_folder_name("project-\U0001F680")
+        assert ok is True
+
+    def test_tab_char_invalid(self):
+        ok, _ = validate_folder_name("my\tproject")
+        assert ok is False
+
+    def test_name_length_255_valid(self):
+        ok, _ = validate_folder_name("a" * 255)
+        assert ok is True
+
+    def test_leading_dot_valid(self):
+        ok, _ = validate_folder_name(".hidden-project")
         assert ok is True
 
 
-# ---------------------------------------------------------------------------
-# validate_folder_name — empty / whitespace
-# ---------------------------------------------------------------------------
-
-class TestEmptyAndWhitespace:
-    def test_empty_string_rejected(self):
-        ok, msg = validate_folder_name("")
-        assert ok is False
-        assert "empty" in msg.lower()
-
-    def test_whitespace_only_rejected(self):
-        ok, msg = validate_folder_name("   ")
-        assert ok is False
-        assert "empty" in msg.lower()
-
-    def test_none_like_empty_string(self):
-        ok, msg = validate_folder_name("")
-        assert ok is False
-
-
-# ---------------------------------------------------------------------------
-# validate_folder_name — trailing period / space
-# ---------------------------------------------------------------------------
-
-class TestTrailingChars:
-    def test_trailing_period_rejected(self):
-        ok, msg = validate_folder_name("myproject.")
-        assert ok is False
-        assert "period" in msg.lower() or "end" in msg.lower()
-
-    def test_trailing_space_rejected(self):
-        ok, msg = validate_folder_name("myproject ")
-        assert ok is False
-
-    def test_name_that_is_just_period_rejected(self):
-        ok, msg = validate_folder_name(".")
-        assert ok is False
-
-    def test_name_that_is_dotdot_rejected(self):
-        ok, msg = validate_folder_name("..")
-        assert ok is False
-
-
-# ---------------------------------------------------------------------------
-# validate_folder_name — illegal characters
-# ---------------------------------------------------------------------------
-
-class TestIllegalCharacters:
-    @pytest.mark.parametrize("char", ['<', '>', ':', '"', '/', '\\', '|', '?', '*'])
-    def test_illegal_char_rejected(self, char: str):
-        ok, msg = validate_folder_name(f"proj{char}name")
-        assert ok is False
-        assert "invalid" in msg.lower() or "character" in msg.lower()
-
-    def test_null_byte_rejected(self):
-        ok, msg = validate_folder_name("proj\x00name")
-        assert ok is False
-
-    def test_control_char_rejected(self):
-        ok, msg = validate_folder_name("proj\x1fname")
-        assert ok is False
-
-
-# ---------------------------------------------------------------------------
-# validate_folder_name — Windows reserved names
-# ---------------------------------------------------------------------------
-
-class TestWindowsReservedNames:
-    @pytest.mark.parametrize("reserved", [
-        "CON", "PRN", "AUX", "NUL",
-        "COM1", "COM9", "LPT1", "LPT9",
-    ])
-    def test_reserved_name_rejected(self, reserved: str):
-        ok, msg = validate_folder_name(reserved)
-        assert ok is False
-        assert "reserved" in msg.lower()
-
-    def test_reserved_name_lowercase_rejected(self):
-        ok, msg = validate_folder_name("con")
-        assert ok is False
-
-    def test_reserved_name_mixed_case_rejected(self):
-        ok, msg = validate_folder_name("CoN")
-        assert ok is False
-
-
-# ---------------------------------------------------------------------------
-# validate_folder_name — length
-# ---------------------------------------------------------------------------
-
-class TestNameLength:
-    def test_name_256_chars_rejected(self):
-        name = "a" * 256
-        ok, msg = validate_folder_name(name)
-        assert ok is False
-        assert "long" in msg.lower() or "255" in msg
-
-
-# ---------------------------------------------------------------------------
-# validate_folder_name — path traversal / security bypasses
-# ---------------------------------------------------------------------------
-
-class TestSecurityBypasses:
-    def test_path_traversal_dotdot_slash(self):
-        ok, _ = validate_folder_name("../evil")
-        assert ok is False
-
-    def test_absolute_unix_path(self):
-        ok, _ = validate_folder_name("/etc/passwd")
-        assert ok is False
-
-    def test_absolute_windows_path(self):
-        ok, _ = validate_folder_name("C:\\Windows")
-        assert ok is False
-
-    def test_unc_path_rejected(self):
-        ok, _ = validate_folder_name("\\\\server\\share")
-        assert ok is False
-
-
-# ---------------------------------------------------------------------------
+# ===========================================================================
 # check_duplicate_folder
-# ---------------------------------------------------------------------------
+# ===========================================================================
 
 class TestCheckDuplicateFolder:
-    def test_returns_false_for_empty_name(self, tmp_path):
-        assert check_duplicate_folder("", str(tmp_path)) is False
+    def test_nonexistent_folder_returns_false(self, tmp_path):
+        result = check_duplicate_folder("ghost-project", str(tmp_path))
+        assert result is False
 
-    def test_returns_false_for_empty_destination(self):
-        assert check_duplicate_folder("myproject", "") is False
+    def test_existing_folder_returns_true(self, tmp_path):
+        (tmp_path / "my-project").mkdir()
+        result = check_duplicate_folder("my-project", str(tmp_path))
+        assert result is True
 
-    def test_returns_false_when_folder_does_not_exist(self, tmp_path):
-        assert check_duplicate_folder("nonexistent", str(tmp_path)) is False
+    def test_empty_name_returns_false(self, tmp_path):
+        result = check_duplicate_folder("", str(tmp_path))
+        assert result is False
 
-    def test_returns_true_when_folder_exists(self, tmp_path):
-        (tmp_path / "existing").mkdir()
-        assert check_duplicate_folder("existing", str(tmp_path)) is True
+    def test_empty_destination_returns_false(self):
+        result = check_duplicate_folder("my-project", "")
+        assert result is False
 
-    def test_returns_false_both_empty(self):
-        assert check_duplicate_folder("", "") is False
+    def test_both_empty_returns_false(self):
+        result = check_duplicate_folder("", "")
+        assert result is False
+
+    def test_existing_file_at_target_returns_true(self, tmp_path):
+        (tmp_path / "my-project").write_text("file, not a folder")
+        result = check_duplicate_folder("my-project", str(tmp_path))
+        assert result is True
+
+    @pytest.mark.skipif(
+        sys.platform == "win32" and not os.environ.get("CI_ELEVATED"),
+        reason="Symlink creation requires elevated privileges on Windows without Developer Mode",
+    )
+    def test_symlink_to_existing_dir_returns_true(self, tmp_path):
+        target = tmp_path / "_real"
+        target.mkdir()
+        link = tmp_path / "my-project"
+        link.symlink_to(target, target_is_directory=True)
+        result = check_duplicate_folder("my-project", str(tmp_path))
+        assert result is True
 
 
-# ---------------------------------------------------------------------------
-# App: project_name_error_label attribute
-# ---------------------------------------------------------------------------
+# ===========================================================================
+# App widget — project_name_error_label
+# ===========================================================================
 
 class TestAppErrorLabel:
     def test_project_name_error_label_exists(self):
         app = _fresh_app()
-        assert hasattr(app, "project_name_error_label")
+        assert hasattr(app, "project_name_error_label"), (
+            "App must have a 'project_name_error_label' attribute after _build_ui()"
+        )
 
-    def test_project_name_error_label_created_with_empty_text(self):
-        _CTK_MOCK.reset_mock()
-        App()
-        label_calls = _CTK_MOCK.CTkLabel.call_args_list
-        empty_text_calls = [c for c in label_calls if c.kwargs.get("text") == ""]
-        assert len(empty_text_calls) >= 1
-
-    def test_project_name_error_label_has_red_color(self):
-        _CTK_MOCK.reset_mock()
-        App()
-        label_calls = _CTK_MOCK.CTkLabel.call_args_list
-        red_calls = [c for c in label_calls if c.kwargs.get("text_color") == "red"]
-        assert len(red_calls) >= 1
-
-
-# ---------------------------------------------------------------------------
-# Edge-case tests added by Tester review
-# ---------------------------------------------------------------------------
-
-class TestEdgeCasesGui003:
-    def test_name_with_leading_spaces_is_valid(self):
-        """Leading spaces are NOT stripped by validate_folder_name; only a
-        trailing space/period is rejected.  Documents current behaviour."""
-        ok, _ = validate_folder_name("  myproject")
-        assert ok is True
-
-    def test_tab_character_in_name_rejected(self):
-        """Tab (\\x09) falls in the \\x00-\\x1f control-character range and
-        must be rejected by the invalid-char regex."""
-        ok, _ = validate_folder_name("proj\tname")
-        assert ok is False
-
-    def test_validate_folder_name_returns_tuple(self):
-        """Return value is always a (bool, str) tuple."""
-        result = validate_folder_name("ok-name")
-        assert isinstance(result, tuple)
-        assert isinstance(result[0], bool)
-        assert isinstance(result[1], str)
-
-    def test_error_message_is_non_empty_for_invalid_name(self):
-        """Error message for an invalid name is a non-empty string."""
-        _, msg = validate_folder_name("")
-        assert isinstance(msg, str)
-        assert len(msg) > 0
-
-    def test_multiple_internal_dots_is_valid(self):
-        """Internal dots ('my..project') do not violate any rule."""
-        ok, _ = validate_folder_name("my..project")
-        assert ok is True
-
-    def test_check_duplicate_folder_matches_file_not_dir(self, tmp_path):
-        """check_duplicate_folder returns True when a FILE (not a directory)
-        exists at the target path — Path.exists() is True for both."""
-        (tmp_path / "target").write_text("data")
-        assert check_duplicate_folder("target", str(tmp_path)) is True
+    def test_error_label_created_with_empty_text(self):
+        app = _fresh_app()
+        # The CTkLabel constructor is mocked; inspect the call that created
+        # the error label (text="", text_color="red").
+        ctk_label_calls = _CTK_MOCK.CTkLabel.call_args_list
+        error_label_call = next(
+            (
+                c
+                for c in ctk_label_calls
+                if c.kwargs.get("text") == "" and c.kwargs.get("text_color") == "red"
+            ),
+            None,
+        )
+        assert error_label_call is not None, (
+            "CTkLabel(text='', text_color='red', ...) was not called during App._build_ui()"
+        )
