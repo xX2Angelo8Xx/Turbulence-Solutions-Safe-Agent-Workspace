@@ -1,9 +1,4 @@
 ID,Test Name,Test Type,WP Reference,Status,Run Date,Environment,Result,Notes
-TST-328,"GUI-004 unit tests — validate_destination_path and destination_error_label (20 tests)",Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,20/20 pass — empty path; whitespace; nonexistent; file not dir; valid writable dir; non-writable (mocked); App label exists with correct args and row=4,Developer Agent GUI-004 implementation run
-TST-329,"Full regression suite after GUI-004 implementation (excl. INS-004)",Regression,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,582 pass / 36 fail / 1 skip — 36 pre-existing SAF-006 failures; zero new regressions,Developer Agent GUI-004 regression check
-TST-316,"SAF-006 developer tests (45 tests) — Tester verification run",Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,29 pass / 16 fail — implementation not committed (BUG-021); _is_ancestor_of_deny_zone missing; tree/find not in allowlist; recursive_flags not in CommandRule,Tester Agent SAF-006 Iteration 1 review
-TST-317,"SAF-006 Tester edge-case tests RTC-001 to RTC-014 and CF-001 to CF-004 (18 tests)",Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,10 pass / 8 fail — 4 fail due to missing SAF-006 implementation; 4 fail due to BUG-022 combined-flag bypass,Tester Agent SAF-006 edge-case run
-TST-318,"Full regression suite SAF-006 Tester run (tests/ excl. INS-004 collection error)",Regression,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,559 pass / 36 fail / 1 skip — 24 SAF-006 failures + pre-existing SAF-007/SAF-010 failures; INS-004 excluded (collection error unrelated to SAF-006),Tester Agent SAF-006 Iteration 1 final run
 TST-001,test_src_dir_exists,Unit,INS-001,Pass,2026-03-10,Windows 11 + Python 3.11,src/ directory exists,
 TST-002,test_launcher_dir_exists,Unit,INS-001,Pass,2026-03-10,Windows 11 + Python 3.11,src/launcher/ directory exists,
 TST-003,test_launcher_main_exists,Unit,INS-001,Pass,2026-03-10,Windows 11 + Python 3.11,src/launcher/main.py exists,
@@ -260,170 +255,43 @@ TST-208,SAF-005 full 106-test suite — Tester Iteration 2 confirmation run,Secu
 TST-209,SAF-005 Tester new BUG-016 edge-case tests (ET-027 to ET-032 — 6 tests),Security,SAF-005,Fail,2026-03-11,Windows 11 + Python 3.11,0/6 pass — no-space and fd-prefixed shell redirect variants bypass zone check,"All 6 fail: test_redirect_no_space_basic_bypasses_gate, test_redirect_no_space_append_bypasses_gate, test_redirect_fd_prefixed_basic_bypasses_gate, test_redirect_fd_prefixed_stderr_bypasses_gate, test_redirect_fd_prefixed_append_bypasses_gate, test_redirect_cat_fd_to_restricted_zone"
 TST-210,SAF-005 full 112-test suite — Tester Iteration 3 confirmation run,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,112/112 pass — BUG-016 fix confirmed; ET-027 to ET-032 all pass,"Tester Agent Iteration 3 re-review; _REDIRECT_OP_RE (^[0-9]*>>?$) handles fd-prefixed operators; _EMBEDDED_REDIRECT_RE (>>?(.+)$) handles no-space embedded redirects; all 3 bypass forms now zone-checked"
 TST-211,Full regression suite Iteration 3 (excluding pre-existing SAF-002 and GUI-001 failures),Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,238/238 pass — zero new failures introduced by BUG-016 fix,Tester Agent Iteration 3: all INS-001 + INS-002 + INS-012 + SAF-001 + SAF-004 + SAF-005 tests pass; no regressions
-TST-269,test_is_truthy_flag_bool_true,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,bool True is recognised as truthy flag,_is_truthy_flag
-TST-270,test_is_truthy_flag_bool_false,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,bool False is not truthy,_is_truthy_flag
-TST-271,test_is_truthy_flag_string_true_lowercase,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "true" is truthy,_is_truthy_flag
-TST-272,test_is_truthy_flag_string_true_mixed_case,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "True" is truthy (case-insensitive),_is_truthy_flag
-TST-273,test_is_truthy_flag_string_true_uppercase,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "TRUE" is truthy (case-insensitive),_is_truthy_flag
-TST-274,test_is_truthy_flag_string_false,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "false" is not truthy,_is_truthy_flag
-TST-275,test_is_truthy_flag_int_1,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,integer 1 is truthy,_is_truthy_flag
-TST-276,test_is_truthy_flag_int_0,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,integer 0 is not truthy,_is_truthy_flag
-TST-277,test_is_truthy_flag_none,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,None is not truthy,_is_truthy_flag
-TST-278,test_validate_include_pattern_safe_wildcard_glob,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,**/*.py glob does not target any deny zone → allow,_validate_include_pattern
-TST-279,test_validate_include_pattern_src_subdir,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,src/** (ask zone) is not denied → allow,_validate_include_pattern
-TST-280,test_validate_include_pattern_github,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.github/** pattern is denied (protection),_validate_include_pattern
-TST-281,test_validate_include_pattern_vscode,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.vscode/** pattern is denied (protection),_validate_include_pattern
-TST-282,test_validate_include_pattern_noagentzone,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,NoAgentZone/** pattern is denied (protection),_validate_include_pattern
-TST-283,test_validate_include_pattern_traversal_dotdot,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,../ in includePattern is denied (traversal guard),_validate_include_pattern
-TST-284,test_validate_include_pattern_traversal_deep,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,deep traversal escaping workspace root is denied,_validate_include_pattern
-TST-285,test_validate_grep_search_include_pattern_github_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern=.github/** → deny (protection),validate_grep_search
-TST-286,test_validate_grep_search_include_pattern_vscode_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern=.vscode/** → deny (protection),validate_grep_search
-TST-287,test_validate_grep_search_include_pattern_noagentzone_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern=NoAgentZone/** → deny (protection),validate_grep_search
-TST-288,test_validate_grep_search_include_ignored_files_bool_true_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles=True → deny (protection),validate_grep_search
-TST-289,test_validate_grep_search_include_ignored_files_string_true_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles="true" (string) → deny (protection),validate_grep_search
-TST-290,test_validate_grep_search_no_params_no_path_asks,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,no special params and no filePath → ask,validate_grep_search
-TST-291,test_validate_grep_search_no_params_project_path_allowed,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,clean params + filePath=project/main.py → allow,validate_grep_search
-TST-292,test_validate_grep_search_no_params_deny_path_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,clean params + filePath=.github/secret → deny,validate_grep_search
-TST-293,test_validate_grep_search_include_ignored_false_not_denied,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles=False does not trigger deny,validate_grep_search
-TST-294,test_validate_grep_search_tool_input_nested_format,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern in nested tool_input dict → deny (VS Code hook format supported),validate_grep_search
-TST-295,test_validate_semantic_search_basic_returns_ask,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,any semantic_search call returns ask for human review,validate_semantic_search
-TST-296,test_validate_semantic_search_protected_query_still_ask,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,query containing .github path text still returns ask (query is not path-classified),validate_semantic_search
-TST-297,test_validate_semantic_search_never_returns_allow,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,semantic_search must never be auto-allowed (protection),validate_semantic_search
-TST-298,test_grep_search_deny_zone_via_include_pattern_protected,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.github/** via includePattern blocked through full decide() (protection),Integration
-TST-299,test_grep_search_traversal_blocked_protection,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,../../../.vscode/** traversal via includePattern blocked (protection),Integration
-TST-300,test_grep_search_include_ignored_files_blocked_protection,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles=True blocked through full decide() (protection),Integration
-TST-301,test_grep_search_github_in_nested_tool_input_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern in nested tool_input → still denied (bypass attempt),Integration
-TST-302,test_grep_search_traversal_to_github_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,project/../.github/** resolves to .github/ and is denied (bypass attempt),Integration
-TST-303,test_grep_search_mixed_case_include_pattern_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.GITHUB/** upper-case normalised and denied (bypass attempt),Integration
-TST-304,test_grep_search_include_ignored_string_true_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles="true" string form denied (bypass attempt),Integration
-TST-305,test_grep_search_noagentzone_lowercase_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,noagentzone/** all-lowercase denied (bypass attempt),Integration
-TST-306,test_grep_search_star_star_github_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,**/.github/** multi-segment wildcard targeting .github/ denied (bypass attempt),Integration
-TST-307,test_semantic_search_cannot_be_allowed_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,semantic_search with innocuous query never returns allow (bypass attempt),Integration
-TST-308,test_decide_grep_search_include_pattern_github_denied,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes grep_search includePattern=.github/** → deny,decide()
-TST-309,test_decide_grep_search_clean_params_project_path_allowed,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes grep_search with safe params + project path → allow,decide()
-TST-310,test_decide_grep_search_clean_params_no_path_asks,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes grep_search with safe params and no filePath → ask,decide()
-TST-311,test_decide_semantic_search_always_ask,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes semantic_search → always ask,decide()
-TST-312,SAF-006 developer test suite — 46 tests (baseline),Security,SAF-006,Pass,2026-03-12,Windows 11 + Python 3.11,46/46 pass — unit tests for _is_ancestor_of_deny_zone() and _has_recursive_flag(); security tests for tree/find/ls/dir/gci; regression tests for non-recursive listing,Tester Agent baseline run
-TST-313,SAF-006 Tester edge-case tests — 13 tests,Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,11 pass / 2 fail — BUG-023: standalone -r/-R in ls.denied_flags blocks ls -R Project/ (expected ask); standalone -r in gci.denied_flags blocks gci -r Project/ (expected ask),"Failing: test_ec_ls_capital_r_project_should_allow (ls -R Project/ returns deny not ask); test_ec_gci_r_project_should_allow (gci -r Project/ returns deny not ask). Passing: tree Project/→ask; find . -name '*.py'→deny; find Project/ -name '*.py'→ask; ls -R /→deny; ls -lR Project/→ask; ls -Rl→deny; ls -Rl Project/→ask; find ../../.github→deny; dir Project/→ask; Get-ChildItem Project/→ask; ls Project/→ask"
-TST-314,SAF-006 full suite (59 tests — developer + tester edge-cases),Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,57/59 pass — 2 new failures BUG-023,Tester Agent Iteration 2 final SAF-006 run
-TST-315,Full regression suite (600 tests — Tester SAF-006 Iteration 2),Regression,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,564 pass / 35 fail / 1 skip — 33 pre-existing (32 INS-004 In Progress + 1 INS-012) + 2 new SAF-006 failures (BUG-023),Verdict: FAIL — SAF-006 returned to Developer. Pre-existing INS-004 and INS-012 failures unrelated to SAF-006.
-TST-312,test_decide_grep_search_include_ignored_denied,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes grep_search with includeIgnoredFiles=True → deny,decide()
-TST-313,test_grep_search_windows_backslash_include_pattern_github_denied,Cross-platform,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,Windows backslash includePattern targeting .github → deny,cross-platform
-TST-314,test_grep_search_wsl_absolute_include_pattern_github_denied,Cross-platform,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,WSL absolute includePattern targeting .github → deny,cross-platform
-TST-315,SAF-003 full test suite (46 tests) + full regression check (448 tests),Regression,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,46/46 SAF-003 tests pass; 448/449 total pass (1 pre-existing INS-012 failure unrelated to SAF-003),Developer Agent final run before handoff
-TST-261,test_valid_simple_name,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,hyphenated name returns (True - ""),validate_folder_name
-TST-262,test_valid_name_with_numbers,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,alphanumeric name returns (True - ""),validate_folder_name
-TST-263,test_valid_name_with_underscores,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,underscore name returns (True - ""),validate_folder_name
-TST-264,test_valid_name_with_hyphens,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,multi-hyphen name returns (True - ""),validate_folder_name
-TST-265,test_return_type_is_tuple,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,return value is a 2-tuple,validate_folder_name
-TST-266,test_valid_returns_empty_message,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,valid name produces empty error string,validate_folder_name
-TST-267,test_empty_string_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty string rejected,validate_folder_name
-TST-268,test_whitespace_only_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,whitespace-only string rejected,validate_folder_name
-TST-269,test_invalid_returns_nonempty_message,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,invalid name produces non-empty error string,validate_folder_name
-TST-270,test_colon_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,colon in name rejected,validate_folder_name
-TST-271,test_backslash_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,backslash in name rejected,validate_folder_name
-TST-272,test_forward_slash_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,forward slash in name rejected,validate_folder_name
-TST-273,test_asterisk_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,asterisk in name rejected,validate_folder_name
-TST-274,test_question_mark_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,question mark in name rejected,validate_folder_name
-TST-275,test_pipe_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,pipe character in name rejected,validate_folder_name
-TST-276,test_less_than_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,less-than sign in name rejected,validate_folder_name
-TST-277,test_greater_than_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,greater-than sign in name rejected,validate_folder_name
-TST-278,test_double_quote_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,double-quote in name rejected,validate_folder_name
-TST-279,test_null_byte_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,null byte in name rejected,validate_folder_name
-TST-280,test_control_char_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,control character (0x01) in name rejected,validate_folder_name
-TST-281,test_single_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,single dot name rejected,validate_folder_name
-TST-282,test_double_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,double dot name rejected,validate_folder_name
-TST-283,test_windows_reserved_con_uppercase_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,CON rejected as reserved,validate_folder_name
-TST-284,test_windows_reserved_nul_lowercase_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,nul rejected as reserved,validate_folder_name
-TST-285,test_windows_reserved_case_insensitive,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,Con (mixed case) rejected as reserved,validate_folder_name
-TST-286,test_windows_reserved_com9_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,COM9 rejected as reserved,validate_folder_name
-TST-287,test_windows_reserved_lpt1_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,LPT1 rejected as reserved,validate_folder_name
-TST-288,test_name_ending_with_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,name ending with period rejected,validate_folder_name
-TST-289,test_name_ending_with_space_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,name ending with space rejected,validate_folder_name
-TST-290,test_path_traversal_with_slash_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,../etc/passwd rejected via forward-slash check (bypass attempt),validate_folder_name
-TST-291,test_path_traversal_backslash_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,..\windows\system32 rejected via backslash check (bypass attempt),validate_folder_name
-TST-292,test_null_byte_before_reserved_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,null byte prefix before CON still rejected (bypass attempt),validate_folder_name
-TST-293,test_control_char_bypass_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,control character embedded in otherwise valid name rejected (bypass attempt),validate_folder_name
-TST-294,test_nonexistent_folder_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,non-existent path returns False,check_duplicate_folder
-TST-295,test_existing_folder_returns_true,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,existing tmpdir subfolder returns True,check_duplicate_folder
-TST-296,test_empty_name_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty name guard returns False,check_duplicate_folder
-TST-297,test_empty_destination_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty destination guard returns False,check_duplicate_folder
-TST-298,test_both_empty_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,both args empty returns False,check_duplicate_folder
-TST-299,test_project_name_error_label_exists,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,app.project_name_error_label attribute present on App instance,App inline error label
-TST-300,test_error_label_created_with_empty_text,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,CTkLabel created with text='' for inline error display,App inline error label
-TST-301,Full regression suite (377 tests — all WPs),Regression,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 40 new GUI-003 + 337 existing tests; zero regressions,Developer Agent GUI-003 implementation complete
-TST-269,test_spec_file_exists,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,launcher.spec exists at repository root,
-TST-270,test_spec_is_valid_python,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,ast.parse succeeds — no syntax errors,
-TST-271,test_spec_references_entry_point,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,main.py referenced in Analysis sources,
-TST-272,test_spec_entry_point_path_contains_src_launcher,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,full path src/launcher/main.py present in spec,
-TST-273,test_spec_includes_templates_in_datas,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,templates entry present in datas,
-TST-274,test_spec_uses_onedir_collect,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,COLLECT() call present — onedir mode confirmed,
-TST-275,test_spec_exclude_binaries_true,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,exclude_binaries=True set in EXE(),
-TST-276,Full regression suite (377 tests — INS-003 addition),Regression,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 7 new INS-003 tests + 370 prior; zero regressions,Developer Agent INS-003
-<<<<<<< Updated upstream
-TST-316,GUI-003 full test suite — Iteration 2 confirmation (52 pass + 1 skip),Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,52/53 pass — BUG-017 fix confirmed (App label tests pass); BUG-018 fix confirmed (256-char test passes); 1 skip = symlink on Windows,Tester Agent GUI-003 Iteration 2
-TST-317,test_digits_only_name_valid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,name composed entirely of digits is valid,Tester edge-case Iteration 2
-TST-318,test_carriage_return_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,carriage return (0x0D) explicitly rejected as control char,Tester edge-case Iteration 2
-TST-319,test_newline_char_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,newline (0x0A) explicitly rejected as control char,Tester edge-case Iteration 2
-TST-320,Full regression suite — GUI-003 Iteration 2 final (337 pass + 3 pre-existing fail + 1 skip),Regression,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,337/341 pass — 3 pre-existing failures (INS-012 spec; SAF-003 brace-expansion x2); zero new failures; 3 new GUI-003 Tester edge-case tests added,Tester Agent GUI-003 Iteration 2 PASS verdict
-TST-316,INS-004 developer test collection attempt (tests/INS-004/test_ins004_template_bundling.py),Unit,INS-004,Fail,2026-03-12,Windows 11 + Python 3.11,0/27 tests runnable — ImportError: cannot import 'list_templates' from project_creator.py; entire module blocked,"BUG-018: list_templates() function absent from project_creator.py; all 27 developer tests unrunnable"
-TST-317,INS-004 Tester edge-case suite (tests/INS-004/test_ins004_edge_cases.py — 18 tests),Unit,INS-004,Fail,2026-03-12,Windows 11 + Python 3.11,11 pass / 7 fail — BUG-017 (TEMPLATES_DIR missing) BUG-018 (list_templates missing) BUG-019 (require-approval.json missing) BUG-020 (security_gate.py stale) all confirmed,"Failing: test_require_approval_json_exists_in_template; test_require_approval_json_is_valid_json; test_security_gate_content_matches_default_project; test_coding_template_key_files_not_empty; test_list_templates_returns_sorted_results; test_config_templates_dir_is_defined; test_config_templates_dir_is_absolute"
-TST-318,Full test suite excluding INS-004 — Tester INS-004 review baseline,Regression,INS-004,Fail,2026-03-12,Windows 11 + Python 3.11,442 pass / 54 fail — all 54 failures are pre-existing (SAF-007 and SAF-010 open WPs); zero new regressions from INS-004 changes,Pre-existing failures confirmed unrelated to INS-004; INS-004 verdict FAIL due to missing code changes and template file defectsTST-319,INS-009 Interface Contract tests (6/6 pass),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,check_for_update() satisfies 2-tuple INS-001 interface; callable/returns-tuple/bool+str all pass,Tester Agent edge-case
-TST-320,INS-009 API URL Security tests (1/5 pass),Security,INS-009,Fail,2026-03-12,Windows 11 + Python 3.11,_API_URL constant absent from module; 4 of 5 security tests fail — no HTTPS URL defined,Tester Agent edge-case
-TST-321,INS-009 Stdlib dependency tests (1/2 pass),Unit,INS-009,Fail,2026-03-12,Windows 11 + Python 3.11,No urllib reference in source; stub makes no HTTP call; test_source_uses_urllib_for_http fails,Tester Agent edge-case
-TST-322,INS-009 Silent error handling tests (8/8 pass),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,All 8 pass — NOTE: passes because stub never calls network; must be re-verified after real implementation,Tester Agent edge-case
-TST-323,INS-009 Version comparison tests (3/7 pass),Unit,INS-009,Fail,2026-03-12,Windows 11 + Python 3.11,Stub always returns False; newer major/minor/patch/v-prefix detection tests all fail,Tester Agent edge-case
-TST-324,INS-009 Version parsing edge cases (9/9 pass),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,9 parametrized cases (alpha/rc/2-part/1-part/large/no-v/4-part) pass — stub ignores mocked API,Tester Agent edge-case
-TST-325,INS-009 API response validation tests (7/7 pass),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,Malformed payloads (missing tag_name/null/int/array/extra fields) handled — stub never inspects response,Tester Agent edge-case
-TST-326,INS-009 Tester full suite (35/44 pass — 9 fail),Integration,INS-009,Fail,2026-03-12,Windows 11 + Python 3.11,9 failing tests confirm implementation is stub-only; all functional requirements of US-015 AC-1 unmet,Tester Agent INS-009 final run
-TST-327,Full regression suite after INS-009 Tester review,Regression,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,28 fail / 549 pass / 1 skipped -- 9 INS-009 gaps + 19 pre-existing Open-WP failures; zero new regressions,Tester Agent regression confirmation
-=======
-TST-316,test_color_primary_exists,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_PRIMARY == #0A1D4E,
-TST-317,test_color_secondary_exists,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_SECONDARY == #5BC5F2,
-TST-318,test_color_text_exists,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_TEXT == #FFFFFF,
-TST-319,test_color_primary_is_string,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_PRIMARY is str,
-TST-320,test_color_secondary_is_string,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_SECONDARY is str,
-TST-321,test_color_text_is_string,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_TEXT is str,
-TST-322,test_window_configure_called,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,window.configure(fg_color=COLOR_PRIMARY) called,
-TST-323,test_window_configure_uses_color_primary,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,fg_color arg is COLOR_PRIMARY,
-TST-324,test_create_button_fg_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Create Project button fg_color == COLOR_SECONDARY,
-TST-325,test_create_button_text_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Create Project button text_color == COLOR_TEXT,
-TST-326,test_create_button_hover_color_set,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Create Project button hover_color present,
-TST-327,test_project_type_label_text_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Project Type label text_color == COLOR_TEXT,
-TST-328,test_dropdown_fg_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,CTkOptionMenu fg_color == COLOR_SECONDARY,
-TST-329,test_dropdown_button_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,CTkOptionMenu button_color == COLOR_SECONDARY,
-TST-330,test_checkbox_text_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,CTkCheckBox text_color == COLOR_TEXT,
-TST-331,test_checkbox_fg_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,CTkCheckBox fg_color == COLOR_SECONDARY,
-TST-332,test_make_label_entry_row_label_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,make_label_entry_row label text_color == COLOR_TEXT,
-TST-333,test_make_browse_row_label_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,make_browse_row label text_color == COLOR_TEXT,
-TST-334,test_make_label_entry_row_entry_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,make_label_entry_row entry text_color == COLOR_TEXT,
-TST-335,test_make_browse_row_entry_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,make_browse_row entry text_color == COLOR_TEXT,
-TST-336,test_browse_button_fg_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Browse button fg_color == COLOR_SECONDARY,
-TST-337,test_browse_button_text_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Browse button text_color == COLOR_TEXT,
-TST-338,test_browse_button_hover_color_set,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Browse button hover_color present,
-TST-339,test_single_space_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,single space string (whitespace-only) rejected cleanly,Tester edge-case
-TST-340,test_leading_whitespace_on_valid_path_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,path with leading spaces is non-existent on all platforms → rejected,Tester edge-case
-TST-341,test_trailing_whitespace_no_crash,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,path with trailing spaces handled without crash; Windows silently strips trailing spaces (accepted); Linux/macOS rejects as non-existent,Tester edge-case — platform-specific OS behaviour documented
-TST-342,test_dir_with_spaces_in_name_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid directory whose name contains spaces is accepted,Tester edge-case
-TST-343,test_dir_with_unicode_chars_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid directory whose name contains Unicode characters is accepted,Tester edge-case
-TST-344,test_dir_with_parentheses_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid directory whose name contains parentheses is accepted,Tester edge-case
-TST-345,test_dir_with_hyphens_and_underscores_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid directory with hyphens and underscores in name is accepted,Tester edge-case
-TST-346,test_dir_starting_with_dot_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid hidden-style directory (dot-prefixed name) is accepted,Tester edge-case
-TST-347,test_long_segment_nonexistent_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,200-character segment non-existent path rejected gracefully without exception,Tester edge-case
-TST-348,test_deeply_nested_nonexistent_path_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,20-level deeply nested non-existent path rejected gracefully without exception,Tester edge-case
-TST-349,test_forward_slashes_accepted_on_windows,Cross-platform,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,Windows path using forward slashes instead of backslashes is accepted by pathlib,Tester edge-case — cross-platform separator handling
-TST-350,test_none_input_rejected_without_crash,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,None passed as path rejected cleanly via short-circuit `if not path` guard — no AttributeError,Tester edge-case
-TST-351,test_return_is_two_tuple_for_valid_path,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,return value is (bool - str) 2-tuple for valid path,Tester edge-case
-TST-352,test_return_is_two_tuple_for_invalid_path,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,return value is (bool - str) 2-tuple for invalid path,Tester edge-case
-TST-353,test_error_message_nonempty_when_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,error message is always a non-empty string when the function returns False,Tester edge-case
-TST-354,test_error_message_empty_when_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,error message is always an empty string when the function returns True,Tester edge-case
-TST-355,Full regression suite (Tester GUI-004 review — 23 GUI-004 tests),Regression,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,553 pass / 33 pre-existing failures (INS-004 In-Progress + INS-012) / 1 skipped — zero new failures; 16 Tester edge-case tests all pass,Tester Agent GUI-004 Iteration 1 final run
-TST-339,test_brace_expansion_multi_group_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{src,tests}/{.github,.vscode}/** Cartesian product — all expansions denied",Tester edge-case
-TST-340,test_brace_expansion_deeply_nested_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.github/{hooks/{scripts,config},workflows}/** nested braces all resolve under .github/ — denied,Tester edge-case
-TST-341,test_brace_expansion_empty_brace_group_no_crash,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,{}/** not expanded (regex requires ≥1 char) — no crash; not falsely denied,Tester edge-case
-TST-342,test_brace_expansion_single_element_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{.github}/** expands to .github/** — denied",Tester edge-case
-TST-343,test_brace_expansion_all_safe_items_not_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{src,tests,Project}/**/*.py — all safe zones; not denied",Tester edge-case
-TST-344,test_brace_expansion_mixed_case_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{.GitHub,.VSCODE}/** mixed-case expansions normalised to lower-case and denied",Tester edge-case
-TST-345,test_brace_expansion_path_traversal_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{../.github,src}/** — ../ inside brace alternative caught by traversal guard — denied",Tester edge-case
-TST-346,SAF-003 Tester full regression suite (57 SAF-003 + full suite),Regression,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,57/57 SAF-003 tests pass; 537/537 total pass; 33 pre-existing INS-004/INS-012 failures unrelated to SAF-003,Tester Agent Iteration 2 final run
->>>>>>> Stashed changes
+TST-212,test_update_check_result_is_namedtuple,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,UpdateCheckResult is a tuple subclass,
+TST-213,test_update_check_result_has_update_available_field,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,update_available field accessible by name,
+TST-214,test_update_check_result_has_latest_version_field,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,latest_version field accessible by name,
+TST-215,test_update_check_result_tuple_unpacking,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,2-tuple unpack works on UpdateCheckResult,
+TST-216,test_parse_version_basic_semver,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.2.3 parses to (1 2 3),
+TST-217,test_parse_version_v_prefix_stripped,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,v2.0.0 parses to (2 0 0),
+TST-218,test_parse_version_two_components_padded,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.4 padded to (1 4 0),
+TST-219,test_parse_version_one_component_padded,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,3 padded to (3 0 0),
+TST-220,test_is_newer_major_bump,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,2.0.0 > 1.9.9,
+TST-221,test_is_newer_minor_bump,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.1.0 > 1.0.9,
+TST-222,test_is_newer_patch_bump,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.0.1 > 1.0.0,
+TST-223,test_is_newer_same_version_returns_false,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.0.0 not newer than 1.0.0,
+TST-224,test_fetch_latest_version_returns_version_string,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,mocked API response tag_name v1.2.3 returns 1.2.3,
+TST-225,test_fetch_latest_version_uses_https,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,_API_URL starts with https://,HTTPS enforcement
+TST-226,test_fetch_latest_version_timeout_forwarded,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,urlopen called with timeout=GITHUB_API_TIMEOUT,
+TST-227,test_fetch_latest_version_network_error_returns_none,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,OSError returns None (silent failure),
+TST-228,test_fetch_latest_version_http_error_returns_none,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,HTTPError 404 returns None,
+TST-229,test_fetch_latest_version_missing_tag_name_returns_none,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,dict without tag_name returns None,
+TST-230,test_fetch_latest_version_empty_tag_name_returns_none,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,empty tag_name returns None,
+TST-231,test_check_for_update_returns_true_when_newer,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,2.0.0 > 1.0.0 returns UpdateCheckResult(True 2.0.0),
+TST-232,test_check_for_update_network_failure_returns_no_update,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,None fetch returns (False current_version),
+TST-233,Full regression suite (493/495 INS-009 addition),Regression,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,493/495 pass -- 21 new INS-009 tests all pass; 2 pre-existing failures (INS-004 INS-012) unrelated to INS-009,Developer Agent INS-009 final run
+TST-234,GUI-004 developer test suite (7 tests — test_gui004_destination_validation.py),Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,7/7 pass — empty/whitespace/nonexistent/file/valid-dir/attribute/empty-label all covered,Developer Agent GUI-004 (results verified by Tester)
+TST-235,test_single_space_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,single space string (whitespace-only) rejected cleanly,Tester edge-case
+TST-236,test_leading_whitespace_on_valid_path_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,path with leading spaces is non-existent on all platforms — rejected,Tester edge-case
+TST-237,test_trailing_whitespace_no_crash,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,path with trailing spaces handled without crash; Windows silently strips trailing spaces (accepted); Linux/macOS rejects as non-existent,Tester edge-case — platform-specific OS behaviour documented
+TST-238,test_dir_with_spaces_in_name_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid directory whose name contains spaces is accepted,Tester edge-case
+TST-239,test_dir_with_unicode_chars_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid directory whose name contains Unicode characters is accepted,Tester edge-case
+TST-240,test_dir_with_parentheses_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid directory whose name contains parentheses is accepted,Tester edge-case
+TST-241,test_dir_with_hyphens_and_underscores_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid directory with hyphens and underscores in name is accepted,Tester edge-case
+TST-242,test_dir_starting_with_dot_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,valid hidden-style directory (dot-prefixed name) is accepted,Tester edge-case
+TST-243,test_long_segment_nonexistent_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,200-character segment non-existent path rejected gracefully without exception,Tester edge-case
+TST-244,test_deeply_nested_nonexistent_path_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,20-level deeply nested non-existent path rejected gracefully without exception,Tester edge-case
+TST-245,test_forward_slashes_accepted_on_windows,Cross-platform,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,Windows path using forward slashes instead of backslashes is accepted by pathlib,Tester edge-case — cross-platform separator handling
+TST-246,test_none_input_rejected_without_crash,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,None passed as path rejected cleanly via short-circuit if-not-path guard — no AttributeError,Tester edge-case
+TST-247,test_return_is_two_tuple_for_valid_path,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,return value is (bool str) 2-tuple for valid path,Tester edge-case
+TST-248,test_return_is_two_tuple_for_invalid_path,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,return value is (bool str) 2-tuple for invalid path,Tester edge-case
+TST-249,test_error_message_nonempty_when_rejected,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,error message is always a non-empty string when the function returns False,Tester edge-case
+TST-250,test_error_message_empty_when_accepted,Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,error message is always an empty string when the function returns True,Tester edge-case
+TST-251,Full regression suite (Tester GUI-004 review — 23 GUI-004 tests),Regression,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,553 pass / 33 pre-existing failures (INS-004 In-Progress + INS-012) / 1 skipped — zero new failures; 16 Tester edge-case tests all pass,Tester Agent GUI-004 Iteration 1 final run
