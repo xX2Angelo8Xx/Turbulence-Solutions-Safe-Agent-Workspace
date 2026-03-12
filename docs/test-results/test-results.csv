@@ -619,3 +619,27 @@ TST-517,test_version_label_grid_called (Iteration 2),Integration,GUI-008,Pass,20
 TST-518,test_version_label_text_contains_version (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,CTkLabel created with text containing display version string,Fixed in Iteration 2
 TST-519,test_version_label_get_display_version_imported (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,get_display_version imported from launcher.config in app.py AST check,Fixed in Iteration 2
 TST-520,GUI-008 full suite (14/14) + full regression (924 pass),Regression,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,14/14 GUI-008 pass; 924 total pass; 11 pre-existing failures unchanged (SAF-010/INS-004/INS-012),Tester Agent Iteration 2 — PASS verdict
+TST-521,test_file_exists,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,build_dmg.sh exists at src/installer/macos/build_dmg.sh,
+TST-522,test_file_is_non_empty,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,File size > 0,
+TST-523,test_shebang_line,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,First line is #!/usr/bin/env bash,
+TST-524,test_set_pipefail,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,set -euo pipefail present,
+TST-525,test_references_hdiutil,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,hdiutil command referenced,
+TST-526,test_hdiutil_create_subcommand,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,hdiutil create subcommand present,
+TST-527,test_hdiutil_compressed_format,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,-format UDZO (compressed DMG) specified,
+TST-528,test_hdiutil_volname,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,-volname flag set for hdiutil create,
+TST-529,test_app_name,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,App name Agent Environment Launcher present,
+TST-530,test_app_version,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Version 0.1.0 embedded,
+TST-531,test_publisher,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Publisher Turbulence Solutions referenced,
+TST-532,test_intel_arch_referenced,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,x86_64 architecture explicitly referenced,
+TST-533,test_arm_arch_referenced,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,arm64 architecture explicitly referenced,
+TST-534,test_target_arch_passed_to_pyinstaller,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,--target-arch passed to PyInstaller,
+TST-535,test_no_users_path,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded /Users/ path (bypass attempt),
+TST-536,test_no_home_path,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded /home/ path (bypass attempt),
+TST-537,test_no_absolute_dist_path,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,dist/ referenced as relative path only (bypass attempt),
+TST-538,test_contents_macos_created,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Contents/MacOS directory created in .app bundle,
+TST-539,test_contents_resources_created,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Contents/Resources directory created in .app bundle,
+TST-540,test_info_plist_written,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Info.plist written into .app bundle,
+TST-541,test_plist_key_present (x10 keys),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,All 10 CFBundle/NS plist keys present (parametrized),
+TST-542,test_references_launcher_spec,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,launcher.spec referenced for PyInstaller build,
+TST-543,test_references_dist_launcher_output,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,dist/launcher output directory referenced,
+TST-544,INS-006 full suite (32 tests) + full regression,Regression,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,32/32 INS-006 pass; 956 total pass; 11 pre-existing failures unchanged,Developer Agent INS-006 Iteration 1 — all tests pass
