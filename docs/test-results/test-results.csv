@@ -416,3 +416,58 @@ TST-360,test_template_non_json_files_match_default_project_byte_for_byte,Unit,IN
 TST-361,test_require_approval_json_is_valid_json,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,require-approval.json is valid parseable JSON,
 TST-362,test_vscode_settings_json_is_valid_json,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,.vscode/settings.json is valid parseable JSON,
 TST-363,Full regression suite (681 tests â€” Tester INS-004 review),Regression,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,681/689 total tests pass; 8 pre-existing failures in INS-012 and SAF-010 unrelated to INS-004; 48/48 INS-004 tests pass; zero regressions introduced,Tester Agent Iteration 1 final run; PASS verdict
+TST-364,test_unit_allows_project_root,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() allows write to Project/ root,Maintenance recovery
+TST-365,test_unit_allows_project_nested,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() allows write to nested Project/ path,Maintenance recovery
+TST-366,test_unit_denies_docs_ask_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies docs/ (ask zone) — stricter than zone-only check,Maintenance recovery
+TST-367,test_unit_denies_src_ask_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies src/ (ask zone),Maintenance recovery
+TST-368,test_unit_denies_tests_ask_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies tests/ (ask zone),Maintenance recovery
+TST-369,test_unit_denies_root_file_ask_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies workspace root files (ask zone),Maintenance recovery
+TST-370,test_unit_denies_github_deny_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies .github/ (deny zone),Maintenance recovery
+TST-371,test_unit_denies_vscode_deny_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies .vscode/ (deny zone),Maintenance recovery
+TST-372,test_unit_denies_noagentzone_deny_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies NoAgentZone/ (deny zone),Maintenance recovery
+TST-373,test_unit_fails_closed_no_path,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() fails closed when no path field present,Maintenance recovery
+TST-374,test_unit_uses_filepath_field,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() reads filePath as first-priority field,Maintenance recovery
+TST-375,test_unit_uses_file_path_field,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() falls back to file_path field,Maintenance recovery
+TST-376,test_unit_uses_directory_field,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() falls back to directory field,Maintenance recovery
+TST-377,test_unit_nested_tool_input_path_allowed,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() reads path from nested tool_input dict (allow),Maintenance recovery
+TST-378,test_unit_nested_tool_input_path_denied,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() reads path from nested tool_input dict (deny),Maintenance recovery
+TST-379,test_security_create_file_project_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,create_file inside Project/ is allowed,Maintenance recovery
+TST-380,test_security_create_file_outside_denied,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,create_file outside Project/ (src/) is denied,Maintenance recovery
+TST-381,test_security_write_file_outside_denied,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,write_file targeting docs/ is denied,Maintenance recovery
+TST-382,test_security_replace_string_in_file_project_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,replace_string_in_file inside Project/ is allowed,Maintenance recovery
+TST-383,test_security_replace_string_in_file_outside_denied,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,replace_string_in_file on docs/ is denied,Maintenance recovery
+TST-384,test_security_multi_replace_project_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,multi_replace_string_in_file inside Project/ is allowed,Maintenance recovery
+TST-385,test_security_multi_replace_outside_denied,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,multi_replace_string_in_file on src/ is denied,Maintenance recovery
+TST-386,test_security_edit_file_project_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,edit_file inside Project/ is allowed,Maintenance recovery
+TST-387,test_security_edit_file_outside_denied,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,edit_file on src/ is denied,Maintenance recovery
+TST-388,test_security_edit_capitalized_denied_outside,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Edit (capitalized alias) targeting .vscode/ is denied,Maintenance recovery
+TST-389,test_bypass_path_traversal_project_to_docs,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,project/../docs/readme.md resolves to docs/ and is denied,Maintenance recovery
+TST-390,test_bypass_deep_traversal_to_github,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,deep traversal escaping workspace resolves and is denied,Maintenance recovery
+TST-391,test_bypass_prefix_sibling_project_evil,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,project-evil/ sibling prefix not confused with project/ by pathlib,Maintenance recovery
+TST-392,test_bypass_null_byte_before_dot_github,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,null byte before .github is stripped and path is denied,Maintenance recovery
+TST-393,test_bypass_mixed_case_project_still_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,PROJECT/ lowercased to project/ by normalizer — allow,Maintenance recovery
+TST-394,test_bypass_unc_path_targeting_docs,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,UNC path to foreign host cannot be granted allow — denied,Maintenance recovery
+TST-395,test_bypass_json_escaped_backslash_to_docs,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,JSON double-escaped backslash path to docs/ normalizes and is denied,Maintenance recovery
+TST-396,test_bypass_traversal_starting_inside_project,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,project/subdir/../../docs/ resolves to docs/ and is denied,Maintenance recovery
+TST-397,test_bypass_null_byte_inside_project_path_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,null byte prepended to valid project path is stripped — allow,Maintenance recovery
+TST-398,test_bypass_mixed_case_vscode_still_denied,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,.VSCODE lowercased to .vscode and denied,Maintenance recovery
+TST-399,test_bypass_project_sibling_with_nested_github,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,project-evil/.github/ denied via Method 2 pattern scan,Maintenance recovery
+TST-400,test_crossplat_windows_project_allowed,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Windows C:\workspace\project\ path allowed,Maintenance recovery
+TST-401,test_crossplat_windows_outside_denied,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Windows C:\workspace\docs\ path denied,Maintenance recovery
+TST-402,test_crossplat_windows_github_denied,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Windows C:\workspace\.github\ path denied,Maintenance recovery
+TST-403,test_crossplat_windows_vscode_denied,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Windows C:\workspace\.vscode\ path denied,Maintenance recovery
+TST-404,test_crossplat_wsl_project_allowed,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,WSL /mnt/c/workspace/project/ path allowed,Maintenance recovery
+TST-405,test_crossplat_wsl_outside_denied,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,WSL /mnt/c/workspace/docs/ path denied,Maintenance recovery
+TST-406,test_crossplat_wsl_github_denied,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,WSL /mnt/c/workspace/.github/ path denied,Maintenance recovery
+TST-407,test_crossplat_gitbash_project_allowed,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Git Bash /c/workspace/project/ path allowed,Maintenance recovery
+TST-408,test_crossplat_gitbash_outside_denied,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Git Bash /c/workspace/docs/ path denied,Maintenance recovery
+TST-409,test_crossplat_gitbash_github_denied,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Git Bash /c/workspace/.github/ path denied,Maintenance recovery
+TST-410,test_crossplat_windows_all_backslashes_project,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Windows all-single-backslash nested project path allowed,Maintenance recovery
+TST-411,test_crossplat_windows_json_escaped_backslash_outside,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Windows JSON double-escaped backslash docs path denied,Maintenance recovery
+TST-412,test_integration_decide_create_file_project,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes create_file to validate_write_tool; Project/ ? allow,Maintenance recovery
+TST-413,test_integration_decide_create_file_docs,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes create_file to validate_write_tool; docs/ ? deny,Maintenance recovery
+TST-414,test_integration_write_tool_no_path_fails_closed,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,decide() write tool with no path fails closed — deny,Maintenance recovery
+TST-415,test_integration_write_tool_intercepted_before_exempt_check,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,_WRITE_TOOLS branch runs before _EXEMPT_TOOLS; docs/ denied not asked,Maintenance recovery
+TST-416,test_integration_edit_notebook_file_not_in_write_tools_asks,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,edit_notebook_file not in _WRITE_TOOLS — routed as non-exempt tool ? ask,Maintenance recovery
+TST-417,test_integration_write_tools_frozenset_contains_expected_tools,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,_WRITE_TOOLS frozenset contains all expected write tool names,Maintenance recovery
+TST-418,Full SAF-007 test suite (54 tests — maintenance recovery),Regression,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,54/54 recovered tests pass; validate_write_tool() confirmed correct; zero regressions,Maintenance recovery — test file recreated after loss
