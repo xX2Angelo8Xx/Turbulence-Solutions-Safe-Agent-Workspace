@@ -351,3 +351,34 @@ TST-273,test_spec_includes_templates_in_datas,Unit,INS-003,Pass,2026-03-12,Windo
 TST-274,test_spec_uses_onedir_collect,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,COLLECT() call present — onedir mode confirmed,
 TST-275,test_spec_exclude_binaries_true,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,exclude_binaries=True set in EXE(),
 TST-276,Full regression suite (377 tests — INS-003 addition),Regression,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 7 new INS-003 tests + 370 prior; zero regressions,Developer Agent INS-003
+TST-316,test_color_primary_exists,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_PRIMARY == #0A1D4E,
+TST-317,test_color_secondary_exists,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_SECONDARY == #5BC5F2,
+TST-318,test_color_text_exists,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_TEXT == #FFFFFF,
+TST-319,test_color_primary_is_string,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_PRIMARY is str,
+TST-320,test_color_secondary_is_string,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_SECONDARY is str,
+TST-321,test_color_text_is_string,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,COLOR_TEXT is str,
+TST-322,test_window_configure_called,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,window.configure(fg_color=COLOR_PRIMARY) called,
+TST-323,test_window_configure_uses_color_primary,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,fg_color arg is COLOR_PRIMARY,
+TST-324,test_create_button_fg_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Create Project button fg_color == COLOR_SECONDARY,
+TST-325,test_create_button_text_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Create Project button text_color == COLOR_TEXT,
+TST-326,test_create_button_hover_color_set,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Create Project button hover_color present,
+TST-327,test_project_type_label_text_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Project Type label text_color == COLOR_TEXT,
+TST-328,test_dropdown_fg_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,CTkOptionMenu fg_color == COLOR_SECONDARY,
+TST-329,test_dropdown_button_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,CTkOptionMenu button_color == COLOR_SECONDARY,
+TST-330,test_checkbox_text_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,CTkCheckBox text_color == COLOR_TEXT,
+TST-331,test_checkbox_fg_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,CTkCheckBox fg_color == COLOR_SECONDARY,
+TST-332,test_make_label_entry_row_label_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,make_label_entry_row label text_color == COLOR_TEXT,
+TST-333,test_make_browse_row_label_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,make_browse_row label text_color == COLOR_TEXT,
+TST-334,test_make_label_entry_row_entry_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,make_label_entry_row entry text_color == COLOR_TEXT,
+TST-335,test_make_browse_row_entry_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,make_browse_row entry text_color == COLOR_TEXT,
+TST-336,test_browse_button_fg_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Browse button fg_color == COLOR_SECONDARY,
+TST-337,test_browse_button_text_color,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Browse button text_color == COLOR_TEXT,
+TST-338,test_browse_button_hover_color_set,Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,Browse button hover_color present,
+TST-339,test_brace_expansion_multi_group_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{src,tests}/{.github,.vscode}/** Cartesian product — all expansions denied",Tester edge-case
+TST-340,test_brace_expansion_deeply_nested_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.github/{hooks/{scripts,config},workflows}/** nested braces all resolve under .github/ — denied,Tester edge-case
+TST-341,test_brace_expansion_empty_brace_group_no_crash,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,{}/** not expanded (regex requires ≥1 char) — no crash; not falsely denied,Tester edge-case
+TST-342,test_brace_expansion_single_element_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{.github}/** expands to .github/** — denied",Tester edge-case
+TST-343,test_brace_expansion_all_safe_items_not_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{src,tests,Project}/**/*.py — all safe zones; not denied",Tester edge-case
+TST-344,test_brace_expansion_mixed_case_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{.GitHub,.VSCODE}/** mixed-case expansions normalised to lower-case and denied",Tester edge-case
+TST-345,test_brace_expansion_path_traversal_deny,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"{../.github,src}/** — ../ inside brace alternative caught by traversal guard — denied",Tester edge-case
+TST-346,SAF-003 Tester full regression suite (57 SAF-003 + full suite),Regression,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,57/57 SAF-003 tests pass; 537/537 total pass; 33 pre-existing INS-004/INS-012 failures unrelated to SAF-003,Tester Agent Iteration 2 final run

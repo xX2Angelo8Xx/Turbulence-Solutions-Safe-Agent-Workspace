@@ -445,3 +445,94 @@ def test_grep_search_wsl_absolute_include_pattern_github_denied():
         "includePattern": "/mnt/c/workspace/.github/**",
     }
     assert sg.decide(data, ws_wsl) == "deny"
+
+
+# ===========================================================================
+# Brace expansion tests  (TST-315 to TST-318)
+# ===========================================================================
+
+def test_brace_expansion_deny_zone_github():
+    # TST-315 — brace expansion: {.github,.vscode}/** expands to include deny zone → deny
+    data = {"tool_name": "grep_search", "includePattern": "{.github,.vscode}/**"}
+    assert sg.decide(data, WS) == "deny"
+
+
+def test_brace_expansion_partial_deny():
+    # TST-316 — brace expansion: .{github,other}/** partial expansion contains deny zone → deny
+    data = {"tool_name": "grep_search", "includePattern": ".{github,other}/**"}
+    assert sg.decide(data, WS) == "deny"
+
+
+def test_brace_expansion_safe_pattern():
+    # TST-317 — brace expansion: {src,tests}/**/*.py expands to only safe zones → not denied
+    data = {"tool_name": "grep_search", "includePattern": "{src,tests}/**/*.py"}
+    assert sg.decide(data, WS) != "deny"
+
+
+def test_brace_expansion_nested_deny():
+    # TST-318 — brace expansion: .github/{hooks,workflows}/** deny zone with brace sub-path → deny
+    data = {"tool_name": "grep_search", "includePattern": ".github/{hooks,workflows}/**"}
+    assert sg.decide(data, WS) == "deny"
+
+
+# ===========================================================================
+# Tester edge-case brace expansion tests  (TST-339 to TST-345)
+# ===========================================================================
+
+def test_brace_expansion_multi_group_deny():
+    # TST-339 — multiple brace groups: {src,tests}/{.github,.vscode}/** expands to
+    # src/.github/**, src/.vscode/**, tests/.github/**, tests/.vscode/** — all denied
+    data = {"tool_name": "grep_search", "includePattern": "{src,tests}/{.github,.vscode}/**"}
+    assert sg.decide(data, WS) == "deny"
+
+
+def test_brace_expansion_deeply_nested_deny():
+    # TST-340 — deeply nested: .github/{hooks/{scripts,config},workflows}/**
+    # Inner {scripts,config} expands first, producing .github/hooks/scripts/** and
+    # .github/hooks/config/** and .github/workflows/** — all under .github/ → deny
+    data = {
+        "tool_name": "grep_search",
+        "includePattern": ".github/{hooks/{scripts,config},workflows}/**",
+    }
+    assert sg.decide(data, WS) == "deny"
+
+
+def test_brace_expansion_empty_brace_group_no_crash():
+    # TST-341 — empty brace group {}/** — [^{}]+ requires ≥1 char so {} is NOT
+    # expanded; the literal pattern {}/** must not cause a crash and must not
+    # be falsely denied (it does not target any deny zone).
+    data = {"tool_name": "grep_search", "includePattern": "{}/**"}
+    result = sg.decide(data, WS)
+    assert result != "deny", (
+        f"Empty brace group {{}}/** should not trigger a deny; got {result!r}"
+    )
+
+
+def test_brace_expansion_single_element_deny():
+    # TST-342 — single-element brace: {.github}/** — expands to .github/** → deny
+    data = {"tool_name": "grep_search", "includePattern": "{.github}/**"}
+    assert sg.decide(data, WS) == "deny"
+
+
+def test_brace_expansion_all_safe_items_not_denied():
+    # TST-343 — all-safe brace: {src,tests,Project}/**/*.py expands to only safe
+    # zones (src, tests, Project) — none are deny zones → must not be denied
+    data = {"tool_name": "grep_search", "includePattern": "{src,tests,Project}/**/*.py"}
+    result = sg.decide(data, WS)
+    assert result != "deny", (
+        f"All-safe brace expansion should not be denied; got {result!r}"
+    )
+
+
+def test_brace_expansion_mixed_case_deny():
+    # TST-344 — mixed-case deny zones: {.GitHub,.VSCODE}/** — zone_classifier
+    # normalises to lower-case before classification; both expansions must be denied
+    data = {"tool_name": "grep_search", "includePattern": "{.GitHub,.VSCODE}/**"}
+    assert sg.decide(data, WS) == "deny"
+
+
+def test_brace_expansion_path_traversal_deny():
+    # TST-345 — traversal inside brace: {../.github,src}/** — the expansion
+    # ../.github/** still contains ".." after normalize_path → traversal guard → deny
+    data = {"tool_name": "grep_search", "includePattern": "{../.github,src}/**"}
+    assert sg.decide(data, WS) == "deny"
