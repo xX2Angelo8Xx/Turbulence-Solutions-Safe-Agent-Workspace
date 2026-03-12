@@ -418,7 +418,7 @@ TST-362,test_vscode_settings_json_is_valid_json,Unit,INS-004,Pass,2026-03-12,Win
 TST-363,Full regression suite (681 tests — Tester INS-004 review),Regression,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,681/689 total tests pass; 8 pre-existing failures in INS-012 and SAF-010 unrelated to INS-004; 48/48 INS-004 tests pass; zero regressions introduced,Tester Agent Iteration 1 final run; PASS verdict
 TST-364,test_unit_allows_project_root,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() allows write to Project/ root,Maintenance recovery
 TST-365,test_unit_allows_project_nested,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() allows write to nested Project/ path,Maintenance recovery
-TST-366,test_unit_denies_docs_ask_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies docs/ (ask zone) � stricter than zone-only check,Maintenance recovery
+TST-366,test_unit_denies_docs_ask_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies docs/ (ask zone) � stricter than zone-only check,Maintenance recovery
 TST-367,test_unit_denies_src_ask_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies src/ (ask zone),Maintenance recovery
 TST-368,test_unit_denies_tests_ask_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies tests/ (ask zone),Maintenance recovery
 TST-369,test_unit_denies_root_file_ask_zone,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,validate_write_tool() denies workspace root files (ask zone),Maintenance recovery
@@ -445,11 +445,11 @@ TST-389,test_bypass_path_traversal_project_to_docs,Security,SAF-007,Pass,2026-03
 TST-390,test_bypass_deep_traversal_to_github,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,deep traversal escaping workspace resolves and is denied,Maintenance recovery
 TST-391,test_bypass_prefix_sibling_project_evil,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,project-evil/ sibling prefix not confused with project/ by pathlib,Maintenance recovery
 TST-392,test_bypass_null_byte_before_dot_github,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,null byte before .github is stripped and path is denied,Maintenance recovery
-TST-393,test_bypass_mixed_case_project_still_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,PROJECT/ lowercased to project/ by normalizer � allow,Maintenance recovery
-TST-394,test_bypass_unc_path_targeting_docs,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,UNC path to foreign host cannot be granted allow � denied,Maintenance recovery
+TST-393,test_bypass_mixed_case_project_still_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,PROJECT/ lowercased to project/ by normalizer � allow,Maintenance recovery
+TST-394,test_bypass_unc_path_targeting_docs,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,UNC path to foreign host cannot be granted allow � denied,Maintenance recovery
 TST-395,test_bypass_json_escaped_backslash_to_docs,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,JSON double-escaped backslash path to docs/ normalizes and is denied,Maintenance recovery
 TST-396,test_bypass_traversal_starting_inside_project,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,project/subdir/../../docs/ resolves to docs/ and is denied,Maintenance recovery
-TST-397,test_bypass_null_byte_inside_project_path_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,null byte prepended to valid project path is stripped � allow,Maintenance recovery
+TST-397,test_bypass_null_byte_inside_project_path_allowed,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,null byte prepended to valid project path is stripped � allow,Maintenance recovery
 TST-398,test_bypass_mixed_case_vscode_still_denied,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,.VSCODE lowercased to .vscode and denied,Maintenance recovery
 TST-399,test_bypass_project_sibling_with_nested_github,Security,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,project-evil/.github/ denied via Method 2 pattern scan,Maintenance recovery
 TST-400,test_crossplat_windows_project_allowed,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Windows C:\workspace\project\ path allowed,Maintenance recovery
@@ -466,8 +466,38 @@ TST-410,test_crossplat_windows_all_backslashes_project,Cross-platform,SAF-007,Pa
 TST-411,test_crossplat_windows_json_escaped_backslash_outside,Cross-platform,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,Windows JSON double-escaped backslash docs path denied,Maintenance recovery
 TST-412,test_integration_decide_create_file_project,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes create_file to validate_write_tool; Project/ ? allow,Maintenance recovery
 TST-413,test_integration_decide_create_file_docs,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes create_file to validate_write_tool; docs/ ? deny,Maintenance recovery
-TST-414,test_integration_write_tool_no_path_fails_closed,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,decide() write tool with no path fails closed � deny,Maintenance recovery
+TST-414,test_integration_write_tool_no_path_fails_closed,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,decide() write tool with no path fails closed � deny,Maintenance recovery
 TST-415,test_integration_write_tool_intercepted_before_exempt_check,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,_WRITE_TOOLS branch runs before _EXEMPT_TOOLS; docs/ denied not asked,Maintenance recovery
-TST-416,test_integration_edit_notebook_file_not_in_write_tools_asks,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,edit_notebook_file not in _WRITE_TOOLS � routed as non-exempt tool ? ask,Maintenance recovery
+TST-416,test_integration_edit_notebook_file_not_in_write_tools_asks,Integration,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,edit_notebook_file not in _WRITE_TOOLS � routed as non-exempt tool ? ask,Maintenance recovery
 TST-417,test_integration_write_tools_frozenset_contains_expected_tools,Unit,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,_WRITE_TOOLS frozenset contains all expected write tool names,Maintenance recovery
-TST-418,Full SAF-007 test suite (54 tests � maintenance recovery),Regression,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,54/54 recovered tests pass; validate_write_tool() confirmed correct; zero regressions,Maintenance recovery � test file recreated after loss
+TST-418,Full SAF-007 test suite (54 tests � maintenance recovery),Regression,SAF-007,Pass,2026-03-12,Windows 11 + Python 3.11,54/54 recovered tests pass; validate_write_tool() confirmed correct; zero regressions,Maintenance recovery � test file recreated after loss
+TST-419,test_config_file_exists,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,require-approval.json exists at correct path,Maintenance — retroactive logging
+TST-420,test_config_is_valid_json,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,require-approval.json is well-formed JSON,Maintenance — retroactive logging
+TST-421,test_hooks_key_present,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,top-level 'hooks' key is present,Maintenance — retroactive logging
+TST-422,test_pretooluse_key_present,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,'PreToolUse' key exists under 'hooks',Maintenance — retroactive logging
+TST-423,test_pretooluse_is_non_empty_list,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,PreToolUse is a non-empty list,Maintenance — retroactive logging
+TST-424,test_entry_type_is_command,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,first PreToolUse entry has type 'command',Maintenance — retroactive logging
+TST-425,test_command_references_security_gate,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,command field references security_gate.py,Maintenance — retroactive logging
+TST-426,test_command_does_not_reference_legacy_sh,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,command does NOT reference old shell script,Maintenance — retroactive logging
+TST-427,test_command_uses_python,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Unix command invokes python or python3,Maintenance — retroactive logging
+TST-428,test_windows_field_present,Cross-platform,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,windows override field is present,Maintenance — retroactive logging
+TST-429,test_windows_command_references_security_gate,Cross-platform,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,windows command references security_gate.py,Maintenance — retroactive logging
+TST-430,test_windows_command_does_not_reference_legacy_ps1,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,windows command does NOT reference old PowerShell script,Maintenance — retroactive logging
+TST-431,test_windows_command_uses_python,Cross-platform,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Windows command invokes python,Maintenance — retroactive logging
+TST-432,test_script_path_resolves,Integration,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,referenced security_gate.py exists on disk,Maintenance — retroactive logging
+TST-433,test_security_gate_is_python_script,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,script reference in command ends with .py,Maintenance — retroactive logging
+TST-434,test_timeout_is_present,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,timeout field is present in PreToolUse entry,Maintenance — retroactive logging
+TST-435,test_timeout_is_positive_integer,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,timeout is a positive integer,Maintenance — retroactive logging
+TST-436,test_no_tool_filter,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,PreToolUse entry has no matcher or tools restriction — covers ALL tools,Maintenance — retroactive logging
+TST-437,test_no_bom_encoding,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,require-approval.json is UTF-8 without BOM,Maintenance — retroactive logging
+TST-438,test_json_round_trip,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,load + dump + load produces equivalent JSON,Maintenance — retroactive logging
+TST-439,test_top_level_only_hooks_key,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,config contains ONLY the 'hooks' key at top level,Maintenance — retroactive logging
+TST-440,test_only_pretooluse_event_registered,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,only PreToolUse is registered under hooks,Maintenance — retroactive logging
+TST-441,test_command_uses_relative_path,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Unix command path is relative not absolute,Maintenance — retroactive logging
+TST-442,test_windows_command_uses_relative_path,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Windows command path is relative not absolute,Maintenance — retroactive logging
+TST-443,test_windows_security_gate_is_python_script,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,script in windows command ends with .py,Maintenance — retroactive logging
+TST-444,test_timeout_within_reasonable_range,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,timeout is within 1-60 seconds,Maintenance — retroactive logging
+TST-445,test_security_gate_has_main_function,Integration,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,security_gate.py defines a callable main() function,Maintenance — retroactive logging
+TST-446,test_security_gate_has_name_guard,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,security_gate.py has if __name__ == '__main__' guard,Maintenance — retroactive logging
+TST-447,test_settings_json_auto_approve_disabled,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,settings.json has chat.tools.global.autoApprove=false,Maintenance — retroactive logging
+TST-448,SAF-010 full test suite (29 tests),Regression,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,29/29 pass — require-approval.json structure and security verified,Maintenance — retroactive logging
