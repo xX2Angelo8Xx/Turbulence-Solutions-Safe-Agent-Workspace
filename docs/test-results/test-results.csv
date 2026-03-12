@@ -351,3 +351,15 @@ TST-273,test_spec_includes_templates_in_datas,Unit,INS-003,Pass,2026-03-12,Windo
 TST-274,test_spec_uses_onedir_collect,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,COLLECT() call present — onedir mode confirmed,
 TST-275,test_spec_exclude_binaries_true,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,exclude_binaries=True set in EXE(),
 TST-276,Full regression suite (377 tests — INS-003 addition),Regression,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 7 new INS-003 tests + 370 prior; zero regressions,Developer Agent INS-003
+TST-277,test_no_bom_encoding,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,require-approval.json is BOM-free UTF-8,Tester Agent edge-case
+TST-278,test_json_round_trip,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,load+dump+load produces semantically equivalent JSON; no duplicate keys,Tester Agent edge-case
+TST-279,test_top_level_only_hooks_key,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Config has no unexpected top-level keys beyond hooks,Tester Agent edge-case
+TST-280,test_only_pretooluse_event_registered,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Only PreToolUse registered under hooks; no unintended extra event hooks,Tester Agent edge-case
+TST-281,test_command_uses_relative_path,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Unix command script path is relative not absolute,Tester Agent edge-case
+TST-282,test_windows_command_uses_relative_path,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Windows command script path is relative not absolute,Tester Agent edge-case
+TST-283,test_windows_security_gate_is_python_script,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Windows command also references a .py file,Tester Agent edge-case
+TST-284,test_timeout_within_reasonable_range,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,Timeout 15s is within acceptable range [1-60],Tester Agent edge-case
+TST-285,test_security_gate_has_main_function,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,security_gate.py defines callable main() function,Tester Agent edge-case
+TST-286,test_security_gate_has_name_guard,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,security_gate.py has if __name__ == __main__ guard,Tester Agent edge-case
+TST-287,Full SAF-010 suite (29/29 pass) -- Tester confirmation,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,29/29 pass -- 19 developer tests + 10 Tester edge-case tests all pass,Tester Agent SAF-010 final run
+TST-288,Full regression suite (551 pass / 2 pre-existing fail) -- Tester SAF-010 review,Regression,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,551 pass / 2 fail (INS-004 INS-012 pre-existing) / 1 skipped -- zero regressions from SAF-010,Tester Agent regression confirmation
