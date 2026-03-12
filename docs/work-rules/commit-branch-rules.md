@@ -33,18 +33,43 @@ The canonical remote is:
 https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
 ```
 
-Before every `git push`, verify the remote URL:
+## Pre-Push Checklist
+
+Before every `git push`, complete the following steps in order:
+
+1. Run `git remote -v` and **visually confirm** the URL matches exactly:
+   ```
+   https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
+   ```
+2. If the URL is wrong, correct it immediately:
+   ```bash
+   git remote set-url origin https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
+   ```
+3. **Never push to any other repository URL.** Pushing to the wrong remote (e.g. `agent-environment-launcher`) is a project-breaking error.
+
+## Post-Merge Cleanup
+
+After a workpackage reaches `Done` and is merged into `main`, the feature branch **MUST** be deleted immediately — do not defer cleanup:
 
 ```bash
-git remote -v
-# If incorrect:
-git remote set-url origin https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
+# Delete local branch
+git branch -d <branch-name>
+
+# Delete remote branch
+git push origin --delete <branch-name>
 ```
+
+Never allow stale merged branches to accumulate in the repository.
+
+## OneDrive Workspace Note
+
+This workspace is stored on OneDrive. Git directory deletions (e.g. branch log directories) may fail due to OneDrive file-sync locks. If git prompts a retry on directory cleanup, answer **`n`** — the branch reference itself is deleted even if the log directory cleanup fails. **Never use `--force` or destructive flags to work around OneDrive lock failures.**
 
 ## Rules
 
 - **One workpackage per branch.** Do not bundle unrelated changes.
 - **One branch per workpackage.** Do not split a single workpackage across multiple branches.
 - After a workpackage reaches `Done`, perform a `git push` before starting the next workpackage.
+- Delete the feature branch (local + remote) immediately after merge — see Post-Merge Cleanup above.
 - Keep commits focused and atomic — each commit should represent a logical unit of change.
 - Do not amend or force-push commits that have already been pushed without explicit approval.

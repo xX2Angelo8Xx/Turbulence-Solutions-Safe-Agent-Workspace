@@ -102,6 +102,21 @@ The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages
 
 ---
 
+## TST-ID Assignment
+
+Every new test result row in `docs/test-results/test-results.csv` requires a unique, strictly sequential TST-ID. Follow these rules without exception:
+
+1. **Before assigning any new TST-ID**, query the CSV for the highest existing ID:
+   ```powershell
+   # PowerShell — get the last TST-ID
+   Import-Csv 'docs/test-results/test-results.csv' | Select-Object -ExpandProperty ID | Sort-Object | Select-Object -Last 1
+   ```
+2. New IDs **MUST** start from the highest existing ID + 1. Do not guess, do not estimate.
+3. **Never reuse or reassign TST-IDs.** Once an ID is issued it is permanent, even if the row is later removed.
+4. When multiple developers are logging results in the same session, each must re-query the CSV immediately before writing to avoid collisions.
+
+---
+
 ## Test Script Preservation
 
 Test scripts are **permanent project artifacts**. They are not throw-away code.

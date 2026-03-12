@@ -39,6 +39,19 @@ Rules for code quality, scope discipline, and implementation practices.
 - Pin major versions for stability.
 - Do not introduce new dependencies without justification in the workpackage comments.
 
+## Repository Configuration Constants
+
+Any constant, variable, or configuration value that references the canonical repository (name, owner, or URL) **MUST** match the values declared in `copilot-instructions.md`. Mismatches are project-breaking errors.
+
+| Field | Value |
+|-------|-------|
+| Owner | `xX2Angelo8Xx` |
+| Repository Name | `Turbulence-Solutions-Safe-Agent-Workspace` |
+| Full URL | `https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace` |
+
+- When adding or updating any constant that references the repo (e.g. `GITHUB_REPO_NAME`, `GITHUB_REPO_OWNER`, `REPO_URL`), cross-check the value against this table before committing.
+- Do not hard-code old or alternative repo names (e.g. `agent-environment-launcher`). If one is found, treat it as a bug and fix it immediately.
+
 ## Code Permanence
 
 - **Test scripts are permanent.** The final test file for each workpackage (`tests/<WP-ID>/`) must never be deleted after the WP is `Done`. It serves as the regression baseline for all future versions.

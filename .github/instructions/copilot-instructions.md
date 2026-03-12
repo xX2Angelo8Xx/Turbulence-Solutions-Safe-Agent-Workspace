@@ -22,6 +22,8 @@ This project has the highest security classification. Prioritize safety over con
 - **All agent operations are fully autonomous once kicked off by the Orchestrator.** Never prompt for user input, never run interactive commands, never require human approval during WP execution. Exceptions: Story Writer (human approval before saving stories), Maintenance agent (human approval before implementing fixes).
 - **No global Python package installs.** All dependencies go into the workspace-local `.venv`. Ask the user before any global install.
 - **Test scripts are permanent.** The final test script for each workpackage lives in `tests/<WP-ID>/` and must never be deleted.
+- **After merging a feature branch, delete it immediately** — both locally (`git branch -d <branch>`) and remotely (`git push origin --delete <branch>`). Never leave merged branches in the repository.
+- **Before committing, always verify edits persisted to disk.** Run `git diff` and confirm all intended changes appear. If a file shows no diff despite edits, the edit was not saved — do not commit until resolved.
 
 ## Key Files
 

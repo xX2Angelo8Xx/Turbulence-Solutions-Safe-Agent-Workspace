@@ -29,6 +29,16 @@ Every agent follows this exact workflow when implementing a workpackage. No step
 | 6 | **Document** | Update `dev-log.md` with implementation summary, decisions made, tests written, and known limitations. |
 | 7 | **Handoff** | Set WP status to `Review`. Commit per `commit-branch-rules.md`. Hand off to Tester Agent. |
 
+### Post-Edit Verification (required after every code change)
+
+After making any code edit, the Developer MUST verify the edit was actually persisted to disk. In-memory edits (e.g. from IDE buffers or tool chains) can be silently discarded without error.
+
+1. **Read back the file from disk** after every edit to confirm the change is present. Do not assume the edit was saved.
+2. **Run `git diff` before committing** to verify all intended changes appear in the diff. If a file shows no changes despite edits, the edits were not saved — do not proceed.
+3. **Never advance a WP to `Review`** based on assumed or remembered test results. Run the full test suite immediately before advancing and confirm all tests pass.
+
+---
+
 ### Phase 2 — Tester (Steps 8–10)
 
 | Step | Action | Details |

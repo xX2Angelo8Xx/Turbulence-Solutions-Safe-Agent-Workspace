@@ -10,5 +10,5 @@ COLOR_TEXT: str = "#FFFFFF"
 TEMPLATES_DIR: Path = Path(__file__).resolve().parent.parent.parent / "templates"
 
 GITHUB_REPO_OWNER: str = "xX2Angelo8Xx"
-GITHUB_REPO_NAME: str = "agent-environment-launcher"
+GITHUB_REPO_NAME: str = "Turbulence-Solutions-Safe-Agent-Workspace"
 GITHUB_RELEASES_URL: str = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/releases/latest"
