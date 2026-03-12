@@ -6,7 +6,8 @@ import tkinter.filedialog as filedialog
 
 import customtkinter as ctk
 
-from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT
+from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, TEMPLATES_DIR
+from launcher.core.project_creator import list_templates
 from launcher.gui.components import make_browse_row, make_label_entry_row
 from launcher.gui.validation import (
     check_duplicate_folder,
@@ -16,6 +17,11 @@ from launcher.gui.validation import (
 
 _WINDOW_WIDTH: int = 580
 _WINDOW_HEIGHT: int = 440
+
+
+def _format_template_name(raw: str) -> str:
+    # Replace separators with spaces and apply title case for display.
+    return raw.replace("-", " ").replace("_", " ").title()
 
 
 class App:
@@ -30,6 +36,10 @@ class App:
         self._window.resizable(False, False)
         self._window.configure(fg_color=COLOR_PRIMARY)
         self._build_ui()
+
+    def _get_template_options(self) -> list[str]:
+        names = list_templates(TEMPLATES_DIR)
+        return [_format_template_name(n) for n in names]
 
     def _build_ui(self) -> None:
         """Construct and arrange all UI widgets."""
@@ -61,7 +71,7 @@ class App:
         ).grid(row=2, column=0, padx=(20, 8), pady=12, sticky="w")
         self.project_type_dropdown = ctk.CTkOptionMenu(
             self._window,
-            values=["Coding"],
+            values=self._get_template_options(),
             fg_color=COLOR_SECONDARY,
             button_color=COLOR_SECONDARY,
             text_color=COLOR_TEXT,

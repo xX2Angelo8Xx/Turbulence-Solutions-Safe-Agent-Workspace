@@ -12,3 +12,12 @@ TEMPLATES_DIR: Path = Path(__file__).resolve().parent.parent.parent / "templates
 GITHUB_REPO_OWNER: str = "xX2Angelo8Xx"
 GITHUB_REPO_NAME: str = "Turbulence-Solutions-Safe-Agent-Workspace"
 GITHUB_RELEASES_URL: str = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/releases/latest"
+
+
+def get_display_version() -> str:
+    """Return the installed package version, falling back to VERSION constant."""
+    try:
+        from importlib.metadata import version, PackageNotFoundError
+        return version("agent-environment-launcher")
+    except PackageNotFoundError:
+        return VERSION
