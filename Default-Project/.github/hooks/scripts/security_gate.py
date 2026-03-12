@@ -37,6 +37,14 @@ _EXEMPT_TOOLS: frozenset = frozenset({
     "runSubagent", "search_subagent",
 })
 
+# SAF-007: Tool names that perform file write operations.
+# These are restricted to Project/ only — writes outside Project/ are denied.
+_WRITE_TOOLS: frozenset = frozenset({
+    "create_file", "write_file", "Write",
+    "edit_file", "Edit",
+    "replace_string_in_file", "multi_replace_string_in_file",
+})
+
 # query and pattern are search-content fields, not file-system paths.
 # Extracting them for zone classification causes false positives on
 # legitimate grep_search / semantic_search calls.
@@ -314,32 +322,32 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         notes="",
     ),
     "ls": CommandRule(
-        denied_flags=frozenset({"-r", "--recursive"}),
+        denied_flags=frozenset(),
         allowed_subcommands=frozenset(),
         path_args_restricted=True,
         allow_arbitrary_paths=False,
-        notes="-R denied; non-recursive listing only",
+        notes="-R/--recursive handled by SAF-006 ancestor check",
     ),
     "dir": CommandRule(
-        denied_flags=frozenset({"/s"}),
+        denied_flags=frozenset(),
         allowed_subcommands=frozenset(),
         path_args_restricted=True,
         allow_arbitrary_paths=False,
-        notes="Windows non-recursive listing",
+        notes="Windows listing; /s handled by SAF-006 ancestor check",
     ),
     "get-childitem": CommandRule(
-        denied_flags=frozenset({"-recurse", "-r"}),
+        denied_flags=frozenset(),
         allowed_subcommands=frozenset(),
         path_args_restricted=True,
         allow_arbitrary_paths=False,
-        notes="PowerShell; non-recursive only",
+        notes="PowerShell; -Recurse handled by SAF-006 ancestor check",
     ),
     "gci": CommandRule(
-        denied_flags=frozenset({"-recurse", "-r"}),
+        denied_flags=frozenset(),
         allowed_subcommands=frozenset(),
         path_args_restricted=True,
         allow_arbitrary_paths=False,
-        notes="Alias for Get-ChildItem",
+        notes="Alias for Get-ChildItem; -Recurse handled by SAF-006 ancestor check",
     ),
     "echo": CommandRule(
         denied_flags=frozenset(),
@@ -500,6 +508,21 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         path_args_restricted=True,
         allow_arbitrary_paths=False,
         notes="PowerShell Move-Item",
+    ),
+    # Category K — Recursive directory listing (SAF-006)
+    "tree": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Inherently recursive; ancestor-of-deny-zone check in SAF-006",
+    ),
+    "find": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Inherently recursive; ancestor-of-deny-zone check in SAF-006",
     ),
 }
 
@@ -787,6 +810,30 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                     if not _check_path_arg(target, ws_root):
                         return False
 
+    # Step 7 — SAF-006: Recursive enumeration ancestor check
+    is_recursive = (
+        verb in _INHERENTLY_RECURSIVE_COMMANDS
+        or _has_recursive_flag(verb, tokens)
+    )
+    if is_recursive:
+        # Collect path arguments
+        path_args = []
+        for tok in args:
+            stripped = tok.strip("\"'")
+            if stripped.startswith("-"):
+                continue
+            if _ENV_ASSIGN_RE.match(stripped):
+                continue
+            path_args.append(stripped)
+
+        # If no explicit path args, implied target is cwd (workspace root)
+        if not path_args:
+            path_args = ["."]
+
+        for pa in path_args:
+            if _is_ancestor_of_deny_zone(pa, ws_root):
+                return False
+
     return True
 
 
@@ -962,6 +1009,20 @@ def _is_truthy_flag(value: object) -> bool:
     return False
 
 
+def _expand_braces(pattern: str) -> list[str]:
+    """Expand shell-style brace groups {a,b,c} into all permutations."""
+    match = re.search(r'\{([^{}]+)\}', pattern)
+    if not match:
+        return [pattern]
+    prefix = pattern[:match.start()]
+    suffix = pattern[match.end():]
+    alternatives = match.group(1).split(',')
+    results = []
+    for alt in alternatives:
+        results.extend(_expand_braces(prefix + alt + suffix))
+    return results
+
+
 def _validate_include_pattern(pattern: str, ws_root: str) -> str:
     """Validate a grep_search ``includePattern`` glob value.
 
@@ -979,6 +1040,14 @@ def _validate_include_pattern(pattern: str, ws_root: str) -> str:
     # this is always a traversal attempt regardless of the destination.
     if ".." in normalized:
         return "deny"
+
+    # Expand brace groups and check each expansion for deny zone access
+    for expanded in _expand_braces(pattern):
+        expanded_norm = zone_classifier.normalize_path(expanded)
+        if ".." in expanded_norm:
+            return "deny"
+        if zone_classifier.classify(expanded, ws_root) == "deny":
+            return "deny"
 
     # Delegate zone membership: covers both Method 1 (relative_to) and
     # Method 2 (regex pattern scan) inside zone_classifier.
@@ -1051,6 +1120,108 @@ def validate_semantic_search(data: dict, ws_root: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# SAF-007: Write restriction — file write tools outside Project/ are denied
+# ---------------------------------------------------------------------------
+
+def validate_write_tool(data: dict, ws_root: str) -> str:
+    """SAF-007: Validate file write tool calls.
+
+    Only allows writes to paths inside Project/ (zone == "allow").
+    All other zones — including "ask" (src/, docs/, tests/) and "deny"
+    (.github/, .vscode/, NoAgentZone/) — are denied.
+
+    When no path is found in the payload, fails closed and returns "deny".
+    """
+    raw_path = extract_path(data)
+    if raw_path is None:
+        # No path field → fail closed
+        return "deny"
+
+    zone = zone_classifier.classify(raw_path, ws_root)
+    if zone == "allow":
+        return "allow"
+    return "deny"
+
+
+# ---------------------------------------------------------------------------
+# SAF-006: Recursive enumeration protection
+# ---------------------------------------------------------------------------
+
+# Commands that are inherently recursive (always enumerate subdirectories)
+_INHERENTLY_RECURSIVE_COMMANDS: frozenset = frozenset({"tree", "find"})
+
+# Commands that become recursive when specific flags are present
+_RECURSIVE_FLAG_MAP: dict[str, frozenset[str]] = {
+    "ls": frozenset({"-r", "--recursive"}),
+    "dir": frozenset({"/s"}),
+    "get-childitem": frozenset({"-recurse", "-r"}),
+    "gci": frozenset({"-recurse", "-r"}),
+}
+
+
+def _is_ancestor_of_deny_zone(path: str, ws_root: str) -> bool:
+    """Return True if *path* is an ancestor of any deny zone.
+
+    A path is an ancestor of a deny zone if the deny zone path starts with
+    the given path. The workspace root itself is an ancestor since deny zones
+    (.github/, .vscode/, NoAgentZone/) are direct children of the root.
+    """
+    norm = normalize_path(path) if path else ws_root
+    # Handle relative paths
+    if not norm or norm == ".":
+        norm = ws_root
+    elif not (len(norm) >= 2 and norm[1] == ":") and not norm.startswith("/"):
+        # Relative path — join with workspace root
+        norm = posixpath.normpath(f"{ws_root}/{norm}")
+
+    ws = ws_root.rstrip("/")
+    deny_zones = [
+        f"{ws}/.github",
+        f"{ws}/.vscode",
+        f"{ws}/noagentzone",
+    ]
+
+    # Check if norm is an ancestor of any deny zone
+    # A is ancestor of B if B starts with A/ or A == B
+    norm_stripped = norm.rstrip("/")
+    for dz in deny_zones:
+        if dz.startswith(norm_stripped + "/") or dz == norm_stripped:
+            return True
+        # Also check if norm IS a deny zone or inside one
+        if norm_stripped.startswith(dz + "/") or norm_stripped == dz:
+            return True
+
+    return False
+
+
+def _has_recursive_flag(verb_lower: str, tokens: list[str]) -> bool:
+    """Check if the command has recursive flags, including combined POSIX flags.
+
+    Handles combined short flags like 'ls -lR' where -R is embedded.
+    """
+    flags = _RECURSIVE_FLAG_MAP.get(verb_lower)
+    if not flags:
+        return False
+
+    for tok in tokens[1:]:
+        tok_lower = tok.lower().strip("\"'")
+        # Direct match
+        if tok_lower in flags:
+            return True
+        # Combined POSIX short flag check (e.g., -lR, -alR, -Rl)
+        if verb_lower in ("ls",) and tok_lower.startswith("-") and not tok_lower.startswith("--"):
+            flag_chars = tok_lower[1:]
+            if "r" in flag_chars:
+                return True
+        if verb_lower in ("get-childitem", "gci") and tok_lower.startswith("-") and not tok_lower.startswith("--"):
+            flag_chars = tok_lower[1:]
+            if "r" in flag_chars:
+                return True
+
+    return False
+
+
+# ---------------------------------------------------------------------------
 # Decision engine
 # ---------------------------------------------------------------------------
 
@@ -1082,6 +1253,11 @@ def decide(data: dict, ws_root: str) -> str:
         return validate_semantic_search(data, ws_root)
     if tool_name == "grep_search":
         return validate_grep_search(data, ws_root)
+
+    # SAF-007: Write tools are restricted to Project/ only.  Any write
+    # targeting a path outside Project/ is denied, even if zone would be "ask".
+    if tool_name in _WRITE_TOOLS:
+        return validate_write_tool(data, ws_root)
 
     # Non-exempt tools (non-empty name not in exempt set): always ask
     if tool_name and tool_name not in _EXEMPT_TOOLS:
