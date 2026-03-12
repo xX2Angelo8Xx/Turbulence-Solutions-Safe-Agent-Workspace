@@ -25,6 +25,22 @@ GUI-001: add main window layout with customtkinter
 INS-002: create pyproject.toml with dependencies
 ```
 
+## Remote Repository
+
+The canonical remote is:
+
+```
+https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
+```
+
+Before every `git push`, verify the remote URL:
+
+```bash
+git remote -v
+# If incorrect:
+git remote set-url origin https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
+```
+
 ## Rules
 
 - **One workpackage per branch.** Do not bundle unrelated changes.

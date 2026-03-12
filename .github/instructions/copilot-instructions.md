@@ -4,6 +4,14 @@
 
 This project has the highest security classification. Prioritize safety over convenience. When in doubt, choose the more restrictive option.
 
+## Repository
+
+- **Remote origin:** `https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git`
+- Before any `git push`, verify with `git remote -v` that origin points to the URL above. If it does not, run:
+  ```
+  git remote set-url origin https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
+  ```
+
 ## Non-Negotiable Rules
 
 - Every code change **MUST** reference a workpackage ID.
