@@ -255,3 +255,25 @@ TST-208,SAF-005 full 106-test suite — Tester Iteration 2 confirmation run,Secu
 TST-209,SAF-005 Tester new BUG-016 edge-case tests (ET-027 to ET-032 — 6 tests),Security,SAF-005,Fail,2026-03-11,Windows 11 + Python 3.11,0/6 pass — no-space and fd-prefixed shell redirect variants bypass zone check,"All 6 fail: test_redirect_no_space_basic_bypasses_gate, test_redirect_no_space_append_bypasses_gate, test_redirect_fd_prefixed_basic_bypasses_gate, test_redirect_fd_prefixed_stderr_bypasses_gate, test_redirect_fd_prefixed_append_bypasses_gate, test_redirect_cat_fd_to_restricted_zone"
 TST-210,SAF-005 full 112-test suite — Tester Iteration 3 confirmation run,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,112/112 pass — BUG-016 fix confirmed; ET-027 to ET-032 all pass,"Tester Agent Iteration 3 re-review; _REDIRECT_OP_RE (^[0-9]*>>?$) handles fd-prefixed operators; _EMBEDDED_REDIRECT_RE (>>?(.+)$) handles no-space embedded redirects; all 3 bypass forms now zone-checked"
 TST-211,Full regression suite Iteration 3 (excluding pre-existing SAF-002 and GUI-001 failures),Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,238/238 pass — zero new failures introduced by BUG-016 fix,Tester Agent Iteration 3: all INS-001 + INS-002 + INS-012 + SAF-001 + SAF-004 + SAF-005 tests pass; no regressions
+TST-212,test_update_check_result_is_namedtuple,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,UpdateCheckResult is a tuple subclass,
+TST-213,test_update_check_result_has_update_available_field,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,update_available field accessible by name,
+TST-214,test_update_check_result_has_latest_version_field,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,latest_version field accessible by name,
+TST-215,test_update_check_result_tuple_unpacking,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,2-tuple unpack works on UpdateCheckResult,
+TST-216,test_parse_version_basic_semver,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.2.3 parses to (1 2 3),
+TST-217,test_parse_version_v_prefix_stripped,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,v2.0.0 parses to (2 0 0),
+TST-218,test_parse_version_two_components_padded,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.4 padded to (1 4 0),
+TST-219,test_parse_version_one_component_padded,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,3 padded to (3 0 0),
+TST-220,test_is_newer_major_bump,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,2.0.0 > 1.9.9,
+TST-221,test_is_newer_minor_bump,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.1.0 > 1.0.9,
+TST-222,test_is_newer_patch_bump,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.0.1 > 1.0.0,
+TST-223,test_is_newer_same_version_returns_false,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,1.0.0 not newer than 1.0.0,
+TST-224,test_fetch_latest_version_returns_version_string,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,mocked API response tag_name v1.2.3 returns 1.2.3,
+TST-225,test_fetch_latest_version_uses_https,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,_API_URL starts with https://,HTTPS enforcement
+TST-226,test_fetch_latest_version_timeout_forwarded,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,urlopen called with timeout=GITHUB_API_TIMEOUT,
+TST-227,test_fetch_latest_version_network_error_returns_none,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,OSError returns None (silent failure),
+TST-228,test_fetch_latest_version_http_error_returns_none,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,HTTPError 404 returns None,
+TST-229,test_fetch_latest_version_missing_tag_name_returns_none,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,dict without tag_name returns None,
+TST-230,test_fetch_latest_version_empty_tag_name_returns_none,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,empty tag_name returns None,
+TST-231,test_check_for_update_returns_true_when_newer,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,2.0.0 > 1.0.0 returns UpdateCheckResult(True 2.0.0),
+TST-232,test_check_for_update_network_failure_returns_no_update,Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,None fetch returns (False current_version),
+TST-233,Full regression suite (493/495 INS-009 addition),Regression,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,493/495 pass -- 21 new INS-009 tests all pass; 2 pre-existing failures (INS-004 INS-012) unrelated to INS-009,Developer Agent INS-009 final run
