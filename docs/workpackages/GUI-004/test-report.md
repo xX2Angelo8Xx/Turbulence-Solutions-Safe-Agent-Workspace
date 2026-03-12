@@ -6,31 +6,55 @@
 
 ## Summary
 
-All 17 tests pass (13 developer-written + 4 tester edge-case). `validate_destination_path` correctly rejects empty/whitespace paths, non-existent paths, file paths (not directories), and non-writable paths. The `destination_error_label` is present in the App with initial empty text and red color. The browse dialog populates the entry on folder selection and is a no-op when the dialog is cancelled. No bugs found.
+The implementation satisfies all WP-004 and US-004 (AC #4) requirements.
+`validate_destination_path()` correctly handles all primary validation paths.
+`destination_error_label` is present on the `App` instance at row 4 as documented.
+The native OS dialog (`filedialog.askdirectory`) is wired to the Browse button.
+Validation wiring into project-creation logic is intentionally deferred to GUI-005 — this is within WP scope.
+
+16 Tester edge-case tests added across 5 categories; all pass.
+Full regression suite: **553 passed / 33 failed-pre-existing / 1 skipped**. No regressions.
+
+**Process note:** The `workpackages.csv` row for GUI-004 was found with status `Open` and `Assigned To` blank at handoff time. This is a workflow-step omission by the Developer (Steps 2 and 7 of `agent-workflow.md`). No functional gap — the dev-log, implementation, and tests are all present and correct. Corrected to `Done` by Tester.
 
 ## Tests Executed
 
 | Test | Type | Result | Notes |
 |------|------|--------|-------|
-| TST-281 — GUI-004 developer test suite (13 tests) | Unit | Pass | All 13/13 pass |
-| TST-282 — GUI-004 tester edge-case tests (4 tests) | Unit | Pass | All 4/4 pass |
-
-### Edge-Case Tests Added (TestEdgeCasesGui004)
-
-| Test | What It Validates |
-|------|-------------------|
-| `test_validate_destination_returns_tuple` | Return type is always `(bool, str)` |
-| `test_invalid_path_error_message_is_non_empty` | Error string is non-empty for all rejection cases |
-| `test_path_with_surrounding_whitespace_rejected` | Path with leading/trailing spaces is not stripped — padded path doesn't exist, correctly rejected |
-| `test_relative_dot_path_accepted` | Bare `.` resolves to cwd, which is a valid writable directory |
+| test_empty_string | Unit | Pass | TST-dev — empty input rejected |
+| test_whitespace_only | Unit | Pass | TST-dev — whitespace-only rejected |
+| test_nonexistent_path | Unit | Pass | TST-dev — non-existent path rejected |
+| test_path_is_file_not_dir | Unit | Pass | TST-dev — file instead of dir rejected |
+| test_valid_writable_dir | Unit | Pass | TST-dev — valid writable dir accepted |
+| test_app_has_destination_error_label | Unit | Pass | TST-dev — attribute present on App |
+| test_destination_error_label_created_with_empty_text | Unit | Pass | TST-dev — label initialised with empty text |
+| test_single_space_rejected | Unit | Pass | TST-235 — single space rejected |
+| test_leading_whitespace_on_valid_path_rejected | Unit | Pass | TST-236 — leading spaces → path not found |
+| test_trailing_whitespace_no_crash | Unit | Pass | TST-237 — trailing spaces handled gracefully; on Windows OS strips trailing spaces silently (accepted); function does not crash |
+| test_dir_with_spaces_in_name_accepted | Unit | Pass | TST-238 — spaces in directory name accepted |
+| test_dir_with_unicode_chars_accepted | Unit | Pass | TST-239 — Unicode directory name accepted |
+| test_dir_with_parentheses_accepted | Unit | Pass | TST-240 — parentheses in directory name accepted |
+| test_dir_with_hyphens_and_underscores_accepted | Unit | Pass | TST-241 — hyphens/underscores accepted |
+| test_dir_starting_with_dot_accepted | Unit | Pass | TST-242 — hidden-style directory accepted |
+| test_long_segment_nonexistent_rejected | Unit | Pass | TST-243 — 200-char segment rejected gracefully |
+| test_deeply_nested_nonexistent_path_rejected | Unit | Pass | TST-244 — 20-level deep path rejected gracefully |
+| test_forward_slashes_accepted_on_windows | Cross-platform | Pass | TST-245 — forward slashes on Windows path accepted |
+| test_none_input_rejected_without_crash | Unit | Pass | TST-246 — None input handled by `if not path` guard |
+| test_return_is_two_tuple_for_valid_path | Unit | Pass | TST-247 — return type (bool, str) confirmed |
+| test_return_is_two_tuple_for_invalid_path | Unit | Pass | TST-248 — return type (bool, str) confirmed |
+| test_error_message_nonempty_when_rejected | Unit | Pass | TST-249 — error string is non-empty on False |
+| test_error_message_empty_when_accepted | Unit | Pass | TST-250 — error string is "" on True |
+| Full regression suite (553/33/1) | Regression | Pass | TST-251 — zero new failures; 553 pass; 33 pre-existing INS-004/INS-012 failures unrelated to GUI-004 |
 
 ## Bugs Found
 
 None.
 
+**Platform behaviour note (not a bug):** On Windows, the Win32 API silently strips trailing spaces from path strings. A caller passing `str(tmp_path) + "   "` will receive `(True, "")` because Windows resolves the path to the same underlying directory. On Linux/macOS, the same input returns `(False, "Destination path does not exist.")`. This is documented OS behaviour; no code change required. Test TST-341 captures this cross-platform difference.
+
 ## TODOs for Developer
 
-None.
+None — no action required.
 
 ## Verdict
 
