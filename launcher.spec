@@ -1,0 +1,67 @@
+# -*- mode: python ; coding: utf-8 -*-
+"""PyInstaller spec file for the Turbulence Solutions Launcher.
+
+Build mode: --onedir  (produces a launcher/ output directory)
+Usage:      pyinstaller launcher.spec
+
+The templates/ directory is bundled as data so the app can locate project
+templates at runtime regardless of installation path.  templates/ is created
+by INS-004; a pyinstaller build requires that directory to exist.
+
+SPECPATH is a PyInstaller built-in that resolves to the directory containing
+this spec file (i.e. the repository root).  Using os.path.join(SPECPATH, ...)
+keeps all paths relative to the spec location, making the build reproducible
+on any machine and on all three supported platforms (Windows, macOS, Linux).
+"""
+
+import os
+
+a = Analysis(
+    [os.path.join(SPECPATH, 'src', 'launcher', 'main.py')],
+    pathex=[os.path.join(SPECPATH, 'src')],
+    binaries=[],
+    datas=[
+        (os.path.join(SPECPATH, 'templates'), 'templates'),
+    ],
+    # customtkinter uses dynamic plugin imports that static analysis misses.
+    hiddenimports=['customtkinter'],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+
+pyz = PYZ(a.pure)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    [],
+    # exclude_binaries=True is the onedir switch; companion files go to COLLECT.
+    exclude_binaries=True,
+    name='launcher',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    # GUI app — suppress console window on Windows.
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='launcher',
+)

@@ -255,3 +255,52 @@ TST-208,SAF-005 full 106-test suite — Tester Iteration 2 confirmation run,Secu
 TST-209,SAF-005 Tester new BUG-016 edge-case tests (ET-027 to ET-032 — 6 tests),Security,SAF-005,Fail,2026-03-11,Windows 11 + Python 3.11,0/6 pass — no-space and fd-prefixed shell redirect variants bypass zone check,"All 6 fail: test_redirect_no_space_basic_bypasses_gate, test_redirect_no_space_append_bypasses_gate, test_redirect_fd_prefixed_basic_bypasses_gate, test_redirect_fd_prefixed_stderr_bypasses_gate, test_redirect_fd_prefixed_append_bypasses_gate, test_redirect_cat_fd_to_restricted_zone"
 TST-210,SAF-005 full 112-test suite — Tester Iteration 3 confirmation run,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,112/112 pass — BUG-016 fix confirmed; ET-027 to ET-032 all pass,"Tester Agent Iteration 3 re-review; _REDIRECT_OP_RE (^[0-9]*>>?$) handles fd-prefixed operators; _EMBEDDED_REDIRECT_RE (>>?(.+)$) handles no-space embedded redirects; all 3 bypass forms now zone-checked"
 TST-211,Full regression suite Iteration 3 (excluding pre-existing SAF-002 and GUI-001 failures),Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,238/238 pass — zero new failures introduced by BUG-016 fix,Tester Agent Iteration 3: all INS-001 + INS-002 + INS-012 + SAF-001 + SAF-004 + SAF-005 tests pass; no regressions
+TST-261,test_valid_simple_name,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,hyphenated name returns (True - ""),validate_folder_name
+TST-262,test_valid_name_with_numbers,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,alphanumeric name returns (True - ""),validate_folder_name
+TST-263,test_valid_name_with_underscores,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,underscore name returns (True - ""),validate_folder_name
+TST-264,test_valid_name_with_hyphens,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,multi-hyphen name returns (True - ""),validate_folder_name
+TST-265,test_return_type_is_tuple,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,return value is a 2-tuple,validate_folder_name
+TST-266,test_valid_returns_empty_message,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,valid name produces empty error string,validate_folder_name
+TST-267,test_empty_string_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty string rejected,validate_folder_name
+TST-268,test_whitespace_only_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,whitespace-only string rejected,validate_folder_name
+TST-269,test_invalid_returns_nonempty_message,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,invalid name produces non-empty error string,validate_folder_name
+TST-270,test_colon_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,colon in name rejected,validate_folder_name
+TST-271,test_backslash_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,backslash in name rejected,validate_folder_name
+TST-272,test_forward_slash_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,forward slash in name rejected,validate_folder_name
+TST-273,test_asterisk_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,asterisk in name rejected,validate_folder_name
+TST-274,test_question_mark_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,question mark in name rejected,validate_folder_name
+TST-275,test_pipe_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,pipe character in name rejected,validate_folder_name
+TST-276,test_less_than_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,less-than sign in name rejected,validate_folder_name
+TST-277,test_greater_than_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,greater-than sign in name rejected,validate_folder_name
+TST-278,test_double_quote_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,double-quote in name rejected,validate_folder_name
+TST-279,test_null_byte_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,null byte in name rejected,validate_folder_name
+TST-280,test_control_char_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,control character (0x01) in name rejected,validate_folder_name
+TST-281,test_single_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,single dot name rejected,validate_folder_name
+TST-282,test_double_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,double dot name rejected,validate_folder_name
+TST-283,test_windows_reserved_con_uppercase_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,CON rejected as reserved,validate_folder_name
+TST-284,test_windows_reserved_nul_lowercase_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,nul rejected as reserved,validate_folder_name
+TST-285,test_windows_reserved_case_insensitive,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,Con (mixed case) rejected as reserved,validate_folder_name
+TST-286,test_windows_reserved_com9_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,COM9 rejected as reserved,validate_folder_name
+TST-287,test_windows_reserved_lpt1_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,LPT1 rejected as reserved,validate_folder_name
+TST-288,test_name_ending_with_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,name ending with period rejected,validate_folder_name
+TST-289,test_name_ending_with_space_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,name ending with space rejected,validate_folder_name
+TST-290,test_path_traversal_with_slash_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,../etc/passwd rejected via forward-slash check (bypass attempt),validate_folder_name
+TST-291,test_path_traversal_backslash_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,..\windows\system32 rejected via backslash check (bypass attempt),validate_folder_name
+TST-292,test_null_byte_before_reserved_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,null byte prefix before CON still rejected (bypass attempt),validate_folder_name
+TST-293,test_control_char_bypass_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,control character embedded in otherwise valid name rejected (bypass attempt),validate_folder_name
+TST-294,test_nonexistent_folder_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,non-existent path returns False,check_duplicate_folder
+TST-295,test_existing_folder_returns_true,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,existing tmpdir subfolder returns True,check_duplicate_folder
+TST-296,test_empty_name_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty name guard returns False,check_duplicate_folder
+TST-297,test_empty_destination_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty destination guard returns False,check_duplicate_folder
+TST-298,test_both_empty_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,both args empty returns False,check_duplicate_folder
+TST-299,test_project_name_error_label_exists,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,app.project_name_error_label attribute present on App instance,App inline error label
+TST-300,test_error_label_created_with_empty_text,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,CTkLabel created with text='' for inline error display,App inline error label
+TST-301,Full regression suite (377 tests — all WPs),Regression,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 40 new GUI-003 + 337 existing tests; zero regressions,Developer Agent GUI-003 implementation complete
+TST-269,test_spec_file_exists,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,launcher.spec exists at repository root,
+TST-270,test_spec_is_valid_python,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,ast.parse succeeds — no syntax errors,
+TST-271,test_spec_references_entry_point,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,main.py referenced in Analysis sources,
+TST-272,test_spec_entry_point_path_contains_src_launcher,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,full path src/launcher/main.py present in spec,
+TST-273,test_spec_includes_templates_in_datas,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,templates entry present in datas,
+TST-274,test_spec_uses_onedir_collect,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,COLLECT() call present — onedir mode confirmed,
+TST-275,test_spec_exclude_binaries_true,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,exclude_binaries=True set in EXE(),
+TST-276,Full regression suite (377 tests — INS-003 addition),Regression,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 7 new INS-003 tests + 370 prior; zero regressions,Developer Agent INS-003
