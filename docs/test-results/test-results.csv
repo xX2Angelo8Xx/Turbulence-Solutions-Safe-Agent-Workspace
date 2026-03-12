@@ -501,6 +501,21 @@ TST-445,test_security_gate_has_main_function,Integration,SAF-010,Pass,2026-03-12
 TST-446,test_security_gate_has_name_guard,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,security_gate.py has if __name__ == '__main__' guard,Maintenance — retroactive logging
 TST-447,test_settings_json_auto_approve_disabled,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,settings.json has chat.tools.global.autoApprove=false,Maintenance — retroactive logging
 TST-448,SAF-010 full test suite (29 tests),Regression,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,29/29 pass — require-approval.json structure and security verified,Maintenance — retroactive logging
+TST-481,test_function_exists,Unit,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,get_display_version callable in config.py,Tester Agent Iteration 1
+TST-482,test_returns_string,Unit,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,get_display_version() returns str,Tester Agent Iteration 1
+TST-483,test_returns_non_empty_string,Unit,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,get_display_version() returns non-empty string,Tester Agent Iteration 1
+TST-484,test_fallback_returns_version_constant,Unit,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,PackageNotFoundError causes fallback to VERSION constant (AC4),Tester Agent Iteration 1
+TST-485,test_fallback_value_is_semver_like,Unit,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,VERSION constant matches semver pattern X.Y.Z,Tester Agent Iteration 1
+TST-486,test_version_constant_exists,Unit,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,config.VERSION attribute is present,Tester Agent Iteration 1
+TST-487,test_version_constant_is_string,Unit,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,config.VERSION is a str instance,Tester Agent Iteration 1
+TST-488,test_display_version_matches_version_constant_or_installed,Unit,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,Result equals installed package version or VERSION fallback,Tester Agent Iteration 1
+TST-489,test_exception_does_not_propagate,Unit,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,get_display_version() never raises — always returns str (AC4),Tester Agent Iteration 1
+TST-490,test_version_label_attribute_exists,Unit,GUI-008,Fail,2026-03-12,Windows 11 + Python 3.11,App.version_label missing — widget never added to app.py (BUG-026),AC1 FAIL
+TST-491,test_version_label_is_ctk_label_not_entry,Unit,GUI-008,Fail,2026-03-12,Windows 11 + Python 3.11,Blocked by missing version_label attribute,AC1 FAIL
+TST-492,test_version_label_grid_called,Unit,GUI-008,Fail,2026-03-12,Windows 11 + Python 3.11,Blocked by missing version_label attribute — not placed at startup,AC3 FAIL
+TST-493,test_version_label_text_contains_version,Unit,GUI-008,Fail,2026-03-12,Windows 11 + Python 3.11,Blocked by missing version_label attribute — text never set,AC2 FAIL
+TST-494,test_version_label_get_display_version_imported,Unit,GUI-008,Fail,2026-03-12,Windows 11 + Python 3.11,get_display_version not imported in app.py — function never called,AC2 FAIL
+TST-495,GUI-008 full suite (14 tests) + full regression (930 tests),Regression,GUI-008,Fail,2026-03-12,Windows 11 + Python 3.11,9 pass / 5 fail (GUI-008); 913 pass total; 16 total failures (11 pre-existing + 5 GUI-008),Tester Agent Iteration 1 — FAIL verdict; WP returned to In Progress
 TST-449,test_compute_file_hash_valid_file,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,SHA256 of real file matches expected digest,
 TST-450,test_compute_file_hash_missing_file,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,non-existent file returns None (fail-closed),
 TST-451,test_compute_file_hash_different_content,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,distinct contents produce distinct hashes,
