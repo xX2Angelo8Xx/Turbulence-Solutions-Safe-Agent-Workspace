@@ -6,11 +6,16 @@ import tkinter.filedialog as filedialog
 
 import customtkinter as ctk
 
-from launcher.config import APP_NAME
+from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT
 from launcher.gui.components import make_browse_row, make_label_entry_row
+from launcher.gui.validation import (
+    check_duplicate_folder,
+    validate_destination_path,
+    validate_folder_name,
+)
 
 _WINDOW_WIDTH: int = 580
-_WINDOW_HEIGHT: int = 340
+_WINDOW_HEIGHT: int = 440
 
 
 class App:
@@ -23,6 +28,7 @@ class App:
         self._window.title(APP_NAME)
         self._window.geometry(f"{_WINDOW_WIDTH}x{_WINDOW_HEIGHT}")
         self._window.resizable(False, False)
+        self._window.configure(fg_color=COLOR_PRIMARY)
         self._build_ui()
 
     def _build_ui(self) -> None:
@@ -37,16 +43,31 @@ class App:
             row=0,
         )
 
-        # Project type label + dropdown
-        ctk.CTkLabel(self._window, text="Project Type:", anchor="w").grid(
-            row=1, column=0, padx=(16, 8), pady=8, sticky="w"
+        # Inline error label for project name validation feedback
+        self.project_name_error_label = ctk.CTkLabel(
+            self._window,
+            text="",
+            text_color="red",
+            anchor="w",
+            height=16,
         )
+        self.project_name_error_label.grid(
+            row=1, column=1, columnspan=2, padx=(0, 16), pady=(0, 4), sticky="w"
+        )
+
+        # Project type label + dropdown
+        ctk.CTkLabel(
+            self._window, text="Project Type:", anchor="w", text_color=COLOR_TEXT,
+        ).grid(row=2, column=0, padx=(20, 8), pady=12, sticky="w")
         self.project_type_dropdown = ctk.CTkOptionMenu(
             self._window,
             values=["Coding"],
+            fg_color=COLOR_SECONDARY,
+            button_color=COLOR_SECONDARY,
+            text_color=COLOR_TEXT,
         )
         self.project_type_dropdown.grid(
-            row=1, column=1, columnspan=2, padx=(0, 16), pady=8, sticky="ew"
+            row=2, column=1, columnspan=2, padx=(0, 20), pady=12, sticky="ew"
         )
 
         # Destination path label + entry + browse button
@@ -55,7 +76,19 @@ class App:
             label_text="Destination:",
             browse_command=self._browse_destination,
             placeholder="Select destination folder",
-            row=2,
+            row=3,
+        )
+
+        # Inline error label for destination validation feedback
+        self.destination_error_label = ctk.CTkLabel(
+            self._window,
+            text="",
+            text_color="red",
+            anchor="w",
+            height=16,
+        )
+        self.destination_error_label.grid(
+            row=4, column=1, columnspan=2, padx=(0, 20), pady=(0, 4), sticky="w"
         )
 
         # Open in VS Code checkbox
@@ -64,9 +97,12 @@ class App:
             self._window,
             text="Open in VS Code",
             variable=self.open_in_vscode_var,
+            text_color=COLOR_TEXT,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
         )
         self.open_in_vscode_checkbox.grid(
-            row=3, column=0, columnspan=2, padx=16, pady=8, sticky="w"
+            row=5, column=0, columnspan=2, padx=20, pady=10, sticky="w"
         )
 
         # Create Project button
@@ -74,9 +110,13 @@ class App:
             self._window,
             text="Create Project",
             command=self._on_create_project,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
+            text_color=COLOR_TEXT,
+            height=40,
         )
         self.create_button.grid(
-            row=4, column=0, columnspan=3, padx=16, pady=(16, 20)
+            row=6, column=0, columnspan=3, padx=20, pady=(20, 24), sticky="ew"
         )
 
     def _browse_destination(self) -> None:

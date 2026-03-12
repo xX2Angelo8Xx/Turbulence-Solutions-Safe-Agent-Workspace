@@ -1,16 +1,51 @@
-"""In-app update check, download, and apply.
-
-Full implementation is provided in INS-009, INS-010, and INS-011.
-"""
+"""In-app update check — queries GitHub Releases API for the latest version."""
 
 from __future__ import annotations
 
+import json
+import urllib.error
+import urllib.request
+
+from launcher.config import GITHUB_RELEASES_URL
+
+_TIMEOUT_SECONDS: int = 5
+
+
+def parse_version(version_str: str) -> tuple[int, ...]:
+    """Parse a semver string like '1.2.3' into a tuple of ints (1, 2, 3).
+
+    A leading 'v' is stripped before parsing (e.g. 'v0.2.0' → (0, 2, 0)).
+    """
+    cleaned = version_str.lstrip("v")
+    parts = cleaned.split(".")
+    result: list[int] = []
+    for part in parts:
+        try:
+            result.append(int(part))
+        except ValueError:
+            result.append(0)
+    return tuple(result)
+
 
 def check_for_update(current_version: str) -> tuple[bool, str]:
-    """Check whether a newer version is available.
+    """Check GitHub Releases for a newer version.
 
-    Returns a tuple of ``(update_available, latest_version)``.
-    This stub always reports no update; the real implementation queries
-    the GitHub Releases API (INS-009).
+    Returns (update_available, latest_version).
+    On any error, silently returns (False, current_version).
     """
-    return False, current_version
+    try:
+        req = urllib.request.Request(
+            GITHUB_RELEASES_URL,
+            headers={"Accept": "application/vnd.github+json"},
+        )
+        with urllib.request.urlopen(req, timeout=_TIMEOUT_SECONDS) as response:
+            raw = response.read()
+        data = json.loads(raw)
+        tag_name: str = data["tag_name"]
+        latest_version = tag_name.lstrip("v")
+        current_tuple = parse_version(current_version)
+        latest_tuple = parse_version(latest_version)
+        return latest_tuple > current_tuple, latest_version
+    except Exception:  # noqa: BLE001
+        return False, current_version
+
