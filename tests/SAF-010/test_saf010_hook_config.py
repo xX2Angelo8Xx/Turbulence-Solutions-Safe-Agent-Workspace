@@ -204,6 +204,164 @@ def test_no_tool_filter(config: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Encoding
+# ---------------------------------------------------------------------------
+
+def test_no_bom_encoding() -> None:
+    """require-approval.json must be UTF-8 without BOM.
+
+    A UTF-8 BOM (0xEF 0xBB 0xBF) would cause json.loads to raise a
+    JSONDecodeError in some Python versions and runtimes.
+    """
+    raw_bytes = _CONFIG_PATH.read_bytes()
+    BOM = b"\xef\xbb\xbf"
+    assert not raw_bytes.startswith(BOM), (
+        "require-approval.json starts with a UTF-8 BOM — must be BOM-free UTF-8"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Round-trip fidelity
+# ---------------------------------------------------------------------------
+
+def test_json_round_trip(config: dict) -> None:
+    """Load + dump + load must produce semantically equivalent JSON.
+
+    Validates that the file has no information-altering content (e.g. duplicate
+    keys) that would silently change behaviour after a serialize / deserialize
+    cycle.
+    """
+    raw = _CONFIG_PATH.read_text(encoding="utf-8")
+    original = json.loads(raw)
+    dumped = json.dumps(original, sort_keys=True)
+    reloaded = json.loads(dumped)
+    assert original == reloaded, (
+        "JSON round-trip produced a different structure — possible duplicate keys"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Top-level structure restriction
+# ---------------------------------------------------------------------------
+
+def test_top_level_only_hooks_key(config: dict) -> None:
+    """Config must contain ONLY the 'hooks' key at the top level.
+
+    Unexpected extra keys could indicate config drift, accidental merge
+    artefacts, or an attacker trying to inject unsupported directives.
+    """
+    unexpected = set(config.keys()) - {"hooks"}
+    assert not unexpected, (
+        f"Unexpected top-level keys found: {unexpected!r}"
+    )
+
+
+def test_only_pretooluse_event_registered(config: dict) -> None:
+    """Only PreToolUse should be registered under 'hooks'.
+
+    An unintended PostToolUse or other event hook added here could
+    silently swallow output or introduce side effects.
+    """
+    registered_events = set(config["hooks"].keys())
+    assert registered_events == {"PreToolUse"}, (
+        f"Unexpected hook events registered: {registered_events - {'PreToolUse'}!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Relative path enforcement
+# ---------------------------------------------------------------------------
+
+def test_command_uses_relative_path(config: dict) -> None:
+    """The Unix 'command' path must be relative, not absolute.
+
+    An absolute path would break on any installation where the workspace is
+    not at exactly the same location.  The path must be relative to the
+    workspace root so VS Code can resolve it portably.
+    """
+    command: str = config["hooks"]["PreToolUse"][0].get("command", "")
+    # Extract the script path (part after the interpreter)
+    parts = command.split(" ", 1)
+    if len(parts) == 2:
+        script_path = parts[1]
+        assert not script_path.startswith("/"), (
+            f"Unix command uses an absolute path: {script_path!r}"
+        )
+        # Also reject Windows-style absolute paths (C:\ or C:/)
+        assert not (len(script_path) > 1 and script_path[1] == ":"), (
+            f"Unix command uses a Windows absolute path: {script_path!r}"
+        )
+
+
+def test_windows_command_uses_relative_path(config: dict) -> None:
+    """The Windows 'command' path must be relative, not absolute."""
+    windows_cmd: str = config["hooks"]["PreToolUse"][0].get("windows", "")
+    parts = windows_cmd.split(" ", 1)
+    if len(parts) == 2:
+        script_path = parts[1]
+        assert not script_path.startswith("/"), (
+            f"Windows command uses a Unix absolute path: {script_path!r}"
+        )
+        assert not (len(script_path) > 1 and script_path[1] == ":"), (
+            f"Windows command uses an absolute path: {script_path!r}"
+        )
+
+
+def test_windows_security_gate_is_python_script(config: dict) -> None:
+    """The script referenced in 'windows' must also end with .py."""
+    windows_cmd: str = config["hooks"]["PreToolUse"][0].get("windows", "")
+    assert windows_cmd.endswith(".py"), (
+        f"Script in 'windows' command is not a .py file: {windows_cmd!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Timeout — reasonable range
+# ---------------------------------------------------------------------------
+
+def test_timeout_within_reasonable_range(config: dict) -> None:
+    """Timeout must be within 1–60 seconds.
+
+    A timeout of 0 would effectively disable the hook.
+    A timeout > 60 would cause VS Code to hang noticeably on every tool call.
+    """
+    timeout = config["hooks"]["PreToolUse"][0].get("timeout", 0)
+    assert 1 <= timeout <= 60, (
+        f"timeout={timeout} is outside the acceptable range [1, 60]"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Security gate script integrity
+# ---------------------------------------------------------------------------
+
+def test_security_gate_has_main_function() -> None:
+    """security_gate.py must define a callable main() function.
+
+    The hook command calls the script directly via python security_gate.py.
+    Without a main() function the script would do nothing when invoked.
+    """
+    script = _SCRIPTS_DIR / "security_gate.py"
+    source = script.read_text(encoding="utf-8")
+    assert "def main(" in source, (
+        "security_gate.py does not define a main() function"
+    )
+
+
+def test_security_gate_has_name_guard() -> None:
+    """security_gate.py must have a 'if __name__ == \"__main__\"' guard.
+
+    Without this guard, importing the module in tests would execute the
+    hook logic and block on stdin.
+    """
+    script = _SCRIPTS_DIR / "security_gate.py"
+    source = script.read_text(encoding="utf-8")
+    assert '__name__ == "__main__"' in source, (
+        "security_gate.py is missing the if __name__ == '__main__' guard"
+    )
+
+
+# ---------------------------------------------------------------------------
 # Settings guard — confirms autoApprove is still disabled
 # ---------------------------------------------------------------------------
 
