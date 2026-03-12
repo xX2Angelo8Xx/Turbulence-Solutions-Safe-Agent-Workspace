@@ -817,10 +817,13 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
     )
     if is_recursive:
         # Collect path arguments
+        _WIN_FLAG_RE = re.compile(r'^/[a-zA-Z0-9]{1,2}$')
         path_args = []
         for tok in args:
             stripped = tok.strip("\"'")
             if stripped.startswith("-"):
+                continue
+            if _WIN_FLAG_RE.match(stripped):
                 continue
             if _ENV_ASSIGN_RE.match(stripped):
                 continue
