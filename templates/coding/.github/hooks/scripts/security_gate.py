@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 import json
 import os
 import posixpath
@@ -52,6 +53,29 @@ _WRITE_TOOLS: frozenset = frozenset({
 _PATH_FIELDS: tuple = ("filePath", "file_path", "path", "directory", "target")
 
 _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceeded
+
+
+# ---------------------------------------------------------------------------
+# SAF-008: File integrity verification constants
+# ---------------------------------------------------------------------------
+# Known-good SHA256 of Default-Project/.vscode/settings.json.
+# Updated by running .github/hooks/scripts/update_hashes.py after any
+# intentional admin change to settings.json.
+_KNOWN_GOOD_SETTINGS_HASH: str = "3adf2151898a24b110b0d334b032e0268998a3e1e17a9a07e27077f3d306cd48"
+
+# Known-good SHA256 of security_gate.py in canonical form.
+# Canonical form: the file content with the value portion of this constant
+# replaced by 64 zeros before hashing.  This makes the hash independent of
+# the stored value while detecting all other modifications.
+# Updated by running .github/hooks/scripts/update_hashes.py.
+_KNOWN_GOOD_GATE_HASH: str = "14d6b9ecba5980dfc5d82235bae651f2197a91281db607aff8b5e2cf44fb7ae1"
+
+_INTEGRITY_WARNING: str = (
+    "SECURITY ALERT: Integrity verification failed. A safety-critical file "
+    "(.vscode/settings.json or security_gate.py) has been modified or "
+    "corrupted. All tool calls are blocked. An administrator must review the "
+    "changes and run update_hashes.py to re-approve the security files."
+)
 
 _DENY_REASON = (
     "BLOCKED: .github, .vscode, and NoAgentZone are permanently restricted. "
@@ -541,6 +565,75 @@ _GIT_DENIED_COMBOS: list[tuple[str, str]] = [
     ("filter-branch", ""),
     ("gc", "--force"),
 ]
+
+
+
+# ---------------------------------------------------------------------------
+# SAF-008: File integrity helpers
+# ---------------------------------------------------------------------------
+
+def _compute_file_hash(path: str) -> "Optional[str]":
+    """Compute the SHA256 hex digest of a file.  Returns None on any error."""
+    try:
+        h = hashlib.sha256()
+        with open(path, "rb") as fh:
+            for chunk in iter(lambda: fh.read(65536), b""):
+                h.update(chunk)
+        return h.hexdigest()
+    except OSError:
+        return None
+
+
+def _compute_gate_canonical_hash(gate_path: str) -> "Optional[str]":
+    """Compute SHA256 of security_gate.py with the gate-hash constant zeroed.
+
+    The canonical form replaces the 64-char hex value of _KNOWN_GOOD_GATE_HASH
+    with 64 zeros before hashing.  This makes the result independent of the
+    stored hash value while detecting any other modification to the file.
+    """
+    try:
+        with open(gate_path, "rb") as fh:
+            content_bytes = fh.read()
+        canonical = re.sub(
+            rb'(?<=_KNOWN_GOOD_GATE_HASH: str = ")[0-9a-fA-F]{64}',
+            b"0" * 64,
+            content_bytes,
+        )
+        return hashlib.sha256(canonical).hexdigest()
+    except (OSError, re.error):
+        return None
+
+
+def verify_file_integrity() -> bool:
+    """SAF-008: Verify SHA256 hashes of security-critical files on startup.
+
+    Checks both .vscode/settings.json and this script against their
+    known-good hashes.  Returns True only when both match.  Fails closed -
+    returns False on any I/O error or unexpected exception.
+    """
+    try:
+        gate_path = os.path.abspath(__file__)
+        scripts_dir = os.path.dirname(gate_path)
+        # Path layout: scripts/ -> hooks/ -> .github/ -> workspace_root/
+        workspace_root = os.path.dirname(
+            os.path.dirname(os.path.dirname(scripts_dir))
+        )
+        settings_path = os.path.join(workspace_root, ".vscode", "settings.json")
+
+        # 1. Verify settings.json
+        settings_hash = _compute_file_hash(settings_path)
+        if settings_hash is None or settings_hash != _KNOWN_GOOD_SETTINGS_HASH:
+            return False
+
+        # 2. Verify security_gate.py using canonical form
+        gate_hash = _compute_gate_canonical_hash(gate_path)
+        if gate_hash is None or gate_hash != _KNOWN_GOOD_GATE_HASH:
+            return False
+
+        return True
+    except Exception:
+        # Any unexpected error -> fail closed
+        return False
 
 
 # ---------------------------------------------------------------------------
@@ -1287,6 +1380,12 @@ def decide(data: dict, ws_root: str) -> str:
 
 def main() -> None:
     try:
+        # SAF-008: Integrity check -- deny all tool calls if files are tampered
+        if not verify_file_integrity():
+            print(build_response("deny", _INTEGRITY_WARNING), flush=True)
+            print(_INTEGRITY_WARNING, file=sys.stderr)
+            sys.exit(0)
+
         raw = sys.stdin.read(_STDIN_MAX_BYTES)
         # If we read exactly the limit the input may be oversized — fail closed
         if len(raw) >= _STDIN_MAX_BYTES:

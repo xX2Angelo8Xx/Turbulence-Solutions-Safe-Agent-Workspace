@@ -606,3 +606,10 @@ TST-504,test_exe_name_matches_pyinstaller_spec_name,Unit,INS-005,Pass,2026-03-12
 TST-505,test_source_dir_matches_pyinstaller_collect_name,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,dist\launcher\* matches COLLECT name=launcher in spec,Tester edge-case
 TST-506,test_wizard_style_is_modern,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,WizardStyle=modern confirmed,Tester edge-case
 TST-507,Full regression suite (936 tests incl. 41 INS-005),Regression,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,16 pre-existing failures (GUI-008/INS-004/INS-012/SAF-010); 0 new failures from INS-005; 41/41 INS-005 tests pass,Tester Agent INS-005 final run; PASS verdict
+TST-508,test_compute_file_hash_empty_file,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Empty file returns SHA256('') not None,Tester edge-case
+TST-509,test_canonical_hash_detects_settings_hash_tampering,Security,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Modifying _KNOWN_GOOD_SETTINGS_HASH in gate IS detected by canonical hash,Tester bypass-attempt
+TST-510,test_canonical_hash_no_constant_line,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,File without hash constant line still hashes without crash,Tester edge-case
+TST-511,test_main_stdin_not_consumed_on_integrity_failure,Security,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,stdin.read() never called before deny on integrity failure,Tester ordering test
+TST-512,test_verify_file_integrity_returns_false_on_exception,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Unexpected exception inside verify returns fail-closed False,Tester edge-case
+TST-513,test_canonical_hash_uppercase_hex_recognized,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Uppercase hex in gate constant is zeroed equally to lowercase,Tester edge-case
+TST-514,SAF-008 full suite (23 tests) + full regression,Regression,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,23/23 SAF-008 pass; 16 pre-existing failures unchanged; 919 pass total,Tester Agent SAF-008 final run; PASS verdict
