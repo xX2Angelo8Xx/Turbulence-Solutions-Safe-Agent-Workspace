@@ -613,13 +613,62 @@ TST-511,test_main_stdin_not_consumed_on_integrity_failure,Security,SAF-008,Pass,
 TST-512,test_verify_file_integrity_returns_false_on_exception,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Unexpected exception inside verify returns fail-closed False,Tester edge-case
 TST-513,test_canonical_hash_uppercase_hex_recognized,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Uppercase hex in gate constant is zeroed equally to lowercase,Tester edge-case
 TST-514,SAF-008 full suite (23 tests) + full regression,Regression,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,23/23 SAF-008 pass; 16 pre-existing failures unchanged; 919 pass total,Tester Agent SAF-008 final run; PASS verdict
-TST-515,test_version_label_attribute_exists (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,App.version_label present after Iteration 2 fix � CTkLabel placed in _build_ui(),Fixed in Iteration 2
-TST-516,test_version_label_is_ctk_label_not_entry (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,Mock identity check (is not) replaces isinstance � impl correct,Tester fixed mock design flaw in Iteration 1 test
-TST-517,test_version_label_grid_called (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,version_label placed at startup via place() � grid mock records other labels,Fixed in Iteration 2
+TST-515,test_version_label_attribute_exists (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,App.version_label present after Iteration 2 fix � CTkLabel placed in _build_ui(),Fixed in Iteration 2
+TST-516,test_version_label_is_ctk_label_not_entry (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,Mock identity check (is not) replaces isinstance � impl correct,Tester fixed mock design flaw in Iteration 1 test
+TST-517,test_version_label_grid_called (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,version_label placed at startup via place() � grid mock records other labels,Fixed in Iteration 2
 TST-518,test_version_label_text_contains_version (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,CTkLabel created with text containing display version string,Fixed in Iteration 2
 TST-519,test_version_label_get_display_version_imported (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,get_display_version imported from launcher.config in app.py AST check,Fixed in Iteration 2
-TST-520,GUI-008 full suite (14/14) + full regression (924 pass),Regression,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,14/14 GUI-008 pass; 924 total pass; 11 pre-existing failures unchanged (SAF-010/INS-004/INS-012),Tester Agent Iteration 2 � PASS verdict
-TST-521,test_file_exists,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,build_dmg.sh exists at src/installer/macos/build_dmg.sh,
+TST-520,GUI-008 full suite (14/14) + full regression (924 pass),Regression,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,14/14 GUI-008 pass; 924 total pass; 11 pre-existing failures unchanged (SAF-010/INS-004/INS-012),Tester Agent Iteration 2 � PASS verdictTST-521,test_af1_core_deny_malformed_input,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-1: malformed JSON fails closed via parse_input + build_response deny path,
+TST-522,test_af1_core_allow_project_path,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-1: read_file on Project/ returns allow end-to-end through decide(),
+TST-523,test_af2_grep_includepattern_github_nested,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-2: grep_search includePattern=.github/** in nested tool_input format → deny,
+TST-524,test_af2_grep_brace_expansion_bypass,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-2: brace-expansion {src,.github}/** bypass attempt → deny,
+TST-525,test_af3_semantic_search_never_allow,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-3: semantic_search with innocuous query never returns allow,
+TST-526,test_af3_semantic_search_nested_input,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-3: semantic_search in VS Code nested format returns ask,
+TST-527,test_af4_recursive_get_childitem,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-4: Get-ChildItem -Recurse on workspace root denied (ancestor of deny zones),
+TST-528,test_af4_recursive_find_command,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-4: find . on workspace root denied (inherently recursive + ancestor),
+TST-529,test_af5_integrity_constants_not_zeroed,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-5: hash constants are valid 64-char hex and non-zero,
+TST-530,test_af5_verify_integrity_function_callable,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-5: verify_file_integrity() exists is callable and returns bool,
+TST-531,test_af6_all_write_tools_project_allowed,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-6: every tool in _WRITE_TOOLS allowed on Project/ path,
+TST-532,test_af6_all_write_tools_outside_denied,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-6: every write tool denied on docs/ .github/ .vscode/ noagentzone/ paths,
+TST-533,test_tools_create_file_project,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,create_file on Project/ → allow,
+TST-534,test_tools_create_file_github,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,create_file on .github/ → deny,
+TST-535,test_tools_replace_project,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,replace_string_in_file on Project/ → allow,
+TST-536,test_tools_replace_docs,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,replace_string_in_file on docs/ (ask zone) → deny (SAF-007 write restriction),
+TST-537,test_tools_multi_replace_project,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,multi_replace_string_in_file on Project/ → allow,
+TST-538,test_tools_multi_replace_vscode,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,multi_replace_string_in_file on .vscode/ → deny,
+TST-539,test_tools_grep_safe_no_path,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,grep_search safe params and no path → ask,
+TST-540,test_tools_grep_blocked_include,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,grep_search with includePattern=.github/** → deny,
+TST-541,test_tools_semantic_search,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,semantic_search → ask (never allow),
+TST-542,test_tools_read_file_project,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,read_file on Project/ → allow,
+TST-543,test_tools_read_file_github,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,read_file on .github/ → deny,
+TST-544,test_tools_list_dir_project,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,list_dir on Project/ → allow,
+TST-545,test_tools_list_dir_noagentzone,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,list_dir on NoAgentZone/ → deny,
+TST-546,test_tools_terminal_safe,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,run_in_terminal safe pytest command → ask,
+TST-547,test_tools_terminal_blocked_path,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,run_in_terminal cat .github/security_gate.py → deny,
+TST-548,test_tools_unknown_tool_asks,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,unrecognised non-exempt tool name → ask,
+TST-549,test_crossplat_win_create_project,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,Windows backslash path → create_file → Project/ → allow,
+TST-550,test_crossplat_win_create_github,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,Windows backslash path → create_file → .github/ → deny,
+TST-551,test_crossplat_wsl_create_project,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,WSL /mnt/c/ path → create_file → Project/ → allow,
+TST-552,test_crossplat_wsl_create_vscode,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,WSL /mnt/c/ path → create_file → .vscode/ → deny,
+TST-553,test_crossplat_gitbash_create_project,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,Git Bash /c/ path → create_file → Project/ → allow,
+TST-554,test_crossplat_gitbash_create_noagentzone,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,Git Bash /c/ path → create_file → NoAgentZone/ → deny,
+TST-555,test_crossplat_win_read_project,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,Windows path → read_file → Project/ → allow,
+TST-556,test_crossplat_win_read_github,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,Windows path → read_file → .github/ → deny,
+TST-557,test_crossplat_wsl_read_project,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,WSL path → read_file → Project/ → allow,
+TST-558,test_crossplat_wsl_read_vscode,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,WSL path → read_file → .vscode/ → deny,
+TST-559,test_crossplat_gitbash_read_project,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,Git Bash path → read_file → Project/ → allow,
+TST-560,test_crossplat_gitbash_read_noagentzone,Cross-platform,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,Git Bash path → read_file → NoAgentZone/ → deny,
+TST-561,test_nested_read_file_project,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → read_file on Project/ → allow,
+TST-562,test_nested_read_file_github,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → read_file on .github/ → deny,
+TST-563,test_nested_create_file_project,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → create_file on Project/ → allow,
+TST-564,test_nested_create_file_outside,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → create_file on docs/ → deny (write restriction),
+TST-565,test_nested_grep_include_github,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → grep_search includePattern=.github/** → deny,
+TST-566,test_nested_grep_safe,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → grep_search safe params → ask,
+TST-567,test_nested_terminal_safe,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → run_in_terminal safe command → ask,
+TST-568,test_nested_terminal_blocked,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → run_in_terminal .vscode path → deny,
+TST-569,test_nested_always_allow,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → ask_questions with blocked path in payload → allow (always-allow bypass),
+TST-570,test_nested_semantic_search_asks,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → semantic_search → ask,
+TST-571,SAF-009 full suite (50 tests) + SAF regression check,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,50/50 SAF-009 pass; 531 total SAF tests pass; 8 pre-existing SAF-010 failures unchanged; zero new failures,Developer Agent SAF-009 final run before handoffTST-521,test_file_exists,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,build_dmg.sh exists at src/installer/macos/build_dmg.sh,
 TST-522,test_file_is_non_empty,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,File size > 0,
 TST-523,test_shebang_line,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,First line is #!/usr/bin/env bash,
 TST-524,test_set_pipefail,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,set -euo pipefail present,
@@ -642,4 +691,4 @@ TST-540,test_info_plist_written,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python
 TST-541,test_plist_key_present (x10 keys),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,All 10 CFBundle/NS plist keys present (parametrized),
 TST-542,test_references_launcher_spec,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,launcher.spec referenced for PyInstaller build,
 TST-543,test_references_dist_launcher_output,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,dist/launcher output directory referenced,
-TST-544,INS-006 full suite (32 tests) + full regression,Regression,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,32/32 INS-006 pass; 956 total pass; 11 pre-existing failures unchanged,Developer Agent INS-006 Iteration 1 � all tests pass
+TST-544,INS-006 full suite (32 tests) + full regression,Regression,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,32/32 INS-006 pass; 956 total pass; 11 pre-existing failures unchanged,Developer Agent INS-006 Iteration 1 � all tests pass
