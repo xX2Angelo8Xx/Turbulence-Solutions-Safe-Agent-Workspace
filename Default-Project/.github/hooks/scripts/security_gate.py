@@ -944,6 +944,113 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
 
 
 # ---------------------------------------------------------------------------
+# SAF-003: Search tool parameter validation
+# ---------------------------------------------------------------------------
+
+def _is_truthy_flag(value: object) -> bool:
+    """Return True if *value* represents an enabled boolean flag.
+
+    Handles bool True, the string "true" (any case), and integer 1.
+    All other values — including None, False, "false", 0 — return False.
+    """
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.lower() == "true"
+    if isinstance(value, int):
+        return value == 1
+    return False
+
+
+def _validate_include_pattern(pattern: str, ws_root: str) -> str:
+    """Validate a grep_search ``includePattern`` glob value.
+
+    Normalizes the pattern, checks for residual ``..`` traversal sequences,
+    and delegates zone membership to ``zone_classifier.classify()``.
+
+    Returns ``"deny"`` if the pattern targets a deny zone or encodes a path
+    traversal attempt.  Returns ``"allow"`` otherwise.
+    """
+    # Normalize using zone_classifier's implementation (strips control chars,
+    # handles backslashes, resolves '..' sequences where possible).
+    normalized = zone_classifier.normalize_path(pattern)
+
+    # If '..' remains after normpath the sequence escapes the workspace root —
+    # this is always a traversal attempt regardless of the destination.
+    if ".." in normalized:
+        return "deny"
+
+    # Delegate zone membership: covers both Method 1 (relative_to) and
+    # Method 2 (regex pattern scan) inside zone_classifier.
+    if zone_classifier.classify(pattern, ws_root) == "deny":
+        return "deny"
+
+    return "allow"
+
+
+def validate_grep_search(data: dict, ws_root: str) -> str:
+    """SAF-003: Validate ``grep_search`` tool parameters prior to execution.
+
+    Inspects ``includePattern`` and ``includeIgnoredFiles`` to close the
+    bypass vectors identified in audit findings 2 and 3.
+
+    Supports both the VS Code hook nested format (parameters inside
+    ``tool_input``) and the flat test format (parameters at the top level).
+
+    Returns ``"deny"``, ``"ask"``, or ``"allow"``.
+    """
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        tool_input = {}
+
+    # Prefer nested tool_input key (VS Code hook format); fall back to
+    # top-level dict key (test / legacy hook format).
+    def _param(key: str) -> object:
+        val = tool_input.get(key)
+        if val is None:
+            val = data.get(key)
+        return val
+
+    # includeIgnoredFiles=true bypasses normal file-hiding mechanisms — deny
+    # to prevent access to files that are intentionally kept from indexing.
+    if _is_truthy_flag(_param("includeIgnoredFiles")):
+        return "deny"
+
+    # includePattern is a glob path filter that constrains which files are
+    # searched.  Deny if it targets a protected zone or encodes a traversal.
+    include_pattern = _param("includePattern")
+    if isinstance(include_pattern, str) and include_pattern:
+        if _validate_include_pattern(include_pattern, ws_root) == "deny":
+            return "deny"
+
+    # Standard path zone check on any explicit file-path field present in
+    # the payload (e.g. a filePath passed alongside the query).
+    raw_path = extract_path(data)
+    if raw_path is None:
+        return "ask"
+    zone = zone_classifier.classify(raw_path, ws_root)
+    if zone == "deny":
+        return "deny"
+    if zone == "allow":
+        return "allow"
+    return "ask"
+
+
+def validate_semantic_search(data: dict, ws_root: str) -> str:
+    """SAF-003: Validate ``semantic_search`` tool call.
+
+    ``semantic_search`` indexes the entire workspace with no path-restriction
+    parameter.  Every call is returned as ``"ask"`` so that a human must
+    review and approve it before execution, preventing automated leakage of
+    protected file content.
+
+    The ``data`` and ``ws_root`` parameters are accepted for API consistency
+    but are not used in the current policy.
+    """
+    return "ask"
+
+
+# ---------------------------------------------------------------------------
 # Decision engine
 # ---------------------------------------------------------------------------
 
@@ -967,6 +1074,14 @@ def decide(data: dict, ws_root: str) -> str:
             return "deny"
         decision, _reason = sanitize_terminal_command(command, ws_root)
         return decision
+
+    # SAF-003: Search tool parameter validation — must run before the
+    # _EXEMPT_TOOLS block so that includePattern / includeIgnoredFiles are
+    # inspected even though both tools appear in _EXEMPT_TOOLS.
+    if tool_name == "semantic_search":
+        return validate_semantic_search(data, ws_root)
+    if tool_name == "grep_search":
+        return validate_grep_search(data, ws_root)
 
     # Non-exempt tools (non-empty name not in exempt set): always ask
     if tool_name and tool_name not in _EXEMPT_TOOLS:

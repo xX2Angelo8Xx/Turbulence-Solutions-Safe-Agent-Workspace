@@ -255,6 +255,53 @@ TST-208,SAF-005 full 106-test suite — Tester Iteration 2 confirmation run,Secu
 TST-209,SAF-005 Tester new BUG-016 edge-case tests (ET-027 to ET-032 — 6 tests),Security,SAF-005,Fail,2026-03-11,Windows 11 + Python 3.11,0/6 pass — no-space and fd-prefixed shell redirect variants bypass zone check,"All 6 fail: test_redirect_no_space_basic_bypasses_gate, test_redirect_no_space_append_bypasses_gate, test_redirect_fd_prefixed_basic_bypasses_gate, test_redirect_fd_prefixed_stderr_bypasses_gate, test_redirect_fd_prefixed_append_bypasses_gate, test_redirect_cat_fd_to_restricted_zone"
 TST-210,SAF-005 full 112-test suite — Tester Iteration 3 confirmation run,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,112/112 pass — BUG-016 fix confirmed; ET-027 to ET-032 all pass,"Tester Agent Iteration 3 re-review; _REDIRECT_OP_RE (^[0-9]*>>?$) handles fd-prefixed operators; _EMBEDDED_REDIRECT_RE (>>?(.+)$) handles no-space embedded redirects; all 3 bypass forms now zone-checked"
 TST-211,Full regression suite Iteration 3 (excluding pre-existing SAF-002 and GUI-001 failures),Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,238/238 pass — zero new failures introduced by BUG-016 fix,Tester Agent Iteration 3: all INS-001 + INS-002 + INS-012 + SAF-001 + SAF-004 + SAF-005 tests pass; no regressions
+TST-269,test_is_truthy_flag_bool_true,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,bool True is recognised as truthy flag,_is_truthy_flag
+TST-270,test_is_truthy_flag_bool_false,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,bool False is not truthy,_is_truthy_flag
+TST-271,test_is_truthy_flag_string_true_lowercase,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "true" is truthy,_is_truthy_flag
+TST-272,test_is_truthy_flag_string_true_mixed_case,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "True" is truthy (case-insensitive),_is_truthy_flag
+TST-273,test_is_truthy_flag_string_true_uppercase,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "TRUE" is truthy (case-insensitive),_is_truthy_flag
+TST-274,test_is_truthy_flag_string_false,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "false" is not truthy,_is_truthy_flag
+TST-275,test_is_truthy_flag_int_1,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,integer 1 is truthy,_is_truthy_flag
+TST-276,test_is_truthy_flag_int_0,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,integer 0 is not truthy,_is_truthy_flag
+TST-277,test_is_truthy_flag_none,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,None is not truthy,_is_truthy_flag
+TST-278,test_validate_include_pattern_safe_wildcard_glob,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,**/*.py glob does not target any deny zone → allow,_validate_include_pattern
+TST-279,test_validate_include_pattern_src_subdir,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,src/** (ask zone) is not denied → allow,_validate_include_pattern
+TST-280,test_validate_include_pattern_github,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.github/** pattern is denied (protection),_validate_include_pattern
+TST-281,test_validate_include_pattern_vscode,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.vscode/** pattern is denied (protection),_validate_include_pattern
+TST-282,test_validate_include_pattern_noagentzone,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,NoAgentZone/** pattern is denied (protection),_validate_include_pattern
+TST-283,test_validate_include_pattern_traversal_dotdot,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,../ in includePattern is denied (traversal guard),_validate_include_pattern
+TST-284,test_validate_include_pattern_traversal_deep,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,deep traversal escaping workspace root is denied,_validate_include_pattern
+TST-285,test_validate_grep_search_include_pattern_github_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern=.github/** → deny (protection),validate_grep_search
+TST-286,test_validate_grep_search_include_pattern_vscode_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern=.vscode/** → deny (protection),validate_grep_search
+TST-287,test_validate_grep_search_include_pattern_noagentzone_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern=NoAgentZone/** → deny (protection),validate_grep_search
+TST-288,test_validate_grep_search_include_ignored_files_bool_true_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles=True → deny (protection),validate_grep_search
+TST-289,test_validate_grep_search_include_ignored_files_string_true_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles="true" (string) → deny (protection),validate_grep_search
+TST-290,test_validate_grep_search_no_params_no_path_asks,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,no special params and no filePath → ask,validate_grep_search
+TST-291,test_validate_grep_search_no_params_project_path_allowed,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,clean params + filePath=project/main.py → allow,validate_grep_search
+TST-292,test_validate_grep_search_no_params_deny_path_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,clean params + filePath=.github/secret → deny,validate_grep_search
+TST-293,test_validate_grep_search_include_ignored_false_not_denied,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles=False does not trigger deny,validate_grep_search
+TST-294,test_validate_grep_search_tool_input_nested_format,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern in nested tool_input dict → deny (VS Code hook format supported),validate_grep_search
+TST-295,test_validate_semantic_search_basic_returns_ask,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,any semantic_search call returns ask for human review,validate_semantic_search
+TST-296,test_validate_semantic_search_protected_query_still_ask,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,query containing .github path text still returns ask (query is not path-classified),validate_semantic_search
+TST-297,test_validate_semantic_search_never_returns_allow,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,semantic_search must never be auto-allowed (protection),validate_semantic_search
+TST-298,test_grep_search_deny_zone_via_include_pattern_protected,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.github/** via includePattern blocked through full decide() (protection),Integration
+TST-299,test_grep_search_traversal_blocked_protection,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,../../../.vscode/** traversal via includePattern blocked (protection),Integration
+TST-300,test_grep_search_include_ignored_files_blocked_protection,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles=True blocked through full decide() (protection),Integration
+TST-301,test_grep_search_github_in_nested_tool_input_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern in nested tool_input → still denied (bypass attempt),Integration
+TST-302,test_grep_search_traversal_to_github_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,project/../.github/** resolves to .github/ and is denied (bypass attempt),Integration
+TST-303,test_grep_search_mixed_case_include_pattern_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.GITHUB/** upper-case normalised and denied (bypass attempt),Integration
+TST-304,test_grep_search_include_ignored_string_true_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles="true" string form denied (bypass attempt),Integration
+TST-305,test_grep_search_noagentzone_lowercase_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,noagentzone/** all-lowercase denied (bypass attempt),Integration
+TST-306,test_grep_search_star_star_github_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,**/.github/** multi-segment wildcard targeting .github/ denied (bypass attempt),Integration
+TST-307,test_semantic_search_cannot_be_allowed_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,semantic_search with innocuous query never returns allow (bypass attempt),Integration
+TST-308,test_decide_grep_search_include_pattern_github_denied,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes grep_search includePattern=.github/** → deny,decide()
+TST-309,test_decide_grep_search_clean_params_project_path_allowed,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes grep_search with safe params + project path → allow,decide()
+TST-310,test_decide_grep_search_clean_params_no_path_asks,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes grep_search with safe params and no filePath → ask,decide()
+TST-311,test_decide_semantic_search_always_ask,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes semantic_search → always ask,decide()
+TST-312,test_decide_grep_search_include_ignored_denied,Integration,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,decide() routes grep_search with includeIgnoredFiles=True → deny,decide()
+TST-313,test_grep_search_windows_backslash_include_pattern_github_denied,Cross-platform,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,Windows backslash includePattern targeting .github → deny,cross-platform
+TST-314,test_grep_search_wsl_absolute_include_pattern_github_denied,Cross-platform,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,WSL absolute includePattern targeting .github → deny,cross-platform
+TST-315,SAF-003 full test suite (46 tests) + full regression check (448 tests),Regression,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,46/46 SAF-003 tests pass; 448/449 total pass (1 pre-existing INS-012 failure unrelated to SAF-003),Developer Agent final run before handoff
 TST-261,test_valid_simple_name,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,hyphenated name returns (True - ""),validate_folder_name
 TST-262,test_valid_name_with_numbers,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,alphanumeric name returns (True - ""),validate_folder_name
 TST-263,test_valid_name_with_underscores,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,underscore name returns (True - ""),validate_folder_name
