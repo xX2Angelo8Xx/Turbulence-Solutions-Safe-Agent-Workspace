@@ -368,3 +368,51 @@ TST-293,SAF-006 full combined test suite (82 tests),Security,SAF-006,Pass,2026-0
 TST-294,INS-009 developer test suite (36 tests),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,36/36 pass -- parse_version + check_for_update + config constants all verified,Tester review initial run
 TST-295,INS-009 tester edge-case tests (6 tests -- TestParseVersionEdgeCases + TestCheckForUpdateImplementation),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,6/6 pass -- uppercase V behavior / Accept header / hardcoded URL / non-string tag_name,Tester-added edge cases all pass
 TST-296,INS-009 combined test suite (42 tests),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,42/42 pass -- all developer and tester tests green,Tester Iteration 1 final run -- PASS verdict; WP marked Done
+TST-316,test_templates_root_dir_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/ directory exists at repository root,
+TST-317,test_coding_template_dir_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/ subdirectory exists,
+TST-318,test_coding_readme_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/README.md exists,
+TST-319,test_coding_gitignore_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.gitignore exists,
+TST-320,test_coding_github_dir_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.github/ directory exists,
+TST-321,test_coding_hooks_json_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.github/hooks/require-approval.json exists,
+TST-322,test_coding_hooks_scripts_security_gate_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.github/hooks/scripts/security_gate.py exists,
+TST-323,test_coding_hooks_scripts_zone_classifier_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.github/hooks/scripts/zone_classifier.py exists,
+TST-324,test_coding_hooks_scripts_ps1_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.github/hooks/scripts/require-approval.ps1 exists,
+TST-325,test_coding_hooks_scripts_sh_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.github/hooks/scripts/require-approval.sh exists,
+TST-326,test_coding_instructions_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.github/instructions/copilot-instructions.md exists,
+TST-327,test_coding_prompts_review_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.github/prompts/review.prompt.md exists,
+TST-328,test_coding_skill_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.github/skills/ts-code-review/SKILL.md exists,
+TST-329,test_coding_vscode_dir_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.vscode/ directory exists,
+TST-330,test_coding_vscode_settings_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/.vscode/settings.json exists,
+TST-331,test_coding_noagentzone_dir_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/NoAgentZone/ directory exists,
+TST-332,test_coding_noagentzone_readme_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/NoAgentZone/README.md exists,
+TST-333,test_coding_project_dir_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/Project/ directory exists,
+TST-334,test_coding_project_app_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/Project/app.py exists,
+TST-335,test_coding_project_readme_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/Project/README.md exists,
+TST-336,test_coding_project_requirements_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/Project/requirements.txt exists,
+TST-337,test_no_pycache_in_template,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,No __pycache__ directories found in templates/coding/,
+TST-338,test_no_pyc_files_in_template,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,No *.pyc files found in templates/coding/,
+TST-339,test_config_templates_dir_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,config.TEMPLATES_DIR attribute is present after import,
+TST-340,test_config_templates_dir_is_path,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,config.TEMPLATES_DIR is a pathlib.Path instance,
+TST-341,test_config_templates_dir_resolves_to_templates,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,TEMPLATES_DIR resolves to repo-root/templates/,
+TST-342,test_config_templates_dir_exists_on_disk,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,TEMPLATES_DIR path exists on disk as a directory,
+TST-343,test_list_templates_function_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates importable from launcher.core.project_creator,
+TST-344,test_list_templates_returns_coding,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates(TEMPLATES_DIR) includes 'coding',
+TST-345,test_list_templates_returns_list,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates() return type is list,
+TST-346,test_list_templates_returns_sorted,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates() output is lexicographically sorted,
+TST-347,test_list_templates_empty_on_missing_dir,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates() returns [] for non-existent path,
+TST-348,test_list_templates_excludes_files,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates() returns only directory names not files,
+TST-349,test_list_templates_with_multiple_templates,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates() returns all template subdirs when multiple exist,
+TST-350,test_list_templates_empty_dir_returns_empty_list,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates() on empty directory returns [],
+TST-351,test_template_discoverable_and_copyable,Integration,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,coding template discoverable via list_templates() and copyable via create_project(); key files present in copy,
+TST-352,test_template_files_match_default_project,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,All files in Default-Project/ (minus __pycache__) exist in templates/coding/,
+TST-353,test_coding_template_has_no_extra_files_beyond_default_project,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/ contains no files absent from Default-Project/,
+TST-354,test_list_templates_on_nonexistent_path_does_not_raise,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates() on missing path returns [] without exception,
+TST-355,test_list_templates_on_file_path_returns_empty,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates() given a file path returns [],
+TST-356,test_template_security_files_match_default_project_content,Security,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,Key security files byte-match (or JSON-semantic-match) their Default-Project/ counterparts,Tester addition — content equality verified for require-approval.json + security_gate.py + zone_classifier.py + settings.json (JSON semantic eq)
+TST-357,test_vscode_settings_json_has_all_required_keys,Security,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,All security-critical settings.json keys present in template; critical values correct,Tester addition — .vscode/settings.json strips JSONC comments but retains all controls; chat.tools.global.autoApprove=false confirmed
+TST-358,test_template_files_are_non_empty,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,No zero-byte files found in templates/coding/,Tester addition — empty placeholder guard
+TST-359,test_list_templates_wrong_type_returns_empty,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,Passing a non-Path string argument returns [] without raising,Tester addition — isinstance() guard verified
+TST-360,test_template_non_json_files_match_default_project_byte_for_byte,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,All non-JSON template files are byte-for-byte identical to Default-Project/ counterparts,Tester addition — full byte sweep on scripts / markdown / shell files
+TST-361,test_require_approval_json_is_valid_json,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,require-approval.json is valid parseable JSON,
+TST-362,test_vscode_settings_json_is_valid_json,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,.vscode/settings.json is valid parseable JSON,
+TST-363,Full regression suite (681 tests — Tester INS-004 review),Regression,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,681/689 total tests pass; 8 pre-existing failures in INS-012 and SAF-010 unrelated to INS-004; 48/48 INS-004 tests pass; zero regressions introduced,Tester Agent Iteration 1 final run; PASS verdict

@@ -1,0 +1,33 @@
+{
+  "files.exclude": {
+    ".github": true,
+    ".vscode": true
+  },
+  "search.exclude": {
+    ".github": true,
+    ".vscode": true
+  },
+  "chat.tools.global.autoApprove": false,
+  "chat.tools.edits.autoApprove": [],
+  "chat.tools.terminal.sandbox.enabled": true,
+  "github.copilot.chat.agent.autoFix": false,
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": false,
+    "windsurf": false,
+    "cursor-global": false,
+    "cursor-workspace": false
+  },
+  "chat.mcp.autoStart": false,
+  "security.workspace.trust.enabled": true,
+  "security.workspace.trust.startupPrompt": "always",
+  "security.workspace.trust.untrustedFiles": "prompt",
+  "security.workspace.trust.banner": "always",
+  "chat.additionalReadAccessFolders": [],
+  "chat.agent.thinking.collapsedTools": "off",
+  "chat.tools.terminal.sandbox.macFileSystem": {
+    "denyRead": [],
+    "allowWrite": ["."],
+    "denyWrite": []
+  },
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true
+}

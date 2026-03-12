@@ -40,3 +40,13 @@ def create_project(
 
     shutil.copytree(str(template_path), str(target))
     return target
+
+
+def list_templates(templates_dir: Path) -> list[str]:
+    """Return a sorted list of template directory names under *templates_dir*.
+
+    Returns an empty list if the path does not exist or is not a directory.
+    """
+    if not isinstance(templates_dir, Path) or not templates_dir.is_dir():
+        return []
+    return sorted(entry.name for entry in templates_dir.iterdir() if entry.is_dir())
