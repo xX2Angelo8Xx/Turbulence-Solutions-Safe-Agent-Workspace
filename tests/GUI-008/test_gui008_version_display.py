@@ -116,8 +116,12 @@ class TestVersionLabel:
         """AC1: version_label must be non-editable (CTkLabel, not CTkEntry)."""
         app = _fresh_app()
         assert hasattr(app, "version_label"), "version_label not found on App"
-        # The label must NOT be a CTkEntry instance (editable text field).
-        assert not isinstance(app.version_label, _CTK_MOCK.CTkEntry), \
+        # With customtkinter fully mocked, all CTkLabel(...) calls return
+        # _CTK_MOCK.CTkLabel.return_value and all CTkEntry(...) calls return
+        # _CTK_MOCK.CTkEntry.return_value — distinct mock objects.
+        # If version_label was mistakenly created via CTkEntry, it would be
+        # the CTkEntry return_value; asserting `is not` catches that case.
+        assert app.version_label is not _CTK_MOCK.CTkEntry.return_value, \
             "version_label must not be a CTkEntry (editable)"
 
     def test_version_label_grid_called(self):

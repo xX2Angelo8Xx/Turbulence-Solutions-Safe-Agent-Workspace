@@ -6,7 +6,7 @@ import tkinter.filedialog as filedialog
 
 import customtkinter as ctk
 
-from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, TEMPLATES_DIR
+from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, TEMPLATES_DIR, get_display_version
 from launcher.core.project_creator import list_templates
 from launcher.gui.components import make_browse_row, make_label_entry_row
 from launcher.gui.validation import (
@@ -128,6 +128,16 @@ class App:
         self.create_button.grid(
             row=6, column=0, columnspan=3, padx=20, pady=(20, 24), sticky="ew"
         )
+
+        # Version label — non-editable, always visible, shows installed version.
+        # place() is used so it does not disturb the grid layout of other rows.
+        self.version_label = ctk.CTkLabel(
+            self._window,
+            text=f"v{get_display_version()}",
+            text_color=COLOR_TEXT,
+            anchor="e",
+        )
+        self.version_label.place(relx=1.0, rely=1.0, x=-20, y=-8, anchor="se")
 
     def _browse_destination(self) -> None:
         """Open a native folder browser and populate the destination entry."""
