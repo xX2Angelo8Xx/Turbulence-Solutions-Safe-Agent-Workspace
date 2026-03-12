@@ -1,13 +1,17 @@
-"""Main application window for the Turbulence Solutions Launcher."""
+﻿"""Main application window for the Turbulence Solutions Launcher."""
 
 from __future__ import annotations
 
+import threading
 import tkinter.filedialog as filedialog
+import tkinter.messagebox as messagebox
+from pathlib import Path
 
 import customtkinter as ctk
 
-from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, TEMPLATES_DIR, get_display_version
-from launcher.core.project_creator import list_templates
+from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, TEMPLATES_DIR, VERSION, get_display_version
+from launcher.core.updater import check_for_update
+from launcher.core.project_creator import create_project, list_templates
 from launcher.gui.components import make_browse_row, make_label_entry_row
 from launcher.gui.validation import (
     check_duplicate_folder,
@@ -16,7 +20,7 @@ from launcher.gui.validation import (
 )
 
 _WINDOW_WIDTH: int = 580
-_WINDOW_HEIGHT: int = 440
+_WINDOW_HEIGHT: int = 520
 
 
 def _format_template_name(raw: str) -> str:
@@ -36,6 +40,8 @@ class App:
         self._window.resizable(False, False)
         self._window.configure(fg_color=COLOR_PRIMARY)
         self._build_ui()
+        # Silent background update check on launch (GUI-009).
+        threading.Thread(target=self._run_update_check, daemon=True).start()
 
     def _get_template_options(self) -> list[str]:
         names = list_templates(TEMPLATES_DIR)
@@ -129,7 +135,35 @@ class App:
             row=6, column=0, columnspan=3, padx=20, pady=(20, 24), sticky="ew"
         )
 
-        # Version label — non-editable, always visible, shows installed version.
+        # Check for Updates button (GUI-010) -- secondary text-link style button.
+        self.check_updates_button = ctk.CTkButton(
+            self._window,
+            text="Check for Updates",
+            command=self._on_check_for_updates,
+            fg_color="transparent",
+            hover_color=COLOR_PRIMARY,
+            text_color=COLOR_SECONDARY,
+            height=24,
+            border_width=0,
+        )
+        self.check_updates_button.grid(
+            row=7, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="e"
+        )
+
+        # Update notification banner (GUI-009) -- hidden until an update is detected.
+        self.update_banner = ctk.CTkLabel(
+            self._window,
+            text="",
+            text_color="#FFD700",
+            anchor="center",
+            height=28,
+        )
+        self.update_banner.grid(
+            row=8, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+        )
+        self.update_banner.grid_remove()
+
+        # Version label -- non-editable, always visible, shows installed version.
         # place() is used so it does not disturb the grid layout of other rows.
         self.version_label = ctk.CTkLabel(
             self._window,
@@ -147,8 +181,86 @@ class App:
             self.destination_entry.insert(0, folder)
 
     def _on_create_project(self) -> None:
-        """Handle Create Project button click. Full logic added in GUI-005."""
-        pass
+        """Handle Create Project button click."""
+        folder_name = self.project_name_entry.get().strip()
+        display_template = self.project_type_dropdown.get()
+        destination_str = self.destination_entry.get().strip()
+
+        # Clear previous inline errors before re-validating.
+        self.project_name_error_label.configure(text="")
+        self.destination_error_label.configure(text="")
+
+        name_valid, name_error = validate_folder_name(folder_name)
+        if not name_valid:
+            self.project_name_error_label.configure(text=name_error)
+            return
+
+        dest_valid, dest_error = validate_destination_path(destination_str)
+        if not dest_valid:
+            self.destination_error_label.configure(text=dest_error)
+            return
+
+        if check_duplicate_folder(folder_name, destination_str):
+            self.project_name_error_label.configure(
+                text=f'A folder named "{folder_name}" already exists at the destination.'
+            )
+            return
+
+        # Reverse-map the title-cased display name back to the raw template dir name.
+        raw_template = next(
+            (t for t in list_templates(TEMPLATES_DIR) if _format_template_name(t) == display_template),
+            None,
+        )
+        if raw_template is None:
+            messagebox.showerror(
+                "Template Not Found",
+                f'Could not find a template matching "{display_template}". '
+                "Please restart the application and try again.",
+            )
+            return
+
+        template_path = TEMPLATES_DIR / raw_template
+        try:
+            created_path = create_project(template_path, Path(destination_str), folder_name)
+        except Exception as exc:
+            messagebox.showerror("Project Creation Failed", str(exc))
+            return
+
+        messagebox.showinfo(
+            "Project Created",
+            f'Project "{folder_name}" created successfully at:\n{created_path}',
+        )
+
+    def _run_update_check(self) -> None:
+        """Run in a background thread; posts the result to the main thread via after()."""
+        update_available, latest_version = check_for_update(VERSION)
+        self._window.after(0, lambda: self._apply_update_result(update_available, latest_version))
+
+    def _apply_update_result(self, update_available: bool, latest_version: str, manual: bool = False) -> None:
+        """Update the banner widget. Must be called on the main Tk thread."""
+        if update_available:
+            self.update_banner.configure(text=f"Update available: v{latest_version}")
+            self.update_banner.grid()
+        elif manual:
+            self.update_banner.configure(text="You're up to date.")
+            self.update_banner.grid()
+        else:
+            self.update_banner.grid_remove()
+
+    def _on_check_for_updates(self) -> None:
+        """Handle Check for Updates button click (GUI-010)."""
+        self.check_updates_button.configure(state="disabled", text="Checking...")
+
+        def _check() -> None:
+            update_available, latest_version = check_for_update(VERSION)
+            self._window.after(0, lambda: self._finish_manual_check(update_available, latest_version))
+
+        threading.Thread(target=_check, daemon=True).start()
+
+    def _finish_manual_check(self, update_available: bool, latest_version: str) -> None:
+        """Restore button state and apply the result of a manual update check."""
+        self.check_updates_button.configure(state="normal", text="Check for Updates")
+        self._apply_update_result(update_available, latest_version, manual=True)
 
     def run(self) -> None:
         """Start the application event loop."""
