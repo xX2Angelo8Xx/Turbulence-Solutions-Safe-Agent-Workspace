@@ -579,3 +579,30 @@ TST-508,test_format_template_name_only_hyphens,Unit,GUI-002,Pass,2026-03-12,Wind
 TST-509,test_format_template_name_leading_dot,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,Dotfile name ".hidden" formatted to ".Hidden" without error,Tester edge-case
 TST-510,test_list_templates_file_path_returns_empty_list,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,File path (not dir) passed to list_templates returns [] gracefully,Tester edge-case
 TST-511,test_list_templates_string_argument_returns_empty_list,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,str argument (not Path) to list_templates returns [] — isinstance type guard works,Tester edge-case
+TST-481,test_app_id_is_valid_guid_format,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppId uses Inno Setup {{GUID} format matching RFC-4122,Tester edge-case
+TST-482,test_app_id_guid_is_not_all_zeros,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppId GUID is not the null all-zeros sentinel,Tester edge-case
+TST-483,test_no_hardcoded_drive_letter[C:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded C:\ path in setup.iss,Tester edge-case
+TST-484,test_no_hardcoded_drive_letter[D:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded D:\ path in setup.iss,Tester edge-case
+TST-485,test_no_hardcoded_drive_letter[E:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded E:\ path in setup.iss,Tester edge-case
+TST-486,test_no_hardcoded_drive_letter[F:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded F:\ path in setup.iss,Tester edge-case
+TST-487,test_no_hardcoded_drive_letter[G:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded G:\ path in setup.iss,Tester edge-case
+TST-488,test_source_path_is_relative_not_absolute,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,Source starts with dist\ — no absolute path,Tester edge-case
+TST-489,test_default_dir_uses_autopf_not_direct_path,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,DefaultDirName={autopf} confirmed by regex,Tester edge-case
+TST-490,test_output_base_filename_declared,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,OutputBaseFilename key is present in [Setup],Tester edge-case
+TST-491,test_output_base_filename_contains_setup,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,OutputBaseFilename value contains Setup keyword,Tester edge-case
+TST-492,test_output_base_filename_no_spaces,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,OutputBaseFilename value has no spaces — shell-safe,Tester edge-case
+TST-493,test_createallsubdirs_flag_present,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,createallsubdirs flag present alongside recursesubdirs,Tester edge-case
+TST-494,test_ignoreversion_flag_present,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,ignoreversion flag present — required for PyInstaller DLL bundles,Tester edge-case
+TST-495,test_compression_is_lzma,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,Compression=lzma on its own line,Tester edge-case
+TST-496,test_solid_compression_enabled,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,SolidCompression=yes on its own line,Tester edge-case
+TST-497,test_privileges_required_is_exactly_admin,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,PrivilegesRequired=admin exactly — not lowest,Tester edge-case
+TST-498,test_architecture_restricted_to_x64,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,ArchitecturesAllowed=x64compatible — prevents 32-bit installs,Tester edge-case
+TST-499,test_start_menu_shortcut_uses_group_macro,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,{group} macro used in [Icons] for Start Menu shortcut,Tester edge-case
+TST-500,test_desktop_shortcut_is_opt_in,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,desktopicon task has Flags: unchecked — opt-in only,Tester edge-case
+TST-501,test_uninstall_delete_type_is_filesandirs,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,Type: filesandirs in [UninstallDelete] — full cleanup,Tester edge-case
+TST-502,test_uninstall_targets_app_macro,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,UninstallDelete Name is {app} — no hardcoded path,Tester edge-case
+TST-503,test_app_version_matches_pyproject_toml,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppVersion 0.1.0 matches pyproject.toml version — cross-validated,Tester edge-case
+TST-504,test_exe_name_matches_pyinstaller_spec_name,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,MyAppExeName launcher.exe matches spec EXE name=launcher,Tester edge-case
+TST-505,test_source_dir_matches_pyinstaller_collect_name,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,dist\launcher\* matches COLLECT name=launcher in spec,Tester edge-case
+TST-506,test_wizard_style_is_modern,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,WizardStyle=modern confirmed,Tester edge-case
+TST-507,Full regression suite (936 tests incl. 41 INS-005),Regression,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,16 pre-existing failures (GUI-008/INS-004/INS-012/SAF-010); 0 new failures from INS-005; 41/41 INS-005 tests pass,Tester Agent INS-005 final run; PASS verdict
