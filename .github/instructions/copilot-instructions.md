@@ -1,19 +1,13 @@
 # Turbulence Solutions — Agent Environment Launcher
 
 ## Safety-First Mandate
-
 This project has the highest security classification. Prioritize safety over convenience. When in doubt, choose the more restrictive option.
 
 ## Repository
-
 - **Remote origin:** `https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git`
-- Before any `git push`, verify with `git remote -v` that origin points to the URL above. If it does not, run:
-  ```
-  git remote set-url origin https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
-  ```
+- Before any `git push`, verify `git remote -v` origin is `https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git`. If not, run: `git remote set-url origin https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git`
 
 ## Non-Negotiable Rules
-
 - Every code change **MUST** reference a workpackage ID.
 - No secrets, credentials, or API keys in source code — ever.
 - Never access `.github/`, `.vscode/`, or `NoAgentZone/` in `Default-Project/` unless your workpackage explicitly requires it.
@@ -26,7 +20,6 @@ This project has the highest security classification. Prioritize safety over con
 - **Before committing, always verify edits persisted to disk.** Run `git diff` and confirm all intended changes appear. If a file shows no diff despite edits, the edit was not saved — do not commit until resolved.
 
 ## Key Files
-
 | File | Purpose |
 |------|---------|
 | `docs/architecture.md` | Project overview and repository structure |
@@ -38,7 +31,6 @@ This project has the highest security classification. Prioritize safety over con
 | `Default-Project/` | Template shipped to users — **never modify for testing** |
 
 ## Rules & Workflows
-
 All detailed rules, workflows, and protocols are in **`docs/work-rules/index.md`** — the central hub. Read it to find the specific rule file for your task.
 
 ## For AI Agents

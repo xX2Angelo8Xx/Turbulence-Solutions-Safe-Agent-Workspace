@@ -40,25 +40,28 @@ Templates (bundled inside Launcher)
 │   │   ├── core/                     # Business logic
 │   │   └── config.py                 # Constants
 │   └── installer/                    # Per-platform installer scripts
-├── templates/                        # Bundled project templates (planned — INS-004)
+├── templates/                        # Bundled project templates
 ├── tests/                            # Permanent test scripts (per workpackage)
 │   ├── conftest.py                   # pytest configuration — src/ path setup
 │   ├── __init__.py
 │   ├── INS-001/                      # Tests for INS-001 (Project Scaffolding)
-│   │   └── test_ins001_structure.py
 │   ├── INS-002/                      # Tests for INS-002 (Python Packaging)
-│   │   └── test_ins002_packaging.py
+│   ├── INS-003/                      # Tests for INS-003 (PyInstaller Config)
+│   ├── INS-004/                      # Tests for INS-004 (Template Bundling)
+│   ├── INS-009/                      # Tests for INS-009 (GitHub Releases Version Check)
+│   ├── INS-012/                      # Tests for INS-012 (.gitignore Configuration)
 │   ├── SAF-001/                      # Tests for SAF-001 (Security Gate Core)
-│   │   └── test_saf001_security_gate.py
 │   ├── SAF-002/                      # Tests for SAF-002 (Zone Enforcement Logic)
-│   │   └── test_saf002_zone_classifier.py
+│   ├── SAF-003/                      # Tests for SAF-003 (Tool Parameter Validation)
 │   ├── SAF-005/                      # Tests for SAF-005 (Terminal Command Sanitization)
-│   │   ├── test_saf005_terminal_sanitization.py
-│   │   └── test_saf005_edge_cases.py
+│   ├── SAF-006/                      # Tests for SAF-006 (Recursive Enumeration Protection)
+│   ├── SAF-007/                      # Tests for SAF-007 (Write Restriction Outside Project)
+│   ├── SAF-010/                      # Tests for SAF-010 (Hook Integration Config)
 │   ├── GUI-001/                      # Tests for GUI-001 (Main Window Layout)
-│   │   └── test_gui001_main_window.py
-│   └── INS-012/                      # Tests for INS-012 (.gitignore Configuration)
-│       └── test_ins012_gitignore.py
+│   ├── GUI-003/                      # Tests for GUI-003 (Folder Name Input)
+│   ├── GUI-004/                      # Tests for GUI-004 (Location Browser)
+│   ├── GUI-011/                      # Tests for GUI-011 (Apply Company Color Theme)
+│   └── GUI-012/                      # Tests for GUI-012 (UI Spacing and Visual Hierarchy)
 ├── docs/
 │   ├── architecture.md               # Project overview and structure (this file)
 │   ├── project-scope.md              # Project scope and vision
