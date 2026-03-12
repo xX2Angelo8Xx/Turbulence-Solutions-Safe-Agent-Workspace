@@ -363,3 +363,16 @@ TST-285,test_security_gate_has_main_function,Unit,SAF-010,Pass,2026-03-12,Window
 TST-286,test_security_gate_has_name_guard,Unit,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,security_gate.py has if __name__ == __main__ guard,Tester Agent edge-case
 TST-287,Full SAF-010 suite (29/29 pass) -- Tester confirmation,Security,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,29/29 pass -- 19 developer tests + 10 Tester edge-case tests all pass,Tester Agent SAF-010 final run
 TST-288,Full regression suite (551 pass / 2 pre-existing fail) -- Tester SAF-010 review,Regression,SAF-010,Pass,2026-03-12,Windows 11 + Python 3.11,551 pass / 2 fail (INS-004 INS-012 pre-existing) / 1 skipped -- zero regressions from SAF-010,Tester Agent regression confirmation
+TST-316,test_spec_hiddenimports_customtkinter,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,customtkinter declared in hiddenimports,Tester edge-case
+TST-317,test_spec_console_false,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,console=False in EXE() — GUI mode verified,Tester edge-case
+TST-318,test_spec_pathex_includes_src,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,pathex references src/ for launcher.* import resolution,Tester edge-case
+TST-319,test_spec_upx_true_in_exe_and_collect,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,upx=True present at least twice (EXE + COLLECT),Tester edge-case
+TST-320,test_spec_noarchive_false,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,noarchive=False set — standard PYZ archive mode,Tester edge-case
+TST-321,test_spec_uses_specpath,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,SPECPATH used for location-independent paths,Tester edge-case
+TST-322,test_spec_uses_os_path_join,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,os.path.join used for cross-platform separator handling,Tester edge-case
+TST-323,test_spec_no_hardcoded_absolute_paths,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,No C:\\ or /home/ or /Users/ absolute paths in spec,Tester edge-case (security/portability)
+TST-324,test_spec_pyz_defined,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,PYZ() call present — bytecode archive defined,Tester edge-case
+TST-325,test_spec_binaries_empty,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,binaries=[] declared — no unexpected injected binaries,Tester edge-case (security)
+TST-326,test_spec_exe_and_collect_both_named_launcher,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,name='launcher' appears in both EXE() and COLLECT(),Tester edge-case
+TST-327,test_spec_datas_templates_source_uses_specpath,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,SPECPATH inside datas=[...] block — portable template bundling,Tester edge-case
+TST-328,Full regression suite (348 pass / 1 pre-existing fail) — Tester INS-003 review,Regression,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,348 pass / 1 fail (test_gitignore_git_recognises_spec INS-012 pre-existing) — 19/19 INS-003 tests pass; zero new failures,Tester Agent INS-003 final run; PASS verdict
