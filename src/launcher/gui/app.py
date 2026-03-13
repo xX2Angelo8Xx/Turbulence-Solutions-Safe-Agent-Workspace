@@ -1,4 +1,4 @@
-﻿"""Main application window for the Turbulence Solutions Launcher."""
+"""Main application window for the Turbulence Solutions Launcher."""
 
 from __future__ import annotations
 

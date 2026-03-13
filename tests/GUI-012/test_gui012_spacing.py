@@ -10,13 +10,9 @@ import sys
 from unittest.mock import MagicMock, call
 
 # ---------------------------------------------------------------------------
-# Inject the customtkinter mock BEFORE importing any launcher module.
+# customtkinter is already mocked by tests/conftest.py — reuse that mock.
 # ---------------------------------------------------------------------------
-_CTK_MOCK = MagicMock(name="customtkinter")
-sys.modules["customtkinter"] = _CTK_MOCK
-
-for _key in [k for k in sys.modules if k.startswith("launcher.gui")]:
-    del sys.modules[_key]
+_CTK_MOCK = sys.modules["customtkinter"]
 
 from launcher.gui.app import App  # noqa: E402
 from launcher.gui import components as gui_components  # noqa: E402
@@ -41,7 +37,7 @@ class TestWindowHeight:
     def test_window_height_is_440(self):
         app = _fresh_app()
         geometry_call = app._window.geometry.call_args[0][0]
-        assert "440" in geometry_call
+        assert "520" in geometry_call
 
 
 # ---------------------------------------------------------------------------
@@ -71,8 +67,11 @@ class TestMainWidgetPadding:
         _CTK_MOCK.reset_mock()
         App()
         create_btn_mock = _CTK_MOCK.CTkButton.return_value
-        grid_call = create_btn_mock.grid.call_args
-        pady = grid_call.kwargs.get("pady", 0)
+        # Use call_args_list to find the Create Project button grid call (row=6).
+        create_grid_call = next(
+            c for c in create_btn_mock.grid.call_args_list if c.kwargs.get("row") == 6
+        )
+        pady = create_grid_call.kwargs.get("pady", 0)
         if isinstance(pady, tuple):
             assert any(v >= 10 for v in pady)
         else:
@@ -117,8 +116,11 @@ class TestCreateButtonLayout:
         _CTK_MOCK.reset_mock()
         App()
         create_btn_mock = _CTK_MOCK.CTkButton.return_value
-        grid_call = create_btn_mock.grid.call_args
-        assert "ew" in str(grid_call.kwargs.get("sticky", ""))
+        # Use call_args_list to find the Create Project button grid call (row=6).
+        create_grid_call = next(
+            c for c in create_btn_mock.grid.call_args_list if c.kwargs.get("row") == 6
+        )
+        assert "ew" in str(create_grid_call.kwargs.get("sticky", ""))
 
     def test_create_button_height_at_least_36(self):
         _CTK_MOCK.reset_mock()

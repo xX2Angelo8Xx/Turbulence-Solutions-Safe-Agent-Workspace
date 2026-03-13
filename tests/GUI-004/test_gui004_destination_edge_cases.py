@@ -14,19 +14,12 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
 
 # ---------------------------------------------------------------------------
-# customtkinter must be mocked before *any* launcher.gui module is imported.
-# validation.py itself does not import customtkinter, but if another test
-# in the same session has already imported a launcher.gui module that does,
-# the mock is already in place.  We inject it defensively here.
+# customtkinter is mocked by tests/conftest.py; no App imports in this file.
 # ---------------------------------------------------------------------------
-if "customtkinter" not in sys.modules:
-    sys.modules["customtkinter"] = MagicMock(name="customtkinter")
-
 from launcher.gui.validation import validate_destination_path  # noqa: E402
 
 

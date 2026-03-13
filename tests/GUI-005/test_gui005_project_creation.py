@@ -20,13 +20,9 @@ from unittest.mock import MagicMock, patch, call
 import pytest
 
 # ---------------------------------------------------------------------------
-# Inject the customtkinter mock BEFORE importing any launcher.gui module.
+# customtkinter is already mocked by tests/conftest.py — reuse that mock.
 # ---------------------------------------------------------------------------
-_CTK_MOCK = MagicMock(name="customtkinter")
-sys.modules["customtkinter"] = _CTK_MOCK
-
-for _key in [k for k in sys.modules if k.startswith("launcher.gui")]:
-    del sys.modules[_key]
+_CTK_MOCK = sys.modules["customtkinter"]
 
 from launcher.gui.app import App  # noqa: E402
 

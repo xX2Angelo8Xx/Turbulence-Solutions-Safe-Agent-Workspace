@@ -10,18 +10,9 @@ import sys
 from unittest.mock import MagicMock, call
 
 # ---------------------------------------------------------------------------
-# Inject customtkinter mock BEFORE any launcher imports.
+# customtkinter is already mocked by tests/conftest.py — reuse that mock.
 # ---------------------------------------------------------------------------
-_CTK_MOCK = MagicMock(name="customtkinter")
-sys.modules["customtkinter"] = _CTK_MOCK
-
-for _key in [k for k in sys.modules if k.startswith("launcher.gui")]:
-    del sys.modules[_key]
-
-# Mock the validation module which does not exist yet (out of this WP scope).
-# Must be injected AFTER the eviction loop so it survives into the import.
-_VALIDATION_MOCK = MagicMock(name="launcher.gui.validation")
-sys.modules["launcher.gui.validation"] = _VALIDATION_MOCK
+_CTK_MOCK = sys.modules["customtkinter"]
 
 from launcher.gui.app import App  # noqa: E402
 from launcher.gui import components as gui_components  # noqa: E402

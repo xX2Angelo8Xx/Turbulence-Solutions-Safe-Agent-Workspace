@@ -55,5 +55,5 @@ def _prevent_background_updates():
     Only patches the app.py local binding — NOT the source module.
     INS-009 tests directly test check_for_update and need the real function.
     """
-    with patch("launcher.gui.app.check_for_update", return_value=None):
+    with patch("launcher.gui.app.check_for_update", return_value=(False, "0.0.0")):
         yield
