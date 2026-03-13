@@ -1,17 +1,4 @@
 {
-  // ============================================================
-  //  Turbulence Solutions – Workspace Security Settings
-  //  Purpose: Maximum approval enforcement for all agent tools
-  //  Managed by administrators only – do not modify manually.
-  // ============================================================
-
-  // ----------------------------------------------------------
-  //  1. HIDE ADMIN FOLDERS
-  //     Hide .github and .vscode from the file explorer and
-  //     search results. Agents cannot discover these folders
-  //     through normal browsing. The hook script blocks direct
-  //     access attempts as an additional layer.
-  // ----------------------------------------------------------
   "files.exclude": {
     ".github": true,
     ".vscode": true
@@ -20,112 +7,29 @@
     ".github": true,
     ".vscode": true
   },
-
-  // ----------------------------------------------------------
-  //  2. GLOBAL AUTO-APPROVE – MUST BE false
-  //     Ensures no tool executes automatically without user
-  //     confirmation. WARNING: setting to true disables
-  //     critical safety mechanisms.
-  // ----------------------------------------------------------
   "chat.tools.global.autoApprove": false,
-
-  // ----------------------------------------------------------
-  //  3. FILE EDITS AUTO-APPROVE – KEEP EMPTY
-  //     No glob patterns → no file modification is accepted
-  //     without manual diff review.
-  // ----------------------------------------------------------
   "chat.tools.edits.autoApprove": [],
-
-  // ----------------------------------------------------------
-  //  4. TERMINAL SANDBOX
-  //     Restricts terminal commands to the working directory
-  //     and blocks network access.
-  //     NOTE: Currently effective on macOS/Linux only.
-  //     Set here for consistency when switching platforms.
-  // ----------------------------------------------------------
   "chat.tools.terminal.sandbox.enabled": true,
-
-  // ----------------------------------------------------------
-  //  5. AGENT AUTO-FIX DISABLED
-  //     Prevents the agent from automatically iterating on
-  //     detected errors, which could trigger uncontrolled
-  //     additional tool calls.
-  // ----------------------------------------------------------
   "github.copilot.chat.agent.autoFix": false,
-
-  // ----------------------------------------------------------
-  //  6. MCP SERVER AUTO-DISCOVERY DISABLED
-  //     Prevents automatic detection and activation of MCP
-  //     servers from other applications (e.g., Claude Desktop).
-  //     Reduces attack surface for tool injection via MCP.
-  // ----------------------------------------------------------
   "chat.mcp.discovery.enabled": {
     "claude-desktop": false,
     "windsurf": false,
     "cursor-global": false,
     "cursor-workspace": false
   },
-
-  // ----------------------------------------------------------
-  //  7. MCP AUTO-START DISABLED
-  //     Prevents automatic restart of MCP servers on config
-  //     changes without explicit user action.
-  // ----------------------------------------------------------
   "chat.mcp.autoStart": false,
-
-  // ----------------------------------------------------------
-  //  8. WORKSPACE TRUST – MAXIMUM SECURITY
-  //     - Keep Workspace Trust enabled
-  //     - Always show startup prompt
-  //     - Always prompt for untrusted files
-  //     - Always show restricted-mode banner
-  // ----------------------------------------------------------
   "security.workspace.trust.enabled": true,
   "security.workspace.trust.startupPrompt": "always",
   "security.workspace.trust.untrustedFiles": "prompt",
   "security.workspace.trust.banner": "always",
-
-  // ----------------------------------------------------------
-  //  9. ADDITIONAL READ ACCESS – KEEP EMPTY
-  //     Do not grant extra folders read access. Agent can
-  //     only read within the workspace. Do NOT populate this
-  //     list to prevent access to other drives/folders.
-  // ----------------------------------------------------------
   "chat.additionalReadAccessFolders": [],
-
-  // ----------------------------------------------------------
-  //  10. MISC AGENT SETTINGS
-  // ----------------------------------------------------------
   "chat.agent.thinking.collapsedTools": "off",
   "chat.tools.terminal.sandbox.macFileSystem": {
     "denyRead": [],
-    "allowWrite": ["."],
+    "allowWrite": [
+      "."
+    ],
     "denyWrite": []
   },
-
-  // ----------------------------------------------------------
-  //  11. COPILOT INSTRUCTION FILES
-  //      Explicitly enable loading of .github/copilot-instructions.md
-  //      and any .github/instructions/*.instructions.md files.
-  //      Required in newer Copilot builds that no longer auto-discover
-  //      instruction files when the .github folder is in files.exclude.
-  // ----------------------------------------------------------
   "github.copilot.chat.codeGeneration.useInstructionFiles": true
-
-  // ----------------------------------------------------------
-  //  NOTE: BUILT-IN TOOLS (read_file, search, etc.)
-  // ----------------------------------------------------------
-  //  VS Code does NOT show a confirmation dialog for built-in
-  //  Copilot tools like read_file or search by default – this
-  //  is a design limitation of the current agent architecture.
-  //
-  //  Confirmation dialogs appear by default ONLY for:
-  //    - Terminal commands
-  //    - File modifications (diff review)
-  //    - External/MCP tools (extensions)
-  //
-  //  The PreToolUse hook in .github/hooks/ compensates for this
-  //  by intercepting ALL tool calls and enforcing approval
-  //  boundaries based on the target path and tool type.
-  // ----------------------------------------------------------
 }

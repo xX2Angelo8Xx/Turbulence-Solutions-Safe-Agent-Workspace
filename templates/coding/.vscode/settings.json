@@ -26,7 +26,9 @@
   "chat.agent.thinking.collapsedTools": "off",
   "chat.tools.terminal.sandbox.macFileSystem": {
     "denyRead": [],
-    "allowWrite": ["."],
+    "allowWrite": [
+      "."
+    ],
     "denyWrite": []
   },
   "github.copilot.chat.codeGeneration.useInstructionFiles": true
