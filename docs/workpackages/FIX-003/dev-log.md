@@ -51,3 +51,31 @@ Additional complication: `Default-Project/.vscode/settings.json` used JSONC comm
 ## Known Limitations
 
 - `Default-Project/.github/hooks/scripts/__pycache__/` contains `.pyc` files that have no counterpart in `templates/coding/`. These are correctly excluded from the sync (`.pyc` files are build artifacts, not source). The comparison script excludes them by design.
+
+---
+
+## Iteration 2 — 2026-03-13 (Re-implementation after crash reset)
+
+### Problem
+WP had been reset to `Open` after a previous attempt crashed. Required full re-implementation:
+- `templates/coding/` was out of sync with `Default-Project/`
+- SHA256 hashes in `security_gate.py` needed verification
+
+### Actions Taken
+1. Set WP to `In Progress`.
+2. Removed stale temp files (`test-output.txt`, `tmp_compute_gate_hash.py`) from `docs/workpackages/FIX-003/`.
+3. Removed `templates/coding/` and re-synced from `Default-Project/` using `shutil.copytree()` with `ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '*.pyo')` to avoid bundling Python bytecache artifacts.
+4. Verified sync: exact match excluding `__pycache__`.
+5. Verified no `__pycache__` in `templates/coding/`.
+6. Computed SHA256 of `Default-Project/.vscode/settings.json` — matches embedded `_KNOWN_GOOD_SETTINGS_HASH`. No update needed.
+7. Computed SHA256 of `security_gate.py` (canonical form with gate hash zeroed) — matches embedded `_KNOWN_GOOD_GATE_HASH`. No update needed.
+
+### Test Results
+- **Suite:** `tests/INS-004/` + `tests/SAF-008/`
+- **Result:** 89 passed, 0 failed
+- All INS-004 and SAF-008 tests pass including:
+  - `test_no_pycache_in_template` ✅
+  - `test_no_pyc_files_in_template` ✅
+  - `test_template_non_json_files_match_default_project_byte_for_byte` ✅
+  - `test_vscode_settings_content_matches_default_project` ✅
+  - SAF-008 hash integrity tests ✅

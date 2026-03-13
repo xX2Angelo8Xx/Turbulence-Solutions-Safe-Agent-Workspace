@@ -25,6 +25,62 @@ Every workpackage with code changes must include tests from the applicable categ
 | **Regression** | Every bug fix | Test that reproduces the original bug and confirms the fix |
 | **Cross-platform** | All safety features | Must pass on Windows, macOS, and Linux |
 
+## Safe Testing of Launch-Capable Code
+
+Rules that apply to all tests in this project. The launcher can open VS Code
+instances, spawn subprocesses, show dialog boxes, and make HTTP calls — any of
+these firing during an automated test run can destabilise or crash the system.
+
+1. **All test runs must be headless.** No real GUI windows, dialog boxes, or
+   external program launches may occur during testing. Tests are always run in a
+   non-interactive terminal. Spawning a visible window or process is a test
+   failure, not a passing side effect.
+
+2. **`tests/conftest.py` autouse fixtures are the safety net.** The following
+   are blocked for the duration of every test function — no opt-in required:
+   - VS Code launches: `launcher.core.vscode.open_in_vscode`,
+     `launcher.gui.app.open_in_vscode`, and `launcher.core.vscode.subprocess.Popen`
+   - GUI popups: `tkinter.messagebox` (showinfo, showerror, showwarning, askyesno)
+     and `tkinter.filedialog` (askdirectory, askopenfilename)
+   - Background HTTP calls: `launcher.core.updater.check_for_update` (both source
+     module binding and `launcher.gui.app` local binding)
+   - Real VS Code detection: `launcher.core.vscode.shutil.which` → returns None
+
+3. **Tests for launch behaviour must use explicit local mocks.** If a test needs
+   to assert that `open_in_vscode()` calls `subprocess.Popen`, it must create its
+   own `with patch("launcher.core.vscode.subprocess.Popen") as mock_popen:` block
+   inside the test function. The conftest autouse fixture's mock is what the
+   production code will hit unless overridden locally.
+
+4. **Never call real functions that spawn processes.** Always mock at the system
+   boundary. For subprocess calls use `patch("...subprocess.Popen")`. For network
+   calls use `patch("...urllib.request.urlopen")`. For sockets use
+   `patch("...socket.create_connection")`. Never allow a real I/O call to reach
+   the OS during tests.
+
+5. **Module reimport safety.** Several GUI test files loop over `sys.modules` and
+   delete launcher module entries (`del sys.modules[k]`) so that the module is
+   reimported with fresh mocks. This is safe: conftest autouse fixtures re-apply
+   their patches before EACH test function invocation. The fixtures will wrap the
+   reimported module transparently as long as the test function does not bypass
+   them by calling the patched targets before the fixture context is entered.
+
+6. **Standard pytest command:**
+   ```
+   .venv\Scripts\python -m pytest tests/ --tb=short -q
+   ```
+   - Never use `--timeout` (requires `pytest-timeout` which is not installed).
+   - Never redirect pytest output to files in the repository root
+     (use `docs/workpackages/<WP-ID>/` if a log file is needed).
+   - Never run pytest with `-s` or `--capture=no` in shared CI environments —
+     this disables output capture and can expose sensitive paths.
+
+7. **Process responsibility.** If a test or agent accidentally spawns an external
+   process (e.g. a VS Code window appears), the agent MUST detect and terminate
+   it before proceeding with any other action. Prevention via conftest fixtures is
+   always preferred over cleanup. If prevention failed, treat it as a critical bug
+   and open a new FIX workpackage before continuing.
+
 ## Testing Workflow
 
 ### For Developers (during implementation)
