@@ -3,8 +3,8 @@
     "PreToolUse": [
       {
         "type": "command",
-        "command": "bash .github/hooks/scripts/require-approval.sh",
-        "windows": "powershell -NoProfile -ExecutionPolicy Bypass -File .github/hooks/scripts/require-approval.ps1",
+        "command": "python .github/hooks/scripts/security_gate.py",
+        "windows": "python .github/hooks/scripts/security_gate.py",
         "timeout": 15
       }
     ]
