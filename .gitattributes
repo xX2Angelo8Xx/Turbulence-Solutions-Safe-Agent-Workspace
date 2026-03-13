@@ -1,0 +1,3 @@
+# Force shell scripts to use LF line endings on all platforms.
+# Bash on Linux will fail with 'command not found' if scripts contain CRLF.
+*.sh text eol=lf
