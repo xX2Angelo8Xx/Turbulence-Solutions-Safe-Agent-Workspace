@@ -15,20 +15,10 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 
 # ---------------------------------------------------------------------------
-# Inject the customtkinter mock BEFORE importing any launcher module that
-# depends on it.  Direct assignment ensures any stale real import is replaced.
+# customtkinter is already mocked by tests/conftest.py — reuse that mock.
 # ---------------------------------------------------------------------------
-_CTK_MOCK = MagicMock(name="customtkinter")
-sys.modules["customtkinter"] = _CTK_MOCK
+_CTK_MOCK = sys.modules["customtkinter"]
 
-# Evict any previously cached launcher.gui modules so the fresh mock is seen.
-for _key in [k for k in sys.modules if k.startswith("launcher.gui")]:
-    del sys.modules[_key]
-
-# Also evict launcher.main so the updated main() body is loaded fresh.
-sys.modules.pop("launcher.main", None)
-
-# Safe to import the modules under test now.
 from launcher.gui.app import App  # noqa: E402
 from launcher.gui import components as gui_components  # noqa: E402
 import launcher.main as launcher_main  # noqa: E402

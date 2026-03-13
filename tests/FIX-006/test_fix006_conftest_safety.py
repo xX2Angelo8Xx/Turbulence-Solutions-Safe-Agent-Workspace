@@ -59,10 +59,12 @@ def test_subprocess_popen_is_real():
 # ---------------------------------------------------------------------------
 
 def test_check_for_update_app_binding_is_blocked():
-    """check_for_update imported into app.py returns None (no HTTP call)."""
+    """check_for_update imported into app.py returns an unpackable tuple (no HTTP call)."""
     import launcher.gui.app as app_mod
     result = app_mod.check_for_update("0.0.1")
-    assert result is None, "check_for_update app.py binding must return None"
+    assert result == (False, "0.0.0"), (
+        f"check_for_update app.py binding must return (False, '0.0.0'), got {result!r}"
+    )
 
 
 def test_check_for_update_source_is_real():
