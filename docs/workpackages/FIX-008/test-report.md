@@ -2,8 +2,8 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-03-13  
-**Iteration:** 1  
-**Verdict:** ‚ùå FAIL ‚Äî Return to Developer
+**Iterations:** 1 (FAIL) ‚Üí 2 (PASS)  
+**Verdict:** ‚úÖ PASS (Iteration 2)
 
 ---
 
@@ -164,3 +164,43 @@ When re-submitting for Tester review:
 - [ ] Full regression suite green
 - [ ] `dev-log.md` updated with Iteration 2 changes
 - [ ] `docs/workpackages/workpackages.csv` status set to `Review`
+
+---
+
+## Iteration 2 Review
+
+### Changes Verified
+
+| Item | Finding |
+|------|---------|
+| `_VSCODE_CMDS` frozenset | ? Defined at module level in `tests/conftest.py`. Contains `{"code", "code-insiders"}`. Used by both Layer 2 and Layer 3. |
+| Layer 2 (`_prevent_vscode_detection`) | ? `_guarded_which` checks `name in _VSCODE_CMDS` ó now blocks `shutil.which("code-insiders")`. |
+| Layer 3 list-args branch | ? `cmd in _VSCODE_CMDS` + `cmd.endswith(os.sep + "code-insiders")` catches bare name and absolute paths. |
+| Layer 3 string-args branch | ? `first in _VSCODE_CMDS` catches `"code-insiders /path"` string form. |
+| Case sensitivity (Layer 3) | ? `cmd = str(args[0]).lower()` ó comparisons are case-insensitive. |
+| BUG-033 fix | ? Both edge-case tests now PASS (were FAIL in Iteration 1). |
+
+### Remaining Documented Gaps (Not Blocking)
+
+| Vector | Risk |
+|--------|------|
+| `code.exe`, `code-insiders.exe` explicit `.exe` name in args | Negligible ó no production code uses this form; Layers 1+2 prevent reaching this path |
+| `shutil.which("Code")` mixed-case | Negligible ó no production code queries with non-lowercase |
+| `codium`, `code-oss` open-source forks | Out of scope; neither binary is used by this project |
+
+---
+
+## Iteration 2 Test Run Results
+
+| TST-ID | Test | Result |
+|--------|------|--------|
+| TST-622 | FIX-008 full suite (11 tests) ó Tester Iteration 2 | ? Pass |
+| TST-623 | Full regression (1567 passed / 2 skipped / 0 failed) ó Tester Iteration 2 | ? Pass |
+
+---
+
+## Verdict: ? PASS
+
+All 11 FIX-008 tests pass including the two previously-failing Tester edge-case
+tests for `code-insiders`. BUG-033 is closed. Full regression is green (1567
+passed / 2 skipped / 0 failed). WP FIX-008 is marked **Done**.
