@@ -38,13 +38,13 @@ these firing during an automated test run can destabilise or crash the system.
 
 2. **`tests/conftest.py` autouse fixtures are the safety net.** The following
    are blocked for the duration of every test function — no opt-in required:
-   - VS Code launches: `launcher.core.vscode.open_in_vscode`,
-     `launcher.gui.app.open_in_vscode`, and `launcher.core.vscode.subprocess.Popen`
+   - VS Code launches: `launcher.core.vscode.open_in_vscode` and
+     `launcher.gui.app.open_in_vscode` both return False
    - GUI popups: `tkinter.messagebox` (showinfo, showerror, showwarning, askyesno)
      and `tkinter.filedialog` (askdirectory, askopenfilename)
-   - Background HTTP calls: `launcher.core.updater.check_for_update` (both source
-     module binding and `launcher.gui.app` local binding)
-   - Real VS Code detection: `launcher.core.vscode.shutil.which` → returns None
+   - Background HTTP calls: `launcher.gui.app.check_for_update` returns None
+     (only the app.py binding — NOT the source module, so INS-009 tests can
+     call the real function with their own HTTP mocks)
 
 3. **Tests for launch behaviour must use explicit local mocks.** If a test needs
    to assert that `open_in_vscode()` calls `subprocess.Popen`, it must create its

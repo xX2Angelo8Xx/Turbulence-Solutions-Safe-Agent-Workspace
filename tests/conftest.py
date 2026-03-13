@@ -57,10 +57,3 @@ def _prevent_background_updates():
     """
     with patch("launcher.gui.app.check_for_update", return_value=None):
         yield
-
-
-@pytest.fixture(autouse=True)
-def _prevent_find_vscode_real_lookup():
-    """Prevent find_vscode() from doing a real system executable lookup."""
-    with patch("launcher.core.vscode.shutil.which", return_value=None):
-        yield
