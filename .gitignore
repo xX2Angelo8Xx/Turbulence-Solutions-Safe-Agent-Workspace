@@ -16,6 +16,9 @@ build/
 # pytest cache
 .pytest_cache/
 
+# Stale pytest output captures (temp files — never commit)
+pytest_*.txt
+
 # Virtual environment (workspace-local — never commit)
 .venv/
 env/
