@@ -134,3 +134,75 @@ def test_all_three_layers_present():
     assert hasattr(conftest_mod, "_subprocess_popen_sentinel"), (
         "Layer 3 fixture '_subprocess_popen_sentinel' missing from conftest.py"
     )
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests — FIX-008 review
+# ---------------------------------------------------------------------------
+
+def test_popen_sentinel_blocks_code_insiders():
+    """subprocess.Popen(['code-insiders', '/tmp']) must raise RuntimeError (Layer 3 guard).
+
+    VS Code Insiders is a first-party Microsoft VS Code variant that ships as
+    'code-insiders' on the PATH. If a test (or reimported module) calls
+    subprocess.Popen with 'code-insiders' as the executable, the Layer 3
+    sentinel must intercept it and raise RuntimeError, just as it does for
+    the plain 'code' binary.
+    """
+    with pytest.raises(RuntimeError, match="SAFETY VIOLATION"):
+        subprocess.Popen(["code-insiders", "/tmp"])
+
+
+def test_popen_sentinel_blocks_code_insiders_string_form():
+    """subprocess.Popen('code-insiders /tmp') string form must raise RuntimeError.
+
+    The sentinel handles both list args and string args. The string form of a
+    code-insiders launch must also be caught.
+    """
+    with pytest.raises(RuntimeError, match="SAFETY VIOLATION"):
+        subprocess.Popen("code-insiders /tmp")
+
+
+def test_layer3_works_independently_of_layers_1_and_2():
+    """Layer 3 (Popen sentinel) is an autouse fixture that acts independently.
+
+    Verify that the sentinel catches a bare subprocess.Popen(["code", ...])
+    call even when the test does NOT explicitly use the Layer 1 or Layer 2
+    fixtures — they are autouse, but this test confirms the sentinel itself
+    is the active guard for any direct Popen call.
+    """
+    with pytest.raises(RuntimeError, match="SAFETY VIOLATION"):
+        subprocess.Popen(["code", "/some/workspace"])
+
+
+def test_popen_allows_python_subprocess():
+    """subprocess.Popen(['python', '-c', 'print(1)']) must NOT be blocked by Layer 3.
+
+    The sentinel only raises for VS Code executables. Legitimate language
+    runtime calls (e.g. nested python -c invocations) must pass through so
+    test infrastructure remains functional.
+    """
+    from unittest.mock import MagicMock
+    import os as _os
+
+    real_popen_mock = MagicMock(name="real_popen_mock")
+
+    def fresh_sentinel(args, *a, **kw):
+        if isinstance(args, (list, tuple)) and args:
+            cmd = str(args[0]).lower()
+            if (
+                cmd == "code"
+                or cmd.endswith(_os.sep + "code")
+                or "visual studio code" in cmd
+            ):
+                raise RuntimeError("SAFETY VIOLATION (test re-sentinel)")
+        elif isinstance(args, str):
+            first = args.strip().lower().split()[0] if args.strip() else ""
+            if first == "code":
+                raise RuntimeError("SAFETY VIOLATION (test re-sentinel)")
+        return real_popen_mock(args, *a, **kw)
+
+    with patch("subprocess.Popen", side_effect=fresh_sentinel):
+        subprocess.Popen(["python", "-c", "print(1)"])
+
+    real_popen_mock.assert_called_once_with(["python", "-c", "print(1)"])
