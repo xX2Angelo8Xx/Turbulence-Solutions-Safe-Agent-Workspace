@@ -12,6 +12,7 @@ import customtkinter as ctk
 from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, TEMPLATES_DIR, VERSION, get_display_version
 from launcher.core.updater import check_for_update
 from launcher.core.project_creator import create_project, list_templates
+from launcher.core.vscode import find_vscode, open_in_vscode
 from launcher.gui.components import make_browse_row, make_label_entry_row
 from launcher.gui.validation import (
     check_duplicate_folder,
@@ -173,6 +174,11 @@ class App:
         )
         self.version_label.place(relx=1.0, rely=1.0, x=-20, y=-8, anchor="se")
 
+        # Disable the VS Code checkbox if VS Code is not detected on startup (GUI-006).
+        if find_vscode() is None:
+            self.open_in_vscode_checkbox.configure(state="disabled")
+            self.open_in_vscode_var.set(False)
+
     def _browse_destination(self) -> None:
         """Open a native folder browser and populate the destination entry."""
         folder = filedialog.askdirectory(title="Select Destination Folder")
@@ -230,6 +236,10 @@ class App:
             "Project Created",
             f'Project "{folder_name}" created successfully at:\n{created_path}',
         )
+
+        # Open the new project in VS Code if the checkbox is checked (GUI-006).
+        if self.open_in_vscode_var.get():
+            open_in_vscode(created_path)
 
     def _run_update_check(self) -> None:
         """Run in a background thread; posts the result to the main thread via after()."""

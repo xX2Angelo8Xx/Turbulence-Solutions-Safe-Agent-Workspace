@@ -22,7 +22,7 @@ Rules governing user story creation, lifecycle, and relationship to workpackages
 | I want | The desired functionality |
 | So that | The benefit or goal |
 | Acceptance Criteria | Numbered list defining the end-to-end definition of done for this feature |
-| Status | `Open`, `In Progress`, `Done` |
+| Status | `Open`, `In Progress`, `Done`, `Closed` |
 | Linked WPs | Comma-separated list of workpackage IDs derived from this story |
 | Comments | Notes, discussion, change history |
 
@@ -34,3 +34,4 @@ Rules governing user story creation, lifecycle, and relationship to workpackages
 4. A user story is `Done` **only when all its linked workpackages are `Done`**.
 5. The acceptance criteria in the user story define the end-to-end definition of done for the feature.
 6. Do not modify acceptance criteria after workpackages have been created without approval.
+7. A user story may be set to `Closed` when it has been superseded or split into other stories and will not be implemented directly. `Closed` stories are retained for audit trail purposes and should have a note in the Comments field explaining the reason (e.g., "Split into US-003, US-004").

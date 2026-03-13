@@ -1,0 +1,21 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-8.4.2, pluggy-1.6.0 -- E:\OneDrive-TurbulenceSolutions\OneDrive - Turbulence Solutions\Artificial Intelligence - TS Guideline\Github Repository\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: E:\OneDrive-TurbulenceSolutions\OneDrive - Turbulence Solutions\Artificial Intelligence - TS Guideline\Github Repository
+configfile: pyproject.toml
+collecting ... collected 34 items
+
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestFindVSCode::test_returns_none_when_code_not_on_path PASSED [  2%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestFindVSCode::test_returns_path_when_code_found PASSED [  5%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestFindVSCode::test_queries_code_executable_specifically PASSED [  8%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestOpenInVSCodeCore::test_returns_false_when_vscode_not_found PASSED [ 11%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestOpenInVSCodeCore::test_returns_true_when_vscode_found PASSED [ 14%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestOpenInVSCodeCore::test_no_subprocess_call_when_vscode_not_found PASSED [ 17%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestOpenInVSCodeCore::test_popen_receives_list_not_string PASSED [ 20%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestOpenInVSCodeCore::test_popen_not_called_with_shell_true PASSED [ 23%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestOpenInVSCodeCore::test_popen_receives_correct_executable PASSED [ 26%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestOpenInVSCodeCore::test_popen_receives_workspace_as_string PASSED [ 29%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestVSCodeNoCommandInjection::test_path_with_spaces_not_split PASSED [ 32%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestVSCodeNoCommandInjection::test_path_with_semicolons_passed_verbatim PASSED [ 35%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestVSCodeNoCommandInjection::test_path_with_double_dash_flags_not_interpreted PASSED [ 38%]
+tests/GUI-006/test_gui006_tester_edge_cases.py::TestVSCodeNotCalledOnDuplicateFolder::test_not_called_when_duplicate_folder_check_fails 
