@@ -21,6 +21,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 
 sys.modules["customtkinter"] = MagicMock(name="customtkinter")
 
+_VSCODE_CMDS = frozenset({"code", "code-insiders"})
+
 
 @pytest.fixture(autouse=True)
 def _prevent_vscode_launch():
@@ -71,7 +73,7 @@ def _prevent_vscode_detection():
     original_which = shutil.which
 
     def _guarded_which(name, *args, **kwargs):
-        if name == "code":
+        if name in _VSCODE_CMDS:
             return None
         return original_which(name, *args, **kwargs)
 
@@ -92,7 +94,12 @@ def _subprocess_popen_sentinel():
     def _guarded_popen(args, *a, **kw):
         if isinstance(args, (list, tuple)) and args:
             cmd = str(args[0]).lower()
-            if cmd == "code" or cmd.endswith(os.sep + "code") or "visual studio code" in cmd:
+            if (
+                cmd in _VSCODE_CMDS
+                or cmd.endswith(os.sep + "code")
+                or cmd.endswith(os.sep + "code-insiders")
+                or "visual studio code" in cmd
+            ):
                 raise RuntimeError(
                     f"SAFETY VIOLATION: subprocess.Popen attempted to launch VS Code "
                     f"with args {args!r}. This means all higher-level guards failed. "
@@ -100,7 +107,7 @@ def _subprocess_popen_sentinel():
                 )
         elif isinstance(args, str):
             first = args.strip().lower().split()[0] if args.strip() else ""
-            if first == "code":
+            if first in _VSCODE_CMDS:
                 raise RuntimeError(
                     f"SAFETY VIOLATION: subprocess.Popen attempted to launch VS Code."
                 )

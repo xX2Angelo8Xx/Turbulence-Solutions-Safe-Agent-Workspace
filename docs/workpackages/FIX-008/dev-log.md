@@ -86,3 +86,49 @@ accidentally appears during testing.
   The Layer 1 and Layer 2 guards make this extremely unlikely in practice.
 - The string form of `args` check uses a split on whitespace; edge cases with
   unusual quoting are not handled (Layer 1 and 2 would catch them first anyway).
+
+---
+
+## Iteration 2
+
+**Date:** 2026-03-13
+**Triggered by:** Tester feedback — BUG-033 (code-insiders not blocked)
+
+### Problem (from test-report.md)
+
+The Layer 3 sentinel and Layer 2 shutil.which guard only checked for `"code"`.
+`subprocess.Popen(["code-insiders", ...])` and `subprocess.Popen("code-insiders ...")`
+passed through the sentinel without raising RuntimeError. On a machine with VS Code
+Insiders installed, this would spawn the IDE.
+
+### Fix
+
+1. Added module-level `_VSCODE_CMDS = frozenset({"code", "code-insiders"})` to
+   `tests/conftest.py` so both variants are defined in one place.
+
+2. `_prevent_vscode_detection` (`_guarded_which`): changed `name == "code"` to
+   `name in _VSCODE_CMDS` — now `shutil.which("code-insiders")` also returns None.
+
+3. `_subprocess_popen_sentinel` (`_guarded_popen`):
+   - List-args branch: replaced `cmd == "code"` with `cmd in _VSCODE_CMDS`; also
+     added `cmd.endswith(os.sep + "code-insiders")` to catch absolute paths.
+   - String-args branch: replaced `first == "code"` with `first in _VSCODE_CMDS`.
+
+### Tests
+
+All 11 FIX-008 tests pass (including the 2 previously-failing Tester edge-case tests):
+- `test_popen_sentinel_blocks_code_insiders` — PASS (was FAIL)
+- `test_popen_sentinel_blocks_code_insiders_string_form` — PASS (was FAIL)
+
+Full regression: 1567 passed / 2 skipped / 0 failed.
+
+### Test Results Logged
+
+- TST-619: test_popen_sentinel_blocks_code_insiders — Pass
+- TST-620: test_popen_sentinel_blocks_code_insiders_string_form — Pass
+- TST-621: FIX-008 full suite + regression — Pass (1567 passed / 2 skipped)
+
+### Files Changed
+
+- `tests/conftest.py` — Added `_VSCODE_CMDS` frozenset; updated `_guarded_which`
+  and `_guarded_popen` to block `"code-insiders"` alongside `"code"`
