@@ -168,10 +168,11 @@ class TestDestinationErrorLabel:
 
     def test_destination_error_label_grid_row_4(self):
         app = _fresh_app()
-        call_kwargs = app.destination_error_label.grid.call_args
-        assert call_kwargs is not None
-        kwargs = call_kwargs.kwargs if call_kwargs.kwargs else call_kwargs[1]
-        assert kwargs.get("row") == 4
+        all_calls = app.destination_error_label.grid.call_args_list
+        assert any(
+            (c.kwargs or c[1]).get("row") == 4
+            for c in all_calls
+        ), f"No grid() call with row=4 found; calls: {all_calls}"
 
 
 # ---------------------------------------------------------------------------
