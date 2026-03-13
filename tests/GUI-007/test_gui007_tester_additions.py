@@ -25,10 +25,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 # ---------------------------------------------------------------------------
-# Inject customtkinter mock — same guard as the other GUI-007 test files.
+# Use the shared customtkinter mock installed by conftest.py.
 # ---------------------------------------------------------------------------
-_CTK_MOCK = MagicMock(name="customtkinter")
-sys.modules.setdefault("customtkinter", _CTK_MOCK)
+_CTK_MOCK = sys.modules["customtkinter"]
 
 from launcher.gui.validation import (  # noqa: E402
     check_duplicate_folder,

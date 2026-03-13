@@ -20,15 +20,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 # ---------------------------------------------------------------------------
-# Inject customtkinter mock before any launcher.gui import (same approach as
-# the developer test file so the two can coexist in the same test session).
+# Use the shared customtkinter mock installed by conftest.py.
 # ---------------------------------------------------------------------------
-_CTK_MOCK = MagicMock(name="customtkinter")
-sys.modules.setdefault("customtkinter", _CTK_MOCK)
+_CTK_MOCK = sys.modules["customtkinter"]
 
-# Ensure the gui modules are freshly importable (the developer test file
-# already cleaned sys.modules before importing; we just rely on the cached
-# entries from that previous import since they share the same process).
 from launcher.gui.validation import (  # noqa: E402
     check_duplicate_folder,
     validate_destination_path,

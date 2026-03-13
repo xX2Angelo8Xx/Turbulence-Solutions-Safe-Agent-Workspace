@@ -24,14 +24,9 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 
 # ---------------------------------------------------------------------------
-# Ensure customtkinter is mocked before any launcher.gui import.
+# Use the shared customtkinter mock installed by conftest.py.
 # ---------------------------------------------------------------------------
-_CTK_MOCK = MagicMock(name="customtkinter")
-sys.modules.setdefault("customtkinter", _CTK_MOCK)
-
-# Remove cached gui modules so they re-import with the mock.
-for _key in [k for k in list(sys.modules) if k.startswith("launcher.gui")]:
-    del sys.modules[_key]
+_CTK_MOCK = sys.modules["customtkinter"]
 
 from launcher.gui.app import App  # noqa: E402
 
