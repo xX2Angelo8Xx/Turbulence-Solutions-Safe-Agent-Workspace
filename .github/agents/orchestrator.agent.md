@@ -36,9 +36,14 @@ You are the **Orchestrator Agent** for the Turbulence Solutions project. You del
 When a Tester marks a WP as `Done`:
 1. Verify the `docs/workpackages/workpackages.csv` row shows `Done`.
 2. Verify a `git push` was performed (Tester is responsible for this).
-3. Log the completion in your session context.
-4. Proceed to the next WP — **do not ask the user for confirmation** to continue.
-5. Only report back to the user after all assigned WPs are complete (or if a blocker is encountered).
+3. **Merge to main:** Run `git checkout main && git merge <branch-name> --no-edit && git push origin main`.
+4. **Delete feature branch:** Run `git branch -d <branch-name>` (local) and `git push origin --delete <branch-name>` (remote). If OneDrive lock errors appear on directory cleanup, ignore them — the branch ref is already deleted.
+5. **Cascade US status:** Check if ALL linked WPs for the parent User Story are Done. If yes, update the User Story status to `Done` in `docs/user-stories/user-stories.csv`.
+6. **Cascade Bug status:** Check `docs/bugs/bugs.csv` — if the completed WP is listed in any bug's `Fixed In WP` column and the bug status is `Open`, update the bug status to `Closed`.
+7. **Architecture sync:** If any new files or directories were created during the WP, update `docs/architecture.md` to reflect the current project structure.
+8. Log the completion in your session context.
+9. Proceed to the next WP — **do not ask the user for confirmation** to continue.
+10. Only report back to the user after all assigned WPs are complete (or if a blocker is encountered).
 
 ## WP Splitting
 

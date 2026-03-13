@@ -43,6 +43,20 @@ You may **only** edit these files:
 
 You must **NOT** edit source code outside of `tests/`. If code changes are needed, return the WP to the Developer with detailed instructions.
 
+## Pre-Done Checklist
+
+Before marking any WP as `Done`, verify ALL of the following:
+
+- [ ] `docs/workpackages/<WP-ID>/dev-log.md` exists and is non-empty
+- [ ] `docs/workpackages/<WP-ID>/test-report.md` has been written by you
+- [ ] Test files exist in `tests/<WP-ID>/` with at least one test
+- [ ] All test runs are logged in `docs/test-results/test-results.csv`
+- [ ] `git add -A` has been run to stage all changes
+- [ ] `git commit` with message `<WP-ID>: Tester PASS`
+- [ ] `git push origin <branch-name>`
+
+If ANY item is missing, do NOT mark the WP as Done. Fix it first or return to Developer.
+
 ## Constraints
 
 - **DO NOT** edit application source code — only test files and tracking CSVs.

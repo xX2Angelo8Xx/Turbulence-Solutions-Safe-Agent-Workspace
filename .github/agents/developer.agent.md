@@ -48,6 +48,23 @@ If the Tester sets the WP back to `In Progress`:
 3. Append a new iteration section to `dev-log.md`.
 4. Re-run all tests. Set back to `Review`. Hand off to Tester again.
 
+## Pre-Handoff Checklist
+
+Before setting any WP to `Review` and handing off to Tester, verify ALL of the following:
+
+- [ ] `docs/workpackages/<WP-ID>/dev-log.md` has been created and filled in
+- [ ] All test files exist in `tests/<WP-ID>/`
+- [ ] All tests pass: `.venv\Scripts\python -m pytest tests/ -v`
+- [ ] Test runs are logged in `docs/test-results/test-results.csv`
+- [ ] `git add -A` — all new and modified files are staged
+- [ ] `git status` — confirms no unstaged changes remain
+- [ ] `git diff --cached --stat` — confirms staged changes match your work
+- [ ] `git commit -m "<WP-ID>: <description>"`
+- [ ] `git push origin <branch-name>`
+- [ ] Read back edited files from disk to confirm edits persisted (per Post-Edit Verification)
+
+If ANY item fails, do NOT hand off. Fix the issue first.
+
 ## Constraints
 
 - **DO NOT** work on more than one workpackage at a time.

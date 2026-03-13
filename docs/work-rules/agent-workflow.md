@@ -29,6 +29,15 @@ Every agent follows this exact workflow when implementing a workpackage. No step
 | 6 | **Document** | Update `dev-log.md` with implementation summary, decisions made, tests written, and known limitations. |
 | 7 | **Handoff** | Set WP status to `Review`. Commit per `commit-branch-rules.md`. Hand off to Tester Agent. |
 
+### Git Operations for Handoff (Step 7)
+
+Before setting WP to Review and handing off:
+1. Run `git add -A` to stage ALL new and modified files.
+2. Run `git status` and verify all intended changes are staged.
+3. Run `git diff --cached --stat` to confirm the staged changes match your work.
+4. Commit with message format: `<WP-ID>: <short description>`
+5. Push the feature branch: `git push origin <branch-name>`
+
 ### Post-Edit Verification (required after every code change)
 
 After making any code edit, the Developer MUST verify the edit was actually persisted to disk. In-memory edits (e.g. from IDE buffers or tool chains) can be silently discarded without error.
@@ -49,6 +58,31 @@ After making any code edit, the Developer MUST verify the edit was actually pers
 
 **If PASS:** Set WP to `Done`. Push.  
 **If FAIL:** Set WP back to `In Progress`. Write specific TODOs in `test-report.md`. Developer reads `test-report.md` and repeats from Step 4.
+
+### Tester PASS Checklist
+
+Before marking a WP as Done, the Tester MUST verify:
+1. `docs/workpackages/<WP-ID>/dev-log.md` exists and is non-empty.
+2. `docs/workpackages/<WP-ID>/test-report.md` has been written (by you, the Tester).
+3. All test files exist in `tests/<WP-ID>/`.
+4. All test runs are logged in `docs/test-results/test-results.csv`.
+5. Run `git add -A` to stage all new test files and CSV updates.
+6. Commit: `<WP-ID>: Tester PASS`
+7. Push: `git push origin <branch-name>`
+
+If any of items 1–4 are missing, do NOT mark the WP as Done. Create the missing artifact or return to Developer.
+
+### Post-Done Finalization (Orchestrator)
+
+After the Tester marks a WP as Done, the Orchestrator (or the Tester if no Orchestrator is active) performs these finalization steps:
+
+1. **Merge to main:** `git checkout main && git merge <branch-name> --no-edit && git push origin main`
+2. **Delete feature branch:** `git branch -d <branch-name>` (local) and `git push origin --delete <branch-name>` (remote)
+3. **Cascade US status:** Check `docs/user-stories/user-stories.csv` — if ALL linked WPs for the parent User Story are now Done, set the User Story status to `Done`.
+4. **Cascade Bug status:** Check `docs/bugs/bugs.csv` — if the WP is listed in any bug's `Fixed In WP` column and the bug is Open, update the bug status to `Closed`.
+5. **Architecture sync:** If any new directories or files were added to the project structure, update `docs/architecture.md` to reflect the current layout.
+
+These steps are mandatory. Skipping them causes maintenance debt that accumulates across sessions.
 
 ---
 
