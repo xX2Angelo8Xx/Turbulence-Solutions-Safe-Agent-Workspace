@@ -46,6 +46,17 @@ After making any code edit, the Developer MUST verify the edit was actually pers
 2. **Run `git diff` before committing** to verify all intended changes appear in the diff. If a file shows no changes despite edits, the edits were not saved — do not proceed.
 3. **Never advance a WP to `Review`** based on assumed or remembered test results. Run the full test suite immediately before advancing and confirm all tests pass.
 
+### Temporary File Policy
+
+Agents may create temporary output files (e.g., pytest output captures, debug logs) **only** inside their workpackage folder: `docs/workpackages/<WP-ID>/` or `tests/<WP-ID>/`. Temporary files must NEVER be created in the repository root or any shared directory.
+
+Rules:
+1. **Allowed locations:** `docs/workpackages/<WP-ID>/`, `tests/<WP-ID>/`
+2. **Forbidden locations:** Repository root, `src/`, `docs/` (top-level), `Default-Project/`, `templates/`
+3. **Cleanup required:** The agent who creates temporary files **must** delete them before handing off the WP. Use `os.remove()` or equivalent after processing.
+4. **Never delete:** Test scripts (`test_*.py`), dev-log.md, test-report.md, or any file that is part of the WP's permanent deliverables.
+5. **Naming convention:** Prefix temporary files with `tmp_` to make them easily identifiable.
+
 ---
 
 ### Phase 2 — Tester (Steps 8–10)

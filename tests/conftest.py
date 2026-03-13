@@ -9,11 +9,15 @@ from __future__ import annotations
 
 import os
 import sys
-from unittest.mock import patch
+import tkinter.filedialog
+import tkinter.messagebox
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+
+sys.modules["customtkinter"] = MagicMock(name="customtkinter")
 
 
 @pytest.fixture(autouse=True)
@@ -25,4 +29,27 @@ def _prevent_vscode_launch():
     """
     with patch("launcher.core.vscode.open_in_vscode", return_value=False), \
          patch("launcher.gui.app.open_in_vscode", return_value=False):
+        yield
+
+
+@pytest.fixture(autouse=True)
+def _prevent_gui_popups():
+    """Prevent real popup dialogs from appearing during tests.
+
+    Patches tkinter.messagebox and tkinter.filedialog functions so that no
+    real OS-level dialog boxes can appear during the test run.
+    """
+    with patch.object(tkinter.messagebox, "showinfo", return_value=None), \
+         patch.object(tkinter.messagebox, "showerror", return_value=None), \
+         patch.object(tkinter.messagebox, "showwarning", return_value=None), \
+         patch.object(tkinter.messagebox, "askyesno", return_value=False), \
+         patch.object(tkinter.filedialog, "askdirectory", return_value=""), \
+         patch.object(tkinter.filedialog, "askopenfilename", return_value=""):
+        yield
+
+
+@pytest.fixture(autouse=True)
+def _prevent_background_updates():
+    """Prevent real HTTP calls to the GitHub Releases API during tests."""
+    with patch("launcher.core.updater.check_for_update", return_value=None):
         yield
