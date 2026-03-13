@@ -8,6 +8,8 @@ installed during development unless `pip install -e .` has been run
 from __future__ import annotations
 
 import os
+import shutil
+import subprocess
 import sys
 import tkinter.filedialog
 import tkinter.messagebox
@@ -56,4 +58,53 @@ def _prevent_background_updates():
     INS-009 tests directly test check_for_update and need the real function.
     """
     with patch("launcher.gui.app.check_for_update", return_value=(False, "0.0.0")):
+        yield
+
+
+@pytest.fixture(autouse=True)
+def _prevent_vscode_detection():
+    """Prevent shutil.which from finding a real VS Code installation.
+
+    Defense layer 2: even if the open_in_vscode mock is bypassed (e.g. via
+    module reimport), find_vscode() returns None and Popen is never reached.
+    """
+    original_which = shutil.which
+
+    def _guarded_which(name, *args, **kwargs):
+        if name == "code":
+            return None
+        return original_which(name, *args, **kwargs)
+
+    with patch("shutil.which", side_effect=_guarded_which):
+        yield
+
+
+@pytest.fixture(autouse=True)
+def _subprocess_popen_sentinel():
+    """Last-resort guard: raise if any code tries to Popen VS Code.
+
+    Defense layer 3: if both open_in_vscode and shutil.which guards fail,
+    this catches the actual subprocess.Popen call and raises RuntimeError
+    instead of spawning a process. Non-VS-Code Popen calls pass through.
+    """
+    _real_popen = subprocess.Popen
+
+    def _guarded_popen(args, *a, **kw):
+        if isinstance(args, (list, tuple)) and args:
+            cmd = str(args[0]).lower()
+            if cmd == "code" or cmd.endswith(os.sep + "code") or "visual studio code" in cmd:
+                raise RuntimeError(
+                    f"SAFETY VIOLATION: subprocess.Popen attempted to launch VS Code "
+                    f"with args {args!r}. This means all higher-level guards failed. "
+                    f"Report this as a critical bug."
+                )
+        elif isinstance(args, str):
+            first = args.strip().lower().split()[0] if args.strip() else ""
+            if first == "code":
+                raise RuntimeError(
+                    f"SAFETY VIOLATION: subprocess.Popen attempted to launch VS Code."
+                )
+        return _real_popen(args, *a, **kw)
+
+    with patch("subprocess.Popen", side_effect=_guarded_popen):
         yield

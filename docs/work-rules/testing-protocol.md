@@ -36,15 +36,40 @@ these firing during an automated test run can destabilise or crash the system.
    non-interactive terminal. Spawning a visible window or process is a test
    failure, not a passing side effect.
 
-2. **`tests/conftest.py` autouse fixtures are the safety net.** The following
-   are blocked for the duration of every test function — no opt-in required:
-   - VS Code launches: `launcher.core.vscode.open_in_vscode` and
-     `launcher.gui.app.open_in_vscode` both return False
+2. **`tests/conftest.py` autouse fixtures are the safety net.** Three defense
+   layers are active for the duration of every test function — no opt-in required:
+
+   **Layer 1 — function mock:** `launcher.core.vscode.open_in_vscode` and
+   `launcher.gui.app.open_in_vscode` are both patched to return False. VS Code
+   is never reached via the normal call path.
+
+   **Layer 2 — detection mock:** `shutil.which("code")` returns None globally.
+   Even if `open_in_vscode` is bypassed (e.g. via module reimport), `find_vscode()`
+   cannot locate a VS Code binary and returns None without reaching `subprocess.Popen`.
+
+   **Layer 3 — subprocess sentinel:** `subprocess.Popen` is wrapped with a
+   sentinel that raises `RuntimeError` immediately if the first argument is a VS
+   Code executable (`"code"`, a path ending in `\code`, or a string containing
+   `"visual studio code"`). Non-VS-Code `Popen` calls pass through to the real
+   implementation unmodified.
+
+   Additional blocks always active:
    - GUI popups: `tkinter.messagebox` (showinfo, showerror, showwarning, askyesno)
      and `tkinter.filedialog` (askdirectory, askopenfilename)
-   - Background HTTP calls: `launcher.gui.app.check_for_update` returns None
-     (only the app.py binding — NOT the source module, so INS-009 tests can
-     call the real function with their own HTTP mocks)
+   - Background HTTP calls: `launcher.gui.app.check_for_update` returns
+     `(False, "0.0.0")` (only the app.py binding — NOT the source module, so
+     INS-009 tests can call the real function with their own HTTP mocks)
+
+2.5. **Emergency procedure — VS Code instance appeared during testing.** If a VS
+   Code window is visible after or during a test run, the agent MUST:
+   1. **Immediately terminate the test run** (Ctrl-C or kill the pytest process).
+   2. **Kill all spawned VS Code processes:**
+      - Windows: `taskkill /F /IM Code.exe`
+      - Unix/macOS: `pkill -f "Visual Studio Code"`
+   3. **Identify the root cause** — which guard failed and why.
+   4. **File a critical FIX workpackage** before resuming any other work.
+   Prevention via conftest fixtures is always preferred. This rule is the
+   emergency fallback when prevention has already failed.
 
 3. **Tests for launch behaviour must use explicit local mocks.** If a test needs
    to assert that `open_in_vscode()` calls `subprocess.Popen`, it must create its

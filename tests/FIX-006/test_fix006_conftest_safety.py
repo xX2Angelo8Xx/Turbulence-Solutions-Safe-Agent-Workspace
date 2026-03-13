@@ -36,22 +36,22 @@ def test_open_in_vscode_app_binding_is_blocked():
 
 
 # ---------------------------------------------------------------------------
-# 2. subprocess.Popen is NOT globally mocked (would break subprocess.run)
+# 2. subprocess.Popen — FIX-008 wraps it with a sentinel; non-VS-Code passes
 # ---------------------------------------------------------------------------
 
 def test_subprocess_popen_is_real():
-    """subprocess.Popen in launcher.core.vscode is the real Popen, not a mock.
+    """subprocess.Popen is wrapped by the FIX-008 sentinel, not a silent no-op.
 
-    We intentionally do NOT mock it globally because vscode.subprocess IS
-    sys.modules['subprocess'] — mocking Popen there would break
-    subprocess.run() across the entire test suite.  Safety is ensured by the
-    open_in_vscode mock (which prevents Popen from ever being reached).
+    FIX-008 change: the conftest wraps subprocess.Popen with a sentinel that
+    raises RuntimeError for VS Code invocations.  The sentinel IS a MagicMock
+    (created by patch()) but with a custom side_effect — it is NOT a silent
+    MagicMock that returns a MagicMock for every call.  We verify this by
+    confirming that calling Popen with "code" as the executable raises
+    RuntimeError rather than silently returning a mock object.
     """
-    import launcher.core.vscode as vscode_mod
-    import subprocess as real_subprocess
-    assert vscode_mod.subprocess.Popen is real_subprocess.Popen, (
-        "subprocess.Popen must NOT be globally mocked — it would break subprocess.run()"
-    )
+    import subprocess as sp_mod
+    with pytest.raises(RuntimeError, match="SAFETY VIOLATION"):
+        sp_mod.Popen(["code", "/some/path"])
 
 
 # ---------------------------------------------------------------------------
