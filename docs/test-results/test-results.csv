@@ -1003,4 +1003,4 @@ TST-1016,test_app_name_present,Unit,FIX-012,Pass,2026-03-14,Windows 11 + Python 
 TST-1017,test_app_version_present,Unit,FIX-012,Pass,2026-03-14,Windows 11 + Python 3.11,AppVersion directive still present in setup.iss,
 TST-1018,test_output_base_filename_present,Unit,FIX-012,Pass,2026-03-14,Windows 11 + Python 3.11,OutputBaseFilename directive still present in setup.iss,
 TST-1019,test_privileges_required_admin,Unit,FIX-012,Pass,2026-03-14,Windows 11 + Python 3.11,PrivilegesRequired=admin still set in setup.iss,
-TST-1020,Full regression suite (1869 passed 29 skipped) - FIX-012 Developer final run,Regression,FIX-012,Pass,2026-03-14,Windows 11 + Python 3.11,1869 passed / 29 skipped / 0 failed — 15 FIX-012 tests + all prior WPs; zero regressions; 29 skips are INS-015 intel tests (by design),Developer Agent final run
+TST-1020,Full regression suite (1869 passed 29 skipped) - FIX-012 Developer final run,Regression,FIX-012,Pass,2026-03-14,Windows 11 + Python 3.11,1869 passed / 29 skipped / 0 failed â€” 15 FIX-012 tests + all prior WPs; zero regressions; 29 skips are INS-015 intel tests (by design),Developer Agent final run
