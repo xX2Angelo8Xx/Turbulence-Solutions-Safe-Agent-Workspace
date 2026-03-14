@@ -951,3 +951,20 @@ TST-964,test_setup_iss_version_matches_pyproject,Integration,FIX-010,Pass,2026-0
 TST-965,test_build_dmg_version_matches_pyproject,Integration,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,build_dmg.sh version matches pyproject.toml,BUG-038
 TST-966,test_build_appimage_version_matches_pyproject,Integration,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,build_appimage.sh version matches pyproject.toml,BUG-038
 TST-967,test_all_build_scripts_have_same_version,Integration,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,All 3 build scripts have same version,BUG-038
+TST-968,test_release_job_needs_all_four_build_jobs,Integration,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,release job needs all 4 build jobs,
+TST-969,test_release_job_needs_exact_four,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,release job needs exactly 4 entries,
+TST-970,test_release_job_needs_no_typos,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,All job names in needs are defined in the workflow,
+TST-971,test_workflow_no_hardcoded_api_tokens,Security,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,No hardcoded GitHub PAT or token prefix in release.yml,
+TST-972,test_workflow_no_hardcoded_passwords,Security,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,No literal password value in release.yml,
+TST-973,test_no_job_has_duplicate_step_names,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,All jobs have unique step names within each job,
+TST-974,test_config_py_version_matches_pyproject,Integration,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,config.py VERSION matches pyproject.toml,
+TST-975,test_all_five_version_sources_match,Integration,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,All 5 version sources (config.py + pyproject + setup.iss + build_dmg + build_appimage) agree,
+TST-976,test_pyproject_version_is_valid_semver,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,pyproject.toml version is valid semver x.y.z,
+TST-977,test_setup_iss_version_is_valid_semver,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,setup.iss version is valid semver x.y.z,
+TST-978,test_macos_intel_build_has_both_macos15_runner_and_x64_arch,Integration,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,macos-intel-build has BOTH macos-15 runner AND x64 arch simultaneously,BUG-036
+TST-979,test_macos_arm_does_not_have_x64_architecture,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,macos-arm-build does not accidentally specify x64 architecture,
+TST-980,test_setup_iss_source_path_resolves_to_repo_root_on_filesystem,Regression,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,Source path ..\..\..\  resolves to repo root via filesystem walk,BUG-037
+TST-981,test_windows_artifact_upload_path_contains_exe,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,Windows upload-artifact path references .exe,
+TST-982,test_macos_intel_artifact_upload_path_is_dmg,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,macOS Intel upload-artifact path references .dmg,
+TST-983,test_linux_artifact_upload_path_is_appimage,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,Linux upload-artifact path references .AppImage,
+TST-984,test_workflow_triggers_only_on_version_tags,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,Workflow triggers only on version tags not branch pushes,
