@@ -145,15 +145,33 @@ def test_gitignore_git_recognises_pycache():
 
 
 def test_gitignore_git_recognises_spec():
-    """git check-ignore must report a .spec file as ignored."""
+    """launcher.spec must be tracked by git despite the *.spec rule.
+
+    FIX-011 added a !launcher.spec negation to .gitignore so this manually
+    maintained PyInstaller spec file remains tracked by git. git ls-files
+    must list it; git check-ignore must NOT match it.
+    """
+    # Should be tracked in the git index
     result = subprocess.run(
+        ["git", "ls-files", "--", "launcher.spec"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    assert result.stdout.strip() == "launcher.spec", (
+        "launcher.spec is not tracked by git — run 'git add -f launcher.spec' to re-track it. "
+        "The !launcher.spec negation in .gitignore should allow this."
+    )
+
+    # Should NOT be ignored (negation must take effect)
+    check_ignore = subprocess.run(
         ["git", "check-ignore", "-q", "launcher.spec"],
         cwd=str(REPO_ROOT),
         capture_output=True,
     )
-    assert result.returncode == 0, (
-        "git check-ignore did not recognise 'launcher.spec' as ignored — "
-        "*.spec rule may be missing or malformed"
+    assert check_ignore.returncode != 0, (
+        "git check-ignore says launcher.spec is ignored — the !launcher.spec negation "
+        "in .gitignore is not taking effect. Check that !launcher.spec appears after *.spec."
     )
 
 

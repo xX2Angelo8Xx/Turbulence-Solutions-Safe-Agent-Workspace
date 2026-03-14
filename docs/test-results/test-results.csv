@@ -968,3 +968,12 @@ TST-981,test_windows_artifact_upload_path_contains_exe,Unit,FIX-010,Pass,2026-03
 TST-982,test_macos_intel_artifact_upload_path_is_dmg,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,macOS Intel upload-artifact path references .dmg,
 TST-983,test_linux_artifact_upload_path_is_appimage,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,Linux upload-artifact path references .AppImage,
 TST-984,test_workflow_triggers_only_on_version_tags,Unit,FIX-010,Pass,2026-03-14,Windows 11 + Python 3.11,Workflow triggers only on version tags not branch pushes,
+TST-985,test_gitignore_has_spec_negation,Unit,FIX-011,Pass,2026-03-14,Windows 11 + Python 3.11,gitignore contains !launcher.spec negation,
+TST-986,test_gitignore_negation_after_spec_wildcard,Unit,FIX-011,Pass,2026-03-14,Windows 11 + Python 3.11,!launcher.spec appears after *.spec rule,
+TST-987,test_launcher_spec_exists_on_disk,Unit,FIX-011,Pass,2026-03-14,Windows 11 + Python 3.11,launcher.spec exists at repo root,
+TST-988,test_launcher_spec_tracked_by_git,Regression,FIX-011,Pass,2026-03-14,Windows 11 + Python 3.11,launcher.spec is tracked by git index,BUG-039
+TST-989,test_launcher_spec_not_ignored_by_git,Regression,FIX-011,Pass,2026-03-14,Windows 11 + Python 3.11,git check-ignore does not match launcher.spec,BUG-039
+TST-990,test_release_yml_no_macos_intel_job,Unit,FIX-011,Pass,2026-03-14,Windows 11 + Python 3.11,release.yml has no macos-intel-build job,
+TST-991,test_release_job_needs_no_intel,Unit,FIX-011,Pass,2026-03-14,Windows 11 + Python 3.11,release job needs does not include macos-intel-build,
+TST-992,test_release_job_needs_exact,Unit,FIX-011,Pass,2026-03-14,Windows 11 + Python 3.11,release job needs is exactly windows-build + macos-arm-build + linux-build,
+TST-993,test_release_job_needs_count,Unit,FIX-011,Pass,2026-03-14,Windows 11 + Python 3.11,release job needs contains exactly 3 entries,

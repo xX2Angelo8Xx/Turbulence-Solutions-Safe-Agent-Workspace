@@ -34,6 +34,9 @@ def workflow():
 
 @pytest.fixture(scope="module")
 def intel_job(workflow):
+    """Return the macos-intel-build job, or skip if removed."""
+    if "macos-intel-build" not in workflow.get("jobs", {}):
+        pytest.skip("macos-intel-build job was removed in FIX-011 (Intel Mac runners deprecated)")
     return workflow["jobs"]["macos-intel-build"]
 
 

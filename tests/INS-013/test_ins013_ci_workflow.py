@@ -12,10 +12,10 @@ WORKFLOW_PATH = REPO_ROOT / ".github" / "workflows" / "release.yml"
 
 EXPECTED_JOBS = [
     "windows-build",
-    "macos-intel-build",
     "macos-arm-build",
     "linux-build",
     "release",
+    # macos-intel-build removed in FIX-011 (Intel Mac runners deprecated)
 ]
 
 
@@ -57,7 +57,10 @@ def test_trigger_push_tags(workflow):
 
 
 def test_all_5_jobs_defined(workflow):
-    """All 5 expected job keys must be present."""
+    """All 4 expected job keys must be present.
+
+    macos-intel-build was removed in FIX-011 (Intel Mac runners deprecated).
+    """
     assert "jobs" in workflow, "Missing 'jobs' key in workflow"
     defined_jobs = set(workflow["jobs"].keys())
     for job in EXPECTED_JOBS:
@@ -70,8 +73,10 @@ def test_windows_build_runs_on(workflow):
 
 
 def test_macos_intel_runs_on(workflow):
-    """macos-intel-build must use macos-15 (Intel x64) runner."""
-    assert workflow["jobs"]["macos-intel-build"]["runs-on"] == "macos-15"
+    """Regression: macos-intel-build must NOT exist in workflow (removed in FIX-011)."""
+    assert "macos-intel-build" not in workflow["jobs"], (
+        "macos-intel-build job still exists — it should have been removed in FIX-011"
+    )
 
 
 def test_macos_arm_runs_on(workflow):
@@ -90,9 +95,12 @@ def test_release_runs_on(workflow):
 
 
 def test_release_needs_all_builds(workflow):
-    """release job must declare needs on all 4 build jobs."""
+    """release job must declare needs on all 3 build jobs.
+
+    macos-intel-build was removed in FIX-011 (Intel Mac runners deprecated).
+    """
     needs = workflow["jobs"]["release"].get("needs", [])
-    expected_builds = ["windows-build", "macos-intel-build", "macos-arm-build", "linux-build"]
+    expected_builds = ["windows-build", "macos-arm-build", "linux-build"]
     needs_set = set(needs)
     for build_job in expected_builds:
         assert build_job in needs_set, f"release.needs is missing: {build_job}"

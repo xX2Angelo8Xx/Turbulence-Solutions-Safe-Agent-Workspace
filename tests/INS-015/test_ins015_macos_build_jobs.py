@@ -22,7 +22,9 @@ def workflow():
 
 @pytest.fixture(scope="module")
 def intel_job(workflow):
-    """Return the macos-intel-build job definition."""
+    """Return the macos-intel-build job definition, or skip if removed."""
+    if "macos-intel-build" not in workflow.get("jobs", {}):
+        pytest.skip("macos-intel-build job was removed in FIX-011 (Intel Mac runners deprecated)")
     return workflow["jobs"]["macos-intel-build"]
 
 
@@ -49,8 +51,16 @@ def arm_steps(arm_job):
 # ---------------------------------------------------------------------------
 
 def test_macos_intel_job_exists(workflow):
-    """macos-intel-build job must be defined."""
-    assert "macos-intel-build" in workflow["jobs"]
+    """macos-intel-build job must NOT be defined (removed in FIX-011).
+
+    GitHub Actions macOS 14+ runners are ARM-only. Intel Python cannot be
+    installed on Apple Silicon. The Intel build job was dropped per user
+    decision in FIX-011.
+    """
+    assert "macos-intel-build" not in workflow["jobs"], (
+        "macos-intel-build job still exists in release.yml — "
+        "it should have been removed in FIX-011"
+    )
 
 
 def test_macos_arm_job_exists(workflow):

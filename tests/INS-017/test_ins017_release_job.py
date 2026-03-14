@@ -16,7 +16,7 @@ import yaml
 REPO_ROOT = pathlib.Path(__file__).parents[2]
 WORKFLOW_PATH = REPO_ROOT / ".github" / "workflows" / "release.yml"
 
-EXPECTED_NEEDS = {"windows-build", "macos-intel-build", "macos-arm-build", "linux-build"}
+EXPECTED_NEEDS = {"windows-build", "macos-arm-build", "linux-build"}
 
 
 @pytest.fixture(scope="module")
@@ -81,7 +81,10 @@ def test_release_job_has_3_steps(release_steps):
 # --- Needs dependency ---
 
 def test_release_needs_all_four_build_jobs(release_job):
-    """release job must declare needs on all 4 platform build jobs."""
+    """release job must declare needs on all 3 platform build jobs.
+
+    macos-intel-build was removed in FIX-011 (Intel Mac runners deprecated).
+    """
     needs = set(release_job.get("needs", []))
     assert needs == EXPECTED_NEEDS, (
         f"Expected needs={EXPECTED_NEEDS}, got needs={needs}"
@@ -93,7 +96,10 @@ def test_release_needs_windows_build(release_job):
 
 
 def test_release_needs_macos_intel_build(release_job):
-    assert "macos-intel-build" in release_job.get("needs", [])
+    """Regression: macos-intel-build must NOT be in release needs (removed in FIX-011)."""
+    assert "macos-intel-build" not in release_job.get("needs", []), (
+        "macos-intel-build should not be in release needs — job was removed in FIX-011"
+    )
 
 
 def test_release_needs_macos_arm_build(release_job):

@@ -30,7 +30,7 @@ PYPROJECT = REPO_ROOT / "pyproject.toml"
 CONFIG_PY = REPO_ROOT / "src" / "launcher" / "config.py"
 
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
-EXPECTED_BUILD_JOBS = {"windows-build", "macos-intel-build", "macos-arm-build", "linux-build"}
+EXPECTED_BUILD_JOBS = {"windows-build", "macos-arm-build", "linux-build"}  # macos-intel-build removed in FIX-011
 
 
 @pytest.fixture(scope="module")
@@ -51,6 +51,9 @@ def release_job(workflow):
 
 @pytest.fixture(scope="module")
 def intel_job(workflow):
+    """Return the macos-intel-build job, or skip if removed."""
+    if "macos-intel-build" not in workflow.get("jobs", {}):
+        pytest.skip("macos-intel-build job was removed in FIX-011 (Intel Mac runners deprecated)")
     return workflow["jobs"]["macos-intel-build"]
 
 
@@ -64,24 +67,23 @@ def arm_job(workflow):
 # ---------------------------------------------------------------------------
 
 def test_release_job_needs_all_four_build_jobs(release_job):
-    """release job must declare all 4 build jobs in 'needs'.
+    """release job must declare all 3 build jobs in 'needs'.
 
-    If any build job is missing, the release job will start before all
-    artifacts are ready, producing an incomplete or empty release.
+    macos-intel-build was removed in FIX-011 (Intel Mac runners deprecated).
     """
     needs = set(release_job.get("needs", []))
     missing = EXPECTED_BUILD_JOBS - needs
     assert not missing, (
         f"release job is missing these build jobs in 'needs': {sorted(missing)}. "
-        "All 4 build jobs must complete before the release job runs."
+        "All 3 build jobs must complete before the release job runs."
     )
 
 
 def test_release_job_needs_exact_four(release_job):
-    """release job 'needs' must have exactly 4 entries — no spurious extra dependencies."""
+    """release job 'needs' must have exactly 3 entries (macos-intel-build removed in FIX-011)."""
     needs = release_job.get("needs", [])
-    assert len(needs) == 4, (
-        f"Expected exactly 4 jobs in release.needs, got {len(needs)}: {needs}"
+    assert len(needs) == 3, (
+        f"Expected exactly 3 jobs in release.needs, got {len(needs)}: {needs}"
     )
 
 
@@ -350,16 +352,10 @@ def test_windows_artifact_upload_path_contains_exe(workflow):
 
 
 def test_macos_intel_artifact_upload_path_is_dmg(workflow):
-    """macos-intel-build artifact upload path must reference .dmg files."""
-    job = workflow["jobs"]["macos-intel-build"]
-    for step in job.get("steps", []):
-        if step.get("uses", "").startswith("actions/upload-artifact"):
-            path = step.get("with", {}).get("path", "")
-            assert ".dmg" in path, (
-                f"macOS Intel artifact upload path {path!r} does not reference a .dmg file."
-            )
-            return
-    pytest.fail("No upload-artifact step found in macos-intel-build")
+    """Regression: macos-intel-build job must not exist (removed in FIX-011)."""
+    assert "macos-intel-build" not in workflow["jobs"], (
+        "macos-intel-build job still exists — it should have been removed in FIX-011"
+    )
 
 
 def test_linux_artifact_upload_path_is_appimage(workflow):

@@ -67,10 +67,13 @@ def test_release_steps_no_env_github_token(release_steps):
 # ---------------------------------------------------------------------------
 
 def test_release_needs_exactly_four_jobs(release_job):
-    """needs must list exactly 4 build jobs — no more, no less."""
+    """needs must list exactly 3 build jobs — no more, no less.
+
+    macos-intel-build was removed in FIX-011 (Intel Mac runners deprecated).
+    """
     needs = release_job.get("needs", [])
-    assert len(needs) == 4, (
-        f"Expected exactly 4 build jobs in needs, got {len(needs)}: {needs}"
+    assert len(needs) == 3, (
+        f"Expected exactly 3 build jobs in needs, got {len(needs)}: {needs}"
     )
 
 

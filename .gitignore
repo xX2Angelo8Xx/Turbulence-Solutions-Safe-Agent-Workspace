@@ -12,6 +12,8 @@ build/
 
 # PyInstaller generated spec files (auto-generated; source specs live in src/installer/)
 *.spec
+# launcher.spec is a manually maintained PyInstaller spec file — must remain tracked
+!launcher.spec
 
 # pytest cache
 .pytest_cache/

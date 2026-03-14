@@ -12,7 +12,7 @@ import yaml
 REPO_ROOT = pathlib.Path(__file__).parents[2]
 WORKFLOW_PATH = REPO_ROOT / ".github" / "workflows" / "release.yml"
 
-EXPECTED_BUILD_JOBS = {"windows-build", "macos-intel-build", "macos-arm-build", "linux-build"}
+EXPECTED_BUILD_JOBS = {"windows-build", "macos-arm-build", "linux-build"}  # macos-intel-build removed in FIX-011
 
 
 @pytest.fixture(scope="module")
@@ -52,7 +52,7 @@ def test_no_duplicate_job_names(workflow):
     assert len(job_names) == len(set(job_names)), (
         f"Duplicate job names detected: {[j for j in job_names if job_names.count(j) > 1]}"
     )
-    assert len(jobs) == 5, f"Expected exactly 5 jobs, found {len(jobs)}: {job_names}"
+    assert len(jobs) == 4, f"Expected exactly 4 jobs (macos-intel-build removed in FIX-011), found {len(jobs)}: {job_names}"
 
 
 # ---------------------------------------------------------------------------
@@ -100,10 +100,10 @@ def test_release_needs_exactly_the_4_build_jobs(workflow):
 
 
 def test_release_needs_count_is_exactly_4(workflow):
-    """release.needs list must have exactly 4 entries (not 3, not 5)."""
+    """release.needs list must have exactly 3 entries (macos-intel-build removed in FIX-011)."""
     needs = workflow["jobs"]["release"].get("needs", [])
-    assert len(needs) == 4, (
-        f"release.needs should have exactly 4 entries, found {len(needs)}: {needs}"
+    assert len(needs) == 3, (
+        f"release.needs should have exactly 3 entries, found {len(needs)}: {needs}"
     )
 
 

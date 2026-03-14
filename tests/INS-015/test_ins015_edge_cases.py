@@ -34,6 +34,9 @@ def workflow():
 
 @pytest.fixture(scope="module")
 def intel_job(workflow):
+    """Return the macos-intel-build job, or skip if removed."""
+    if "macos-intel-build" not in workflow.get("jobs", {}):
+        pytest.skip("macos-intel-build job was removed in FIX-011 (Intel Mac runners deprecated)")
     return workflow["jobs"]["macos-intel-build"]
 
 
@@ -252,12 +255,16 @@ def test_macos_arm_no_tokens_in_env(arm_steps):
 # Runners are distinct
 # ---------------------------------------------------------------------------
 
-def test_macos_runners_are_distinct(intel_job, arm_job):
-    """Intel and ARM jobs must use different runner images."""
-    intel_runner = intel_job.get("runs-on")
+def test_macos_runners_are_distinct(workflow, arm_job):
+    """macOS build jobs must use distinct runner images.
+
+    Since macos-intel-build was removed in FIX-011, this test now verifies
+    that the remaining macos-arm-build uses macos-14 (not macos-15 or same
+    as any other macOS job if one were re-added).
+    """
     arm_runner = arm_job.get("runs-on")
-    assert intel_runner != arm_runner, (
-        f"Both macOS jobs use runner {intel_runner!r} — they must use different images"
+    assert arm_runner == "macos-14", (
+        f"macos-arm-build should use macos-14 runner, got {arm_runner!r}"
     )
 
 
