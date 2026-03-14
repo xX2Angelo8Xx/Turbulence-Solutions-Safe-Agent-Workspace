@@ -191,26 +191,26 @@ def test_setup_iss_source_path_is_not_bare_dist():
 # ---------------------------------------------------------------------------
 
 def test_setup_iss_version_is_1_0_0():
-    """setup.iss MyAppVersion must be 1.0.0 (BUG-038 fix)."""
+    """setup.iss MyAppVersion must be 1.0.1 (updated by FIX-014 version bump)."""
     content = SETUP_ISS.read_text(encoding="utf-8")
-    assert 'MyAppVersion "1.0.0"' in content, (
-        "setup.iss MyAppVersion must be 1.0.0 to match pyproject.toml. Got something else."
+    assert 'MyAppVersion "1.0.1"' in content, (
+        "setup.iss MyAppVersion must be 1.0.1 to match pyproject.toml. Got something else."
     )
 
 
 def test_build_dmg_version_is_1_0_0():
-    """build_dmg.sh APP_VERSION must be 1.0.0 (BUG-038 fix)."""
+    """build_dmg.sh APP_VERSION must be 1.0.1 (updated by FIX-014 version bump)."""
     content = BUILD_DMG.read_text(encoding="utf-8")
-    assert 'APP_VERSION="1.0.0"' in content, (
-        "build_dmg.sh APP_VERSION must be 1.0.0 to match pyproject.toml. Got something else."
+    assert 'APP_VERSION="1.0.1"' in content, (
+        "build_dmg.sh APP_VERSION must be 1.0.1 to match pyproject.toml. Got something else."
     )
 
 
 def test_build_appimage_version_is_1_0_0():
-    """build_appimage.sh APP_VERSION must be 1.0.0 (BUG-038 fix)."""
+    """build_appimage.sh APP_VERSION must be 1.0.1 (updated by FIX-014 version bump)."""
     content = BUILD_APPIMAGE.read_text(encoding="utf-8")
-    assert 'APP_VERSION="1.0.0"' in content, (
-        "build_appimage.sh APP_VERSION must be 1.0.0 to match pyproject.toml. Got something else."
+    assert 'APP_VERSION="1.0.1"' in content, (
+        "build_appimage.sh APP_VERSION must be 1.0.1 to match pyproject.toml. Got something else."
     )
 
 

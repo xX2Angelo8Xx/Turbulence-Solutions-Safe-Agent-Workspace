@@ -1063,3 +1063,16 @@ TST-1076,test_readme_in_subdirectory_does_not_count_as_sole_readme,Unit,GUI-014,
 TST-1077,test_readme_md_uppercase_exact_match,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Only exact-case README.md triggers not-ready; Readme.md is ready,Tester Agent GUI-014
 TST-1078,test_readme_md_with_sibling_file_is_ready,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,README.md with a sibling file means the template is ready,Tester Agent GUI-014
 TST-1079,Full regression suite (1934 passed 29 skipped 1 pre-existing fail) - GUI-014 Tester final run,Regression,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,1934 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 27 GUI-014 tests all pass; zero regressions,Tester Agent final run - PASS verdict
+TST-1080,test_config_version_constant_is_1_0_1,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,config.py VERSION constant equals 1.0.1,
+TST-1081,test_config_py_contains_version_string,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,config.py source contains VERSION: str = "1.0.1",
+TST-1082,test_pyproject_version_is_1_0_1,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,pyproject.toml version = "1.0.1",
+TST-1083,test_pyproject_does_not_contain_old_version,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,pyproject.toml no longer contains 1.0.0,
+TST-1084,test_setup_iss_myappversion_is_1_0_1,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,setup.iss MyAppVersion = "1.0.1",
+TST-1085,test_setup_iss_does_not_contain_old_version,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,setup.iss no longer contains MyAppVersion 1.0.0,
+TST-1086,test_build_dmg_app_version_is_1_0_1,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_dmg.sh APP_VERSION="1.0.1",
+TST-1087,test_build_dmg_does_not_contain_old_version,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_dmg.sh no longer contains APP_VERSION 1.0.0,
+TST-1088,test_build_appimage_app_version_is_1_0_1,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_appimage.sh APP_VERSION="1.0.1",
+TST-1089,test_build_appimage_does_not_contain_old_version,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_appimage.sh no longer contains APP_VERSION 1.0.0,
+TST-1090,test_all_five_versions_are_identical,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,All 5 version strings are identical,
+TST-1091,test_all_versions_equal_expected,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,All 5 versions equal 1.0.1,
+TST-1092,Full regression suite (1946 passed 29 skipped 1 pre-existing fail) - FIX-014 Developer run,Regression,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,1946 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 12 FIX-014 tests all pass; zero regressions,Developer Agent FIX-014
