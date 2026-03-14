@@ -274,3 +274,131 @@ class TestCreateProjectUsesCurrentTemplate:
         mock_create.assert_called_once()
         called_template_path = mock_create.call_args[0][0]
         assert called_template_path == tmp_path / "coding"
+
+
+# ---------------------------------------------------------------------------
+# Edge-case tests added by Tester (GUI-014)
+# ---------------------------------------------------------------------------
+
+class TestAllTemplatesComingSoon:
+    """Edge case: every template in the directory has only README.md."""
+
+    def test_current_template_fallback_when_all_coming_soon(self, tmp_path: Path):
+        """When no template is ready, _current_template falls back to the first
+        coming-soon option (not an empty string) so the dropdown is not blank."""
+        (tmp_path / "alpha").mkdir()
+        (tmp_path / "alpha" / "README.md").write_text("")
+        (tmp_path / "beta").mkdir()
+        (tmp_path / "beta" / "README.md").write_text("")
+
+        with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
+            app = _fresh_app()
+
+        # Both are coming-soon; fallback picks the first option.
+        assert app._current_template != ""
+        assert app._current_template in ("Alpha ...coming soon", "Beta ...coming soon")
+
+    def test_coming_soon_set_has_all_when_none_ready(self, tmp_path: Path):
+        """With all templates unready, _coming_soon_options contains every display name."""
+        (tmp_path / "alpha").mkdir()
+        (tmp_path / "alpha" / "README.md").write_text("")
+        (tmp_path / "beta").mkdir()
+        (tmp_path / "beta" / "README.md").write_text("")
+
+        with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
+            app = _fresh_app()
+
+        assert "Alpha ...coming soon" in app._coming_soon_options
+        assert "Beta ...coming soon" in app._coming_soon_options
+        assert len(app._coming_soon_options) == 2
+
+
+class TestCreateProjectComingSoonBypass:
+    """Verify create_project cannot be triggered via a coming-soon template
+    even if the dropdown somehow contains that value when the button is clicked."""
+
+    def test_on_create_project_refuses_coming_soon_display_name(self, tmp_path: Path):
+        """If the dropdown somehow returns a coming-soon display name at click time,
+        _on_create_project must NOT call create_project — the reverse-map guard
+        should return an error and abort."""
+        (tmp_path / "creative-marketing").mkdir()
+        (tmp_path / "creative-marketing" / "README.md").write_text("")
+        dest = tmp_path / "dest"
+        dest.mkdir()
+
+        with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
+            _CTK_MOCK.reset_mock()
+            app = App()
+
+        # Wire up independent mock widgets.
+        app.project_name_entry = MagicMock()
+        app.project_name_entry.get.return_value = "my-project"
+        app.destination_entry = MagicMock()
+        app.destination_entry.get.return_value = str(dest)
+        app.project_name_error_label = MagicMock()
+        app.destination_error_label = MagicMock()
+        # Force the dropdown to return the coming-soon display name (bypass guard).
+        app.project_type_dropdown = MagicMock()
+        app.project_type_dropdown.get.return_value = "Creative Marketing ...coming soon"
+
+        mock_create = MagicMock()
+
+        with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path, "create_project": mock_create}), \
+             patch("launcher.gui.app.messagebox") as mock_mb:
+            app._on_create_project()
+
+        # create_project must NOT have been called.
+        mock_create.assert_not_called()
+        # An error dialog must have been shown.
+        mock_mb.showerror.assert_called_once()
+
+
+class TestRealTemplatesDirectory:
+    """Verify the live templates/ directory produces the expected display names."""
+
+    def test_coding_template_is_ready(self):
+        """The real templates/coding/ directory must be considered ready."""
+        from launcher.config import TEMPLATES_DIR as REAL_TEMPLATES_DIR
+        assert is_template_ready(REAL_TEMPLATES_DIR, "coding") is True
+
+    def test_creative_marketing_template_is_not_ready(self):
+        """The real templates/creative-marketing/ directory must NOT be ready (only README.md)."""
+        from launcher.config import TEMPLATES_DIR as REAL_TEMPLATES_DIR
+        assert is_template_ready(REAL_TEMPLATES_DIR, "creative-marketing") is False
+
+    def test_real_templates_display_names(self):
+        """Against the real templates/ dir the app produces 'Coding' (ready)
+        and 'Creative Marketing ...coming soon' (not ready)."""
+        from launcher.config import TEMPLATES_DIR as REAL_TEMPLATES_DIR
+        _CTK_MOCK.reset_mock()
+        app = App()
+        options = app._get_template_options()
+        assert "Coding" in options
+        assert "Creative Marketing ...coming soon" in options
+        assert not any(o.endswith("...coming soon") and "Coding" in o for o in options)
+
+
+class TestIsTemplateReadyEdgeCases:
+    """Additional edge cases for is_template_ready()."""
+
+    def test_readme_in_subdirectory_does_not_count_as_sole_readme(self, tmp_path: Path):
+        """A README.md inside a subdirectory does not make the template non-ready;
+        the top-level iterdir() sees the subdir, not its contents."""
+        (tmp_path / "structured").mkdir()
+        (tmp_path / "structured" / "src").mkdir()
+        (tmp_path / "structured" / "src" / "README.md").write_text("")
+        # Top-level only has 'src/' subdir — that counts as content.
+        assert is_template_ready(tmp_path, "structured") is True
+
+    def test_readme_md_uppercase_exact_match(self, tmp_path: Path):
+        """Only a file named exactly 'README.md' at the top level triggers not-ready."""
+        (tmp_path / "t1").mkdir()
+        (tmp_path / "t1" / "Readme.md").write_text("")   # different case → ready
+        assert is_template_ready(tmp_path, "t1") is True
+
+    def test_readme_md_with_sibling_file_is_ready(self, tmp_path: Path):
+        """README.md alongside another file means the template IS ready."""
+        (tmp_path / "t2").mkdir()
+        (tmp_path / "t2" / "README.md").write_text("")
+        (tmp_path / "t2" / "main.py").write_text("")
+        assert is_template_ready(tmp_path, "t2") is True
