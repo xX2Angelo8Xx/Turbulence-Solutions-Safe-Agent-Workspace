@@ -9,7 +9,7 @@ from pathlib import Path
 
 import customtkinter as ctk
 
-from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, TEMPLATES_DIR, VERSION, get_display_version
+from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, LOGO_PATH, TEMPLATES_DIR, VERSION, get_display_version
 from launcher.core.updater import check_for_update
 from launcher.core.downloader import download_update
 from launcher.core.applier import apply_update
@@ -23,7 +23,7 @@ from launcher.gui.validation import (
 )
 
 _WINDOW_WIDTH: int = 580
-_WINDOW_HEIGHT: int = 520
+_WINDOW_HEIGHT: int = 590
 
 
 def _format_template_name(raw: str) -> str:
@@ -45,6 +45,14 @@ class App:
         # Tracks the latest available version so the install handler can use it.
         self._latest_version: str = VERSION
         self._build_ui()
+        # Set window icon from TS-Logo.png (GUI-013).
+        try:
+            from PIL import Image, ImageTk
+            _icon_img = Image.open(str(LOGO_PATH))
+            self._icon_photo = ImageTk.PhotoImage(_icon_img)
+            self._window.iconphoto(True, self._icon_photo)
+        except Exception:
+            pass
         # Silent background update check on launch (GUI-009).
         threading.Thread(target=self._run_update_check, daemon=True).start()
 
@@ -56,12 +64,30 @@ class App:
         """Construct and arrange all UI widgets."""
         self._window.grid_columnconfigure(1, weight=1)
 
+        # Logo header (GUI-013) -- brand logo at the top of the window.
+        try:
+            from PIL import Image
+            _logo_img = Image.open(str(LOGO_PATH))
+            self._logo_ctk = ctk.CTkImage(
+                light_image=_logo_img, dark_image=_logo_img, size=(160, 50)
+            )
+            self.logo_label = ctk.CTkLabel(
+                self._window,
+                image=self._logo_ctk,
+                text="",
+            )
+            self.logo_label.grid(
+                row=0, column=0, columnspan=3, padx=20, pady=(12, 4)
+            )
+        except Exception:
+            pass
+
         # Project name label + entry
         self.project_name_entry = make_label_entry_row(
             self._window,
             label_text="Project Name:",
             placeholder="my-project",
-            row=0,
+            row=1,
         )
 
         # Inline error label for project name validation feedback
@@ -73,13 +99,13 @@ class App:
             height=16,
         )
         self.project_name_error_label.grid(
-            row=1, column=1, columnspan=2, padx=(0, 16), pady=(0, 4), sticky="w"
+            row=2, column=1, columnspan=2, padx=(0, 16), pady=(0, 4), sticky="w"
         )
 
         # Project type label + dropdown
         ctk.CTkLabel(
             self._window, text="Project Type:", anchor="w", text_color=COLOR_TEXT,
-        ).grid(row=2, column=0, padx=(20, 8), pady=12, sticky="w")
+        ).grid(row=3, column=0, padx=(20, 8), pady=12, sticky="w")
         self.project_type_dropdown = ctk.CTkOptionMenu(
             self._window,
             values=self._get_template_options(),
@@ -88,7 +114,7 @@ class App:
             text_color=COLOR_TEXT,
         )
         self.project_type_dropdown.grid(
-            row=2, column=1, columnspan=2, padx=(0, 20), pady=12, sticky="ew"
+            row=3, column=1, columnspan=2, padx=(0, 20), pady=12, sticky="ew"
         )
 
         # Destination path label + entry + browse button
@@ -97,7 +123,7 @@ class App:
             label_text="Destination:",
             browse_command=self._browse_destination,
             placeholder="Select destination folder",
-            row=3,
+            row=4,
         )
 
         # Inline error label for destination validation feedback
@@ -109,7 +135,7 @@ class App:
             height=16,
         )
         self.destination_error_label.grid(
-            row=4, column=1, columnspan=2, padx=(0, 20), pady=(0, 4), sticky="w"
+            row=5, column=1, columnspan=2, padx=(0, 20), pady=(0, 4), sticky="w"
         )
 
         # Open in VS Code checkbox
@@ -123,7 +149,7 @@ class App:
             hover_color="#4AA8D4",
         )
         self.open_in_vscode_checkbox.grid(
-            row=5, column=0, columnspan=2, padx=20, pady=10, sticky="w"
+            row=6, column=0, columnspan=2, padx=20, pady=10, sticky="w"
         )
 
         # Create Project button
@@ -137,7 +163,7 @@ class App:
             height=40,
         )
         self.create_button.grid(
-            row=6, column=0, columnspan=3, padx=20, pady=(20, 24), sticky="ew"
+            row=7, column=0, columnspan=3, padx=20, pady=(20, 24), sticky="ew"
         )
 
         # Check for Updates button (GUI-010) -- secondary text-link style button.
@@ -152,7 +178,7 @@ class App:
             border_width=0,
         )
         self.check_updates_button.grid(
-            row=7, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="e"
+            row=8, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="e"
         )
 
         # Update notification banner (GUI-009) -- hidden until an update is detected.
@@ -164,7 +190,7 @@ class App:
             height=28,
         )
         self.update_banner.grid(
-            row=8, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+            row=9, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
         )
         self.update_banner.grid_remove()
 
@@ -179,7 +205,7 @@ class App:
             height=32,
         )
         self.download_install_button.grid(
-            row=9, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+            row=10, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
         )
         self.download_install_button.grid_remove()
 

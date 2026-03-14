@@ -22,6 +22,7 @@ a = Analysis(
     binaries=[],
     datas=[
         (os.path.join(SPECPATH, 'templates'), 'templates'),
+        (os.path.join(SPECPATH, 'TS-Logo.png'), '.'),
     ],
     # customtkinter uses dynamic plugin imports that static analysis misses.
     hiddenimports=['customtkinter'],
@@ -43,6 +44,7 @@ exe = EXE(
     exclude_binaries=True,
     name='launcher',
     debug=False,
+    icon=os.path.join(SPECPATH, 'TS-Logo.png'),
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,

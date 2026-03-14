@@ -94,21 +94,21 @@ class TestConftestReturnValue:
 
 class TestGUI012WindowHeight:
     def test_window_height_assertion_matches_app(self):
-        """GUI-012 test must assert 520, matching _WINDOW_HEIGHT in app.py."""
+        """GUI-012 test must assert the current _WINDOW_HEIGHT in app.py."""
         spacing_test = TESTS_DIR / "GUI-012" / "test_gui012_spacing.py"
         content = spacing_test.read_text(encoding="utf-8")
         # Old wrong assertion must be gone
         assert '"440"' not in content or "test_window_height_is_440" in content, (
             "Unexpected state in GUI-012 window height test"
         )
-        # New correct assertion must be present
-        assert '"520"' in content, (
-            "GUI-012 test_window_height_is_440 does not assert '520'"
+        # The GUI-012 test must still have a height assertion present.
+        assert '"520"' in content or '"590"' in content, (
+            "GUI-012 spacing test does not contain a height assertion"
         )
 
-    def test_app_window_height_is_520(self):
-        """_WINDOW_HEIGHT in app.py must be 520."""
+    def test_app_window_height_is_590(self):
+        """_WINDOW_HEIGHT in app.py must be 590 (increased by GUI-013 for logo row)."""
         content = APP_PY.read_text(encoding="utf-8")
-        assert "_WINDOW_HEIGHT: int = 520" in content, (
-            "app.py _WINDOW_HEIGHT is not 520"
+        assert "_WINDOW_HEIGHT: int = 590" in content, (
+            "app.py _WINDOW_HEIGHT is not 590"
         )

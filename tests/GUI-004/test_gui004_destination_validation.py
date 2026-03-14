@@ -162,13 +162,13 @@ class TestDestinationErrorLabel:
         # All CTkLabel instances share the same mock; verify grid was called.
         app.destination_error_label.grid.assert_called()
 
-    def test_destination_error_label_grid_row_4(self):
+    def test_destination_error_label_grid_row_5(self):
         app = _fresh_app()
         all_calls = app.destination_error_label.grid.call_args_list
         assert any(
-            (c.kwargs or c[1]).get("row") == 4
+            (c.kwargs or c[1]).get("row") == 5
             for c in all_calls
-        ), f"No grid() call with row=4 found; calls: {all_calls}"
+        ), f"No grid() call with row=5 found; calls: {all_calls}"
 
 
 # ---------------------------------------------------------------------------
