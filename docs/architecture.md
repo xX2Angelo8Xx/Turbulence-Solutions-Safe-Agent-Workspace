@@ -26,8 +26,10 @@ Templates (bundled inside Launcher)
 │   │   ├── tester.agent.md           # Review and testing agent
 │   │   ├── maintenance.agent.md      # Project health audit agent
 │   │   └── story-writer.agent.md     # User story creation agent
-│   └── instructions/
-│       └── copilot-instructions.md   # Landing page — auto-loaded for all agents
+│   ├── instructions/
+│   │   └── copilot-instructions.md   # Landing page — auto-loaded for all agents
+│   └── workflows/
+│       └── release.yml               # CI/CD: build + release on version tag push
 ├── Default-Project/                  # "Coding" template (shipped to users)
 │   ├── .github/                      # Hook scripts, Copilot config
 │   ├── .vscode/                      # VS Code security settings
@@ -55,6 +57,11 @@ Templates (bundled inside Launcher)
 │   ├── INS-010/                      # Tests for INS-010 (Update Download)
 │   ├── INS-011/                      # Tests for INS-011 (Update Apply and Restart)
 │   ├── INS-012/                      # Tests for INS-012 (.gitignore Configuration)
+│   ├── INS-013/                      # Tests for INS-013 (CI Workflow Skeleton)
+│   ├── INS-014/                      # Tests for INS-014 (CI Windows Build Job)
+│   ├── INS-015/                      # Tests for INS-015 (CI macOS Build Jobs)
+│   ├── INS-016/                      # Tests for INS-016 (CI Linux Build Job)
+│   ├── INS-017/                      # Tests for INS-017 (CI Release Upload Job)
 │   ├── SAF-001/                      # Tests for SAF-001 (Security Gate Core)
 │   ├── SAF-002/                      # Tests for SAF-002 (Zone Enforcement Logic)
 │   ├── SAF-003/                      # Tests for SAF-003 (Tool Parameter Validation)
