@@ -78,6 +78,10 @@ Templates (bundled inside Launcher)
 │   ├── FIX-008/                      # Tests for FIX-008 (Conftest Multi-Layer VS Code Guard)
 │   ├── FIX-009/                      # Tests for FIX-009 (TST-ID Deduplication)
 │   ├── FIX-010/                      # Tests for FIX-010 (Fix CI/CD Release Pipeline)
+│   ├── FIX-011/                      # Tests for FIX-011 (Fix CI Spec File and Drop Intel Mac)
+│   ├── FIX-012/                      # Tests for FIX-012 (Fix macOS/Windows CI directives)
+│   ├── FIX-013/                      # Tests for FIX-013 (Fix PyInstaller Template Path)
+│   ├── FIX-014/                      # Tests for FIX-014 (Bump Version to 1.0.1)
 │   ├── GUI-001/                      # Tests for GUI-001 (Main Window Layout)
 │   ├── GUI-002/                      # Tests for GUI-002 (Project Type Selection)
 │   ├── GUI-003/                      # Tests for GUI-003 (Folder Name Input)
@@ -89,7 +93,9 @@ Templates (bundled inside Launcher)
 │   ├── GUI-009/                      # Tests for GUI-009 (Update Notification Banner)
 │   ├── GUI-010/                      # Tests for GUI-010 (Check for Updates Button)
 │   ├── GUI-011/                      # Tests for GUI-011 (Apply Company Color Theme)
-│   └── GUI-012/                      # Tests for GUI-012 (UI Spacing and Visual Hierarchy)
+│   ├── GUI-012/                      # Tests for GUI-012 (UI Spacing and Visual Hierarchy)
+│   ├── GUI-013/                      # Tests for GUI-013 (Add TS-Logo to App GUI and Icon)
+│   └── GUI-014/                      # Tests for GUI-014 (Grey Out Unfinished Templates)
 ├── docs/
 │   ├── architecture.md               # Project overview and structure (this file)
 │   ├── project-scope.md              # Project scope and vision
@@ -116,6 +122,7 @@ Templates (bundled inside Launcher)
 │   ├── test-results/
 │   │   └── test-results.csv          # Test execution records
 │   └── maintenance/                  # Maintenance audit logs (timestamped)
+├── TS-Logo.png                       # Company logo (used as app icon and GUI header)
 ├── .gitignore                        # Excludes .venv/, __pycache__/, build artifacts, etc.
 ├── .venv/                            # Workspace-local virtual environment (gitignored)
 └── pyproject.toml                    # Python packaging configuration
@@ -127,7 +134,7 @@ All work is tracked in [workpackages/workpackages.csv](workpackages/workpackages
 
 Each workpackage in active development gets a dedicated folder under `docs/workpackages/<WP-ID>/` containing the developer's log (`dev-log.md`) and the tester's report (`test-report.md`). See [work-rules/workpackage-rules.md](work-rules/workpackage-rules.md) for details.
 
-Categories: **INS** (Installer) · **SAF** (Safety) · **GUI** (GUI) · **DOC** (Documentation)
+Categories: **INS** (Installer) · **SAF** (Safety) · **GUI** (GUI) · **FIX** (Fix / Bug Fix) · **DOC** (Documentation)
 
 All rules and workflows are documented in [work-rules/index.md](work-rules/index.md) — the central hub.
 
