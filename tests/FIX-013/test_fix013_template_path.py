@@ -117,3 +117,68 @@ def test_ctk_option_menu_values_non_empty(tmp_path):
         "CTkOptionMenu would receive a non-empty values list"
     )
     assert "coding" in captured_values
+
+
+# ---------------------------------------------------------------------------
+# Tester Edge Cases
+# ---------------------------------------------------------------------------
+
+def test_meipass_set_but_templates_dir_missing_returns_empty_list(tmp_path):
+    """Edge case: _MEIPASS is set but templates/ does not exist inside it.
+    list_templates() must return [] without raising — no crash in broken bundle."""
+    fake_meipass = str(tmp_path / "MEI_no_templates")
+    # Do NOT create the templates subdirectory inside fake_meipass
+    templates_dir = _reload_config(meipass_value=fake_meipass)
+
+    from launcher.core.project_creator import list_templates
+    result = list_templates(templates_dir)
+
+    assert result == [], (
+        f"Expected [] when _MEIPASS/templates/ does not exist, got {result}"
+    )
+
+
+def test_meipass_empty_string_falls_through_to_dev_path():
+    """Edge case: sys._MEIPASS == '' is falsy.
+    The conditional 'if getattr(sys, \"_MEIPASS\", None):' evaluates to False,
+    so the dev-mode path must be used (not Path('') / 'templates')."""
+    import launcher.config as cfg
+
+    dev_expected = Path(cfg.__file__).resolve().parent.parent.parent / "templates"
+    result = _reload_config(meipass_value="")
+
+    assert result == dev_expected, (
+        f"Empty string _MEIPASS should use dev path {dev_expected!r}, got {result!r}"
+    )
+
+
+def test_real_templates_dir_contains_expected_template_names():
+    """Integration: dev TEMPLATES_DIR contains exactly 'coding' and 'creative-marketing'."""
+    from launcher.core.project_creator import list_templates
+
+    dev_templates_dir = _reload_config(meipass_value=None)
+    templates = list_templates(dev_templates_dir)
+
+    assert "coding" in templates, f"'coding' missing from {templates}"
+    assert "creative-marketing" in templates, f"'creative-marketing' missing from {templates}"
+
+
+def test_meipass_bundled_templates_discoverable(tmp_path):
+    """Edge case: simulate a correctly bundled PyInstaller env.
+    When _MEIPASS/templates/ exists with coding/ and creative-marketing/,
+    list_templates() must return both names."""
+    fake_meipass = str(tmp_path / "MEI_full")
+    fake_templates = tmp_path / "MEI_full" / "templates"
+    (fake_templates / "coding").mkdir(parents=True)
+    (fake_templates / "creative-marketing").mkdir()
+
+    templates_dir = _reload_config(meipass_value=fake_meipass)
+
+    from launcher.core.project_creator import list_templates
+    result = list_templates(templates_dir)
+
+    assert "coding" in result, f"'coding' not found in bundled templates: {result}"
+    assert "creative-marketing" in result, (
+        f"'creative-marketing' not found in bundled templates: {result}"
+    )
+    assert len(result) == 2, f"Expected 2 templates, got {result}"
