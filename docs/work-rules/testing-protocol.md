@@ -128,6 +128,15 @@ these firing during an automated test run can destabilise or crash the system.
 6. Write findings in the WP's `test-report.md` (see format below).
 7. **Never run commands that require user input** — all test execution must be non-interactive.
 
+### Bug-Fix Workpackages (FIX-xxx)
+
+Bug-fix workpackages follow the same testing requirements as feature WPs with these clarifications:
+
+1. Every FIX WP **must** have a dedicated `tests/FIX-xxx/` directory with at least one regression test that reproduces the original bug and confirms the fix.
+2. If the fix is validated primarily through an existing WP's test suite (e.g., FIX-004 fixes a bug in INS-006), the FIX WP's test directory should contain at minimum a test that specifically targets the fixed behavior.
+3. All FIX WP tests **must** be logged as individual entries in `test-results.csv` with the FIX WP's ID in the `WP Reference` column.
+4. The Tester **must** write a `test-report.md` for FIX WPs, just as for any other WP.
+
 ## Test Result CSV
 
 All test runs are logged in `docs/test-results/test-results.csv`.

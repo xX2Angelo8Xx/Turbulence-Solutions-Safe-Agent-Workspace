@@ -60,6 +60,12 @@ The following checks are executed in order. Each item produces a **Pass**, **War
 - Are all agent files in `.github/agents/` syntactically valid with required YAML frontmatter?
 - Is the `Default-Project/` template unmodified (no accidental test changes)?
 
+### 10. Recurring Issue Tracking
+- Review findings from the previous maintenance log (if one exists in `docs/maintenance/`).
+- Check whether any previously proposed actions were NOT implemented.
+- Flag any issues that recur across multiple maintenance cycles — these indicate a rules gap, not just an execution failure.
+- For recurring issues: propose a specific rule change in the work-rules documentation, not just another cleanup action.
+
 ---
 
 ## Output — Maintenance Log
@@ -90,6 +96,7 @@ docs/maintenance/YYYY-MM-DD-maintenance.md
 | 7 | Test Coverage Gaps | Pass/Warning/Fail | <findings> |
 | 8 | Bug Tracking | Pass/Warning/Fail | <findings> |
 | 9 | Structural Integrity | Pass/Warning/Fail | <findings> |
+| 10 | Recurring Issue Tracking | Pass/Warning/Fail | <findings> |
 
 ## Proposed Actions
 

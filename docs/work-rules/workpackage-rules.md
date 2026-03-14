@@ -19,6 +19,8 @@ IDs use category prefixes followed by a three-digit number:
 | `SAF-xxx` | Safety |
 | `GUI-xxx` | GUI |
 | `DOC-xxx` | Documentation |
+| `FIX-xxx` | Fix / Bug Fix |
+| `MNT-xxx` | Maintenance |
 
 New categories may be introduced as the project evolves. Prefix must be uppercase, number zero-padded to three digits.
 
@@ -97,3 +99,33 @@ Workpackages must be broken into the **smallest atomic units** that can be imple
 - Instead of "Build safety gate" → `SAF-001: Core hook entry point`, `SAF-002: Zone enforcement logic`, `SAF-003: Tool parameter validation`
 
 If a Developer determines a WP is too large mid-implementation, they must stop, report to the Orchestrator, and request a split before continuing.
+
+## Decomposed Workpackages
+
+When a workpackage is too large and is split into sub-workpackages:
+
+1. The parent WP status remains `Done` with a comment listing all sub-WP IDs.
+2. The parent WP **must** have a `docs/workpackages/<WP-ID>/` folder containing a `dev-log.md` that documents the decomposition decision and lists all sub-WPs.
+3. The parent WP does **not** require a `test-report.md` — testing is handled by each sub-WP independently.
+4. All sub-WPs must reference the same User Story as the parent.
+5. The parent WP's `Comments` field must state: "Decomposed into sub-workpackages <list> — see sub-WPs for implementation."
+
+## Human-Performed Work
+
+When a workpackage is implemented by a human (not an AI agent):
+
+1. The human **must** still follow the status lifecycle: `Open → In Progress → Review → Done`.
+2. A `dev-log.md` must be created in the WP folder, even if brief.
+3. If no separate Tester review is performed, the human must create a retroactive `test-report.md` documenting:
+   - How the fix was verified (e.g., "verified via full test suite run")
+   - Whether a dedicated `tests/<WP-ID>/` directory is applicable
+4. Human-fix WPs that only modify test code or configuration (no production code) may be exempt from creating a dedicated test directory, but this exemption must be documented in the `test-report.md`.
+5. The `Assigned To` column must show who performed the work (e.g., "Human" or the person's name).
+
+## Cross-Reference Integrity
+
+When creating a new workpackage that references a User Story:
+
+1. **Update the User Story's `Linked WPs` column** in `user-stories.csv` to include the new WP ID in the same commit.
+2. This is mandatory — failing to do so creates cross-reference drift that must be caught and fixed during maintenance.
+3. When decomposing a WP into sub-WPs, update the parent User Story's `Linked WPs` to include all sub-WP IDs.

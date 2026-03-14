@@ -91,7 +91,8 @@ After the Tester marks a WP as Done, the Orchestrator (or the Tester if no Orche
 2. **Delete feature branch:** `git branch -d <branch-name>` (local) and `git push origin --delete <branch-name>` (remote)
 3. **Cascade US status:** Check `docs/user-stories/user-stories.csv` — if ALL linked WPs for the parent User Story are now Done, set the User Story status to `Done`.
 4. **Cascade Bug status:** Check `docs/bugs/bugs.csv` — if the WP is listed in any bug's `Fixed In WP` column and the bug is Open, update the bug status to `Closed`.
-5. **Architecture sync:** If any new directories or files were added to the project structure, update `docs/architecture.md` to reflect the current layout.
+5. **Architecture sync (mandatory):** Compare the actual directory layout against `docs/architecture.md`. If ANY discrepancy exists (new directories, renamed folders, removed items), update the document immediately. This step has been historically skipped — treat it as a blocking requirement before proceeding to the next WP.
+6. **Post-merge verification:** After merging and branch deletion, run `git branch -r --merged main` to confirm no stale merged branches remain. If any are found, delete them immediately.
 
 These steps are mandatory. Skipping them causes maintenance debt that accumulates across sessions.
 
