@@ -13,7 +13,7 @@ from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT
 from launcher.core.updater import check_for_update
 from launcher.core.downloader import download_update
 from launcher.core.applier import apply_update
-from launcher.core.project_creator import create_project, list_templates
+from launcher.core.project_creator import create_project, is_template_ready, list_templates
 from launcher.core.vscode import find_vscode, open_in_vscode
 from launcher.gui.components import make_browse_row, make_label_entry_row
 from launcher.gui.validation import (
@@ -44,6 +44,9 @@ class App:
         self._window.configure(fg_color=COLOR_PRIMARY)
         # Tracks the latest available version so the install handler can use it.
         self._latest_version: str = VERSION
+        # Initialized before _build_ui so the dropdown builder can populate them.
+        self._coming_soon_options: set[str] = set()
+        self._current_template: str = ""
         self._build_ui()
         # Set window icon from TS-Logo.png (GUI-013).
         try:
@@ -58,7 +61,18 @@ class App:
 
     def _get_template_options(self) -> list[str]:
         names = list_templates(TEMPLATES_DIR)
-        return [_format_template_name(n) for n in names]
+        all_options: list[str] = []
+        coming_soon: set[str] = set()
+        for name in names:
+            display = _format_template_name(name)
+            if not is_template_ready(TEMPLATES_DIR, name):
+                display = f"{display} ...coming soon"
+                coming_soon.add(display)
+            all_options.append(display)
+        # Store coming-soon set as a side effect so _build_ui and _on_template_selected
+        # can access it without a second scan.
+        self._coming_soon_options = coming_soon
+        return all_options
 
     def _build_ui(self) -> None:
         """Construct and arrange all UI widgets."""
@@ -106,13 +120,20 @@ class App:
         ctk.CTkLabel(
             self._window, text="Project Type:", anchor="w", text_color=COLOR_TEXT,
         ).grid(row=3, column=0, padx=(20, 8), pady=12, sticky="w")
+        options = self._get_template_options()  # also populates self._coming_soon_options
+        ready_options = [o for o in options if o not in self._coming_soon_options]
+        # Default to the first ready template so coming-soon items are never pre-selected.
+        self._current_template = ready_options[0] if ready_options else (options[0] if options else "")
         self.project_type_dropdown = ctk.CTkOptionMenu(
             self._window,
-            values=self._get_template_options(),
+            values=options if options else [""],
+            command=self._on_template_selected,
             fg_color=COLOR_SECONDARY,
             button_color=COLOR_SECONDARY,
             text_color=COLOR_TEXT,
         )
+        if self._current_template:
+            self.project_type_dropdown.set(self._current_template)
         self.project_type_dropdown.grid(
             row=3, column=1, columnspan=2, padx=(0, 20), pady=12, sticky="ew"
         )
@@ -230,6 +251,13 @@ class App:
         if folder:
             self.destination_entry.delete(0, "end")
             self.destination_entry.insert(0, folder)
+
+    def _on_template_selected(self, value: str) -> None:
+        """Prevent selection of coming-soon templates by reverting to the previous valid choice."""
+        if value in self._coming_soon_options:
+            self.project_type_dropdown.set(self._current_template)
+            return
+        self._current_template = value
 
     def _on_create_project(self) -> None:
         """Handle Create Project button click."""

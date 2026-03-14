@@ -1034,3 +1034,22 @@ TST-1047,test_logo_label_placed_at_row_zero_columnspan_3,Unit,GUI-013,Pass,2026-
 TST-1048,test_pillow_in_pyproject_dependencies,Unit,GUI-013,Pass,2026-03-14,Windows 11 + Python 3.11,Pillow present in pyproject.toml [project] dependencies,Tester Agent GUI-013
 TST-1049,test_pillow_dependency_has_upper_version_bound,Unit,GUI-013,Pass,2026-03-14,Windows 11 + Python 3.11,Pillow dependency has upper bound (<12) preventing silent breaking upgrades,Tester Agent GUI-013
 TST-1050,Full regression suite (1907 passed 29 skipped 1 pre-existing fail) - GUI-013 Tester final run,Regression,GUI-013,Pass,2026-03-14,Windows 11 + Python 3.11,1907 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 18 GUI-013 tests (8 dev + 10 Tester); zero regressions,Tester Agent final run — PASS verdict
+TST-1051,test_ready_when_directory_has_multiple_files,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,is_template_ready True for dir with multiple files,Developer Agent GUI-014
+TST-1052,test_not_ready_when_only_readme,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,is_template_ready False for dir with only README.md,Developer Agent GUI-014
+TST-1053,test_not_ready_for_nonexistent_directory,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,is_template_ready False for non-existent dir,Developer Agent GUI-014
+TST-1054,test_ready_when_directory_has_single_non_readme_file,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Single non-README file - ready,Developer Agent GUI-014
+TST-1055,test_not_ready_for_empty_directory,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Empty dir - not ready,Developer Agent GUI-014
+TST-1056,test_ready_when_only_subdirectory_present,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Subdirectory counts as content - ready,Developer Agent GUI-014
+TST-1057,test_not_ready_with_readme_only_case_exact,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Case-exact README.md check,Developer Agent GUI-014
+TST-1058,test_coming_soon_label_appended_to_unready,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Coming-soon suffix appended to unready templates,Developer Agent GUI-014
+TST-1059,test_ready_template_has_no_coming_soon_label,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Ready template has no coming-soon suffix,Developer Agent GUI-014
+TST-1060,test_returns_both_ready_and_coming_soon,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Both ready and coming-soon templates in options,Developer Agent GUI-014
+TST-1061,test_coming_soon_set_contains_only_unready_display_names,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,_coming_soon_options set contains only unready names,Developer Agent GUI-014
+TST-1062,test_default_template_is_first_ready_option,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Default _current_template is first ready option,Developer Agent GUI-014
+TST-1063,test_default_does_not_select_coming_soon,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Default selection never a coming-soon item,Developer Agent GUI-014
+TST-1064,test_coming_soon_options_set_populated,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,_coming_soon_options set populated on App init,Developer Agent GUI-014
+TST-1065,test_revert_on_coming_soon_selection,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Selecting coming-soon item reverts dropdown,Developer Agent GUI-014
+TST-1066,test_valid_selection_updates_current_template,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,Valid selection updates _current_template,Developer Agent GUI-014
+TST-1067,test_coming_soon_selection_does_not_update_current_template,Unit,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,State not mutated on coming-soon selection,Developer Agent GUI-014
+TST-1068,test_on_create_project_uses_current_template,Integration,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,create_project uses _current_template path,Developer Agent GUI-014
+TST-1069,Full regression suite (1925 passed 29 skipped 1 pre-existing fail) - GUI-014 dev final run,Regression,GUI-014,Pass,2026-03-14,Windows 11 + Python 3.11,1925 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 18 GUI-014 tests all pass; zero regressions,Developer Agent final run

@@ -79,7 +79,9 @@ class TestGetTemplateOptions:
     def test_with_two_subdirs(self):
         with _mock_list_templates(["coding", "creative-marketing"]):
             result = self._app()._get_template_options()
-        assert result == ["Coding", "Creative Marketing"]
+        # coding is ready; creative-marketing only has README.md so gets ' ...coming soon'
+        assert "Coding" in result
+        assert any("Creative Marketing" in entry for entry in result)
 
     def test_with_single_subdir(self):
         with _mock_list_templates(["coding"]):
@@ -101,7 +103,9 @@ class TestGetTemplateOptions:
     def test_results_preserve_order_from_list_templates(self):
         with _mock_list_templates(["aaa-first", "mmm-middle", "zzz-last"]):
             result = self._app()._get_template_options()
-        assert result == ["Aaa First", "Mmm Middle", "Zzz Last"]
+        # Order must be preserved; fake names don't exist so they get ' ...coming soon'.
+        display_names = [entry.replace(" ...coming soon", "") for entry in result]
+        assert display_names == ["Aaa First", "Mmm Middle", "Zzz Last"]
 
 
 # ---------------------------------------------------------------------------
@@ -156,7 +160,8 @@ class TestDropdownDynamicLoading:
         call_kwargs = _CTK_MOCK.CTkOptionMenu.call_args
         values_arg = call_kwargs[1].get("values") or call_kwargs[0][1]
         assert "Coding" in values_arg
-        assert "Creative Marketing" in values_arg
+        # creative-marketing only has README.md → shown with coming-soon label
+        assert any("Creative Marketing" in v for v in values_arg)
 
     def test_adding_new_template_dir_changes_options(self):
         """A new subdirectory injected into list_templates output appears in options."""
@@ -168,14 +173,16 @@ class TestDropdownDynamicLoading:
         _CTK_MOCK.reset_mock()
         with _mock_list_templates(["coding", "data-science"]):
             after = App()._get_template_options()
-        assert "Data Science" in after
+        assert any("Data Science" in entry for entry in after)
 
     def test_dropdown_values_not_hardcoded(self):
         """With a custom list_templates result, dropdown changes — proving it is dynamic."""
         _CTK_MOCK.reset_mock()
         with _mock_list_templates(["my-custom-type"]):
             result = App()._get_template_options()
-        assert result == ["My Custom Type"]
+        # Custom name doesn't exist in real TEMPLATES_DIR → is_template_ready returns
+        # False → displayed with coming-soon label; base name must still appear.
+        assert any("My Custom Type" in entry for entry in result)
 
 
 # ---------------------------------------------------------------------------
@@ -206,10 +213,11 @@ class TestTemplateDirPresence:
         assert "Coding" in result
 
     def test_real_templates_dir_options_contain_creative_marketing(self):
-        """_get_template_options() with the real templates dir includes ''Creative Marketing''."""
+        """_get_template_options() with the real templates dir includes a ''Creative Marketing'' entry."""
         _CTK_MOCK.reset_mock()
         result = App()._get_template_options()
-        assert "Creative Marketing" in result
+        # creative-marketing only has README.md so it gets a ' ...coming soon' label.
+        assert any("Creative Marketing" in option for option in result)
 
 
 # ---------------------------------------------------------------------------

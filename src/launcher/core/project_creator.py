@@ -50,3 +50,13 @@ def list_templates(templates_dir: Path) -> list[str]:
     if not isinstance(templates_dir, Path) or not templates_dir.is_dir():
         return []
     return sorted(entry.name for entry in templates_dir.iterdir() if entry.is_dir())
+
+
+def is_template_ready(templates_dir: Path, template_name: str) -> bool:
+    """Return True if the template directory has files beyond just README.md."""
+    template_path = templates_dir / template_name
+    if not template_path.is_dir():
+        return False
+    contents = [f.name for f in template_path.iterdir()]
+    # A template is ready if it has more than just README.md
+    return len(contents) > 1 or (len(contents) == 1 and contents[0] != "README.md")
