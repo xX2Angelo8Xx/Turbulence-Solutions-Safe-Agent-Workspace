@@ -816,3 +816,30 @@ TST-688,test_on_install_update_disables_button,Integration,INS-011,Pass,2026-03-
 TST-689,test_on_install_error_restores_button,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,button restored on install error,
 TST-690,test_download_update_imported_in_app,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,download_update imported in app.py,
 TST-691,test_apply_update_imported_in_app,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,apply_update imported in app.py,
+TST-692,test_no_shell_true_in_source,Security,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,applier.py source contains zero occurrences of shell=True,Tester Agent INS-011
+TST-693,test_all_subprocess_calls_use_shell_false,Security,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,every shell= assignment in applier.py is shell=False,Tester Agent INS-011
+TST-694,test_no_eval_or_exec_in_source,Security,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,eval() and exec() absent from applier.py source,Tester Agent INS-011
+TST-695,test_linux2_dispatches_to_apply_linux,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,linux2 (legacy Linux platform string) dispatches to _apply_linux,Tester Agent INS-011
+TST-696,test_linux_arm_dispatches_to_apply_linux,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,linux-arm platform string dispatches to _apply_linux,Tester Agent INS-011
+TST-697,test_apply_update_dispatches_exactly_once,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,platform handler invoked exactly once — no double dispatch,Tester Agent INS-011
+TST-698,test_windows_path_with_spaces,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,installer path with spaces preserved as single list arg (no shell splitting),Tester Agent INS-011
+TST-699,test_windows_path_with_unicode,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,installer path with unicode characters handled correctly,Tester Agent INS-011
+TST-700,test_validate_accepts_regular_file,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,regular file passes _validate_installer_path,Tester Agent INS-011
+TST-701,test_validate_rejects_empty_file,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,empty file still passes validation (size not checked — by design),Tester Agent INS-011
+TST-702,test_validate_rejects_nested_directory,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,nested directory raises ValueError,Tester Agent INS-011
+TST-703,test_macos_nobrowse_flag_in_attach,Security,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,-nobrowse present in hdiutil attach args — prevents DMG sidebar entry,Tester Agent INS-011
+TST-704,test_macos_installer_path_passed_to_hdiutil,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,actual DMG path passed to hdiutil attach,Tester Agent INS-011
+TST-705,test_macos_mount_point_uses_mkdtemp_not_volumes,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,mount point from tempfile.mkdtemp with ts_update prefix — not /Volumes,Tester Agent INS-011
+TST-706,test_find_app_bundle_with_multiple_app_dirs,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,multiple .app dirs in DMG — first is returned without error,Tester Agent INS-011
+TST-707,test_macos_rsync_source_has_trailing_slash,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,rsync source arg ends with / for correct directory sync,Tester Agent INS-011
+TST-708,test_macos_dest_is_under_applications,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,rsync destination starts with /Applications/,Tester Agent INS-011
+TST-709,test_linux_execv_passes_sys_argv,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,os.execv receives sys.argv to preserve CLI args on relaunch,Tester Agent INS-011
+TST-710,test_linux_execv_target_matches_os_replace_destination,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,os.execv path equals os.replace destination (same binary location),Tester Agent INS-011
+TST-711,test_linux_chmod_sets_all_exec_bits,Unit,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,S_IXUSR + S_IXGRP + S_IXOTH all set on AppImage,Tester Agent INS-011
+TST-712,test_install_button_hidden_on_startup,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,download_install_button hidden until update detected,Tester Agent INS-011
+TST-713,test_install_button_shows_only_when_update_available,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,button not shown when update_available=False,Tester Agent INS-011
+TST-714,test_on_install_update_disables_button_before_thread,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,button set to state=disabled synchronously before thread starts,Tester Agent INS-011
+TST-715,test_on_install_error_restores_to_normal_state,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,button state=normal and Install text restored after error,Tester Agent INS-011
+TST-716,test_apply_update_result_updates_latest_version_tracking,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,_latest_version updated to new version when update available,Tester Agent INS-011
+TST-717,test_apply_update_result_does_not_update_version_when_up_to_date,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,_latest_version not overwritten when update_available=False,Tester Agent INS-011
+TST-718,Full regression suite (1659 tests) — INS-011 Tester final run,Regression,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,1659 passed / 2 skipped / 0 failed — 40 Dev + 26 Tester edge-case tests; zero regressions,Tester Agent INS-011 — PASS verdict
