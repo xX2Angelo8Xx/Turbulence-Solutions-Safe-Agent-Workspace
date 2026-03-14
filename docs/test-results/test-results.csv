@@ -868,3 +868,20 @@ TST-739,test_workflow_file_is_utf8_without_bom,Unit,INS-013,Pass,2026-03-14,Wind
 TST-740,test_tag_trigger_pattern_is_exact_semver_glob,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,Tags list is exactly [v*.*.*],Tester Agent INS-013
 TST-741,test_no_branch_trigger_present,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,No push.branches trigger present,Tester Agent INS-013
 TST-742,Full regression suite (1683 tests) - INS-013 Tester final run,Regression,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,1683 passed / 2 skipped / 0 failed - 12 dev + 12 Tester edge-case tests; zero regressions,Tester Agent INS-013 - PASS verdict
+TST-743,test_windows_build_job_exists,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,windows-build job present in workflow,Developer Agent INS-014
+TST-744,test_windows_build_runs_on_windows_latest,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,runs-on is windows-latest,Developer Agent INS-014
+TST-745,test_windows_build_job_has_7_steps,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,windows-build has exactly 7 steps,Developer Agent INS-014
+TST-746,test_windows_build_checkout_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,actions/checkout@v4 step present,Developer Agent INS-014
+TST-747,test_windows_build_python_setup_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,actions/setup-python@v5 step present,Developer Agent INS-014
+TST-748,test_windows_build_python_version_is_311,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,python-version is '3.11',Developer Agent INS-014
+TST-749,test_windows_build_install_dependencies_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,Install dependencies step present,Developer Agent INS-014
+TST-750,test_windows_build_pip_install_command,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,pip install -e .[dev] command correct,Developer Agent INS-014
+TST-751,test_windows_build_pyinstaller_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,Build with PyInstaller step present,Developer Agent INS-014
+TST-752,test_windows_build_pyinstaller_references_launcher_spec,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,pyinstaller command references launcher.spec,Developer Agent INS-014
+TST-753,test_windows_build_inno_setup_install_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,Install Inno Setup step present,Developer Agent INS-014
+TST-754,test_windows_build_choco_command,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,choco install innosetup -y present,Developer Agent INS-014
+TST-755,test_windows_build_iscc_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,Build installer step present,Developer Agent INS-014
+TST-756,test_windows_build_iscc_references_setup_iss,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,iscc references src/installer/windows/setup.iss,Developer Agent INS-014
+TST-757,test_windows_build_upload_artifact_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,actions/upload-artifact@v4 step present,Developer Agent INS-014
+TST-758,test_windows_build_artifact_name_and_path,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,artifact name=windows-installer path=AgentEnvironmentLauncher-Setup.exe,Developer Agent INS-014
+TST-759,Full regression suite (1699 tests) - INS-014 Developer run,Regression,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,1699 passed / 2 skipped / 0 failed - 16 INS-014 tests; zero regressions,Developer Agent INS-014
