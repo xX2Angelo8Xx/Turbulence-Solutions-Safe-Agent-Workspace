@@ -885,3 +885,15 @@ TST-756,test_windows_build_iscc_references_setup_iss,Unit,INS-014,Pass,2026-03-1
 TST-757,test_windows_build_upload_artifact_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,actions/upload-artifact@v4 step present,Developer Agent INS-014
 TST-758,test_windows_build_artifact_name_and_path,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,artifact name=windows-installer path=AgentEnvironmentLauncher-Setup.exe,Developer Agent INS-014
 TST-759,Full regression suite (1699 tests) - INS-014 Developer run,Regression,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,1699 passed / 2 skipped / 0 failed - 16 INS-014 tests; zero regressions,Developer Agent INS-014
+TST-760,test_no_shell_override_in_any_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,No shell: override in any windows-build step,Tester Agent INS-014
+TST-761,test_artifact_no_retention_days,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,upload-artifact does not set retention-days,Tester Agent INS-014
+TST-762,test_all_run_steps_have_human_readable_names,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,All run: steps have a non-empty name:,Tester Agent INS-014
+TST-763,test_no_secrets_referenced_in_windows_build_steps,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,No ${{ secrets.* }} in any windows-build step,Tester Agent INS-014
+TST-764,test_artifact_path_matches_inno_setup_output_directory,Unit,INS-014,Fail,2026-03-14,Windows 11 + Python 3.11,BUG-034: artifact path Output/... does not match Inno Setup output src/installer/windows/Output/...,Tester Agent INS-014
+TST-765,test_setup_iss_exists_at_path_referenced_by_iscc,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,setup.iss file exists at src/installer/windows/setup.iss,Tester Agent INS-014
+TST-766,test_setup_iss_has_no_explicit_output_dir,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,No OutputDir directive in setup.iss — Inno Setup default applies,Tester Agent INS-014
+TST-767,test_python_version_is_string_not_float,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,python-version is a string type not a float,Tester Agent INS-014
+TST-768,test_checkout_is_first_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,actions/checkout@v4 is the first step,Tester Agent INS-014
+TST-769,test_upload_artifact_is_last_step,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,actions/upload-artifact@v4 is the last step,Tester Agent INS-014
+TST-770,test_no_user_controlled_values_in_env,Unit,INS-014,Pass,2026-03-14,Windows 11 + Python 3.11,No github.event injected into env: blocks,Tester Agent INS-014
+TST-771,Full regression suite (1699 tests) - INS-014 Tester run,Regression,INS-014,Fail,2026-03-14,Windows 11 + Python 3.11,1699 pass 2 skip 0 fail other; 26/27 INS-014 tests pass; 1 fail (BUG-034 artifact path),Tester Agent INS-014
