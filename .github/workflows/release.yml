@@ -93,6 +93,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Install libfuse2
+        run: sudo apt-get update && sudo apt-get install -y libfuse2
+
+      - name: Build with PyInstaller
+        run: pyinstaller launcher.spec
+
+      - name: Build AppImage
+        run: |
+          chmod +x src/installer/linux/build_appimage.sh
+          src/installer/linux/build_appimage.sh x86_64
+
+      - name: Upload Linux AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-appimage
+          path: dist/*.AppImage
+
   release:
     needs: [windows-build, macos-intel-build, macos-arm-build, linux-build]
     runs-on: ubuntu-latest
