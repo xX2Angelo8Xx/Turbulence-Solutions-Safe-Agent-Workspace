@@ -1,5 +1,6 @@
 """Application-wide constants for the Turbulence Solutions Launcher."""
 
+import sys
 from pathlib import Path
 
 APP_NAME: str = "Turbulence Solutions Launcher"
@@ -7,7 +8,13 @@ VERSION: str = "1.0.0"
 COLOR_PRIMARY: str = "#0A1D4E"
 COLOR_SECONDARY: str = "#5BC5F2"
 COLOR_TEXT: str = "#FFFFFF"
-TEMPLATES_DIR: Path = Path(__file__).resolve().parent.parent.parent / "templates"
+
+# PyInstaller bundles templates/ at _MEIPASS/templates/.
+# In development, templates/ is at repo_root/templates/ (3 levels up from config.py).
+if getattr(sys, '_MEIPASS', None):
+    TEMPLATES_DIR: Path = Path(sys._MEIPASS) / "templates"
+else:
+    TEMPLATES_DIR: Path = Path(__file__).resolve().parent.parent.parent / "templates"
 
 GITHUB_REPO_OWNER: str = "xX2Angelo8Xx"
 GITHUB_REPO_NAME: str = "Turbulence-Solutions-Safe-Agent-Workspace"
