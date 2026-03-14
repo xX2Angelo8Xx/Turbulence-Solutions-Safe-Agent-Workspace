@@ -11,6 +11,8 @@ import customtkinter as ctk
 
 from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, TEMPLATES_DIR, VERSION, get_display_version
 from launcher.core.updater import check_for_update
+from launcher.core.downloader import download_update
+from launcher.core.applier import apply_update
 from launcher.core.project_creator import create_project, list_templates
 from launcher.core.vscode import find_vscode, open_in_vscode
 from launcher.gui.components import make_browse_row, make_label_entry_row
@@ -40,6 +42,8 @@ class App:
         self._window.geometry(f"{_WINDOW_WIDTH}x{_WINDOW_HEIGHT}")
         self._window.resizable(False, False)
         self._window.configure(fg_color=COLOR_PRIMARY)
+        # Tracks the latest available version so the install handler can use it.
+        self._latest_version: str = VERSION
         self._build_ui()
         # Silent background update check on launch (GUI-009).
         threading.Thread(target=self._run_update_check, daemon=True).start()
@@ -164,6 +168,21 @@ class App:
         )
         self.update_banner.grid_remove()
 
+        # Download & Install Update button (INS-011) -- shown only when update available.
+        self.download_install_button = ctk.CTkButton(
+            self._window,
+            text="Download & Install Update",
+            command=self._on_install_update,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
+            text_color=COLOR_TEXT,
+            height=32,
+        )
+        self.download_install_button.grid(
+            row=9, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+        )
+        self.download_install_button.grid_remove()
+
         # Version label -- non-editable, always visible, shows installed version.
         # place() is used so it does not disturb the grid layout of other rows.
         self.version_label = ctk.CTkLabel(
@@ -247,15 +266,19 @@ class App:
         self._window.after(0, lambda: self._apply_update_result(update_available, latest_version))
 
     def _apply_update_result(self, update_available: bool, latest_version: str, manual: bool = False) -> None:
-        """Update the banner widget. Must be called on the main Tk thread."""
+        """Update the banner and install button. Must be called on the main Tk thread."""
         if update_available:
+            self._latest_version = latest_version
             self.update_banner.configure(text=f"Update available: v{latest_version}")
             self.update_banner.grid()
+            self.download_install_button.grid()
         elif manual:
             self.update_banner.configure(text="You're up to date.")
             self.update_banner.grid()
+            self.download_install_button.grid_remove()
         else:
             self.update_banner.grid_remove()
+            self.download_install_button.grid_remove()
 
     def _on_check_for_updates(self) -> None:
         """Handle Check for Updates button click (GUI-010)."""
@@ -271,6 +294,44 @@ class App:
         """Restore button state and apply the result of a manual update check."""
         self.check_updates_button.configure(state="normal", text="Check for Updates")
         self._apply_update_result(update_available, latest_version, manual=True)
+
+    def _on_install_update(self) -> None:
+        """Handle Download & Install Update button click (INS-011).
+
+        Runs the download in a background thread to keep the UI responsive,
+        then calls apply_update() on success.  Errors are surfaced to the user
+        via a messagebox rather than crashing silently.
+        """
+        version = self._latest_version
+        self.download_install_button.configure(
+            state="disabled", text="Downloading..."
+        )
+
+        def _download_and_apply() -> None:
+            try:
+                installer_path = download_update(version)
+            except Exception as exc:  # noqa: BLE001
+                self._window.after(
+                    0,
+                    lambda: self._on_install_error(f"Download failed: {exc}"),
+                )
+                return
+            try:
+                apply_update(installer_path)
+            except Exception as exc:  # noqa: BLE001
+                self._window.after(
+                    0,
+                    lambda: self._on_install_error(f"Install failed: {exc}"),
+                )
+
+        threading.Thread(target=_download_and_apply, daemon=True).start()
+
+    def _on_install_error(self, message: str) -> None:
+        """Restore the install button and show an error dialog."""
+        self.download_install_button.configure(
+            state="normal", text="Download & Install Update"
+        )
+        messagebox.showerror("Update Failed", message)
 
     def run(self) -> None:
         """Start the application event loop."""
