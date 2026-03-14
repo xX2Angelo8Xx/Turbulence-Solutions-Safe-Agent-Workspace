@@ -1076,3 +1076,17 @@ TST-1089,test_build_appimage_does_not_contain_old_version,Unit,FIX-014,Pass,2026
 TST-1090,test_all_five_versions_are_identical,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,All 5 version strings are identical,
 TST-1091,test_all_versions_equal_expected,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,All 5 versions equal 1.0.1,
 TST-1092,Full regression suite (1946 passed 29 skipped 1 pre-existing fail) - FIX-014 Developer run,Regression,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,1946 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 12 FIX-014 tests all pass; zero regressions,Developer Agent FIX-014
+TST-1093,test_get_display_version_fallback_when_package_not_installed,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,get_display_version() returns VERSION constant when package not installed,Tester Agent FIX-014 edge-case
+TST-1094,test_get_display_version_returns_non_empty_string,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,get_display_version() fallback path returns non-empty string,Tester Agent FIX-014 edge-case
+TST-1095,test_config_version_is_semver,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,config.py VERSION matches semver X.Y.Z format,Tester Agent FIX-014 edge-case
+TST-1096,test_pyproject_version_is_semver,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,pyproject.toml version matches semver X.Y.Z format,Tester Agent FIX-014 edge-case
+TST-1097,test_setup_iss_version_is_semver,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,setup.iss MyAppVersion matches semver X.Y.Z format,Tester Agent FIX-014 edge-case
+TST-1098,test_build_dmg_version_is_semver,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_dmg.sh APP_VERSION matches semver X.Y.Z format,Tester Agent FIX-014 edge-case
+TST-1099,test_build_appimage_version_is_semver,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_appimage.sh APP_VERSION matches semver X.Y.Z format,Tester Agent FIX-014 edge-case
+TST-1100,test_no_stale_version_in_config_py,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,config.py contains no stale 1.0.0 string,Tester Agent FIX-014 edge-case
+TST-1101,test_no_stale_version_in_pyproject,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,pyproject.toml contains no stale 1.0.0 string,Tester Agent FIX-014 edge-case
+TST-1102,test_no_stale_version_in_setup_iss,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,setup.iss contains no stale 1.0.0 string,Tester Agent FIX-014 edge-case
+TST-1103,test_no_stale_version_in_build_dmg,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_dmg.sh contains no stale 1.0.0 string,Tester Agent FIX-014 edge-case
+TST-1104,test_no_stale_version_in_build_appimage,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_appimage.sh contains no stale 1.0.0 string,Tester Agent FIX-014 edge-case
+TST-1105,test_no_stale_version_across_launcher_python_sources,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,No Python source in src/launcher/ contains stale 1.0.0 string,Tester Agent FIX-014 edge-case
+TST-1106,Full regression suite (1959 passed 29 skipped 1 pre-existing fail) - FIX-014 Tester final run,Regression,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,1959 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 25 FIX-014 tests all pass; zero regressions,Tester Agent final run - PASS verdict
