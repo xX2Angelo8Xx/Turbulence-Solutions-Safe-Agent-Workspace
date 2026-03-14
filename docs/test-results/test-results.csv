@@ -927,3 +927,6 @@ TST-940,test_app_window_height_is_520,Unit,FIX-007,Pass,2026-03-13,Windows 11 + 
 TST-941,test_no_duplicate_tst_ids,Unit,FIX-009,Pass,2026-03-14,Windows 11 + Python 3.11,Pass,All 925 TST-IDs unique after deduplication
 TST-942,test_tst_id_format,Unit,FIX-009,Pass,2026-03-14,Windows 11 + Python 3.11,Pass,All IDs match TST-NNN format
 TST-943,test_required_fields_not_empty,Unit,FIX-009,Pass,2026-03-14,Windows 11 + Python 3.11,Pass,No empty required fields
+TST-944,test_tst_ids_sequential_no_gaps_in_renumbered_range,Unit,FIX-009,Pass,2026-03-14,Windows 11 + Python 3.11,Pass,Tester edge-case: TST-786 to TST-943 form a contiguous sequence with no gaps
+TST-945,test_wp_reference_not_empty_for_all_rows,Unit,FIX-009,Pass,2026-03-14,Windows 11 + Python 3.11,Pass,Tester edge-case: all 928 rows have a non-blank WP Reference
+TST-946,test_all_run_dates_are_valid_iso8601,Unit,FIX-009,Pass,2026-03-14,Windows 11 + Python 3.11,Pass,Tester edge-case: all 928 Run Date values are valid ISO 8601 calendar dates
