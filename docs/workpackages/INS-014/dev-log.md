@@ -72,3 +72,28 @@ All 16 INS-014 tests pass. Full regression suite: 1699 passed / 2 skipped / 0 fa
 
 - The CI job will only run on GitHub Actions (windows-latest runner). Local validation is YAML-only.
 - Python version is pinned to '3.11' (string), matching GitHub Actions convention.
+
+---
+
+## Iteration 2 — BUG-034 Fix (2026-03-14)
+
+### Tester Findings Addressed
+
+**BUG-034**: Artifact path in upload-artifact step was Output/AgentEnvironmentLauncher-Setup.exe
+(repo-root-relative). Inno Setup resolves OutputDir relative to the .iss script file's
+directory (src/installer/windows/), so the EXE is actually written to
+src/installer/windows/Output/AgentEnvironmentLauncher-Setup.exe.
+
+### Changes Made
+
+**.github/workflows/release.yml**
+- path: Output/AgentEnvironmentLauncher-Setup.exe  →  path: src/installer/windows/Output/AgentEnvironmentLauncher-Setup.exe
+
+**	ests/INS-014/test_ins014_windows_build_job.py**
+- 	est_windows_build_artifact_name_and_path: replaced in substring check on filename with exact
+  equality assertion on the full path string src/installer/windows/Output/AgentEnvironmentLauncher-Setup.exe.
+
+### Test Results
+
+- INS-014 suite: **27 / 27 pass** (16 developer + 11 Tester edge-case)
+- Full regression suite: **1710 passed, 2 skipped, 0 failed**

@@ -141,9 +141,9 @@ def test_windows_build_artifact_name_and_path(windows_steps):
             assert artifact_with.get("name") == "windows-installer", (
                 f"Expected artifact name 'windows-installer', got: {artifact_with.get('name')!r}"
             )
-            path = artifact_with.get("path", "")
-            assert "AgentEnvironmentLauncher-Setup.exe" in path, (
-                f"Expected AgentEnvironmentLauncher-Setup.exe in path, got: {path!r}"
+            expected_path = "src/installer/windows/Output/AgentEnvironmentLauncher-Setup.exe"
+            assert artifact_with.get("path") == expected_path, (
+                f"Expected artifact path {expected_path!r}, got: {artifact_with.get('path')!r}"
             )
             return
     pytest.fail("No upload-artifact step found")
