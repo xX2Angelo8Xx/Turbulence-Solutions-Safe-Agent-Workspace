@@ -62,9 +62,9 @@ def test_macos_arm_job_exists(workflow):
 # Runner labels
 # ---------------------------------------------------------------------------
 
-def test_macos_intel_runs_on_macos13(intel_job):
-    """macos-intel-build must use the macos-13 runner."""
-    assert intel_job["runs-on"] == "macos-13"
+def test_macos_intel_runs_on_macos15(intel_job):
+    """macos-intel-build must use the macos-15 runner."""
+    assert intel_job["runs-on"] == "macos-15"
 
 
 def test_macos_arm_runs_on_macos14(arm_job):
@@ -76,18 +76,18 @@ def test_macos_arm_runs_on_macos14(arm_job):
 # Step count
 # ---------------------------------------------------------------------------
 
-def test_macos_intel_has_6_steps(intel_steps):
-    """macos-intel-build must have exactly 6 steps."""
-    assert len(intel_steps) == 6, (
-        f"Expected 6 steps, got {len(intel_steps)}: "
+def test_macos_intel_has_5_steps(intel_steps):
+    """macos-intel-build must have exactly 5 steps."""
+    assert len(intel_steps) == 5, (
+        f"Expected 5 steps, got {len(intel_steps)}: "
         + str([s.get("name") or s.get("uses") for s in intel_steps])
     )
 
 
-def test_macos_arm_has_6_steps(arm_steps):
-    """macos-arm-build must have exactly 6 steps."""
-    assert len(arm_steps) == 6, (
-        f"Expected 6 steps, got {len(arm_steps)}: "
+def test_macos_arm_has_5_steps(arm_steps):
+    """macos-arm-build must have exactly 5 steps."""
+    assert len(arm_steps) == 5, (
+        f"Expected 5 steps, got {len(arm_steps)}: "
         + str([s.get("name") or s.get("uses") for s in arm_steps])
     )
 
@@ -174,26 +174,32 @@ def test_macos_arm_install_deps(arm_steps):
 # PyInstaller step
 # ---------------------------------------------------------------------------
 
-def test_macos_intel_pyinstaller_step(intel_steps):
-    """macos-intel-build must have 'Build with PyInstaller' step referencing launcher.spec."""
-    for step in intel_steps:
-        if step.get("name") == "Build with PyInstaller":
-            cmd = step.get("run", "")
-            assert "pyinstaller" in cmd
-            assert "launcher.spec" in cmd
-            return
-    pytest.fail("'Build with PyInstaller' step not found in macos-intel-build")
+def test_macos_intel_no_standalone_pyinstaller_step(intel_steps):
+    """macos-intel-build must NOT have a standalone 'Build with PyInstaller' step.
+
+    PyInstaller is invoked by build_dmg.sh with --target-arch; a standalone
+    pyinstaller step would run before the script and pre-populate dist/launcher/,
+    causing the script to skip the --target-arch build.
+    """
+    names = [s.get("name", "") for s in intel_steps]
+    assert "Build with PyInstaller" not in names, (
+        "macos-intel-build must not have a standalone 'Build with PyInstaller' step; "
+        "PyInstaller is invoked with --target-arch inside build_dmg.sh"
+    )
 
 
-def test_macos_arm_pyinstaller_step(arm_steps):
-    """macos-arm-build must have 'Build with PyInstaller' step referencing launcher.spec."""
-    for step in arm_steps:
-        if step.get("name") == "Build with PyInstaller":
-            cmd = step.get("run", "")
-            assert "pyinstaller" in cmd
-            assert "launcher.spec" in cmd
-            return
-    pytest.fail("'Build with PyInstaller' step not found in macos-arm-build")
+def test_macos_arm_no_standalone_pyinstaller_step(arm_steps):
+    """macos-arm-build must NOT have a standalone 'Build with PyInstaller' step.
+
+    PyInstaller is invoked by build_dmg.sh with --target-arch; a standalone
+    pyinstaller step would run before the script and pre-populate dist/launcher/,
+    causing the script to skip the --target-arch build.
+    """
+    names = [s.get("name", "") for s in arm_steps]
+    assert "Build with PyInstaller" not in names, (
+        "macos-arm-build must not have a standalone 'Build with PyInstaller' step; "
+        "PyInstaller is invoked with --target-arch inside build_dmg.sh"
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -45,9 +45,9 @@ def test_linux_build_runs_on_ubuntu_latest(linux_job):
     )
 
 
-def test_linux_build_job_has_7_steps(linux_steps):
-    assert len(linux_steps) == 7, (
-        f"Expected 7 steps, got {len(linux_steps)}: "
+def test_linux_build_job_has_6_steps(linux_steps):
+    assert len(linux_steps) == 6, (
+        f"Expected 6 steps, got {len(linux_steps)}: "
         + str([s.get("name") or s.get("uses") for s in linux_steps])
     )
 
@@ -163,19 +163,30 @@ def test_linux_build_libfuse2_apt_get_update_before_install(linux_steps):
 # PyInstaller step
 # ---------------------------------------------------------------------------
 
-def test_linux_build_pyinstaller_step(linux_steps):
+def test_linux_build_no_standalone_pyinstaller_step(linux_steps):
+    """linux-build must NOT have a standalone 'Build with PyInstaller' step.
+
+    PyInstaller is invoked by build_appimage.sh; a standalone pyinstaller step
+    would pre-populate dist/launcher/ and cause the script to skip the build.
+    """
     names = [s.get("name", "") for s in linux_steps]
-    assert "Build with PyInstaller" in names, "Missing 'Build with PyInstaller' step"
+    assert "Build with PyInstaller" not in names, (
+        "linux-build must not have a standalone 'Build with PyInstaller' step"
+    )
 
 
-def test_linux_build_pyinstaller_references_launcher_spec(linux_steps):
+def test_linux_build_appimage_script_handles_pyinstaller(linux_steps):
+    """linux-build 'Build AppImage' step must invoke build_appimage.sh
+    which runs PyInstaller internally.
+    """
     for step in linux_steps:
-        if step.get("name") == "Build with PyInstaller":
+        if step.get("name") == "Build AppImage":
             cmd = step.get("run", "")
-            assert "pyinstaller" in cmd, f"Expected pyinstaller command, got: {cmd!r}"
-            assert "launcher.spec" in cmd, f"Expected launcher.spec, got: {cmd!r}"
+            assert "build_appimage.sh" in cmd, (
+                f"Expected build_appimage.sh in Build AppImage step, got: {cmd!r}"
+            )
             return
-    pytest.fail("'Build with PyInstaller' step not found")
+    pytest.fail("'Build AppImage' step not found")
 
 
 # ---------------------------------------------------------------------------
@@ -280,21 +291,21 @@ def _step_index(steps, name_or_uses: str) -> int:
 
 def test_linux_build_libfuse2_before_pyinstaller(linux_steps):
     libfuse_idx = _step_index(linux_steps, "Install libfuse2")
-    pyinstaller_idx = _step_index(linux_steps, "Build with PyInstaller")
+    appimage_idx = _step_index(linux_steps, "Build AppImage")
     assert libfuse_idx != -1, "'Install libfuse2' step not found"
-    assert pyinstaller_idx != -1, "'Build with PyInstaller' step not found"
-    assert libfuse_idx < pyinstaller_idx, (
-        "Install libfuse2 must appear before Build with PyInstaller"
+    assert appimage_idx != -1, "'Build AppImage' step not found"
+    assert libfuse_idx < appimage_idx, (
+        "Install libfuse2 must appear before Build AppImage"
     )
 
 
 def test_linux_build_pyinstaller_before_appimage(linux_steps):
-    pyinstaller_idx = _step_index(linux_steps, "Build with PyInstaller")
     appimage_idx = _step_index(linux_steps, "Build AppImage")
-    assert pyinstaller_idx != -1, "'Build with PyInstaller' step not found"
+    upload_idx = _step_index(linux_steps, "Upload Linux AppImage")
     assert appimage_idx != -1, "'Build AppImage' step not found"
-    assert pyinstaller_idx < appimage_idx, (
-        "Build with PyInstaller must appear before Build AppImage"
+    assert upload_idx != -1, "'Upload Linux AppImage' step not found"
+    assert appimage_idx < upload_idx, (
+        "Build AppImage must appear before Upload Linux AppImage"
     )
 
 

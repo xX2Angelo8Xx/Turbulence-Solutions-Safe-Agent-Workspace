@@ -70,8 +70,8 @@ def test_windows_build_runs_on(workflow):
 
 
 def test_macos_intel_runs_on(workflow):
-    """macos-intel-build must use macos-13 (Intel) runner."""
-    assert workflow["jobs"]["macos-intel-build"]["runs-on"] == "macos-13"
+    """macos-intel-build must use macos-15 (Intel x64) runner."""
+    assert workflow["jobs"]["macos-intel-build"]["runs-on"] == "macos-15"
 
 
 def test_macos_arm_runs_on(workflow):

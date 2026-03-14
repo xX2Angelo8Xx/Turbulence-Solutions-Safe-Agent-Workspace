@@ -63,11 +63,15 @@ class TestNoHardcodedPaths:
         )
 
     def test_source_path_is_relative_not_absolute(self):
-        """Source entry must use a relative path (dist\\launcher\\*), never an absolute path."""
+        """Source path must navigate from the .iss file up to the repo root using ..\\  segments."""
         content = read_iss()
-        # Confirm it is relative by checking the Source line starts with 'dist\'
-        assert re.search(r'Source:\s*"dist\\', content), (
-            "Source path must be relative, starting with 'dist\\'"
+        match = re.search(r'Source:\s*"([^"]+)"', content)
+        assert match, "No Source: path found"
+        source_val = match.group(1)
+        parts = [p for p in source_val.split("\\") if p]
+        assert parts[:3] == ["..", "..", ".."], (
+            f"Source path {source_val!r} must start with three ..\\  segments "
+            "to navigate from src/installer/windows/ to the repo root"
         )
 
     def test_default_dir_uses_autopf_not_direct_path(self):
