@@ -748,3 +748,21 @@ TST-620,test_popen_sentinel_blocks_code_insiders_string_form,Security,FIX-008,Pa
 TST-621,FIX-008 full suite (11 tests) + full regression,Regression,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,1567 passed / 2 skipped / 0 failed � all 11 FIX-008 tests green including code-insiders,FIX-008 Developer Iteration 2
 TST-622,FIX-008 full suite (11 tests) � Tester Iteration 2 independent verification,Security,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,11/11 pass � all Tester edge-case tests green (code-insiders list + string form now blocked by _VSCODE_CMDS),Tester Agent Iteration 2 � BUG-033 fix verified
 TST-623,Full regression (all tests) � Tester Iteration 2,Regression,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,1567 passed / 2 skipped / 0 failed � zero regressions; matches Developer log,Tester Agent Iteration 2 � full regression green
+TST-624,test_script_exists_default_project,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,update_hashes.py present in Default-Project hooks/scripts/,
+TST-625,test_script_exists_templates,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,update_hashes.py present in templates/coding hooks/scripts/,
+TST-626,test_script_is_valid_python,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,script compiles without syntax errors,
+TST-627,test_no_absolute_paths_in_script,Security,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,no hardcoded absolute paths in source,
+TST-628,test_sha256_file_valid,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,_sha256_file returns correct 64-char hex digest,
+TST-629,test_sha256_file_missing,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,_sha256_file raises FileNotFoundError on missing file,
+TST-630,test_canonical_gate_hash_zeros_gate_constant,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,canonical hash zeroes _KNOWN_GOOD_GATE_HASH value before hashing,
+TST-631,test_canonical_hash_independent_of_gate_hash_value,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,canonical hash identical regardless of initial gate hash,
+TST-632,test_patch_hash_settings,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,_patch_hash correctly replaces settings hash in content bytes,
+TST-633,test_patch_hash_gate,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,_patch_hash correctly replaces gate hash in content bytes,
+TST-634,test_patch_hash_raises_when_pattern_missing,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,_patch_hash raises ValueError when pattern not found,
+TST-635,test_full_update_on_real_files_integrity_passes,Integration,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,full update on temp copy passes security_gate verify_file_integrity,
+TST-636,test_update_is_idempotent,Integration,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,running update_hashes twice produces identical content,
+TST-637,test_update_error_missing_settings,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,update_hashes exits 1 and prints error when settings.json missing,
+TST-638,test_update_error_missing_gate,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,update_hashes exits 1 and prints error when security_gate.py missing,
+TST-639,test_embedded_hashes_are_64_lowercase_hex,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,both embedded hash constants are valid 64-char lowercase hex,
+TST-640,test_scripts_are_byte_for_byte_identical,Unit,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,Default-Project and templates/coding update_hashes.py are identical,
+TST-641,Full regression suite (1584 tests) — SAF-011 developer run,Regression,SAF-011,Pass,2026-03-14,Windows 11 + Python 3.11,1584 passed / 2 skipped / 0 failed — 17 new SAF-011 tests + all prior WPs; zero regressions,Developer Agent SAF-011
