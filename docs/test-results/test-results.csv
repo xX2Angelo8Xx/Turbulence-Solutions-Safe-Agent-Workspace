@@ -97,7 +97,7 @@ TST-095,test_unc_path_project_asks,Cross-platform,SAF-001,Pass,2026-03-10,Window
 TST-096,test_very_large_input_fails_closed,Security,SAF-001,Pass,2026-03-10,Windows 11 + Python 3.11,1 MiB+1 garbage stdin returns deny exit 0,Iteration 2 — stdin size guard (_STDIN_MAX_BYTES) fixes Tester concern 4
 TST-097,test_query_field_not_treated_as_path,Security,SAF-001,Pass,2026-03-10,Windows 11 + Python 3.11,grep_search with query='.github/secret' is not auto-denied,Iteration 2 — query removed from _PATH_FIELDS; fixes Tester concern 1
 TST-098,test_empty_tool_name,Unit,SAF-001,Pass,2026-03-10,Windows 11 + Python 3.11,empty tool_name falls through to path-based zone check,Iteration 2 — returns allow for project/ path
-TST-099,test_tool_name_not_string,Security,SAF-001,Pass,2026-03-10,Windows 11 + Python 3.11,non-string tool_name does not raise; returns safe decision,Iteration 2 — extract_tool_name returns "" for non-string values
+TST-099,test_tool_name_not_string,Security,SAF-001,Pass,2026-03-10,Windows 11 + Python 3.11,non-string tool_name does not raise; returns safe decision,"Iteration 2 — extract_tool_name returns """" for non-string values"
 TST-100,test_ws_root_with_trailing_slash,Unit,SAF-001,Pass,2026-03-10,Windows 11 + Python 3.11,get_zone handles ws_root with trailing slash correctly,Iteration 2 — ws_root.rstrip('/') inside get_zone
 TST-101,test_response_hookSpecificOutput_exact_structure,Integration,SAF-001,Pass,2026-03-10,Windows 11 + Python 3.11,allow/deny/ask responses have exact VS Code hookSpecificOutput structure,Iteration 2 — allow has no permissionDecisionReason; deny and ask include it
 TST-102,test_decide_project_sibling_prefix_bypass,Security,SAF-001,Pass,2026-03-10,Windows 11 + Python 3.11,project-evil/.github/x is denied — Method 2 catches it,Iteration 2 — first_segment='project-evil' not matched; pattern fallback denies
@@ -119,9 +119,9 @@ TST-117,Full regression suite (96 tests — Tester INS-002 re-review),Regression
 TST-118,Full regression suite (96 tests — Tester SAF-001 Iteration 2 re-review),Regression,SAF-001,Pass,2026-03-10,Windows 11 + Python 3.11,96/96 pass — BUG-003 and BUG-004 fixed; security_gate.py and test source present; all 60 SAF-001 tests pass,Tester Agent SAF-001 Iteration 2 re-review: all blocking issues resolved; no regressions; PASS verdict
 TST-119,SAF-004 design re-review — Stage 4 chain-separator coverage,Design Review,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,Section 5 Stage 4 now explicitly specifies ; / && / || chain-splitting with each segment analyzed independently,BUG-005 confirmed fixed — normative spec now matches Section 9.6 requirement
 TST-120,SAF-004 design re-review — escape hatch residual checks cover P-01 to P-28,Security,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,Section 12.4 now reads 'Full obfuscation pre-scan (P-01 to P-28)' — all _OBFUSCATION_PATTERNS applied to exception-matched commands,BUG-006 confirmed fixed — eval/exec/source/IEX/$() etc. no longer bypassable via exception entry
-TST-121,SAF-004 design re-review — P-10 -e short flag in Section 6 code block,Design Review,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,Section 6 _OBFUSCATION_PATTERNS P-10 updated to r'(?:powershell|pwsh)[^\n]*?-e(?:nc(?:odedcommand)?)?\s+[A-Za-z0-9+/=]{10,}',BUG-007 confirmed fixed — -e short flag now caught in implementation reference code
+TST-121,SAF-004 design re-review — P-10 -e short flag in Section 6 code block,Design Review,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,Section 6 _OBFUSCATION_PATTERNS P-10 updated to r'(?:powershell|pwsh)[^\n]*?-e(?:nc(?:odedcommand)?)?\s+[A-Za-z0-9+/=]{10,}'
 TST-122,SAF-004 design re-review — pre-scan pattern count,Design Review,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,Section 5 Stage 3 now states '28 patterns total (Section 6 and Section 10 platform patterns)',BUG-008 confirmed fixed — count matches actual specification (P-01 to P-23 + P-24 to P-28)
-TST-123,SAF-004 design re-review — python3.x and pip3.x version-alias matching,Design Review,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,"Section 7.2 Category A specifies re.match(r'^python3?\.\d+$'); Category B specifies re.match(r'^pip3\.\d+$'); python2/pip2 → deny",TODO-5 confirmed fixed — regex mechanism explicitly specified; literal 'python3.x' dict key prohibited
+TST-123,SAF-004 design re-review — python3.x and pip3.x version-alias matching,Design Review,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,Section 7.2 Category A specifies re.match(r'^python3?\.\d+$'); Category B specifies re.match(r'^pip3\.\d+$'); python2/pip2 → deny,TODO-5 confirmed fixed — regex mechanism explicitly specified; literal 'python3.x' dict key prohibited
 TST-124,Full regression suite (96 tests — Tester SAF-004 Iteration 2 re-review),Regression,SAF-004,Pass,2026-03-10,Windows 11 + Python 3.11,96/96 pass — no regressions; INS-001 + INS-002 + SAF-001 all green,Tester Agent SAF-004 Iteration 2 re-review: all 5 issues confirmed fixed; PASS verdict
 TST-125,test_normalize_null_byte_stripped,Security,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,null byte removed before any comparison,zone_classifier.normalize_path
 TST-126,test_normalize_double_backslash,Cross-platform,SAF-002,Pass,2026-03-11,Windows 11 + Python 3.11,JSON double-escaped \\ converted to /,zone_classifier.normalize_path
@@ -253,14 +253,14 @@ TST-206,SAF-005 tester edge-case tests Iteration 2 (ET-001 to ET-026),Security,S
 TST-207,Full SAF/INS regression suite Iteration 2 (excluding pre-existing GUI-001 and SAF-002 failures),Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,232/232 pass — zero new failures introduced,Pre-existing GUI-001 (BUG-012) and SAF-002 failures unrelated to SAF-005
 TST-208,SAF-005 full 106-test suite — Tester Iteration 2 confirmation run,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,106/106 pass — BUG-013/014/015 fixes confirmed; all ET-001 to ET-026 pass,Tester Agent re-review; 26/26 edge-case tests (including previously failing ET-001 to ET-005) all pass
 TST-209,SAF-005 Tester new BUG-016 edge-case tests (ET-027 to ET-032 — 6 tests),Security,SAF-005,Fail,2026-03-11,Windows 11 + Python 3.11,0/6 pass — no-space and fd-prefixed shell redirect variants bypass zone check,"All 6 fail: test_redirect_no_space_basic_bypasses_gate, test_redirect_no_space_append_bypasses_gate, test_redirect_fd_prefixed_basic_bypasses_gate, test_redirect_fd_prefixed_stderr_bypasses_gate, test_redirect_fd_prefixed_append_bypasses_gate, test_redirect_cat_fd_to_restricted_zone"
-TST-210,SAF-005 full 112-test suite — Tester Iteration 3 confirmation run,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,112/112 pass — BUG-016 fix confirmed; ET-027 to ET-032 all pass,"Tester Agent Iteration 3 re-review; _REDIRECT_OP_RE (^[0-9]*>>?$) handles fd-prefixed operators; _EMBEDDED_REDIRECT_RE (>>?(.+)$) handles no-space embedded redirects; all 3 bypass forms now zone-checked"
+TST-210,SAF-005 full 112-test suite — Tester Iteration 3 confirmation run,Security,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,112/112 pass — BUG-016 fix confirmed; ET-027 to ET-032 all pass,Tester Agent Iteration 3 re-review; _REDIRECT_OP_RE (^[0-9]*>>?$) handles fd-prefixed operators; _EMBEDDED_REDIRECT_RE (>>?(.+)$) handles no-space embedded redirects; all 3 bypass forms now zone-checked
 TST-211,Full regression suite Iteration 3 (excluding pre-existing SAF-002 and GUI-001 failures),Regression,SAF-005,Pass,2026-03-11,Windows 11 + Python 3.11,238/238 pass — zero new failures introduced by BUG-016 fix,Tester Agent Iteration 3: all INS-001 + INS-002 + INS-012 + SAF-001 + SAF-004 + SAF-005 tests pass; no regressions
 TST-269,test_is_truthy_flag_bool_true,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,bool True is recognised as truthy flag,_is_truthy_flag
 TST-270,test_is_truthy_flag_bool_false,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,bool False is not truthy,_is_truthy_flag
-TST-271,test_is_truthy_flag_string_true_lowercase,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "true" is truthy,_is_truthy_flag
-TST-272,test_is_truthy_flag_string_true_mixed_case,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "True" is truthy (case-insensitive),_is_truthy_flag
-TST-273,test_is_truthy_flag_string_true_uppercase,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "TRUE" is truthy (case-insensitive),_is_truthy_flag
-TST-274,test_is_truthy_flag_string_false,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,string "false" is not truthy,_is_truthy_flag
+TST-271,test_is_truthy_flag_string_true_lowercase,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"string ""true"" is truthy",_is_truthy_flag
+TST-272,test_is_truthy_flag_string_true_mixed_case,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"string ""True"" is truthy (case-insensitive)",_is_truthy_flag
+TST-273,test_is_truthy_flag_string_true_uppercase,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"string ""TRUE"" is truthy (case-insensitive)",_is_truthy_flag
+TST-274,test_is_truthy_flag_string_false,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"string ""false"" is not truthy",_is_truthy_flag
 TST-275,test_is_truthy_flag_int_1,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,integer 1 is truthy,_is_truthy_flag
 TST-276,test_is_truthy_flag_int_0,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,integer 0 is not truthy,_is_truthy_flag
 TST-277,test_is_truthy_flag_none,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,None is not truthy,_is_truthy_flag
@@ -275,7 +275,7 @@ TST-285,test_validate_grep_search_include_pattern_github_denied,Security,SAF-003
 TST-286,test_validate_grep_search_include_pattern_vscode_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern=.vscode/** → deny (protection),validate_grep_search
 TST-287,test_validate_grep_search_include_pattern_noagentzone_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern=NoAgentZone/** → deny (protection),validate_grep_search
 TST-288,test_validate_grep_search_include_ignored_files_bool_true_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles=True → deny (protection),validate_grep_search
-TST-289,test_validate_grep_search_include_ignored_files_string_true_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles="true" (string) → deny (protection),validate_grep_search
+TST-289,test_validate_grep_search_include_ignored_files_string_true_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"includeIgnoredFiles=""true"" (string) → deny (protection)",validate_grep_search
 TST-290,test_validate_grep_search_no_params_no_path_asks,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,no special params and no filePath → ask,validate_grep_search
 TST-291,test_validate_grep_search_no_params_project_path_allowed,Unit,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,clean params + filePath=project/main.py → allow,validate_grep_search
 TST-292,test_validate_grep_search_no_params_deny_path_denied,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,clean params + filePath=.github/secret → deny,validate_grep_search
@@ -290,7 +290,7 @@ TST-300,test_grep_search_include_ignored_files_blocked_protection,Security,SAF-0
 TST-301,test_grep_search_github_in_nested_tool_input_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includePattern in nested tool_input → still denied (bypass attempt),Integration
 TST-302,test_grep_search_traversal_to_github_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,project/../.github/** resolves to .github/ and is denied (bypass attempt),Integration
 TST-303,test_grep_search_mixed_case_include_pattern_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,.GITHUB/** upper-case normalised and denied (bypass attempt),Integration
-TST-304,test_grep_search_include_ignored_string_true_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,includeIgnoredFiles="true" string form denied (bypass attempt),Integration
+TST-304,test_grep_search_include_ignored_string_true_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,"includeIgnoredFiles=""true"" string form denied (bypass attempt)",Integration
 TST-305,test_grep_search_noagentzone_lowercase_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,noagentzone/** all-lowercase denied (bypass attempt),Integration
 TST-306,test_grep_search_star_star_github_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,**/.github/** multi-segment wildcard targeting .github/ denied (bypass attempt),Integration
 TST-307,test_semantic_search_cannot_be_allowed_bypass,Security,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,semantic_search with innocuous query never returns allow (bypass attempt),Integration
@@ -302,72 +302,72 @@ TST-312,test_decide_grep_search_include_ignored_denied,Integration,SAF-003,Pass,
 TST-313,test_grep_search_windows_backslash_include_pattern_github_denied,Cross-platform,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,Windows backslash includePattern targeting .github → deny,cross-platform
 TST-314,test_grep_search_wsl_absolute_include_pattern_github_denied,Cross-platform,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,WSL absolute includePattern targeting .github → deny,cross-platform
 TST-315,SAF-003 full test suite (46 tests) + full regression check (448 tests),Regression,SAF-003,Pass,2026-03-12,Windows 11 + Python 3.11,46/46 SAF-003 tests pass; 448/449 total pass (1 pre-existing INS-012 failure unrelated to SAF-003),Developer Agent final run before handoff
-TST-261,test_valid_simple_name,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,hyphenated name returns (True - ""),validate_folder_name
-TST-262,test_valid_name_with_numbers,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,alphanumeric name returns (True - ""),validate_folder_name
-TST-263,test_valid_name_with_underscores,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,underscore name returns (True - ""),validate_folder_name
-TST-264,test_valid_name_with_hyphens,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,multi-hyphen name returns (True - ""),validate_folder_name
-TST-265,test_return_type_is_tuple,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,return value is a 2-tuple,validate_folder_name
-TST-266,test_valid_returns_empty_message,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,valid name produces empty error string,validate_folder_name
-TST-267,test_empty_string_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty string rejected,validate_folder_name
-TST-268,test_whitespace_only_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,whitespace-only string rejected,validate_folder_name
-TST-269,test_invalid_returns_nonempty_message,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,invalid name produces non-empty error string,validate_folder_name
-TST-270,test_colon_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,colon in name rejected,validate_folder_name
-TST-271,test_backslash_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,backslash in name rejected,validate_folder_name
-TST-272,test_forward_slash_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,forward slash in name rejected,validate_folder_name
-TST-273,test_asterisk_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,asterisk in name rejected,validate_folder_name
-TST-274,test_question_mark_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,question mark in name rejected,validate_folder_name
-TST-275,test_pipe_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,pipe character in name rejected,validate_folder_name
-TST-276,test_less_than_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,less-than sign in name rejected,validate_folder_name
-TST-277,test_greater_than_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,greater-than sign in name rejected,validate_folder_name
-TST-278,test_double_quote_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,double-quote in name rejected,validate_folder_name
-TST-279,test_null_byte_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,null byte in name rejected,validate_folder_name
-TST-280,test_control_char_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,control character (0x01) in name rejected,validate_folder_name
-TST-281,test_single_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,single dot name rejected,validate_folder_name
-TST-282,test_double_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,double dot name rejected,validate_folder_name
-TST-283,test_windows_reserved_con_uppercase_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,CON rejected as reserved,validate_folder_name
-TST-284,test_windows_reserved_nul_lowercase_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,nul rejected as reserved,validate_folder_name
-TST-285,test_windows_reserved_case_insensitive,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,Con (mixed case) rejected as reserved,validate_folder_name
-TST-286,test_windows_reserved_com9_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,COM9 rejected as reserved,validate_folder_name
-TST-287,test_windows_reserved_lpt1_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,LPT1 rejected as reserved,validate_folder_name
-TST-288,test_name_ending_with_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,name ending with period rejected,validate_folder_name
-TST-289,test_name_ending_with_space_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,name ending with space rejected,validate_folder_name
-TST-290,test_path_traversal_with_slash_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,../etc/passwd rejected via forward-slash check (bypass attempt),validate_folder_name
-TST-291,test_path_traversal_backslash_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,..\windows\system32 rejected via backslash check (bypass attempt),validate_folder_name
-TST-292,test_null_byte_before_reserved_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,null byte prefix before CON still rejected (bypass attempt),validate_folder_name
-TST-293,test_control_char_bypass_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,control character embedded in otherwise valid name rejected (bypass attempt),validate_folder_name
-TST-294,test_nonexistent_folder_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,non-existent path returns False,check_duplicate_folder
-TST-295,test_existing_folder_returns_true,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,existing tmpdir subfolder returns True,check_duplicate_folder
-TST-296,test_empty_name_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty name guard returns False,check_duplicate_folder
-TST-297,test_empty_destination_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty destination guard returns False,check_duplicate_folder
-TST-298,test_both_empty_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,both args empty returns False,check_duplicate_folder
-TST-299,test_project_name_error_label_exists,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,app.project_name_error_label attribute present on App instance,App inline error label
-TST-300,test_error_label_created_with_empty_text,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,CTkLabel created with text='' for inline error display,App inline error label
-TST-301,Full regression suite (377 tests — all WPs),Regression,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 40 new GUI-003 + 337 existing tests; zero regressions,Developer Agent GUI-003 implementation complete
-TST-269,test_spec_file_exists,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,launcher.spec exists at repository root,
-TST-270,test_spec_is_valid_python,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,ast.parse succeeds — no syntax errors,
-TST-271,test_spec_references_entry_point,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,main.py referenced in Analysis sources,
-TST-272,test_spec_entry_point_path_contains_src_launcher,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,full path src/launcher/main.py present in spec,
-TST-273,test_spec_includes_templates_in_datas,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,templates entry present in datas,
-TST-274,test_spec_uses_onedir_collect,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,COLLECT() call present — onedir mode confirmed,
-TST-275,test_spec_exclude_binaries_true,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,exclude_binaries=True set in EXE(),
-TST-276,Full regression suite (377 tests — INS-003 addition),Regression,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 7 new INS-003 tests + 370 prior; zero regressions,Developer Agent INS-003TST-277,GUI-011 color theme test suite (23 tests),Unit,GUI-011,Fail,2026-03-12,Windows 11 + Python 3.11,0/23 pass — all fail with ImportError: cannot import name 'COLOR_PRIMARY' from launcher.config,Source files not updated; implementation never saved to disk
-TST-278,Full regression suite (excl. GUI-011 and SAF-006),Regression,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,523 passed 2 skipped — no regressions from GUI-011,GUI-011 source files unchanged so no regressions introducedTST-279,GUI-003 developer test suite (48 tests),Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,48/48 pass - validate_folder_name and check_duplicate_folder fully tested,Tester review iteration 1
-TST-280,GUI-003 tester edge-case tests (6 tests),Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,6/6 pass - tab char rejection / leading spaces / file-at-target duplicate / return type,Added by Tester Agent in TestEdgeCasesGui003
-TST-281,GUI-004 developer test suite (13 tests),Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,13/13 pass - validate_destination_path and browse dialog behaviour fully tested,Tester review iteration 1
-TST-282,GUI-004 tester edge-case tests (4 tests),Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,4/4 pass - return type / padded path rejected / relative dot path accepted,Added by Tester Agent in TestEdgeCasesGui004
-TST-283,GUI-011 developer test suite iteration 2 (23 tests),Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,23/23 pass - all color constants and widget colors verified,Tester review iteration 2 after developer fix
-TST-284,GUI-011 tester edge-case tests (6 tests),Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,6/6 pass - hex format validation / non-resizable / title / error label colours,Added by Tester Agent in TestEdgeCasesGui011
-TST-285,GUI-012 developer test suite (11 tests),Unit,GUI-012,Pass,2026-03-12,Windows 11 + Python 3.11,11/11 pass - window height / padding / button layout fully tested,Tester review iteration 1
-TST-286,GUI-012 tester edge-case tests (4 tests),Unit,GUI-012,Pass,2026-03-12,Windows 11 + Python 3.11,4/4 pass - width=580 / non-resizable / entry pady / dropdown pady,Added by Tester Agent in TestEdgeCasesGui012
-TST-287,Full GUI WP combined test suite (115 tests),Regression,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,115/115 pass - zero regressions across all four GUI workpackages,Post-edge-case full run confirming no regressions
-TST-288,SAF-006 developer test suite (46 tests — test_saf006_recursive_protection.py),Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,45/46 pass — test_dir_slash_s_blocked fails: dir /s returns ask expected deny,Tester Iteration 3 initial run — BUG-024 confirmed
-TST-289,SAF-006 tester edge-case tests (19 tests — test_saf006_edge_cases.py),Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,17/19 pass — test_dir_slash_s_no_path_blocked and test_dir_slash_s_slash_b_no_path_blocked fail (both BUG-024),Tester Iteration 3 edge-case run — Windows flags not filtered in Step 7 path_args collection
-TST-290,SAF-006 full test suite (65 tests),Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,62/65 pass — 3 failures all BUG-024 (dir /s with no explicit path),Tester Iteration 3 combined run — verdict FAIL; WP returned to In ProgressTST-291,SAF-006 full test suite (65 tests),Security,SAF-006,Pass,2026-03-12,Windows 11 + Python 3.11,65/65 pass â€" BUG-024 fixed by filtering Windows-style flags in Step 7 path_args collection,Developer Iteration 4 â€" _WIN_FLAG_RE guard added; all 65 tests pass
-TST-292,SAF-006 tester iteration 4 edge-case tests (17 tests -- test_saf006_tester_iter4.py),Security,SAF-006,Pass,2026-03-12,Windows 11 + Python 3.11,17/17 pass -- WIN_FLAG_RE boundary tests all green,Tester Iteration 4 -- trailing slash / uppercase / 2-char flag / long path / tree /f variants all verified
-TST-293,SAF-006 full combined test suite (82 tests),Security,SAF-006,Pass,2026-03-12,Windows 11 + Python 3.11,82/82 pass -- all iterations green,Tester Iteration 4 final run -- PASS verdict; WP marked Done
-TST-294,INS-009 developer test suite (36 tests),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,36/36 pass -- parse_version + check_for_update + config constants all verified,Tester review initial run
-TST-295,INS-009 tester edge-case tests (6 tests -- TestParseVersionEdgeCases + TestCheckForUpdateImplementation),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,6/6 pass -- uppercase V behavior / Accept header / hardcoded URL / non-string tag_name,Tester-added edge cases all pass
-TST-296,INS-009 combined test suite (42 tests),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,42/42 pass -- all developer and tester tests green,Tester Iteration 1 final run -- PASS verdict; WP marked Done
+TST-786,test_valid_simple_name,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,"hyphenated name returns (True - """")",validate_folder_name
+TST-787,test_valid_name_with_numbers,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,"alphanumeric name returns (True - """")",validate_folder_name
+TST-788,test_valid_name_with_underscores,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,"underscore name returns (True - """")",validate_folder_name
+TST-789,test_valid_name_with_hyphens,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,"multi-hyphen name returns (True - """")",validate_folder_name
+TST-790,test_return_type_is_tuple,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,return value is a 2-tuple,validate_folder_name
+TST-791,test_valid_returns_empty_message,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,valid name produces empty error string,validate_folder_name
+TST-792,test_empty_string_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty string rejected,validate_folder_name
+TST-793,test_whitespace_only_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,whitespace-only string rejected,validate_folder_name
+TST-794,test_invalid_returns_nonempty_message,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,invalid name produces non-empty error string,validate_folder_name
+TST-795,test_colon_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,colon in name rejected,validate_folder_name
+TST-796,test_backslash_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,backslash in name rejected,validate_folder_name
+TST-797,test_forward_slash_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,forward slash in name rejected,validate_folder_name
+TST-798,test_asterisk_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,asterisk in name rejected,validate_folder_name
+TST-799,test_question_mark_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,question mark in name rejected,validate_folder_name
+TST-800,test_pipe_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,pipe character in name rejected,validate_folder_name
+TST-801,test_less_than_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,less-than sign in name rejected,validate_folder_name
+TST-802,test_greater_than_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,greater-than sign in name rejected,validate_folder_name
+TST-803,test_double_quote_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,double-quote in name rejected,validate_folder_name
+TST-804,test_null_byte_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,null byte in name rejected,validate_folder_name
+TST-805,test_control_char_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,control character (0x01) in name rejected,validate_folder_name
+TST-806,test_single_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,single dot name rejected,validate_folder_name
+TST-807,test_double_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,double dot name rejected,validate_folder_name
+TST-808,test_windows_reserved_con_uppercase_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,CON rejected as reserved,validate_folder_name
+TST-809,test_windows_reserved_nul_lowercase_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,nul rejected as reserved,validate_folder_name
+TST-810,test_windows_reserved_case_insensitive,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,Con (mixed case) rejected as reserved,validate_folder_name
+TST-811,test_windows_reserved_com9_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,COM9 rejected as reserved,validate_folder_name
+TST-812,test_windows_reserved_lpt1_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,LPT1 rejected as reserved,validate_folder_name
+TST-813,test_name_ending_with_dot_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,name ending with period rejected,validate_folder_name
+TST-814,test_name_ending_with_space_invalid,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,name ending with space rejected,validate_folder_name
+TST-815,test_path_traversal_with_slash_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,../etc/passwd rejected via forward-slash check (bypass attempt),validate_folder_name
+TST-816,test_path_traversal_backslash_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,..\windows\system32 rejected via backslash check (bypass attempt),validate_folder_name
+TST-817,test_null_byte_before_reserved_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,null byte prefix before CON still rejected (bypass attempt),validate_folder_name
+TST-818,test_control_char_bypass_rejected,Security,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,control character embedded in otherwise valid name rejected (bypass attempt),validate_folder_name
+TST-819,test_nonexistent_folder_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,non-existent path returns False,check_duplicate_folder
+TST-820,test_existing_folder_returns_true,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,existing tmpdir subfolder returns True,check_duplicate_folder
+TST-821,test_empty_name_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty name guard returns False,check_duplicate_folder
+TST-822,test_empty_destination_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,empty destination guard returns False,check_duplicate_folder
+TST-823,test_both_empty_returns_false,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,both args empty returns False,check_duplicate_folder
+TST-824,test_project_name_error_label_exists,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,app.project_name_error_label attribute present on App instance,App inline error label
+TST-825,test_error_label_created_with_empty_text,Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,CTkLabel created with text='' for inline error display,App inline error label
+TST-826,Full regression suite (377 tests — all WPs),Regression,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 40 new GUI-003 + 337 existing tests; zero regressions,Developer Agent GUI-003 implementation complete
+TST-827,test_spec_file_exists,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,launcher.spec exists at repository root,
+TST-828,test_spec_is_valid_python,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,ast.parse succeeds — no syntax errors,
+TST-829,test_spec_references_entry_point,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,main.py referenced in Analysis sources,
+TST-830,test_spec_entry_point_path_contains_src_launcher,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,full path src/launcher/main.py present in spec,
+TST-831,test_spec_includes_templates_in_datas,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,templates entry present in datas,
+TST-832,test_spec_uses_onedir_collect,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,COLLECT() call present — onedir mode confirmed,
+TST-833,test_spec_exclude_binaries_true,Unit,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,exclude_binaries=True set in EXE(),
+TST-834,Full regression suite (377 tests — INS-003 addition),Regression,INS-003,Pass,2026-03-12,Windows 11 + Python 3.11,377/377 pass — 7 new INS-003 tests + 370 prior; zero regressions,Developer Agent INS-003TST-277
+TST-835,Full regression suite (excl. GUI-011 and SAF-006),Regression,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,523 passed 2 skipped — no regressions from GUI-011,GUI-011 source files unchanged so no regressions introducedTST-279
+TST-836,GUI-003 tester edge-case tests (6 tests),Unit,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,6/6 pass - tab char rejection / leading spaces / file-at-target duplicate / return type,Added by Tester Agent in TestEdgeCasesGui003
+TST-837,GUI-004 developer test suite (13 tests),Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,13/13 pass - validate_destination_path and browse dialog behaviour fully tested,Tester review iteration 1
+TST-838,GUI-004 tester edge-case tests (4 tests),Unit,GUI-004,Pass,2026-03-12,Windows 11 + Python 3.11,4/4 pass - return type / padded path rejected / relative dot path accepted,Added by Tester Agent in TestEdgeCasesGui004
+TST-839,GUI-011 developer test suite iteration 2 (23 tests),Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,23/23 pass - all color constants and widget colors verified,Tester review iteration 2 after developer fix
+TST-840,GUI-011 tester edge-case tests (6 tests),Unit,GUI-011,Pass,2026-03-12,Windows 11 + Python 3.11,6/6 pass - hex format validation / non-resizable / title / error label colours,Added by Tester Agent in TestEdgeCasesGui011
+TST-841,GUI-012 developer test suite (11 tests),Unit,GUI-012,Pass,2026-03-12,Windows 11 + Python 3.11,11/11 pass - window height / padding / button layout fully tested,Tester review iteration 1
+TST-842,GUI-012 tester edge-case tests (4 tests),Unit,GUI-012,Pass,2026-03-12,Windows 11 + Python 3.11,4/4 pass - width=580 / non-resizable / entry pady / dropdown pady,Added by Tester Agent in TestEdgeCasesGui012
+TST-843,Full GUI WP combined test suite (115 tests),Regression,GUI-003,Pass,2026-03-12,Windows 11 + Python 3.11,115/115 pass - zero regressions across all four GUI workpackages,Post-edge-case full run confirming no regressions
+TST-844,SAF-006 developer test suite (46 tests — test_saf006_recursive_protection.py),Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,45/46 pass — test_dir_slash_s_blocked fails: dir /s returns ask expected deny,Tester Iteration 3 initial run — BUG-024 confirmed
+TST-845,SAF-006 tester edge-case tests (19 tests — test_saf006_edge_cases.py),Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,17/19 pass — test_dir_slash_s_no_path_blocked and test_dir_slash_s_slash_b_no_path_blocked fail (both BUG-024),Tester Iteration 3 edge-case run — Windows flags not filtered in Step 7 path_args collection
+TST-846,SAF-006 full test suite (65 tests),Security,SAF-006,Fail,2026-03-12,Windows 11 + Python 3.11,62/65 pass — 3 failures all BUG-024 (dir /s with no explicit path),Tester Iteration 3 combined run — verdict FAIL; WP returned to In ProgressTST-291
+TST-847,SAF-006 tester iteration 4 edge-case tests (17 tests -- test_saf006_tester_iter4.py),Security,SAF-006,Pass,2026-03-12,Windows 11 + Python 3.11,17/17 pass -- WIN_FLAG_RE boundary tests all green,Tester Iteration 4 -- trailing slash / uppercase / 2-char flag / long path / tree /f variants all verified
+TST-848,SAF-006 full combined test suite (82 tests),Security,SAF-006,Pass,2026-03-12,Windows 11 + Python 3.11,82/82 pass -- all iterations green,Tester Iteration 4 final run -- PASS verdict; WP marked Done
+TST-849,INS-009 developer test suite (36 tests),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,36/36 pass -- parse_version + check_for_update + config constants all verified,Tester review initial run
+TST-850,INS-009 tester edge-case tests (6 tests -- TestParseVersionEdgeCases + TestCheckForUpdateImplementation),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,6/6 pass -- uppercase V behavior / Accept header / hardcoded URL / non-string tag_name,Tester-added edge cases all pass
+TST-851,INS-009 combined test suite (42 tests),Unit,INS-009,Pass,2026-03-12,Windows 11 + Python 3.11,42/42 pass -- all developer and tester tests green,Tester Iteration 1 final run -- PASS verdict; WP marked Done
 TST-316,test_templates_root_dir_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/ directory exists at repository root,
 TST-317,test_coding_template_dir_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/ subdirectory exists,
 TST-318,test_coding_readme_exists,Unit,INS-004,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/README.md exists,
@@ -548,21 +548,21 @@ TST-477,test_source_uses_dist_launcher_glob,Unit,INS-005,Pass,2026-03-12,Windows
 TST-478,test_source_has_recursesubdirs,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,recursesubdirs flag present in [Files] entry,
 TST-479,test_has_app_id,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppId GUID declared in [Setup],
 TST-480,test_privileges_required_set,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,PrivilegesRequired=admin declared,
-TST-481,test_single_word_capitalised,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: single word capitalised correctly,
-TST-482,test_hyphenated_to_title_case,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: hyphenated dirs produce title-case display names,
-TST-483,test_underscore_separator,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: underscores converted to spaces,
-TST-484,test_mixed_hyphen_and_underscore,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: mixed separators handled,
-TST-485,test_empty_string,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: empty string returns empty string,
-TST-486,test_already_title_case,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: already title-cased input preserved,
-TST-487,test_all_caps,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: ALL CAPS input normalised to title case,
-TST-488,test_returns_list,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options returns a list type,
-TST-489,test_with_two_subdirs,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options: two mocked dirs produce two formatted names,
-TST-490,test_with_single_subdir,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options: single dir produces one formatted name,
-TST-491,test_empty_list_returns_empty_list,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options: empty list from list_templates returns [],
-TST-492,test_files_are_not_included_only_dirs,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options passes through only directories from list_templates,
-TST-493,test_results_preserve_order_from_list_templates,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options preserves order returned by list_templates,
-TST-494,test_returns_only_subdirectory_names,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates: files in templates/ are excluded; only dirs returned,
-TST-495,test_files_excluded,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates: plain file alongside dirs is excluded from results,
+TST-852,test_single_word_capitalised,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: single word capitalised correctly,
+TST-853,test_hyphenated_to_title_case,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: hyphenated dirs produce title-case display names,
+TST-854,test_underscore_separator,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: underscores converted to spaces,
+TST-855,test_mixed_hyphen_and_underscore,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: mixed separators handled,
+TST-856,test_empty_string,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: empty string returns empty string,
+TST-857,test_already_title_case,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: already title-cased input preserved,
+TST-858,test_all_caps,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_format_template_name: ALL CAPS input normalised to title case,
+TST-859,test_returns_list,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options returns a list type,
+TST-860,test_with_two_subdirs,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options: two mocked dirs produce two formatted names,
+TST-861,test_with_single_subdir,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options: single dir produces one formatted name,
+TST-862,test_empty_list_returns_empty_list,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options: empty list from list_templates returns [],
+TST-863,test_files_are_not_included_only_dirs,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options passes through only directories from list_templates,
+TST-864,test_results_preserve_order_from_list_templates,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,_get_template_options preserves order returned by list_templates,
+TST-865,test_returns_only_subdirectory_names,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates: files in templates/ are excluded; only dirs returned,
+TST-866,test_files_excluded,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates: plain file alongside dirs is excluded from results,
 TST-496,test_empty_dir_returns_empty_list,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates: empty dir returns [],
 TST-497,test_missing_dir_returns_empty_list,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates: non-existent path returns [],
 TST-498,test_results_are_sorted_alphabetically,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,list_templates: results are sorted alphabetically,
@@ -571,45 +571,45 @@ TST-500,test_adding_new_template_dir_changes_options,Integration,GUI-002,Pass,20
 TST-501,test_dropdown_values_not_hardcoded,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,custom list_templates result flows through to dropdown — dynamic not hardcoded,
 TST-502,test_creative_marketing_dir_exists,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,templates/creative-marketing/ directory exists in repository,
 TST-503,test_coding_dir_exists,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,templates/coding/ directory exists in repository,
-TST-504,test_real_templates_dir_options_contain_coding,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,real templates dir produces option "Coding",
-TST-505,test_real_templates_dir_options_contain_creative_marketing,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,real templates dir produces option "Creative Marketing",
-TST-506,test_format_template_name_unicode_chars,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,Unicode dir name "café-design" correctly formatted to "Café Design",Tester edge-case
-TST-507,test_format_template_name_numbers_prefix,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,Digit-prefixed name "3d-modeling" correctly formatted to "3D Modeling",Tester edge-case
-TST-508,test_format_template_name_only_hyphens,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,All-hyphen name "---" converts to spaces without error,Tester edge-case
-TST-509,test_format_template_name_leading_dot,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,Dotfile name ".hidden" formatted to ".Hidden" without error,Tester edge-case
+TST-504,test_real_templates_dir_options_contain_coding,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,"real templates dir produces option ""Coding""",
+TST-505,test_real_templates_dir_options_contain_creative_marketing,Integration,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,"real templates dir produces option ""Creative Marketing""",
+TST-506,test_format_template_name_unicode_chars,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,"Unicode dir name ""café-design"" correctly formatted to ""Café Design""",Tester edge-case
+TST-507,test_format_template_name_numbers_prefix,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,"Digit-prefixed name ""3d-modeling"" correctly formatted to ""3D Modeling""",Tester edge-case
+TST-508,test_format_template_name_only_hyphens,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,"All-hyphen name ""---"" converts to spaces without error",Tester edge-case
+TST-509,test_format_template_name_leading_dot,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,"Dotfile name "".hidden"" formatted to "".Hidden"" without error",Tester edge-case
 TST-510,test_list_templates_file_path_returns_empty_list,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,File path (not dir) passed to list_templates returns [] gracefully,Tester edge-case
 TST-511,test_list_templates_string_argument_returns_empty_list,Unit,GUI-002,Pass,2026-03-12,Windows 11 + Python 3.11,str argument (not Path) to list_templates returns [] — isinstance type guard works,Tester edge-case
-TST-481,test_app_id_is_valid_guid_format,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppId uses Inno Setup {{GUID} format matching RFC-4122,Tester edge-case
-TST-482,test_app_id_guid_is_not_all_zeros,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppId GUID is not the null all-zeros sentinel,Tester edge-case
-TST-483,test_no_hardcoded_drive_letter[C:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded C:\ path in setup.iss,Tester edge-case
-TST-484,test_no_hardcoded_drive_letter[D:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded D:\ path in setup.iss,Tester edge-case
-TST-485,test_no_hardcoded_drive_letter[E:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded E:\ path in setup.iss,Tester edge-case
-TST-486,test_no_hardcoded_drive_letter[F:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded F:\ path in setup.iss,Tester edge-case
-TST-487,test_no_hardcoded_drive_letter[G:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded G:\ path in setup.iss,Tester edge-case
-TST-488,test_source_path_is_relative_not_absolute,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,Source starts with dist\ — no absolute path,Tester edge-case
-TST-489,test_default_dir_uses_autopf_not_direct_path,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,DefaultDirName={autopf} confirmed by regex,Tester edge-case
-TST-490,test_output_base_filename_declared,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,OutputBaseFilename key is present in [Setup],Tester edge-case
-TST-491,test_output_base_filename_contains_setup,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,OutputBaseFilename value contains Setup keyword,Tester edge-case
-TST-492,test_output_base_filename_no_spaces,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,OutputBaseFilename value has no spaces — shell-safe,Tester edge-case
-TST-493,test_createallsubdirs_flag_present,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,createallsubdirs flag present alongside recursesubdirs,Tester edge-case
-TST-494,test_ignoreversion_flag_present,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,ignoreversion flag present — required for PyInstaller DLL bundles,Tester edge-case
-TST-495,test_compression_is_lzma,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,Compression=lzma on its own line,Tester edge-case
-TST-496,test_solid_compression_enabled,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,SolidCompression=yes on its own line,Tester edge-case
-TST-497,test_privileges_required_is_exactly_admin,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,PrivilegesRequired=admin exactly — not lowest,Tester edge-case
-TST-498,test_architecture_restricted_to_x64,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,ArchitecturesAllowed=x64compatible — prevents 32-bit installs,Tester edge-case
-TST-499,test_start_menu_shortcut_uses_group_macro,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,{group} macro used in [Icons] for Start Menu shortcut,Tester edge-case
-TST-500,test_desktop_shortcut_is_opt_in,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,desktopicon task has Flags: unchecked — opt-in only,Tester edge-case
-TST-501,test_uninstall_delete_type_is_filesandirs,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,Type: filesandirs in [UninstallDelete] — full cleanup,Tester edge-case
-TST-502,test_uninstall_targets_app_macro,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,UninstallDelete Name is {app} — no hardcoded path,Tester edge-case
-TST-503,test_app_version_matches_pyproject_toml,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppVersion 0.1.0 matches pyproject.toml version — cross-validated,Tester edge-case
-TST-504,test_exe_name_matches_pyinstaller_spec_name,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,MyAppExeName launcher.exe matches spec EXE name=launcher,Tester edge-case
-TST-505,test_source_dir_matches_pyinstaller_collect_name,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,dist\launcher\* matches COLLECT name=launcher in spec,Tester edge-case
-TST-506,test_wizard_style_is_modern,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,WizardStyle=modern confirmed,Tester edge-case
-TST-507,Full regression suite (936 tests incl. 41 INS-005),Regression,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,16 pre-existing failures (GUI-008/INS-004/INS-012/SAF-010); 0 new failures from INS-005; 41/41 INS-005 tests pass,Tester Agent INS-005 final run; PASS verdict
-TST-508,test_compute_file_hash_empty_file,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Empty file returns SHA256('') not None,Tester edge-case
-TST-509,test_canonical_hash_detects_settings_hash_tampering,Security,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Modifying _KNOWN_GOOD_SETTINGS_HASH in gate IS detected by canonical hash,Tester bypass-attempt
-TST-510,test_canonical_hash_no_constant_line,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,File without hash constant line still hashes without crash,Tester edge-case
-TST-511,test_main_stdin_not_consumed_on_integrity_failure,Security,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,stdin.read() never called before deny on integrity failure,Tester ordering test
+TST-867,test_app_id_is_valid_guid_format,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppId uses Inno Setup {{GUID} format matching RFC-4122,Tester edge-case
+TST-868,test_app_id_guid_is_not_all_zeros,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppId GUID is not the null all-zeros sentinel,Tester edge-case
+TST-869,test_no_hardcoded_drive_letter[C:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded C:\ path in setup.iss,Tester edge-case
+TST-870,test_no_hardcoded_drive_letter[D:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded D:\ path in setup.iss,Tester edge-case
+TST-871,test_no_hardcoded_drive_letter[E:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded E:\ path in setup.iss,Tester edge-case
+TST-872,test_no_hardcoded_drive_letter[F:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded F:\ path in setup.iss,Tester edge-case
+TST-873,test_no_hardcoded_drive_letter[G:],Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded G:\ path in setup.iss,Tester edge-case
+TST-874,test_source_path_is_relative_not_absolute,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,Source starts with dist\ — no absolute path,Tester edge-case
+TST-875,test_default_dir_uses_autopf_not_direct_path,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,DefaultDirName={autopf} confirmed by regex,Tester edge-case
+TST-876,test_output_base_filename_declared,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,OutputBaseFilename key is present in [Setup],Tester edge-case
+TST-877,test_output_base_filename_contains_setup,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,OutputBaseFilename value contains Setup keyword,Tester edge-case
+TST-878,test_output_base_filename_no_spaces,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,OutputBaseFilename value has no spaces — shell-safe,Tester edge-case
+TST-879,test_createallsubdirs_flag_present,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,createallsubdirs flag present alongside recursesubdirs,Tester edge-case
+TST-880,test_ignoreversion_flag_present,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,ignoreversion flag present — required for PyInstaller DLL bundles,Tester edge-case
+TST-881,test_compression_is_lzma,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,Compression=lzma on its own line,Tester edge-case
+TST-882,test_solid_compression_enabled,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,SolidCompression=yes on its own line,Tester edge-case
+TST-883,test_privileges_required_is_exactly_admin,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,PrivilegesRequired=admin exactly — not lowest,Tester edge-case
+TST-884,test_architecture_restricted_to_x64,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,ArchitecturesAllowed=x64compatible — prevents 32-bit installs,Tester edge-case
+TST-885,test_start_menu_shortcut_uses_group_macro,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,{group} macro used in [Icons] for Start Menu shortcut,Tester edge-case
+TST-886,test_desktop_shortcut_is_opt_in,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,desktopicon task has Flags: unchecked — opt-in only,Tester edge-case
+TST-887,test_uninstall_delete_type_is_filesandirs,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,Type: filesandirs in [UninstallDelete] — full cleanup,Tester edge-case
+TST-888,test_uninstall_targets_app_macro,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,UninstallDelete Name is {app} — no hardcoded path,Tester edge-case
+TST-889,test_app_version_matches_pyproject_toml,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,AppVersion 0.1.0 matches pyproject.toml version — cross-validated,Tester edge-case
+TST-890,test_exe_name_matches_pyinstaller_spec_name,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,MyAppExeName launcher.exe matches spec EXE name=launcher,Tester edge-case
+TST-891,test_source_dir_matches_pyinstaller_collect_name,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,dist\launcher\* matches COLLECT name=launcher in spec,Tester edge-case
+TST-892,test_wizard_style_is_modern,Unit,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,WizardStyle=modern confirmed,Tester edge-case
+TST-893,Full regression suite (936 tests incl. 41 INS-005),Regression,INS-005,Pass,2026-03-12,Windows 11 + Python 3.11,16 pre-existing failures (GUI-008/INS-004/INS-012/SAF-010); 0 new failures from INS-005; 41/41 INS-005 tests pass,Tester Agent INS-005 final run; PASS verdict
+TST-894,test_compute_file_hash_empty_file,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Empty file returns SHA256('') not None,Tester edge-case
+TST-895,test_canonical_hash_detects_settings_hash_tampering,Security,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Modifying _KNOWN_GOOD_SETTINGS_HASH in gate IS detected by canonical hash,Tester bypass-attempt
+TST-896,test_canonical_hash_no_constant_line,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,File without hash constant line still hashes without crash,Tester edge-case
+TST-897,test_main_stdin_not_consumed_on_integrity_failure,Security,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,stdin.read() never called before deny on integrity failure,Tester ordering test
 TST-512,test_verify_file_integrity_returns_false_on_exception,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Unexpected exception inside verify returns fail-closed False,Tester edge-case
 TST-513,test_canonical_hash_uppercase_hex_recognized,Unit,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,Uppercase hex in gate constant is zeroed equally to lowercase,Tester edge-case
 TST-514,SAF-008 full suite (23 tests) + full regression,Regression,SAF-008,Pass,2026-03-12,Windows 11 + Python 3.11,23/23 SAF-008 pass; 16 pre-existing failures unchanged; 919 pass total,Tester Agent SAF-008 final run; PASS verdict
@@ -618,10 +618,10 @@ TST-516,test_version_label_is_ctk_label_not_entry (Iteration 2),Integration,GUI-
 TST-517,test_version_label_grid_called (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,version_label placed at startup via place() � grid mock records other labels,Fixed in Iteration 2
 TST-518,test_version_label_text_contains_version (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,CTkLabel created with text containing display version string,Fixed in Iteration 2
 TST-519,test_version_label_get_display_version_imported (Iteration 2),Integration,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,get_display_version imported from launcher.config in app.py AST check,Fixed in Iteration 2
-TST-520,GUI-008 full suite (14/14) + full regression (924 pass),Regression,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,14/14 GUI-008 pass; 924 total pass; 11 pre-existing failures unchanged (SAF-010/INS-004/INS-012),Tester Agent Iteration 2 � PASS verdictTST-521,test_af1_core_deny_malformed_input,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-1: malformed JSON fails closed via parse_input + build_response deny path,
+TST-520,GUI-008 full suite (14/14) + full regression (924 pass),Regression,GUI-008,Pass,2026-03-12,Windows 11 + Python 3.11,14/14 GUI-008 pass; 924 total pass; 11 pre-existing failures unchanged (SAF-010/INS-004/INS-012),Tester Agent Iteration 2 � PASS verdictTST-521
 TST-522,test_af1_core_allow_project_path,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-1: read_file on Project/ returns allow end-to-end through decide(),
 TST-523,test_af2_grep_includepattern_github_nested,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-2: grep_search includePattern=.github/** in nested tool_input format → deny,
-TST-524,test_af2_grep_brace_expansion_bypass,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-2: brace-expansion {src,.github}/** bypass attempt → deny,
+TST-524,test_af2_grep_brace_expansion_bypass,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-2: brace-expansion {src,.github}/** bypass attempt → deny
 TST-525,test_af3_semantic_search_never_allow,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-3: semantic_search with innocuous query never returns allow,
 TST-526,test_af3_semantic_search_nested_input,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-3: semantic_search in VS Code nested format returns ask,
 TST-527,test_af4_recursive_get_childitem,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,regression AF-4: Get-ChildItem -Recurse on workspace root denied (ancestor of deny zones),
@@ -668,30 +668,30 @@ TST-567,test_nested_terminal_safe,Integration,SAF-009,Pass,2026-03-12,Windows 11
 TST-568,test_nested_terminal_blocked,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → run_in_terminal .vscode path → deny,
 TST-569,test_nested_always_allow,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → ask_questions with blocked path in payload → allow (always-allow bypass),
 TST-570,test_nested_semantic_search_asks,Integration,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,VS Code nested tool_input → semantic_search → ask,
-TST-571,SAF-009 full suite (50 tests) + SAF regression check,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,50/50 SAF-009 pass; 531 total SAF tests pass; 8 pre-existing SAF-010 failures unchanged; zero new failures,Developer Agent SAF-009 final run before handoffTST-521,test_file_exists,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,build_dmg.sh exists at src/installer/macos/build_dmg.sh,
-TST-522,test_file_is_non_empty,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,File size > 0,
-TST-523,test_shebang_line,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,First line is #!/usr/bin/env bash,
-TST-524,test_set_pipefail,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,set -euo pipefail present,
-TST-525,test_references_hdiutil,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,hdiutil command referenced,
-TST-526,test_hdiutil_create_subcommand,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,hdiutil create subcommand present,
-TST-527,test_hdiutil_compressed_format,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,-format UDZO (compressed DMG) specified,
-TST-528,test_hdiutil_volname,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,-volname flag set for hdiutil create,
-TST-529,test_app_name,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,App name Agent Environment Launcher present,
-TST-530,test_app_version,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Version 0.1.0 embedded,
-TST-531,test_publisher,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Publisher Turbulence Solutions referenced,
-TST-532,test_intel_arch_referenced,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,x86_64 architecture explicitly referenced,
-TST-533,test_arm_arch_referenced,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,arm64 architecture explicitly referenced,
-TST-534,test_target_arch_passed_to_pyinstaller,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,--target-arch passed to PyInstaller,
-TST-535,test_no_users_path,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded /Users/ path (bypass attempt),
-TST-536,test_no_home_path,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded /home/ path (bypass attempt),
-TST-537,test_no_absolute_dist_path,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,dist/ referenced as relative path only (bypass attempt),
-TST-538,test_contents_macos_created,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Contents/MacOS directory created in .app bundle,
-TST-539,test_contents_resources_created,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Contents/Resources directory created in .app bundle,
-TST-540,test_info_plist_written,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Info.plist written into .app bundle,
-TST-541,test_plist_key_present (x10 keys),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,All 10 CFBundle/NS plist keys present (parametrized),
-TST-542,test_references_launcher_spec,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,launcher.spec referenced for PyInstaller build,
-TST-543,test_references_dist_launcher_output,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,dist/launcher output directory referenced,
-TST-544,INS-006 full suite (32 tests) + full regression,Regression,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,32/32 INS-006 pass; 956 total pass; 11 pre-existing failures unchanged,Developer Agent INS-006 Iteration 1 — all tests pass
+TST-571,SAF-009 full suite (50 tests) + SAF regression check,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,50/50 SAF-009 pass; 531 total SAF tests pass; 8 pre-existing SAF-010 failures unchanged; zero new failures,Developer Agent SAF-009 final run before handoffTST-521
+TST-898,test_file_is_non_empty,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,File size > 0,
+TST-899,test_shebang_line,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,First line is #!/usr/bin/env bash,
+TST-900,test_set_pipefail,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,set -euo pipefail present,
+TST-901,test_references_hdiutil,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,hdiutil command referenced,
+TST-902,test_hdiutil_create_subcommand,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,hdiutil create subcommand present,
+TST-903,test_hdiutil_compressed_format,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,-format UDZO (compressed DMG) specified,
+TST-904,test_hdiutil_volname,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,-volname flag set for hdiutil create,
+TST-905,test_app_name,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,App name Agent Environment Launcher present,
+TST-906,test_app_version,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Version 0.1.0 embedded,
+TST-907,test_publisher,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Publisher Turbulence Solutions referenced,
+TST-908,test_intel_arch_referenced,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,x86_64 architecture explicitly referenced,
+TST-909,test_arm_arch_referenced,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,arm64 architecture explicitly referenced,
+TST-910,test_target_arch_passed_to_pyinstaller,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,--target-arch passed to PyInstaller,
+TST-911,test_no_users_path,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded /Users/ path (bypass attempt),
+TST-912,test_no_home_path,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,No hardcoded /home/ path (bypass attempt),
+TST-913,test_no_absolute_dist_path,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,dist/ referenced as relative path only (bypass attempt),
+TST-914,test_contents_macos_created,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Contents/MacOS directory created in .app bundle,
+TST-915,test_contents_resources_created,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Contents/Resources directory created in .app bundle,
+TST-916,test_info_plist_written,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Info.plist written into .app bundle,
+TST-917,test_plist_key_present (x10 keys),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,All 10 CFBundle/NS plist keys present (parametrized),
+TST-918,test_references_launcher_spec,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,launcher.spec referenced for PyInstaller build,
+TST-919,test_references_dist_launcher_output,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,dist/launcher output directory referenced,
+TST-920,INS-006 full suite (32 tests) + full regression,Regression,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,32/32 INS-006 pass; 956 total pass; 11 pre-existing failures unchanged,Developer Agent INS-006 Iteration 1 — all tests pass
 TST-572,TestLineEndings — no CRLF / no bare CR (2 tests),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Script uses LF-only line endings; safe for macOS bash execution,Tester edge-case
 TST-573,TestEncoding — no UTF-8 BOM / trailing newline (2 tests),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,No BOM; file ends with newline (POSIX compliant),Tester edge-case
 TST-574,TestVersionConsistency — APP_VERSION matches pyproject.toml,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,0.1.0 in build_dmg.sh matches pyproject.toml project.version,Tester edge-case
@@ -708,11 +708,11 @@ TST-584,test_decide_empty_dict_not_allow,Security,SAF-009,Pass,2026-03-12,Window
 TST-585,test_write_tool_path_field_outside_project_denied,Security,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,create_file with `path` field outside Project/ → deny (SAF-007 via alternate field),Tester edge-case
 TST-586,test_write_tool_path_field_inside_project_allowed,Security,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,create_file with `path` field inside Project/ → allow,Tester edge-case
 TST-587,SAF-009 combined suite (59 tests) — Tester final run,Regression,SAF-009,Pass,2026-03-12,Windows 11 + Python 3.11,59/59 pass — 50 Developer + 9 Tester edge-case; zero regressions; 0.17s,Tester Agent Iteration 1 — PASS verdict; WP marked Done
-TST-578,TestHdiutilFlags — -ov / -srcfolder / -o dist output (3 tests),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,-ov prevents failure on re-run; -srcfolder and -o dist/ correct,Tester edge-case
-TST-579,TestNoCredentials — 9 sensitive keyword checks,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,No password/token/secret/api_key/private_key/PEM header/aws_access in script,Tester edge-case
-TST-580,TestDmgFilename — version/arch variable interpolation / .dmg extension (3 tests),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,DMG filename uses ${APP_VERSION} and ${TARGET_ARCH} for dynamic naming,Tester edge-case
-TST-581,TestArchFallback — uname -m fallback present,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Script uses uname -m when no architecture argument supplied,Tester edge-case
-TST-582,INS-006 full combined suite (63 tests = 32 dev + 31 Tester) + full regression,Regression,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,63/63 INS-006 pass; 1001 total pass; 16 pre-existing failures unchanged; 0 new failures,Tester Agent Iteration 1 final run — PASS verdict
+TST-921,TestHdiutilFlags — -ov / -srcfolder / -o dist output (3 tests),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,-ov prevents failure on re-run; -srcfolder and -o dist/ correct,Tester edge-case
+TST-922,TestNoCredentials — 9 sensitive keyword checks,Security,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,No password/token/secret/api_key/private_key/PEM header/aws_access in script,Tester edge-case
+TST-923,TestDmgFilename — version/arch variable interpolation / .dmg extension (3 tests),Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,DMG filename uses ${APP_VERSION} and ${TARGET_ARCH} for dynamic naming,Tester edge-case
+TST-924,TestArchFallback — uname -m fallback present,Unit,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,Script uses uname -m when no architecture argument supplied,Tester edge-case
+TST-925,INS-006 full combined suite (63 tests = 32 dev + 31 Tester) + full regression,Regression,INS-006,Pass,2026-03-12,Windows 11 + Python 3.11,63/63 INS-006 pass; 1001 total pass; 16 pre-existing failures unchanged; 0 new failures,Tester Agent Iteration 1 final run — PASS verdict
 TST-588,GUI-009 developer test suite — TestUpdateBannerExists + TestApplyUpdateResult + TestRunUpdateCheck (11 tests),Unit,GUI-009,Pass,2026-03-12,Windows 11 + Python 3.11,11/11 pass — widget exists; hidden on init; banner shows/hides correctly; thread daemon; after(0) called,Developer Iteration 1
 TST-589,GUI-009 edge-case suite — TestNetworkErrorHandling + TestBannerToggling + TestVersionStringFormatting + TestThreadSafetyGuarantees (13 tests),Unit,GUI-009,Pass,2026-03-12,Windows 11 + Python 3.11,13/13 pass — network error; banner toggle; format checks; after(0) zero-delay; callback triggers apply,Developer edge-case additions
 TST-590,GUI-009 tester additions — TestEmptyVersionStringSafety + TestAutoLaunchIsSilentCheck (3 tests),Unit,GUI-009,Pass,2026-03-12,Windows 11 + Python 3.11,3/3 pass — empty version safe; auto-launch callback uses manual=False (silent path),Tester Agent Iteration 1 additions
@@ -722,7 +722,6 @@ TST-593,GUI-010 edge-case suite — TestDoubleClickPrevention + TestButtonRestor
 TST-594,GUI-010 tester additions — TestEmptyVersionRestoresButton + TestInnerCheckClosureSchedulesViaAfter (3 tests),Unit,GUI-010,Pass,2026-03-12,Windows 11 + Python 3.11,3/3 pass — empty version button restored + banner shown; inner closure uses after(0) zero-delay,Tester Agent Iteration 1 additions
 TST-595,GUI-010 full combined suite (22 tests = 9 dev + 10 edge-case + 3 Tester) + regression,Regression,GUI-010,Pass,2026-03-12,Windows 11 + Python 3.11,22/22 GUI-010 pass; regression: 1041 passed / 16 pre-existing failures unchanged / 0 new failures,Tester Agent Iteration 1 final run — PASS verdict; WP marked Done
 TST-596,INS-007 developer test suite (35 tests — test_ins007_build_appimage.py),Unit,INS-007,Pass,2026-03-12,Windows 11 + Python 3.11,35/35 pass — file existence / shebang / architecture / AppDir structure / .desktop / icon / AppRun / appimagetool / security / metadata all verified,Developer Agent INS-007 Iteration 1
-
 TST-597,GUI-007 developer test suite — validate_folder_name + check_duplicate_folder + validate_destination_path + App._on_create_project (86 tests),Unit,GUI-007,Pass,2026-03-12,Windows 11 + Python 3.11,86/86 pass — all validation branches covered; inline error labels; error clearing; happy path; edge cases,Developer Iteration 1
 TST-598,FIX-004 INS-006 line endings test suite (63 tests),Unit,FIX-004,Pass,2026-03-13,Windows 11 + Python 3.11,63/63 pass — TestLineEndings::test_no_crlf_line_endings and test_no_bare_cr now pass; build_dmg.sh confirmed LF-only,Developer Iteration 1
 TST-599,INS-012 gitignore test suite (30 tests),Unit,FIX-005,Pass,2026-03-13,Windows 11 + Python 3.11,30/30 pass — test_gitignore_git_recognises_spec now passes after untracking launcher.spec from git index,Developer Agent FIX-005
@@ -737,13 +736,13 @@ TST-607,test_popen_sentinel_blocks_vscode_string_form,Security,FIX-008,Pass,2026
 TST-608,test_popen_sentinel_allows_other_commands,Unit,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,subprocess.Popen([echo hello]) passes through sentinel without raising,FIX-008 Developer Iteration 1
 TST-609,test_find_vscode_returns_none,Integration,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,find_vscode() returns None during tests � Layer 2 blocks detection,FIX-008 Developer Iteration 1
 TST-610,test_all_three_layers_present,Unit,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,All 3 autouse fixtures present in conftest.py � structural check,FIX-008 Developer Iteration 1
-TST-611,FIX-008 full suite (8 tests = 7 FIX-008 + 1 updated FIX-006) + full regression,Regression,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,1563 passed / 2 skipped / 0 failed � zero regressions introduced,FIX-008 Developer Iteration 1TST-612,Full regression baseline (1563 tests) — Tester pre-review,Regression,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,1563 passed / 2 skipped / 0 failed — matches Developer log exactly,Tester Agent Iteration 1 — baseline confirmed
+TST-611,FIX-008 full suite (8 tests = 7 FIX-008 + 1 updated FIX-006) + full regression,Regression,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,1563 passed / 2 skipped / 0 failed � zero regressions introduced,FIX-008 Developer Iteration 1TST-612
 TST-613,FIX-008 developer test suite (7 tests all pass) — Tester code review,Unit,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,7/7 pass — Layer 2 selectivity / Layer 3 vscode block / Layer 3 passthrough / find_vscode / structural,Tester Agent Iteration 1 — all dev tests green
 TST-614,test_popen_sentinel_blocks_code_insiders,Security,FIX-008,Fail,2026-03-13,Windows 11 + Python 3.11,FileNotFoundError — sentinel does NOT intercept code-insiders; passes through to real Popen (BUG-033),Tester edge-case: VS Code Insiders variant not blocked by Layer 3 sentinel
 TST-615,test_popen_sentinel_blocks_code_insiders_string_form,Security,FIX-008,Fail,2026-03-13,Windows 11 + Python 3.11,FileNotFoundError — sentinel does NOT intercept string form 'code-insiders /tmp' (BUG-033),Tester edge-case: string form of code-insiders also bypasses Layer 3
 TST-616,test_layer3_works_independently_of_layers_1_and_2,Unit,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,RuntimeError raised — Layer 3 autouse sentinel correctly intercepts direct Popen('code') call,Tester edge-case: Layer 3 independence confirmed
 TST-617,test_popen_allows_python_subprocess,Unit,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,Popen(['python' '-c' 'print(1)']) passes through sentinel without raising — legitimate calls unblocked,Tester edge-case: non-VS-Code subprocess passthrough confirmed
-TST-618,FIX-008 tester edge-case suite (5 tests: 2 fail + 3 pass),Security,FIX-008,Fail,2026-03-13,Windows 11 + Python 3.11,9/11 total FIX-008 tests pass; 2 new failures — code-insiders not blocked by Layer 3 sentinel,Tester Agent Iteration 1 — FAIL verdict; WP returned to In ProgressTST-619,test_popen_sentinel_blocks_code_insiders,Security,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,RuntimeError raised for Popen(['code-insiders' '/tmp']) � BUG-033 fixed,FIX-008 Developer Iteration 2
+TST-618,FIX-008 tester edge-case suite (5 tests: 2 fail + 3 pass),Security,FIX-008,Fail,2026-03-13,Windows 11 + Python 3.11,9/11 total FIX-008 tests pass; 2 new failures — code-insiders not blocked by Layer 3 sentinel,Tester Agent Iteration 1 — FAIL verdict; WP returned to In ProgressTST-619
 TST-620,test_popen_sentinel_blocks_code_insiders_string_form,Security,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,RuntimeError raised for Popen('code-insiders /tmp') string form � BUG-033 fixed,FIX-008 Developer Iteration 2
 TST-621,FIX-008 full suite (11 tests) + full regression,Regression,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,1567 passed / 2 skipped / 0 failed � all 11 FIX-008 tests green including code-insiders,FIX-008 Developer Iteration 2
 TST-622,FIX-008 full suite (11 tests) � Tester Iteration 2 independent verification,Security,FIX-008,Pass,2026-03-13,Windows 11 + Python 3.11,11/11 pass � all Tester edge-case tests green (code-insiders list + string form now blocked by _VSCODE_CMDS),Tester Agent Iteration 2 � BUG-033 fix verified
@@ -854,7 +853,7 @@ TST-726,test_release_runs_on,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.
 TST-727,test_release_needs_all_builds,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,release.needs contains all 4 build job names,Developer Agent INS-013
 TST-728,test_each_job_has_steps,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,All 5 jobs have at least one step,Developer Agent INS-013
 TST-729,test_workflow_name,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,Workflow name is Build and Release,Developer Agent INS-013
-TST-718,Full regression suite (1659 tests) — INS-011 Tester final run,Regression,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,1659 passed / 2 skipped / 0 failed — 40 Dev + 26 Tester edge-case tests; zero regressions,Tester Agent INS-011 — PASS verdict
+TST-926,Full regression suite (1659 tests) — INS-011 Tester final run,Regression,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,1659 passed / 2 skipped / 0 failed — 40 Dev + 26 Tester edge-case tests; zero regressions,Tester Agent INS-011 — PASS verdict
 TST-730,test_yaml_round_trip_no_data_loss,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,YAML round-trip dump/reload produces identical structure,Tester Agent INS-013
 TST-731,test_no_duplicate_job_names,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,All job names are distinct and count is exactly 5,Tester Agent INS-013
 TST-732,test_workflow_name_is_non_empty_string,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,Workflow name is a non-empty string,Tester Agent INS-013
@@ -906,9 +905,25 @@ TST-777,INS-015 Tester edge-case tests (18 tests),Unit,INS-015,Pass,2026-03-14,W
 TST-778,Full regression suite (1759 tests) - INS-015 Tester final,Regression,INS-015,Pass,2026-03-14,Windows 11 + Python 3.11,1759 passed 2 skipped 0 failed; 49 INS-015 tests (31 dev + 18 tester); zero regressions; Tester PASS,Tester Agent INS-015
 TST-779,INS-016 linux-build job tests (28 tests),Unit,INS-016,Pass,2026-03-14,Windows 11 + Python 3.11,28 passed 0 failed; job steps/runner/python/libfuse2/pyinstaller/appimage/artifact all verified,Developer Agent INS-016
 TST-780,Full regression suite (1787 tests) - INS-016 Developer final,Regression,INS-016,Pass,2026-03-14,Windows 11 + Python 3.11,1787 passed 2 skipped 0 failed; zero regressions,Developer Agent INS-016
-TST-781,"INS-016 tester edge-case tests (7 tests)",Unit,INS-016,Pass,2026-03-14,Windows 11 + Python 3.11,"35 passed 0 failed; no shell overrides / no secrets / sudo only for apt-get / distinct artifact name / checkout first / apt-get not bare apt / script exists","Tester Agent INS-016"
+TST-781,INS-016 tester edge-case tests (7 tests),Unit,INS-016,Pass,2026-03-14,Windows 11 + Python 3.11,35 passed 0 failed; no shell overrides / no secrets / sudo only for apt-get / distinct artifact name / checkout first / apt-get not bare apt / script exists,Tester Agent INS-016
 TST-782,INS-017 release job tests (21 tests),Unit,INS-017,Pass,2026-03-14,Windows 11 + Python 3.11,21 passed 0 failed; needs/permissions/download-artifact/softprops/files-glob/generate_release_notes all verified,Developer Agent INS-017
 TST-783,Full regression suite (1808 tests) - INS-017 Developer final,Regression,INS-017,Pass,2026-03-14,Windows 11 + Python 3.11,1808 passed 2 skipped 0 failed; zero regressions,Developer Agent INS-017
-TST-782,"Full regression suite (1794 tests) - INS-016 Tester PASS",Regression,INS-016,Pass,2026-03-14,Windows 11 + Python 3.11,"1794 passed 2 skipped 0 failed; zero regressions after tester edge-case additions","Tester Agent INS-016"
+TST-927,Full regression suite (1794 tests) - INS-016 Tester PASS,Regression,INS-016,Pass,2026-03-14,Windows 11 + Python 3.11,1794 passed 2 skipped 0 failed; zero regressions after tester edge-case additions,Tester Agent INS-016
 TST-784,INS-017 tester edge-case tests (11 tests),Unit,INS-017,Pass,2026-03-14,Windows 11 + Python 3.11,11 passed 0 failed; no env-token-leak/needs-count/artifact-conflict/floating-tags/shell-override/pinned-versions/no-setup-python all verified,Tester Agent INS-017
-TST-785,"Full regression suite (1819 tests) - INS-017 Tester PASS",Regression,INS-017,Pass,2026-03-14,Windows 11 + Python 3.11,"1819 passed 2 skipped 0 failed; 32 INS-017 tests (21 dev + 11 tester); zero regressions; Tester PASS","Tester Agent INS-017"
+TST-785,Full regression suite (1819 tests) - INS-017 Tester PASS,Regression,INS-017,Pass,2026-03-14,Windows 11 + Python 3.11,1819 passed 2 skipped 0 failed; 32 INS-017 tests (21 dev + 11 tester); zero regressions; Tester PASS,Tester Agent INS-017
+TST-928,test_open_in_vscode_source_binding_is_blocked,Unit,FIX-006,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-929,test_open_in_vscode_app_binding_is_blocked,Unit,FIX-006,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-930,test_subprocess_popen_is_real,Unit,FIX-006,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-931,test_check_for_update_app_binding_is_blocked,Unit,FIX-006,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-932,test_check_for_update_source_is_real,Unit,FIX-006,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-933,test_safety_chain_open_in_vscode_cannot_reach_popen,Integration,FIX-006,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-934,test_file_does_not_use_del_sys_modules_loop,Regression,FIX-007,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-935,test_file_uses_shared_ctk_mock,Regression,FIX-007,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-936,test_app_py_has_no_bom,Unit,FIX-007,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-937,test_app_py_is_valid_python,Unit,FIX-007,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-938,test_check_for_update_returns_tuple,Unit,FIX-007,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-939,test_window_height_assertion_matches_app,Unit,FIX-007,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-940,test_app_window_height_is_520,Unit,FIX-007,Pass,2026-03-13,Windows 11 + Python 3.11,Pass,Retroactively logged during maintenance 2026-03-14
+TST-941,test_no_duplicate_tst_ids,Unit,FIX-009,Pass,2026-03-14,Windows 11 + Python 3.11,Pass,All 925 TST-IDs unique after deduplication
+TST-942,test_tst_id_format,Unit,FIX-009,Pass,2026-03-14,Windows 11 + Python 3.11,Pass,All IDs match TST-NNN format
+TST-943,test_required_fields_not_empty,Unit,FIX-009,Pass,2026-03-14,Windows 11 + Python 3.11,Pass,No empty required fields
