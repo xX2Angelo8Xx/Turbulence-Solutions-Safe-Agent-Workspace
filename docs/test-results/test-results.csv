@@ -855,3 +855,16 @@ TST-727,test_release_needs_all_builds,Unit,INS-013,Pass,2026-03-14,Windows 11 + 
 TST-728,test_each_job_has_steps,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,All 5 jobs have at least one step,Developer Agent INS-013
 TST-729,test_workflow_name,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,Workflow name is Build and Release,Developer Agent INS-013
 TST-718,Full regression suite (1659 tests) — INS-011 Tester final run,Regression,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,1659 passed / 2 skipped / 0 failed — 40 Dev + 26 Tester edge-case tests; zero regressions,Tester Agent INS-011 — PASS verdict
+TST-730,test_yaml_round_trip_no_data_loss,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,YAML round-trip dump/reload produces identical structure,Tester Agent INS-013
+TST-731,test_no_duplicate_job_names,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,All job names are distinct and count is exactly 5,Tester Agent INS-013
+TST-732,test_workflow_name_is_non_empty_string,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,Workflow name is a non-empty string,Tester Agent INS-013
+TST-733,test_no_explicit_shell_directives,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,No shell: key present in any step across all jobs,Tester Agent INS-013
+TST-734,test_release_needs_exactly_the_4_build_jobs,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,release.needs set equals exactly the 4 build jobs,Tester Agent INS-013
+TST-735,test_release_needs_count_is_exactly_4,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,release.needs list has exactly 4 entries,Tester Agent INS-013
+TST-736,test_each_job_uses_checkout_action,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,First step of every job is actions/checkout,Tester Agent INS-013
+TST-737,test_no_pull_request_target_trigger,Security,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,No pull_request_target trigger present (security),Tester Agent INS-013
+TST-738,test_no_hardcoded_secrets_in_raw_file,Security,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,No hardcoded credentials/tokens in raw YAML,Tester Agent INS-013
+TST-739,test_workflow_file_is_utf8_without_bom,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,File has no UTF-8 BOM prefix,Tester Agent INS-013
+TST-740,test_tag_trigger_pattern_is_exact_semver_glob,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,Tags list is exactly [v*.*.*],Tester Agent INS-013
+TST-741,test_no_branch_trigger_present,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,No push.branches trigger present,Tester Agent INS-013
+TST-742,Full regression suite (1683 tests) - INS-013 Tester final run,Regression,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,1683 passed / 2 skipped / 0 failed - 12 dev + 12 Tester edge-case tests; zero regressions,Tester Agent INS-013 - PASS verdict
