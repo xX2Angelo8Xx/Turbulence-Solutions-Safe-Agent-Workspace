@@ -174,18 +174,18 @@ When re-submitting for Tester review:
 | Item | Finding |
 |------|---------|
 | `_VSCODE_CMDS` frozenset | ? Defined at module level in `tests/conftest.py`. Contains `{"code", "code-insiders"}`. Used by both Layer 2 and Layer 3. |
-| Layer 2 (`_prevent_vscode_detection`) | ? `_guarded_which` checks `name in _VSCODE_CMDS` — now blocks `shutil.which("code-insiders")`. |
+| Layer 2 (`_prevent_vscode_detection`) | ? `_guarded_which` checks `name in _VSCODE_CMDS` ï¿½ now blocks `shutil.which("code-insiders")`. |
 | Layer 3 list-args branch | ? `cmd in _VSCODE_CMDS` + `cmd.endswith(os.sep + "code-insiders")` catches bare name and absolute paths. |
 | Layer 3 string-args branch | ? `first in _VSCODE_CMDS` catches `"code-insiders /path"` string form. |
-| Case sensitivity (Layer 3) | ? `cmd = str(args[0]).lower()` — comparisons are case-insensitive. |
+| Case sensitivity (Layer 3) | ? `cmd = str(args[0]).lower()` ï¿½ comparisons are case-insensitive. |
 | BUG-033 fix | ? Both edge-case tests now PASS (were FAIL in Iteration 1). |
 
 ### Remaining Documented Gaps (Not Blocking)
 
 | Vector | Risk |
 |--------|------|
-| `code.exe`, `code-insiders.exe` explicit `.exe` name in args | Negligible — no production code uses this form; Layers 1+2 prevent reaching this path |
-| `shutil.which("Code")` mixed-case | Negligible — no production code queries with non-lowercase |
+| `code.exe`, `code-insiders.exe` explicit `.exe` name in args | Negligible ï¿½ no production code uses this form; Layers 1+2 prevent reaching this path |
+| `shutil.which("Code")` mixed-case | Negligible ï¿½ no production code queries with non-lowercase |
 | `codium`, `code-oss` open-source forks | Out of scope; neither binary is used by this project |
 
 ---
@@ -194,8 +194,8 @@ When re-submitting for Tester review:
 
 | TST-ID | Test | Result |
 |--------|------|--------|
-| TST-622 | FIX-008 full suite (11 tests) — Tester Iteration 2 | ? Pass |
-| TST-623 | Full regression (1567 passed / 2 skipped / 0 failed) — Tester Iteration 2 | ? Pass |
+| TST-622 | FIX-008 full suite (11 tests) ï¿½ Tester Iteration 2 | ? Pass |
+| TST-623 | Full regression (1567 passed / 2 skipped / 0 failed) ï¿½ Tester Iteration 2 | ? Pass |
 
 ---
 
