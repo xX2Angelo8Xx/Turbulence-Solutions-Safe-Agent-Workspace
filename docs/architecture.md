@@ -13,7 +13,7 @@ Installer (.exe / .dmg / .AppImage)
 
 Templates (bundled inside Launcher)
   └── coding/          ← Default-Project template
-  └── creative/        ← Future: marketing/creative template
+  └── creative-marketing/   ← Marketing/creative template
 ```
 
 ## Repository Structure
