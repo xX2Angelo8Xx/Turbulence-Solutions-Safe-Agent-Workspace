@@ -161,11 +161,14 @@ class TestPrivilegesAndArch:
             "PrivilegesRequired must be exactly 'admin' — writing to {autopf} requires elevation"
         )
 
-    def test_architecture_restricted_to_x64(self):
-        """ArchitecturesAllowed must be set to prevent 32-bit installs of a 64-bit bundle."""
+    def test_architecture_directives_not_present(self):
+        """ArchitecturesAllowed/ArchitecturesInstallMode removed — not supported by CI Inno Setup (BUG-041)."""
         content = read_iss()
-        assert "ArchitecturesAllowed=x64compatible" in content, (
-            "ArchitecturesAllowed=x64compatible must be declared to restrict to 64-bit systems"
+        assert "ArchitecturesAllowed" not in content, (
+            "ArchitecturesAllowed must not be present — not supported by chocolatey Inno Setup on CI (BUG-041)"
+        )
+        assert "ArchitecturesInstallMode" not in content, (
+            "ArchitecturesInstallMode must not be present — not supported by chocolatey Inno Setup on CI (BUG-041)"
         )
 
 

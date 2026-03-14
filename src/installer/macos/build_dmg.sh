@@ -42,7 +42,6 @@ echo "==> Building ${APP_NAME} v${APP_VERSION} for ${TARGET_ARCH}"
 if [ ! -d "${DIST_DIR}/launcher" ]; then
     echo "==> Running PyInstaller..."
     python -m PyInstaller \
-        --target-arch "${TARGET_ARCH}" \
         --distpath "${DIST_DIR}" \
         --workpath "${BUILD_DIR}" \
         --noconfirm \

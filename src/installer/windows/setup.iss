@@ -19,8 +19,6 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=admin
-ArchitecturesAllowed=x64compatible
-ArchitecturesInstallMode=x64compatible
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

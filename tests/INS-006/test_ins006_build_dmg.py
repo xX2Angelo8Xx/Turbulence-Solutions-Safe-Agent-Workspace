@@ -122,10 +122,11 @@ class TestArchitectureSupport:
             "Script must explicitly reference the ARM architecture arm64"
         )
 
-    def test_target_arch_passed_to_pyinstaller(self):
+    def test_target_arch_not_passed_to_pyinstaller(self):
+        """--target-arch must NOT be passed — not allowed when a .spec file is given (BUG-040)."""
         content = read_script()
-        assert "--target-arch" in content, (
-            "Script must pass --target-arch to PyInstaller to control output architecture"
+        assert "--target-arch" not in content, (
+            "--target-arch must not be passed to PyInstaller when using a .spec file (BUG-040)"
         )
 
 
