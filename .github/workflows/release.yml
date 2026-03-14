@@ -1,0 +1,33 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+  macos-intel-build:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+  macos-arm-build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+  linux-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+  release:
+    needs: [windows-build, macos-intel-build, macos-arm-build, linux-build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4

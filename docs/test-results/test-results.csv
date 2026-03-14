@@ -842,4 +842,16 @@ TST-714,test_on_install_update_disables_button_before_thread,Integration,INS-011
 TST-715,test_on_install_error_restores_to_normal_state,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,button state=normal and Install text restored after error,Tester Agent INS-011
 TST-716,test_apply_update_result_updates_latest_version_tracking,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,_latest_version updated to new version when update available,Tester Agent INS-011
 TST-717,test_apply_update_result_does_not_update_version_when_up_to_date,Integration,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,_latest_version not overwritten when update_available=False,Tester Agent INS-011
+TST-718,test_workflow_file_exists,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,.github/workflows/release.yml exists at expected path,Developer Agent INS-013
+TST-719,test_workflow_yaml_valid,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,YAML parses without errors and root is a dict,Developer Agent INS-013
+TST-720,test_trigger_push_tags,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,on.push.tags contains v*.*.* pattern,Developer Agent INS-013
+TST-721,test_all_5_jobs_defined,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,All 5 expected job keys present (4 builds + release),Developer Agent INS-013
+TST-722,test_windows_build_runs_on,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,windows-build uses windows-latest runner,Developer Agent INS-013
+TST-723,test_macos_intel_runs_on,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,macos-intel-build uses macos-13 runner,Developer Agent INS-013
+TST-724,test_macos_arm_runs_on,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,macos-arm-build uses macos-14 runner,Developer Agent INS-013
+TST-725,test_linux_build_runs_on,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,linux-build uses ubuntu-latest runner,Developer Agent INS-013
+TST-726,test_release_runs_on,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,release job uses ubuntu-latest runner,Developer Agent INS-013
+TST-727,test_release_needs_all_builds,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,release.needs contains all 4 build job names,Developer Agent INS-013
+TST-728,test_each_job_has_steps,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,All 5 jobs have at least one step,Developer Agent INS-013
+TST-729,test_workflow_name,Unit,INS-013,Pass,2026-03-14,Windows 11 + Python 3.11,Workflow name is Build and Release,Developer Agent INS-013
 TST-718,Full regression suite (1659 tests) — INS-011 Tester final run,Regression,INS-011,Pass,2026-03-14,Windows 11 + Python 3.11,1659 passed / 2 skipped / 0 failed — 40 Dev + 26 Tester edge-case tests; zero regressions,Tester Agent INS-011 — PASS verdict
