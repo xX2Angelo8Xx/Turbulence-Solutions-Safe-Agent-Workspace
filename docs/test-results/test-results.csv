@@ -1114,3 +1114,16 @@ TST-1127,test_app_uses_wm_iconbitmap_on_windows,Unit,FIX-016,Pass,2026-03-16,Win
 TST-1128,test_app_uses_iconphoto_on_non_windows,Unit,FIX-016,Pass,2026-03-16,Windows 11 + Python 3.11,iconphoto path verified for non-Windows,
 TST-1129,test_app_source_has_win32_branch,Unit,FIX-016,Pass,2026-03-16,Windows 11 + Python 3.11,app.py contains win32 guard and both iconbitmap/iconphoto calls,
 TST-1130,Full regression suite (1941 passed 29 skipped 1 pre-existing fail) - FIX-016 dev final run,Regression,FIX-016,Pass,2026-03-16,Windows 11 + Python 3.11,1941 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 12 FIX-016 tests all pass; zero new regressions,Developer Agent final run
+TST-1131,test_config_version_constant_is_1_0_2,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,config.py VERSION constant equals 1.0.2,
+TST-1132,test_config_py_contains_version_string,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,config.py source contains VERSION: str = "1.0.2",
+TST-1133,test_pyproject_version_is_1_0_2,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,pyproject.toml version field equals 1.0.2,
+TST-1134,test_pyproject_does_not_contain_old_version,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,pyproject.toml does not contain version 1.0.1,
+TST-1135,test_setup_iss_myappversion_is_1_0_2,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,setup.iss MyAppVersion equals 1.0.2,
+TST-1136,test_setup_iss_does_not_contain_old_version,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,setup.iss does not contain MyAppVersion 1.0.1,
+TST-1137,test_build_dmg_app_version_is_1_0_2,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,build_dmg.sh APP_VERSION equals 1.0.2,
+TST-1138,test_build_dmg_does_not_contain_old_version,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,build_dmg.sh does not contain APP_VERSION 1.0.1,
+TST-1139,test_build_appimage_app_version_is_1_0_2,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,build_appimage.sh APP_VERSION equals 1.0.2,
+TST-1140,test_build_appimage_does_not_contain_old_version,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,build_appimage.sh does not contain APP_VERSION 1.0.1,
+TST-1141,test_all_five_versions_are_identical,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,All 5 version locations are consistent,
+TST-1142,test_all_versions_equal_expected,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,All 5 version locations equal 1.0.2,
+TST-1143,Full regression suite (1993 passed 29 skipped 1 pre-existing fail) - FIX-017 dev final run,Regression,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,1993 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 12 FIX-017 tests all pass; zero new regressions,Developer Agent final run

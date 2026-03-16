@@ -95,7 +95,7 @@ class TestAppMetadata:
 
     def test_app_version(self):
         content = read_script()
-        assert "1.0.1" in content, "Script must embed version 1.0.1"
+        assert "1.0.2" in content, "Script must embed version 1.0.2"
 
     def test_publisher(self):
         content = read_script()

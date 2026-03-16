@@ -1,6 +1,6 @@
-"""Tests for FIX-014: Bump Version to 1.0.1.
+"""Tests for FIX-017: Bump Version to 1.0.2.
 
-Verifies that all 5 version locations have been updated to 1.0.1 and that
+Verifies that all 5 version locations have been updated to 1.0.2 and that
 all version strings are consistent with each other.
 """
 from pathlib import Path
@@ -19,11 +19,11 @@ EXPECTED_VERSION = "1.0.2"
 
 
 # ---------------------------------------------------------------------------
-# AC1: config.py VERSION is "1.0.1"
+# AC1: config.py VERSION is "1.0.2"
 # ---------------------------------------------------------------------------
 
 class TestConfigVersion:
-    def test_config_version_constant_is_1_0_1(self):
+    def test_config_version_constant_is_1_0_2(self):
         """config.py VERSION constant must equal '1.0.2'."""
         import importlib.util
         spec = importlib.util.spec_from_file_location("launcher.config", CONFIG_PY)
@@ -34,7 +34,7 @@ class TestConfigVersion:
         )
 
     def test_config_py_contains_version_string(self):
-        """config.py source file must contain VERSION = '1.0.2'."""
+        """config.py source file must contain VERSION: str = '1.0.2'."""
         content = CONFIG_PY.read_text(encoding="utf-8")
         assert f'VERSION: str = "{EXPECTED_VERSION}"' in content, (
             f"config.py does not contain VERSION: str = \"{EXPECTED_VERSION}\""
@@ -42,11 +42,11 @@ class TestConfigVersion:
 
 
 # ---------------------------------------------------------------------------
-# AC2: pyproject.toml version is "1.0.1"
+# AC2: pyproject.toml version is "1.0.2"
 # ---------------------------------------------------------------------------
 
 class TestPyprojectVersion:
-    def test_pyproject_version_is_1_0_1(self):
+    def test_pyproject_version_is_1_0_2(self):
         """pyproject.toml [project] version must be '1.0.2'."""
         content = PYPROJECT.read_text(encoding="utf-8")
         assert f'version = "{EXPECTED_VERSION}"' in content, (
@@ -54,19 +54,19 @@ class TestPyprojectVersion:
         )
 
     def test_pyproject_does_not_contain_old_version(self):
-        """pyproject.toml must not still reference version 1.0.0."""
+        """pyproject.toml must not still reference version 1.0.1."""
         content = PYPROJECT.read_text(encoding="utf-8")
-        assert 'version = "1.0.0"' not in content, (
-            "pyproject.toml still contains old version 1.0.0"
+        assert 'version = "1.0.1"' not in content, (
+            "pyproject.toml still contains old version 1.0.1"
         )
 
 
 # ---------------------------------------------------------------------------
-# AC3: setup.iss MyAppVersion is "1.0.1"
+# AC3: setup.iss MyAppVersion is "1.0.2"
 # ---------------------------------------------------------------------------
 
 class TestSetupIssVersion:
-    def test_setup_iss_myappversion_is_1_0_1(self):
+    def test_setup_iss_myappversion_is_1_0_2(self):
         """setup.iss #define MyAppVersion must be '1.0.2'."""
         content = SETUP_ISS.read_text(encoding="utf-8")
         assert f'MyAppVersion "{EXPECTED_VERSION}"' in content, (
@@ -74,19 +74,19 @@ class TestSetupIssVersion:
         )
 
     def test_setup_iss_does_not_contain_old_version(self):
-        """setup.iss must not still reference version 1.0.0."""
+        """setup.iss must not still reference version 1.0.1."""
         content = SETUP_ISS.read_text(encoding="utf-8")
-        assert 'MyAppVersion "1.0.0"' not in content, (
-            "setup.iss still contains old MyAppVersion 1.0.0"
+        assert 'MyAppVersion "1.0.1"' not in content, (
+            "setup.iss still contains old MyAppVersion 1.0.1"
         )
 
 
 # ---------------------------------------------------------------------------
-# AC4: build_dmg.sh APP_VERSION is "1.0.1"
+# AC4: build_dmg.sh APP_VERSION is "1.0.2"
 # ---------------------------------------------------------------------------
 
 class TestBuildDmgVersion:
-    def test_build_dmg_app_version_is_1_0_1(self):
+    def test_build_dmg_app_version_is_1_0_2(self):
         """build_dmg.sh APP_VERSION must be '1.0.2'."""
         content = BUILD_DMG.read_text(encoding="utf-8")
         assert f'APP_VERSION="{EXPECTED_VERSION}"' in content, (
@@ -94,19 +94,19 @@ class TestBuildDmgVersion:
         )
 
     def test_build_dmg_does_not_contain_old_version(self):
-        """build_dmg.sh must not still reference APP_VERSION 1.0.0."""
+        """build_dmg.sh must not still reference APP_VERSION 1.0.1."""
         content = BUILD_DMG.read_text(encoding="utf-8")
-        assert 'APP_VERSION="1.0.0"' not in content, (
-            "build_dmg.sh still contains old APP_VERSION 1.0.0"
+        assert 'APP_VERSION="1.0.1"' not in content, (
+            "build_dmg.sh still contains old APP_VERSION 1.0.1"
         )
 
 
 # ---------------------------------------------------------------------------
-# AC5: build_appimage.sh APP_VERSION is "1.0.1"
+# AC5: build_appimage.sh APP_VERSION is "1.0.2"
 # ---------------------------------------------------------------------------
 
 class TestBuildAppimageVersion:
-    def test_build_appimage_app_version_is_1_0_1(self):
+    def test_build_appimage_app_version_is_1_0_2(self):
         """build_appimage.sh APP_VERSION must be '1.0.2'."""
         content = BUILD_APPIMAGE.read_text(encoding="utf-8")
         assert f'APP_VERSION="{EXPECTED_VERSION}"' in content, (
@@ -114,10 +114,10 @@ class TestBuildAppimageVersion:
         )
 
     def test_build_appimage_does_not_contain_old_version(self):
-        """build_appimage.sh must not still reference APP_VERSION 1.0.0."""
+        """build_appimage.sh must not still reference APP_VERSION 1.0.1."""
         content = BUILD_APPIMAGE.read_text(encoding="utf-8")
-        assert 'APP_VERSION="1.0.0"' not in content, (
-            "build_appimage.sh still contains old APP_VERSION 1.0.0"
+        assert 'APP_VERSION="1.0.1"' not in content, (
+            "build_appimage.sh still contains old APP_VERSION 1.0.1"
         )
 
 
