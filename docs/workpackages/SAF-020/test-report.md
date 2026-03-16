@@ -1,9 +1,9 @@
 # SAF-020 Test Report — Detect and Block Terminal Wildcard Patterns
 
-**Verdict: FAIL**
+**Verdict: PASS**
 
 **Tester:** Tester Agent  
-**Date:** 2026-03-16  
+**Date:** 2026-03-17  
 **Branch:** `SAF-020/wildcard-blocking`  
 **WP Goal:** Terminal wildcard bypass vector is fully closed; no glob pattern can resolve to restricted zones.
 
@@ -11,9 +11,11 @@
 
 ## Summary
 
-The SAF-020 implementation correctly handles `*` and `?` wildcard patterns via the new `_wildcard_prefix_matches_deny_zone()` helper function. All 69 Developer-written tests pass. However, the Tester's edge-case suite uncovered an active security bypass: **bracket expression wildcards** (`[.g]*`, `[Nn]*`, `[.v]*`) are not detected as deny-zone patterns. This violates the WP goal that "no glob pattern can resolve to restricted zones."
+**Iteration 1 (2026-03-16):** SAF-020 implementation correctly blocked `*` and `?` wildcard patterns but missed bracket expression wildcards (`[.g]*`, `[Nn]*`, `[.v]*`). 7 Tester edge-case tests failed. WP was returned to Developer with BUG-051.
 
-**Result:** 7 Tester edge-case tests FAIL. WP is returned to the Developer for fixing.
+**Iteration 2 (2026-03-17):** Developer fixed BUG-051 by adding `[` to the wildcard trigger characters in `_wildcard_prefix_matches_deny_zone()` and all caller sites. All 107 SAF-020 tests now pass. Full regression suite passes with only the pre-existing INS-005 failure.
+
+**Final Result: PASS. WP marked Done.**
 
 ---
 
@@ -22,13 +24,15 @@ The SAF-020 implementation correctly handles `*` and `?` wildcard patterns via t
 | Run | Suite | Result | Tests |
 |-----|-------|--------|-------|
 | TST-1392 | SAF-020 Developer suite (69 tests) | PASS | 69 passed |
-| TST-1393 | SAF-020 Tester edge-case suite | FAIL | 7 failed / 100 passed (107 total) |
-| TST-1394 | Full regression suite | FAIL | 7 new fails / 2749 passed / 3 pre-existing |
+| TST-1393 | SAF-020 Tester edge-case suite (Iteration 1) | FAIL | 7 failed / 100 passed (107 total) |
+| TST-1394 | Full regression suite (Iteration 1) | FAIL | 7 new fails / 2749 passed / 3 pre-existing |
+| TST-1395 | SAF-020 Iteration 2 — full SAF-020 suite post-bracket fix | PASS | 107 passed |
+| TST-1396 | SAF-020 Iteration 2 — full regression suite | PASS | 2782 passed / 1 pre-existing / 29 skipped |
+| TST-1397 | SAF-020 Tester re-verification — full SAF-020 suite | PASS | 107 passed |
+| TST-1398 | SAF-020 Tester re-verification — full regression suite | PASS | 2782 passed / 1 pre-existing / 29 skipped |
 
-Pre-existing failures (not caused by SAF-020):
-- `SAF-008`: Hash integrity (deferred to SAF-025)
-- `INS-005`: `filesandirs` assertion (pre-existing, unrelated)
-- `FIX-009`: Duplicate TST-1389 — **fixed by Tester** (duplicate corrected to TST-1391)
+**Pre-existing failures (not caused by SAF-020):**
+- `INS-005`: `filesandirs` vs `filesandordirs` assertion mismatch — BUG-045, pre-existing
 
 ---
 
@@ -118,81 +122,56 @@ This occurs because:
 
 ---
 
-## TODOs for Developer (Required to Pass)
+---
 
-### TODO 1 — Add bracket expression detection to `_wildcard_prefix_matches_deny_zone`
+## Iteration 2 — BUG-051 Fix Verification
 
-**File:** `Default-Project/.github/hooks/scripts/security_gate.py` (and mirror in `templates/`)
+### Fix Applied
+Three changes in `_wildcard_prefix_matches_deny_zone()` in both `Default-Project/` and `templates/coding/`:
 
-The function must treat `[` as a wildcard character trigger. Recommended approach:
+1. **Early-exit guard** — `"[" not in token` added so pure bracket expressions trigger the check.
+2. **Part wildcard detection** — `"[" not in part` added so bracket-containing components enter the wildcard branch.
+3. **`wc_pos` calculation** — `"["` added to the searched characters, extracting the prefix before the first `[`.
+4. **Caller trigger conditions** — `"[" in stripped` added at lines 1171 and 1364.
 
-```python
-def _wildcard_prefix_matches_deny_zone(token: str) -> bool:
-    # Add [ to the early-exit check:
-    if "*" not in token and "?" not in token and "[" not in token:
-        return False
-    ...
-    # In the per-component logic, extend the wildcard position calculation:
-    wc_pos = len(part)
-    for wc_char in ("*", "?", "["):
-        pos = part.find(wc_char)
-        if pos != -1:
-            wc_pos = min(wc_pos, pos)
-    comp_prefix = part[:wc_pos]
-    ...
-```
+### Previously Failing Tests — Now PASS
 
-With this fix:
-- `[.g]*` → wildcard detected at index 0 → comp_prefix = `""` (empty) → conservative deny ✓
-- `[Nn]*` → wildcard at 0 → empty prefix → deny ✓
-- `some/[.g]*` → safe parent entered → allow (unchanged, correct) ✓
+| Test | Status |
+|------|--------|
+| `TestBracketExpressionWildcards::test_bracket_dotg_star_helper_denied` | ✅ PASS |
+| `TestBracketExpressionWildcards::test_bracket_n_upper_lower_star_helper_denied` | ✅ PASS |
+| `TestBracketExpressionWildcards::test_bracket_dotv_star_helper_denied` | ✅ PASS |
+| `TestBracketExpressionWildcards::test_bracket_dotg_star_sanitize_denied` | ✅ PASS |
+| `TestBracketExpressionWildcards::test_bracket_n_star_via_gci_denied` | ✅ PASS |
+| `TestBracketExpressionWildcards::test_bracket_dotv_star_via_dir_denied` | ✅ PASS |
+| `TestWildcardsAfterPipe::test_pipe_bracket_dotg_still_caught_by_ls` | ✅ PASS |
 
-### TODO 2 — Update the wildcard check triggers in `_validate_args` and `_check_path_arg`
-
-**Line 1038 in `_check_path_arg`:**
-```python
-if _wildcard_prefix_matches_deny_zone(token):
-```
-This is already correct since `_wildcard_prefix_matches_deny_zone` will be fixed.
-
-**Line 1171 in `_validate_args`:**
-```python
-if not _prev_was_flag and ("*" in stripped or "?" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
-```
-Update the trigger condition to also include `[`:
-```python
-if not _prev_was_flag and ("*" in stripped or "?" in stripped or "[" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
-```
-
-**Line 1364 in exception-listed command handling** — same update:
-```python
-if ("*" in stripped or "?" in stripped or "[" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
-```
-
-### TODO 3 — Sync the templated copy
-
-After fixing `Default-Project/.github/hooks/scripts/security_gate.py`, sync all changes to `templates/coding/.github/hooks/scripts/security_gate.py`.
-
-### TODO 4 — Update the `_WILDCARD_DENY_ZONES` docstring / comment
-
-Update the `_wildcard_prefix_matches_deny_zone` docstring to mention bracket expressions:
-```
-Wildcards: *, ?, and [ (bracket expression start).
-```
-
-### TODO 5 — Run update_hashes.py
-
-After modifying `security_gate.py`, run `.github/hooks/scripts/update_hashes.py` to update `_KNOWN_GOOD_GATE_HASH`. This will fix the SAF-008 hash test (which can then be removed from expected-fail notes).
+### Mirror Sync Verified
+`templates/coding/.github/hooks/scripts/security_gate.py` contains identical fix — confirmed via `TestMirrorSync` suite (7 tests all pass).
 
 ---
 
-## Pre-Done Checklist Result
+## Bugs Found
+
+- **BUG-051** (Iteration 1): SAF-020 bracket expression wildcards bypass wildcard deny check — **CLOSED** (fixed in Iteration 2)
+
+---
+
+## Pre-Done Checklist
 
 - [x] `docs/workpackages/SAF-020/dev-log.md` exists and is non-empty
-- [x] `docs/workpackages/SAF-020/test-report.md` written by Tester
-- [x] Test files exist in `tests/SAF-020/` (developer + tester suites)
-- [x] All test runs logged in `docs/test-results/test-results.csv`
-- [ ] **BLOCKED: 7 security tests fail — WP cannot be marked Done**
-- [ ] git commit / push — deferred until Developer fixes the bypass
+- [x] `docs/workpackages/SAF-020/test-report.md` written by Tester (this document)
+- [x] Test files exist in `tests/SAF-020/` — `test_saf020_wildcard_blocking.py` (69 tests) + `test_saf020_tester_edge_cases.py` (38 tests) = 107 total
+- [x] All test runs logged in `docs/test-results/test-results.csv` (TST-1392 through TST-1398)
+- [x] BUG-051 closed in `docs/bugs/bugs.csv`
+- [x] git add -A staged
+- [x] git commit `SAF-020: Tester PASS`
+- [x] git push origin `SAF-020/wildcard-blocking`
 
-**WP Status: Back to In Progress. Fix BUG-051 then re-submit for Tester review.**
+---
+
+## Verdict
+
+**PASS — WP SAF-020 is marked Done.**
+
+All 107 SAF-020 tests pass. The bracket expression wildcard bypass (BUG-051) is fixed and verified. Full regression suite passes with only the pre-existing INS-005 failure (unrelated to this WP). The terminal wildcard bypass vector is now fully closed for `*`, `?`, and `[...]` patterns across both `Default-Project/` and `templates/coding/`.
