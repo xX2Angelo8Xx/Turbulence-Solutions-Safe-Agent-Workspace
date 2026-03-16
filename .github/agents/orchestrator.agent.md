@@ -1,6 +1,6 @@
 ---
 description: "Use when multiple workpackages need to be executed, or when the user wants to delegate work. Decomposes multi-WP tasks, spawns one Developer subagent per workpackage, monitors progress. Never implements code directly. Use for: orchestration, delegation, multi-task planning, workpackage assignment."
-tools: [read, edit, search, agent, todo]
+tools: [read, edit, search, agent, todo, execute]
 agents: [developer, tester, story-writer]
 model: ['Claude Opus 4.6 (copilot)']
 argument-hint: "List the workpackage IDs to implement (e.g., GUI-001, GUI-002)"

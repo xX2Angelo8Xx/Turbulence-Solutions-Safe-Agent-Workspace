@@ -1089,4 +1089,15 @@ TST-1102,test_no_stale_version_in_setup_iss,Unit,FIX-014,Pass,2026-03-14,Windows
 TST-1103,test_no_stale_version_in_build_dmg,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_dmg.sh contains no stale 1.0.0 string,Tester Agent FIX-014 edge-case
 TST-1104,test_no_stale_version_in_build_appimage,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,build_appimage.sh contains no stale 1.0.0 string,Tester Agent FIX-014 edge-case
 TST-1105,test_no_stale_version_across_launcher_python_sources,Unit,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,No Python source in src/launcher/ contains stale 1.0.0 string,Tester Agent FIX-014 edge-case
-TST-1106,Full regression suite (1959 passed 29 skipped 1 pre-existing fail) - FIX-014 Tester final run,Regression,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,1959 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 25 FIX-014 tests all pass; zero regressions,Tester Agent final run - PASS verdict
+TST-1106,Full regression suite (1959 passed 29 skipped 1 pre-existing fail) - FIX-014 Tester final run,Regression,FIX-014,Pass,2026-03-14,Windows 11 + Python 3.11,1959 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 25 FIX-014 tests all pass; zero regressions,Tester Agent final run - PASS verdict      
+TST-1107,test_logo_no_hardcoded_160_50,Regression,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,size=(160 50) not present in app.py,
+TST-1108,test_logo_size_uses_computed_width,Regression,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,_target_width and _target_height variables present in app.py,
+TST-1109,test_logo_ctk_image_size_is_proportional,Integration,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,CTkImage called with proportional size=(100 50) for 200x100 image,
+TST-1110,test_logo_preserves_aspect_ratio_wide_image[400-100-200],Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,4:1 wide image yields width=200 for target_height=50,
+TST-1111,test_logo_preserves_aspect_ratio_wide_image[50-200-12],Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,1:4 tall image yields width=12 for target_height=50,
+TST-1112,test_logo_preserves_aspect_ratio_wide_image[100-100-50],Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,square image yields width=50 for target_height=50,
+TST-1113,test_logo_preserves_aspect_ratio_wide_image[320-80-200],Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,4:1 ratio at different scale yields width=200,
+TST-1114,test_logo_preserves_aspect_ratio_wide_image[1000-250-200],Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,large 4:1 image yields width=200,
+TST-1115,test_logo_preserves_aspect_ratio_tall_image,Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,tall image computed width is less than target height,
+TST-1116,test_logo_preserves_aspect_ratio_square_image,Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,square image computed width equals target height,
+TST-1117,Full regression suite (1969 passed 29 skipped 1 pre-existing fail) - FIX-015 dev final run,Regression,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,1969 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 10 FIX-015 tests all pass; zero regressions,Developer Agent final run

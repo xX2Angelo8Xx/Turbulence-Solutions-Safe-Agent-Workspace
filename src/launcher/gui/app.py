@@ -82,8 +82,10 @@ class App:
         try:
             from PIL import Image
             _logo_img = Image.open(str(LOGO_PATH))
+            _target_height = 50
+            _target_width = int(_logo_img.width * (_target_height / _logo_img.height))
             self._logo_ctk = ctk.CTkImage(
-                light_image=_logo_img, dark_image=_logo_img, size=(160, 50)
+                light_image=_logo_img, dark_image=_logo_img, size=(_target_width, _target_height)
             )
             self.logo_label = ctk.CTkLabel(
                 self._window,
