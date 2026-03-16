@@ -142,9 +142,9 @@ def test_allowlist_python_version():
     assert is_ask("python --version")
 
 
-# T-013: pip install requests → ask
+# T-013: pip install requests → deny (SAF-017: no VIRTUAL_ENV active → deny to prevent global installs)
 def test_allowlist_pip_install():
-    assert is_ask("pip install requests")
+    assert is_deny("pip install requests")
 
 
 # T-014: pytest (no path arg) → allow
@@ -334,9 +334,9 @@ def test_bypass_call_operator():
     assert is_deny("& $cmd .github/f")
 
 
-# T-049: python3 with extra spaces normalized → deny (P-01 after normalization)
+# T-049: python3 -c now allowed (SAF-017: -c removed from denied_flags; P-01 obfuscation pattern removed)
 def test_bypass_python_c_extra_spaces():
-    assert is_deny('python3    -c "..."')
+    assert is_ask('python3    -c "..."')
 
 
 # T-050: powershell -e (short flag) + base64 → deny (P-10 extended)
@@ -379,9 +379,9 @@ def test_bypass_execution_policy():
     assert is_deny("powershell -ExecutionPolicy Bypass -File x.ps1")
 
 
-# T-058: PYTHON -C uppercase → deny (after lowercase normalization)
+# T-058: PYTHON -C now allowed (SAF-017: -c removed from denied_flags; case normalization still applies)
 def test_bypass_case_variation():
-    assert is_deny('PYTHON -C "import os"')
+    assert is_ask('PYTHON -C "import os"')
 
 
 # T-059: semicolon inject with .github → deny

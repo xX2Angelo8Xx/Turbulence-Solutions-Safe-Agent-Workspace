@@ -68,7 +68,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "a9648fad5241bc2f0d9ef4d68c1b3e79c21f1faeba6175
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "bae5f238ae6e4af3e5144aaf5445f227bbe441cf48d494116ef527394f451707"
+_KNOWN_GOOD_GATE_HASH: str = "798a605eaaa65c22efb6683ffbacac0163e188dbaa0874c9e6bda1a3d83a0bce"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -92,7 +92,7 @@ _DENY_REASON = (
 # Applied against the LOWERCASED command string.  Any match → immediate deny.
 _OBFUSCATION_PATTERNS: list[re.Pattern[str]] = [
     # P-01 to P-09: interpreter chaining flags
-    re.compile(r"\bpython[23]?\s+(-u\s+)?-c\b"),
+    # SAF-017: P-01 (python -c) removed — allowed when cwd is inside project folder
     re.compile(r"\bpython[23]?\s+(-u\s+)?-m\s+code\b"),
     re.compile(r"\bperl\s+-e\b"),
     re.compile(r"\bruby\s+-e\b"),
@@ -162,21 +162,24 @@ class CommandRule:
 _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
     # Category A — Python Runtime
     "python": CommandRule(
-        denied_flags=frozenset({"-c", "-i", "--interactive"}),
+        # SAF-017: -c removed from denied_flags; python -c "..." allowed inside project folder
+        denied_flags=frozenset({"-i", "--interactive"}),
         allowed_subcommands=frozenset(),
         path_args_restricted=True,
         allow_arbitrary_paths=False,
         notes="python3.x aliases normalized to python; -m restricted to approved modules",
     ),
     "python3": CommandRule(
-        denied_flags=frozenset({"-c", "-i", "--interactive"}),
+        # SAF-017: -c removed from denied_flags; python3 -c "..." allowed inside project folder
+        denied_flags=frozenset({"-i", "--interactive"}),
         allowed_subcommands=frozenset(),
         path_args_restricted=True,
         allow_arbitrary_paths=False,
         notes="python3.x aliases normalized to python3",
     ),
     "py": CommandRule(
-        denied_flags=frozenset({"-c", "-i", "--interactive"}),
+        # SAF-017: -c removed from denied_flags; py -c "..." allowed inside project folder
+        denied_flags=frozenset({"-i", "--interactive"}),
         allowed_subcommands=frozenset(),
         path_args_restricted=True,
         allow_arbitrary_paths=False,
@@ -720,8 +723,9 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
 }
 
 # Allowed Python -m modules (Section 7.2 Category A sub-rules)
+# SAF-017: added "venv" — path arg is zone-checked in _validate_args
 _PYTHON_ALLOWED_MODULES: frozenset[str] = frozenset({
-    "pytest", "build", "pip", "setuptools", "hatchling",
+    "pytest", "build", "pip", "setuptools", "hatchling", "venv",
 })
 
 # Destructive git subcommand+flag combinations that must be denied
@@ -1022,14 +1026,45 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                 module = args[i + 1].lower()
                 if module not in _PYTHON_ALLOWED_MODULES:
                     return False
+                # SAF-017: for 'venv', zone-check the target path argument
+                if module == "venv" and i + 2 < len(args):
+                    venv_target = args[i + 2].strip("\"'")
+                    if "$" in venv_target:
+                        return False
+                    if _is_path_like(venv_target) and not _check_path_arg(venv_target, ws_root):
+                        return False
                 break
+
+    # SAF-017: pip install — only allowed when VIRTUAL_ENV is active inside project folder
+    if verb in ("pip", "pip3"):
+        subcmd = next((a.lower() for a in args if not a.startswith("-")), None)
+        if subcmd == "install":
+            virtual_env = os.environ.get("VIRTUAL_ENV", "")
+            if not virtual_env:
+                # No venv active — deny to prevent global installations
+                return False
+            norm_venv = normalize_path(virtual_env)
+            if not norm_venv.startswith(ws_root):
+                # Venv is outside project folder — deny
+                return False
+
+    # SAF-017: for python/python3/py with -c, the argument immediately after -c
+    # is inline code — not a filesystem path.  Build a skip-set of those indices
+    # so step 5 does not zone-check them.
+    _code_arg_indices: set[int] = set()
+    if verb in ("python", "python3", "py"):
+        for _ci, _ctok in enumerate(args):
+            if _ctok.lower() == "-c" and _ci + 1 < len(args):
+                _code_arg_indices.add(_ci + 1)
 
     # 5. Path argument zone checks
     # Enforce when path_args_restricted=True OR allow_arbitrary_paths=False (BUG-015).
     # Commands like npm/yarn/pnpm with allow_arbitrary_paths=False will zone-check
     # any path-like argument even though path_args_restricted is False.
     if rule.path_args_restricted or not rule.allow_arbitrary_paths:
-        for tok in args:
+        for _idx, tok in enumerate(args):
+            if _idx in _code_arg_indices:
+                continue  # inline code string — not a path, skip zone check
             stripped = tok.strip("\"'")
             # Skip pure flags
             if stripped.startswith("-"):

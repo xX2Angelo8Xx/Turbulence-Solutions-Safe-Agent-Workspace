@@ -110,12 +110,12 @@ def test_bypass_newline_injection_cat_github_blocked():
 # ---------------------------------------------------------------------------
 # ET-007: Tab injection
 # ---------------------------------------------------------------------------
-# Tabs are whitespace for str.split(), so python\t-c\t"code" normalises to
-# "python -c \"code\"" which is caught by P-01.
+# SAF-017: python -c is now allowed (P-01 removed, -c out of denied_flags).
+# Tab-normalization still applies; python\t-c\t'code' resolves to "allow".
 
 def test_bypass_tab_injection_python_c_blocked():
-    """Tab-separated python -c must be denied after normalization."""
-    assert is_deny("python\t-c\t'import os'")
+    """Tab-separated python -c resolves to allow after SAF-017 (-c permitted)."""
+    assert is_ask("python\t-c\t'import os'")
 
 
 # ---------------------------------------------------------------------------

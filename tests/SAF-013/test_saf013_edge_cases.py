@@ -296,10 +296,10 @@ def test_terminal_with_noagentzone_path_returns_deny(sg):
 
 
 def test_terminal_obfuscation_python_c_returns_deny(sg):
-    """python -c 'import os' is an obfuscation pattern — must return deny."""
+    """python -c 'import os' is now allowed (SAF-017: -c removed from denied_flags, P-01 removed)."""
     result, reason = sg.sanitize_terminal_command("python -c 'import os'", WS)
-    assert result == "deny", (
-        f"sanitize_terminal_command returned {result!r} for python -c — expected 'deny'"
+    assert result == "allow", (
+        f"sanitize_terminal_command returned {result!r} for python -c — expected 'allow'"
     )
 
 
