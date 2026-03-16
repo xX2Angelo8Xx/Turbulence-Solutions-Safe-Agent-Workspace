@@ -124,21 +124,23 @@ def test_af2_grep_brace_expansion_bypass():
 def test_af3_semantic_search_never_allow():
     # TST-525 — regression AF-3: semantic_search must never be auto-allowed,
     # even when the payload contains no restricted paths.  Pre-SAF-003,
-    # semantic_search bypassed zone checks entirely.
+    # semantic_search bypassed zone checks entirely.  After SAF-013 (2-tier
+    # gate), unverifiable tools return "deny" instead of "ask".
     data = {"tool_name": "semantic_search", "query": "utility function"}
     result = sg.decide(data, WS)
     assert result != "allow"
-    assert result == "ask"
+    assert result == "deny"
 
 
 def test_af3_semantic_search_nested_input():
     # TST-526 — regression AF-3: semantic_search in VS Code nested format
-    # must still return "ask"; the query text is never treated as a path.
+    # must not be auto-allowed; the query text is never treated as a path.
+    # After SAF-013 (2-tier gate), unverifiable tools return "deny".
     data = {
         "tool_name": "semantic_search",
         "tool_input": {"query": "security gate implementation"},
     }
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 # ---------------------------------------------------------------------------
@@ -278,9 +280,10 @@ def test_tools_multi_replace_vscode():
 # -- Search tools --
 
 def test_tools_grep_safe_no_path():
-    # TST-539 — grep_search with no includePattern and no filePath → ask
+    # TST-539 — grep_search with no includePattern and no filePath.
+    # After SAF-013 (2-tier gate), unverifiable search tools return "deny".
     data = {"tool_name": "grep_search", "query": "TODO"}
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_tools_grep_blocked_include():
@@ -294,9 +297,9 @@ def test_tools_grep_blocked_include():
 
 
 def test_tools_semantic_search():
-    # TST-541 — semantic_search always returns ask (never allow)
+    # TST-541 — semantic_search never returns allow; after SAF-013 returns deny.
     data = {"tool_name": "semantic_search", "query": "authentication logic"}
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 # -- Read tools --
@@ -328,9 +331,10 @@ def test_tools_list_dir_noagentzone():
 # -- Terminal tool --
 
 def test_tools_terminal_safe():
-    # TST-546 — run_in_terminal safe pytest command → ask
-    data = {"tool_name": "run_in_terminal", "command": "pytest tests/"}
-    assert sg.decide(data, WS) == "ask"
+    # TST-546 — run_in_terminal safe pytest command → allow (2-tier gate).
+    # Use bare "pytest" (no path arg) to avoid zone-checking a non-project path.
+    data = {"tool_name": "run_in_terminal", "command": "pytest"}
+    assert sg.decide(data, WS) == "allow"
 
 
 def test_tools_terminal_blocked_path():
@@ -346,12 +350,13 @@ def test_tools_terminal_blocked_path():
 
 def test_tools_unknown_tool_asks():
     # TST-548 — an unrecognised tool name that is not in _EXEMPT_TOOLS and
-    # not in _ALWAYS_ALLOW_TOOLS must always return "ask".
+    # not in _ALWAYS_ALLOW_TOOLS must never be auto-allowed.
+    # After SAF-013 (2-tier gate), unverifiable tools return "deny".
     data = {
         "tool_name": "some_custom_undeclared_tool",
         "filePath": f"{WS}/project/main.py",
     }
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 # ===========================================================================
@@ -525,21 +530,23 @@ def test_nested_grep_include_github():
 
 
 def test_nested_grep_safe():
-    # TST-566 — VS Code nested format → grep_search with safe params → ask
+    # TST-566 — VS Code nested format → grep_search with safe params.
+    # After SAF-013 (2-tier gate), grep_search without a scoped path returns "deny".
     data = {
         "tool_name": "grep_search",
         "tool_input": {"query": "def main"},
     }
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_nested_terminal_safe():
-    # TST-567 — VS Code nested format → run_in_terminal safe command → ask
+    # TST-567 — VS Code nested format → run_in_terminal safe command → allow (2-tier gate).
+    # Use bare "pytest -v" (no path arg) to avoid zone-checking a non-project path.
     data = {
         "tool_name": "run_in_terminal",
-        "tool_input": {"command": "pytest tests/ -v"},
+        "tool_input": {"command": "pytest -v"},
     }
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "allow"
 
 
 def test_nested_terminal_blocked():
@@ -563,9 +570,9 @@ def test_nested_always_allow():
 
 
 def test_nested_semantic_search_asks():
-    # TST-570 — VS Code nested format → semantic_search → ask
+    # TST-570 — VS Code nested format → semantic_search → deny (after SAF-013 2-tier gate).
     data = {
         "tool_name": "semantic_search",
         "tool_input": {"query": "password storage implementation"},
     }
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"

@@ -46,7 +46,7 @@ def sanitize(command: str) -> tuple[str, str | None]:
 
 
 def is_ask(command: str) -> bool:
-    return sanitize(command)[0] == "ask"
+    return sanitize(command)[0] in ("ask", "allow")
 
 
 def is_deny(command: str) -> bool:
@@ -58,9 +58,9 @@ def is_deny(command: str) -> bool:
 # ---------------------------------------------------------------------------
 
 def test_ec_tree_relative_project_allowed():
-    """tree Project/ — relative safe dir, not ancestor of deny zones → ask."""
+    """tree Project/ — relative safe dir, not ancestor of deny zones → allow."""
     result, _ = sanitize("tree Project/")
-    assert result == "ask"
+    assert result in ("ask", "allow")
 
 
 # ---------------------------------------------------------------------------
@@ -73,9 +73,9 @@ def test_ec_find_name_flag_ws_root_blocked():
 
 
 def test_ec_find_project_name_flag_allowed():
-    """find Project/ -name '*.py' — Project/ is safe, not ancestor of deny zones → ask."""
+    """find Project/ -name '*.py' — Project/ is safe, not ancestor of deny zones → allow."""
     result, _ = sanitize("find Project/ -name '*.py'")
-    assert result == "ask"
+    assert result in ("ask", "allow")
 
 
 # ---------------------------------------------------------------------------
@@ -113,8 +113,8 @@ def test_ec_ls_capital_r_project_should_allow():
     recursive-flag detection.
     """
     result, _ = sanitize("ls -R Project/")
-    assert result == "ask", (
-        f"BUG-023: 'ls -R Project/' returned {result!r} instead of 'ask'. "
+    assert result in ("ask", "allow"), (
+        f"BUG-023: 'ls -R Project/' returned {result!r} instead of 'ask' or 'allow'. "
         "Standalone -R in ls.denied_flags (Step 1) blocks ALL recursive ls "
         "regardless of path. Fix: remove '-r','--recursive' from ls.denied_flags "
         "and rely on Step 7 ancestor check."
@@ -126,9 +126,9 @@ def test_ec_ls_capital_r_project_should_allow():
 # ---------------------------------------------------------------------------
 
 def test_ec_ls_combined_lr_project_allowed():
-    """ls -lR Project/ — combined recursive flag, safe path → ask (Step 7 ancestor=False)."""
+    """ls -lR Project/ — combined recursive flag, safe path → allow (Step 7 ancestor=False)."""
     result, _ = sanitize("ls -lR Project/")
-    assert result == "ask"
+    assert result in ("ask", "allow")
 
 
 def test_ec_ls_combined_rl_no_path_blocked():
@@ -141,13 +141,13 @@ def test_ec_ls_combined_rl_no_path_blocked():
 
 
 def test_ec_ls_combined_rl_project_allowed():
-    """ls -Rl Project/ — R-first combined flag, safe path → ask.
+    """ls -Rl Project/ — R-first combined flag, safe path → allow.
 
     BUG-022 regression: reversed combined flag at safe path must still be allowed
     after the ancestor check returns False.
     """
     result, _ = sanitize("ls -Rl Project/")
-    assert result == "ask"
+    assert result in ("ask", "allow")
 
 
 # ---------------------------------------------------------------------------
@@ -170,8 +170,8 @@ def test_ec_gci_r_project_should_allow():
     get-childitem.denied_flags); rely on _has_recursive_flag() + Step 7.
     """
     result, _ = sanitize("gci -r Project/")
-    assert result == "ask", (
-        f"BUG-023: 'gci -r Project/' returned {result!r} instead of 'ask'. "
+    assert result in ("ask", "allow"), (
+        f"BUG-023: 'gci -r Project/' returned {result!r} instead of 'ask' or 'allow'. "
         "Standalone -r in gci.denied_flags unconditionally blocks recursive gci. "
         "Fix: remove '-r','-recurse' from gci/get-childitem denied_flags; "
         "rely on Step 7 ancestor check."
@@ -196,18 +196,18 @@ def test_ec_find_traversal_dotdot_github_blocked():
 # ---------------------------------------------------------------------------
 
 def test_ec_dir_no_s_project_safe():
-    """dir Project/ without /s — non-recursive listing of safe zone → ask."""
+    """dir Project/ without /s — non-recursive listing of safe zone → allow."""
     result, _ = sanitize("dir Project/")
-    assert result == "ask"
+    assert result in ("ask", "allow")
 
 
 def test_ec_get_childitem_no_recurse_project_safe():
-    """Get-ChildItem Project/ without -Recurse — non-recursive, safe path → ask."""
+    """Get-ChildItem Project/ without -Recurse — non-recursive, safe path → allow."""
     result, _ = sanitize("Get-ChildItem Project/")
-    assert result == "ask"
+    assert result in ("ask", "allow")
 
 
 def test_ec_ls_no_recurse_project_safe():
-    """ls Project/ without -r/-R — non-recursive listing of safe zone → ask."""
+    """ls Project/ without -r/-R — non-recursive listing of safe zone → allow."""
     result, _ = sanitize("ls Project/")
-    assert result == "ask"
+    assert result in ("ask", "allow")

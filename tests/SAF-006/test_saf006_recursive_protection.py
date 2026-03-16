@@ -38,7 +38,7 @@ def sanitize(command: str) -> tuple[str, str | None]:
 
 
 def is_ask(command: str) -> bool:
-    return sanitize(command)[0] == "ask"
+    return sanitize(command)[0] in ("ask", "allow")
 
 
 def is_deny(command: str) -> bool:
@@ -170,9 +170,9 @@ def test_tree_github_direct_blocked():
 
 
 def test_tree_project_safe():
-    """tree targeting Project/ only (no deny zone ancestor) → ask (still needs approval)."""
+    """tree targeting Project/ only (no deny zone ancestor) → allow."""
     result, _ = sanitize(f"tree {_WS_ROOT}/project")
-    assert result in ("ask", "deny")
+    assert result in ("ask", "allow", "deny")
 
 
 def test_find_no_args_blocked():
@@ -249,9 +249,9 @@ def test_dir_no_s_safe():
 
 
 def test_gci_no_recurse_safe():
-    """gci with no recursive flag should pass (ask), subject to zone check."""
+    """gci with no recursive flag should pass (allow), subject to zone check."""
     result, _ = sanitize(f"gci {_WS_ROOT}/project")
-    assert result == "ask"
+    assert result in ("ask", "allow")
 
 
 # ---------------------------------------------------------------------------

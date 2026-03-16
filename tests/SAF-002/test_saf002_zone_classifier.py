@@ -130,17 +130,17 @@ def test_classify_deny_noagentzone():
 
 def test_classify_ask_docs():
     # TST-138
-    assert zc.classify(f"{WS}/docs/readme.md", WS) == "ask"
+    assert zc.classify(f"{WS}/docs/readme.md", WS) == "deny"
 
 
 def test_classify_ask_root_file():
     # TST-139
-    assert zc.classify(f"{WS}/README.md", WS) == "ask"
+    assert zc.classify(f"{WS}/README.md", WS) == "deny"
 
 
 def test_classify_ask_src():
     # TST-140
-    assert zc.classify(f"{WS}/src/launcher/main.py", WS) == "ask"
+    assert zc.classify(f"{WS}/src/launcher/main.py", WS) == "deny"
 
 
 # ===========================================================================
@@ -178,7 +178,7 @@ def test_bypass_deep_traversal():
 def test_bypass_prefix_sibling():
     # TST-145 — "project-evil/" must NOT match "project/" (str.startswith bypass)
     # pathlib.relative_to() correctly rejects sibling prefixes
-    assert zc.classify(f"{WS}/project-evil/payload.py", WS) == "ask"
+    assert zc.classify(f"{WS}/project-evil/payload.py", WS) == "deny"
     # but a nested .github under a sibling must still be denied (Method 2)
     assert zc.classify(f"{WS}/project-evil/.github/x", WS) == "deny"
 
@@ -272,8 +272,8 @@ def test_get_zone_backward_compat_deny():
 
 
 def test_get_zone_backward_compat_ask():
-    # TST-160 — sg.get_zone() must still return 'ask' for non-zone paths
-    assert sg.get_zone(f"{WS}/docs/readme.md", WS) == "ask"
+    # TST-160 — sg.get_zone() now returns 'deny' for non-zone paths in 2-tier model
+    assert sg.get_zone(f"{WS}/docs/readme.md", WS) == "deny"
 
 
 def test_decide_project_allow():
@@ -289,9 +289,9 @@ def test_decide_github_deny():
 
 
 def test_decide_ask_zone():
-    # TST-163 — full decide() pipeline: read_file on docs/ → ask
+    # TST-163 — full decide() pipeline: read_file on docs/ → deny (2-tier model)
     data = {"tool_name": "read_file", "filePath": f"{WS}/docs/readme.md"}
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_decide_path_traversal_still_denied():
@@ -342,10 +342,10 @@ def test_edge_consecutive_interior_slashes_in_deny_path():
 
 
 def test_edge_very_long_path_no_exception():
-    # TST-181 — extremely long paths must not raise an exception and must fail closed (ask)
+    # TST-181 — extremely long paths must not raise an exception and must fail closed
     long_path = f"{WS}/" + "a/" * 500 + "file.py"
     result = zc.classify(long_path, WS)
-    assert result == "ask"
+    assert result == "deny"
 
 
 def test_security_traversal_arriving_at_deny_dir_root():
@@ -360,7 +360,7 @@ def test_edge_ws_root_with_multiple_trailing_slashes():
     ws_trailing = WS + "///"
     assert zc.classify(f"{WS}/project/app.py", ws_trailing) == "allow"
     assert zc.classify(f"{WS}/.github/secret", ws_trailing) == "deny"
-    assert zc.classify(f"{WS}/docs/readme.md", ws_trailing) == "ask"
+    assert zc.classify(f"{WS}/docs/readme.md", ws_trailing) == "deny"
 
 
 def test_security_tab_before_deny_dir():

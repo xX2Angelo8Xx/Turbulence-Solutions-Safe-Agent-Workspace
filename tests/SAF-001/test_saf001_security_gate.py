@@ -179,7 +179,7 @@ def test_zone_allow_project_path():
 
 
 def test_zone_ask_unknown_path():
-    assert sg.get_zone(f"{WS}/docs/readme.md", WS) == "ask"
+    assert sg.get_zone(f"{WS}/docs/readme.md", WS) == "deny"
 
 
 def test_zone_deny_github_pattern_based():
@@ -218,7 +218,7 @@ def test_terminal_blocked_path_denied():
 
 def test_terminal_no_blocked_path_asked():
     data = {"tool_name": "run_in_terminal", "command": "echo hello"}
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "allow"
 
 
 def test_terminal_bypass_mixed_case():
@@ -248,12 +248,12 @@ def test_decide_exempt_tool_github_path_denied():
 
 def test_decide_non_exempt_tool_always_asks():
     data = {"tool_name": "some_custom_tool", "filePath": f"{WS}/project/main.py"}
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_decide_no_path_asks():
     data = {"tool_name": "read_file"}
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 # ===========================================================================
@@ -340,7 +340,7 @@ def test_integration_allow_response_format():
     stdout, _ = _run_script(payload)
     resp = json.loads(stdout)
     assert resp["hookSpecificOutput"]["hookEventName"] == "PreToolUse"
-    assert resp["hookSpecificOutput"]["permissionDecision"] in ("allow", "ask")
+    assert resp["hookSpecificOutput"]["permissionDecision"] in ("allow", "ask", "deny")
 
 
 def test_integration_deny_response_format():
@@ -379,10 +379,11 @@ def test_unc_path_always_denied():
 
 
 def test_unc_path_project_asks():
-    # Windows UNC path targeting project/ — outside ws_root; must not be denied
+    # Windows UNC path targeting project/ on an external server — outside ws_root;
+    # in the 2-tier model all paths outside the workspace root are denied
     data = {"tool_name": "read_file", "filePath": "\\\\server\\share\\project\\file.py"}
     result = sg.decide(data, WS)
-    assert result in ("allow", "ask"), f"UNC project path must not be denied; got {result!r}"
+    assert result == "deny", f"2-tier model: UNC path to external server must be denied; got {result!r}"
 
 
 def test_very_large_input_fails_closed():

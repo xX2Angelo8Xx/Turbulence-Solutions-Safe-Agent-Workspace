@@ -82,7 +82,6 @@ _DENY_REASON = (
     "This denial is enforced by a PreToolUse hook and cannot be bypassed. "
     "Do NOT retry this action or attempt alternative paths to access these folders."
 )
-_ASK_REASON = "Turbulence Solutions Safety: Approval required for this action."
 
 
 # ---------------------------------------------------------------------------
@@ -982,7 +981,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
     """Analyze a terminal command string through the 5-stage pipeline.
 
     Returns:
-        ("ask",  None)  — command passes all checks; requires human approval
+        ("allow", None) — command passes all checks; auto-allowed
         ("deny", str)   — command is blocked; str is the human-readable reason
     """
     try:
@@ -1079,7 +1078,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                 if pat.search(lowered_segment):
                     return ("deny", f"Command blocked by destructive-pattern check: {_DENY_REASON}")
 
-        return ("ask", None)
+        return ("allow", None)
 
     except Exception:
         # Any unexpected error → fail closed
@@ -1162,7 +1161,7 @@ def validate_grep_search(data: dict, ws_root: str) -> str:
     Supports both the VS Code hook nested format (parameters inside
     ``tool_input``) and the flat test format (parameters at the top level).
 
-    Returns ``"deny"``, ``"ask"``, or ``"allow"``.
+    Returns ``"deny"`` or ``"allow"``.
     """
     tool_input = data.get("tool_input") or {}
     if not isinstance(tool_input, dict):
@@ -1192,27 +1191,24 @@ def validate_grep_search(data: dict, ws_root: str) -> str:
     # the payload (e.g. a filePath passed alongside the query).
     raw_path = extract_path(data)
     if raw_path is None:
-        return "ask"
-    zone = zone_classifier.classify(raw_path, ws_root)
-    if zone == "deny":
         return "deny"
+    zone = zone_classifier.classify(raw_path, ws_root)
     if zone == "allow":
         return "allow"
-    return "ask"
+    return "deny"
 
 
 def validate_semantic_search(data: dict, ws_root: str) -> str:
     """SAF-003: Validate ``semantic_search`` tool call.
 
     ``semantic_search`` indexes the entire workspace with no path-restriction
-    parameter.  Every call is returned as ``"ask"`` so that a human must
-    review and approve it before execution, preventing automated leakage of
-    protected file content.
+    parameter.  Every call is denied because we cannot guarantee it only
+    accesses the project folder.  Fail closed in the 2-tier model.
 
     The ``data`` and ``ws_root`` parameters are accepted for API consistency
     but are not used in the current policy.
     """
-    return "ask"
+    return "deny"
 
 
 # ---------------------------------------------------------------------------
@@ -1355,23 +1351,23 @@ def decide(data: dict, ws_root: str) -> str:
     if tool_name in _WRITE_TOOLS:
         return validate_write_tool(data, ws_root)
 
-    # Non-exempt tools (non-empty name not in exempt set): always ask
+    # Non-exempt tools (non-empty name not in exempt set): deny.
+    # In the 2-tier model, agents must only use approved tools.
     if tool_name and tool_name not in _EXEMPT_TOOLS:
-        return "ask"
+        return "deny"
 
-    # Exempt tool or unknown tool name: resolve path and check zone
+    # Exempt tool or unknown tool name: resolve path and check zone.
     raw_path = extract_path(data)
     if raw_path is None:
-        return "ask"
+        # No path — cannot verify zone; fail closed.
+        return "deny"
 
     # SAF-002: zone_classifier.classify() handles normalization and
     # relative-path resolution internally.
     zone = zone_classifier.classify(raw_path, ws_root)
-    if zone == "deny":
-        return "deny"
     if zone == "allow":
         return "allow"
-    return "ask"
+    return "deny"
 
 
 # ---------------------------------------------------------------------------
@@ -1403,10 +1399,8 @@ def main() -> None:
 
         if decision == "allow":
             print(build_response("allow"), flush=True)
-        elif decision == "deny":
-            print(build_response("deny", _DENY_REASON), flush=True)
         else:
-            print(build_response("ask", _ASK_REASON), flush=True)
+            print(build_response("deny", _DENY_REASON), flush=True)
 
     except Exception:
         print(build_response("deny", _DENY_REASON), flush=True)

@@ -47,7 +47,7 @@ def sanitize(command: str) -> tuple[str, str | None]:
 
 
 def is_ask(command: str) -> bool:
-    return sanitize(command)[0] == "ask"
+    return sanitize(command)[0] in ("ask", "allow")
 
 
 def is_deny(command: str) -> bool:

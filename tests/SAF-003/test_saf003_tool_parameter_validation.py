@@ -96,13 +96,13 @@ def test_is_truthy_flag_none():
 # ===========================================================================
 
 def test_validate_include_pattern_safe_wildcard_glob():
-    # TST-278 — broad wildcard glob targeting no specific zone → allow
-    assert sg._validate_include_pattern("**/*.py", WS) == "allow"
+    # TST-278 — broad wildcard glob in 2-tier model: classifies as deny (not in project folder)
+    assert sg._validate_include_pattern("**/*.py", WS) == "deny"
 
 
 def test_validate_include_pattern_src_subdir():
-    # TST-279 — glob scoped to src/ (ask zone, but not deny) → allow (not denied)
-    assert sg._validate_include_pattern("src/**", WS) == "allow"
+    # TST-279 — src/ glob in 2-tier model: classifies as deny (src is not project folder)
+    assert sg._validate_include_pattern("src/**", WS) == "deny"
 
 
 def test_validate_include_pattern_github():
@@ -186,9 +186,9 @@ def test_validate_grep_search_include_ignored_files_string_true_denied():
 
 
 def test_validate_grep_search_no_params_no_path_asks():
-    # TST-290 — no special params, no filePath → ask (standard fallback)
+    # TST-290 — no special params, no filePath → deny (fail-closed: no path = deny)
     data = {"tool_name": "grep_search", "query": "hello"}
-    assert sg.validate_grep_search(data, WS) == "ask"
+    assert sg.validate_grep_search(data, WS) == "deny"
 
 
 def test_validate_grep_search_no_params_project_path_allowed():
@@ -212,14 +212,14 @@ def test_validate_grep_search_no_params_deny_path_denied():
 
 
 def test_validate_grep_search_include_ignored_false_not_denied():
-    # TST-293 — includeIgnoredFiles=False is explicitly not a bypass → not denied
+    # TST-293 — includeIgnoredFiles=False: no bypass attempt, but no path → deny (fail-closed)
     data = {
         "tool_name": "grep_search",
         "query": "anything",
         "includeIgnoredFiles": False,
     }
     result = sg.validate_grep_search(data, WS)
-    assert result != "deny"
+    assert result == "deny"
 
 
 def test_validate_grep_search_tool_input_nested_format():
@@ -239,16 +239,16 @@ def test_validate_grep_search_tool_input_nested_format():
 # ===========================================================================
 
 def test_validate_semantic_search_basic_returns_ask():
-    # TST-295 — any semantic_search call returns "ask" for human review
+    # TST-295 — any semantic_search call returns "deny" in 2-tier model
     data = {"tool_name": "semantic_search", "query": "find all functions"}
-    assert sg.validate_semantic_search(data, WS) == "ask"
+    assert sg.validate_semantic_search(data, WS) == "deny"
 
 
 def test_validate_semantic_search_protected_query_still_ask():
-    # TST-296 — query containing protected path name still returns "ask"
-    # (query is search text, not a path; it must not be denied)
+    # TST-296 — query containing protected path name still returns "deny" in 2-tier
+    # (query is search text, not a path; semantic_search is always denied)
     data = {"tool_name": "semantic_search", "query": ".github/secret hook"}
-    assert sg.validate_semantic_search(data, WS) == "ask"
+    assert sg.validate_semantic_search(data, WS) == "deny"
 
 
 def test_validate_semantic_search_never_returns_allow():
@@ -383,11 +383,11 @@ def test_decide_grep_search_include_pattern_github_denied():
 
 
 def test_decide_grep_search_clean_params_project_path_allowed():
-    # TST-309 — full decide() pipeline: grep_search with safe params → allow
+    # TST-309 — full decide() pipeline: grep_search with project-scoped params → allow
     data = {
         "tool_name": "grep_search",
         "query": "def main",
-        "includePattern": "src/**",
+        "includePattern": f"{WS}/project/**",
         "filePath": f"{WS}/project/main.py",
     }
     result = sg.decide(data, WS)
@@ -395,20 +395,20 @@ def test_decide_grep_search_clean_params_project_path_allowed():
 
 
 def test_decide_grep_search_clean_params_no_path_asks():
-    # TST-310 — full decide() pipeline: grep_search with safe params, no path → ask
+    # TST-310 — full decide() pipeline: grep_search with safe params, no path → deny
     data = {
         "tool_name": "grep_search",
         "query": "import os",
         "includePattern": "**/*.py",
     }
     result = sg.decide(data, WS)
-    assert result == "ask"
+    assert result == "deny"
 
 
 def test_decide_semantic_search_always_ask():
-    # TST-311 — full decide() pipeline: semantic_search always → ask
+    # TST-311 — full decide() pipeline: semantic_search always → deny in 2-tier
     data = {"tool_name": "semantic_search", "query": "list all public methods"}
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_decide_grep_search_include_ignored_denied():
@@ -464,9 +464,9 @@ def test_brace_expansion_partial_deny():
 
 
 def test_brace_expansion_safe_pattern():
-    # TST-317 — brace expansion: {src,tests}/**/*.py expands to only safe zones → not denied
+    # TST-317 — in 2-tier model, {src,tests}/**/*.py expands to non-project zones → deny
     data = {"tool_name": "grep_search", "includePattern": "{src,tests}/**/*.py"}
-    assert sg.decide(data, WS) != "deny"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_brace_expansion_nested_deny():
@@ -499,12 +499,12 @@ def test_brace_expansion_deeply_nested_deny():
 
 def test_brace_expansion_empty_brace_group_no_crash():
     # TST-341 — empty brace group {}/** — [^{}]+ requires ≥1 char so {} is NOT
-    # expanded; the literal pattern {}/** must not cause a crash and must not
-    # be falsely denied (it does not target any deny zone).
+    # expanded; classify treats {}/** as non-project path → deny in 2-tier model.
+    # Must not cause a crash.
     data = {"tool_name": "grep_search", "includePattern": "{}/**"}
     result = sg.decide(data, WS)
-    assert result != "deny", (
-        f"Empty brace group {{}}/** should not trigger a deny; got {result!r}"
+    assert result == "deny", (
+        f"Empty brace group {{}}/** produces a non-project path, expected deny; got {result!r}"
     )
 
 
@@ -515,12 +515,12 @@ def test_brace_expansion_single_element_deny():
 
 
 def test_brace_expansion_all_safe_items_not_denied():
-    # TST-343 — all-safe brace: {src,tests,Project}/**/*.py expands to only safe
-    # zones (src, tests, Project) — none are deny zones → must not be denied
+    # TST-343 — in 2-tier model, {src,tests,Project}/**/*.py: src and tests expand
+    # to non-project paths which are classified as deny. The first deny short-circuits.
     data = {"tool_name": "grep_search", "includePattern": "{src,tests,Project}/**/*.py"}
     result = sg.decide(data, WS)
-    assert result != "deny", (
-        f"All-safe brace expansion should not be denied; got {result!r}"
+    assert result == "deny", (
+        f"In 2-tier model non-project zone expansions are denied; got {result!r}"
     )
 
 

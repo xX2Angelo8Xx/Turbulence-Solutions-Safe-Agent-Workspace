@@ -1180,3 +1180,16 @@ TST-1193,SAF-012 Developer test suite (51 tests),Unit/Security,SAF-012,Pass,2026
 TST-1194,SAF-012 Tester edge-case suite (44 tests),Unit/Security,SAF-012,Pass,2026-03-16,Windows 11 + Python 3.11,44 passed in 0.22s,Tester-added edge cases: empty workspace; special folder names; workspace with spaces; empty path; WSL/GitBash paths; URL-encoded bypass; JSON double-escaped backslash
 TST-1195,SAF-012 combined suite (95 tests),Unit/Security/Integration,SAF-012,Pass,2026-03-16,Windows 11 + Python 3.11,95 passed in 0.55s,All SAF-012 tests pass (Developer 51 + Tester 44)
 TST-1196,Full regression suite (Tester run SAF-012 branch),Regression,SAF-012,Pass,2026-03-16,Windows 11 + Python 3.11,2110 passed / 79 failed / 29 skipped,79 failures all pre-existing: 7 unrelated (FIX-009 encoding 6 + INS-005 installer 1); 72 expected cascade from zone_classifier interface change (SAF-001/002/003/005/006/009) -- all return deny (more restrictive) not SAF-012 defects
+TST-1197,test_ask_reason_constant_removed,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,_ASK_REASON constant not present in security_gate module,
+TST-1198,test_sanitize_terminal_python_version_returns_allow,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,sanitize_terminal_command returns allow for python --version,
+TST-1199,test_sanitize_terminal_git_status_returns_allow,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,sanitize_terminal_command returns allow for git status,
+TST-1200,test_sanitize_terminal_pytest_returns_allow,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,sanitize_terminal_command returns allow for pytest,
+TST-1201,test_sanitize_terminal_rm_rf_returns_deny,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,sanitize_terminal_command returns deny for rm -rf /,
+TST-1202,test_grep_search_no_path_returns_deny,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,validate_grep_search returns deny when no path supplied,
+TST-1203,test_semantic_search_always_returns_deny,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,validate_semantic_search always returns deny in 2-tier model,
+TST-1204,test_decide_unknown_tool_returns_deny,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,decide returns deny for unknown tools - no ask path,
+TST-1205,test_decide_create_file_project_returns_allow,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,create_file targeting project folder returns allow,
+TST-1206,test_decide_create_file_github_returns_deny,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,create_file targeting .github folder returns deny,
+TST-1207,test_response_json_never_ask,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,permissionDecision in JSON is only allow or deny never ask,
+TST-1208,test_both_copies_identical,Integration,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,Default-Project and templates/coding security_gate.py are identical,
+TST-1209,Full regression suite (Developer run SAF-013 branch),Regression,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,2193 passed / 8 pre-existing failures / 29 skipped,8 pre-existing: 6 FIX-009 CSV encoding + 1 INS-005 installer + 1 SAF-008 hash not updated (SAF-025)

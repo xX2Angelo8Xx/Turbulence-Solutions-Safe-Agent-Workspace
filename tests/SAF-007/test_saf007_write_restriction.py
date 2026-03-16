@@ -391,9 +391,9 @@ def test_integration_write_tool_intercepted_before_exempt_check():
 
 def test_integration_edit_notebook_file_not_in_write_tools_asks():
     # TST-416 — edit_notebook_file is NOT in _WRITE_TOOLS and NOT in _EXEMPT_TOOLS;
-    # decide() categorises it as a non-exempt unknown tool → always "ask"
+    # decide() categorises it as a non-exempt unknown tool → "deny" in 2-tier model (SAF-013)
     data = {"tool_name": "edit_notebook_file", "filePath": f"{WS}/project/nb.ipynb"}
-    assert sg.decide(data, WS) == "ask"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_integration_write_tools_frozenset_contains_expected_tools():
