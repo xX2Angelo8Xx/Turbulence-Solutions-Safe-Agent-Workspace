@@ -604,6 +604,77 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         allow_arbitrary_paths=False,
         notes="Unix/Windows file info; path args zone-checked",
     ),
+    # Category M — Write file commands (SAF-015)
+    "set-content": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell Set-Content; path args zone-checked",
+    ),
+    "sc": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Alias for Set-Content; path args zone-checked",
+    ),
+    "add-content": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell Add-Content; path args zone-checked",
+    ),
+    "ac": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Alias for Add-Content; path args zone-checked",
+    ),
+    "out-file": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell Out-File; path args zone-checked",
+    ),
+    "rename-item": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell Rename-Item; source and dest zone-checked",
+    ),
+    "ren": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Alias for Rename-Item; path args zone-checked",
+    ),
+    "tee-object": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell Tee-Object; output file path zone-checked",
+    ),
+    "tee": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Unix tee; output file path zone-checked",
+    ),
+    "ni": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Alias for New-Item; path args zone-checked",
+    ),
 }
 
 # Allowed Python -m modules (Section 7.2 Category A sub-rules)
