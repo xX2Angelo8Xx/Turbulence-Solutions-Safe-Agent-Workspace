@@ -1,12 +1,14 @@
-"""SAF-002 — Zone Enforcement Logic
+"""SAF-012 — Zone Enforcement Logic (2-Tier Deny-by-Default)
 
-Standalone 3-tier zone classifier using pathlib for path operations.
+Standalone 2-tier zone classifier using pathlib for path operations.
 
 Zones
 -----
-allow  — Project/
-deny   — .github/, .vscode/, NoAgentZone/
-ask    — everything else  (default / fail-safe)
+allow  — detected project folder (the one non-system subfolder of the workspace root)
+deny   — everything else  (default / fail-safe)
+
+The "ask" zone has been removed. All paths outside the project folder
+are denied — no path accidentally receives "allow".
 
 Design
 ------
@@ -18,25 +20,67 @@ startswith(), relative_to() rejects sibling-prefix paths  (e.g.
 Method 2 is a regex fallback that catches paths from different roots,
 UNC paths, and any case where Method 1 cannot determine the zone.
 
-The default return value is "ask" — no path accidentally receives
-"allow".  All decisions fail closed.
+Project folder detection is performed at classification time by scanning
+immediate subdirectories of the workspace root and selecting the first
+non-system folder alphabetically.  This removes the dependency on any
+hardcoded folder name.
+
+Security: all decisions fail closed (deny).  .github/, .vscode/, and
+NoAgentZone/ are kept as explicit denies (defense in depth) in addition
+to the blanket deny-by-default for any path outside the project folder.
 """
 from __future__ import annotations
 
+import os
 import posixpath
 import re
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Literal
 
-ZoneDecision = Literal["allow", "deny", "ask"]
+ZoneDecision = Literal["allow", "deny"]
 
 # Deny-zone folder names (lowercase — all comparisons are case-insensitive)
 _DENY_DIRS: frozenset[str] = frozenset({".github", ".vscode", "noagentzone"})
-_ALLOW_DIR: str = "project"
 
-# Method 2 compiled patterns — anchored on a "/" to avoid mid-segment matches
+# Method 2 compiled pattern — anchored on a "/" to avoid mid-segment matches
 _BLOCKED_PATTERN = re.compile(r"/(\.github|\.vscode|noagentzone)(/|$)")
-_ALLOW_PATTERN = re.compile(r"/project(/|$)")
+
+
+def detect_project_folder(workspace_root: Path) -> str:
+    """Return the name of the project folder inside *workspace_root*.
+
+    Scans the immediate subdirectories of *workspace_root* and returns the
+    first entry (alphabetically, case-insensitive) whose lowercase name is
+    NOT in ``_DENY_DIRS``.  This allows the project folder to have any name
+    (e.g. "Project", "MatlabDemo", "MyApp") without requiring a hardcoded
+    constant.
+
+    Parameters
+    ----------
+    workspace_root : Path
+        Absolute path to the workspace root directory.
+
+    Returns
+    -------
+    str
+        Lowercase name of the detected project folder.
+
+    Raises
+    ------
+    RuntimeError
+        If no non-system subfolder is found under *workspace_root*.
+    """
+    entries = sorted(
+        (e for e in os.listdir(workspace_root) if os.path.isdir(os.path.join(workspace_root, e))),
+        key=str.lower,
+    )
+    for entry in entries:
+        if entry.lower() not in _DENY_DIRS:
+            return entry.lower()
+    raise RuntimeError(
+        f"No project folder detected under {workspace_root}. "
+        "All immediate subdirectories are system-reserved folders."
+    )
 
 
 def normalize_path(p: str) -> str:
@@ -77,7 +121,7 @@ def normalize_path(p: str) -> str:
 
 
 def classify(raw_path: str, ws_root: str) -> ZoneDecision:
-    """Classify *raw_path* against the 3-tier zone system.
+    """Classify *raw_path* against the 2-tier zone system.
 
     Parameters
     ----------
@@ -91,9 +135,8 @@ def classify(raw_path: str, ws_root: str) -> ZoneDecision:
 
     Returns
     -------
-    'allow'  — path is inside Project/
-    'deny'   — path is inside .github/, .vscode/, or NoAgentZone/
-    'ask'    — path is anywhere else  (default / fail-safe)
+    'allow'  — path is inside the detected project folder
+    'deny'   — path is anywhere else (default / fail-safe)
     """
     norm = normalize_path(raw_path)
 
@@ -104,6 +147,13 @@ def classify(raw_path: str, ws_root: str) -> ZoneDecision:
         norm = posixpath.normpath(ws_root.rstrip("/") + "/" + norm)
 
     ws_clean = ws_root.rstrip("/")
+
+    # Detect the project folder at classification time using the real filesystem.
+    # Fail closed: if detection fails, deny immediately — no path is allowed.
+    try:
+        project_dir = detect_project_folder(Path(ws_clean))
+    except (RuntimeError, OSError):
+        return "deny"
 
     # ------------------------------------------------------------------
     # Method 1: pathlib relative_to() for structured first-segment check
@@ -118,7 +168,7 @@ def classify(raw_path: str, ws_root: str) -> ZoneDecision:
         first = rel.parts[0] if rel.parts else ""
         if first in _DENY_DIRS:
             return "deny"
-        if first == _ALLOW_DIR:
+        if first == project_dir:
             return "allow"
         # First segment is neither deny nor allow — fall through to Method 2.
         # This is intentional: a path like "project-evil/.github/x" must still
@@ -137,12 +187,14 @@ def classify(raw_path: str, ws_root: str) -> ZoneDecision:
     full_with_slash = "/" + norm
     if _BLOCKED_PATTERN.search(full_with_slash):
         return "deny"
-    # Only grant "allow" for paths that genuinely reside inside the workspace root.
-    # Matching _ALLOW_PATTERN anywhere in the string would return "allow" for a UNC
-    # path like \\server\share\project\... that is on a foreign network host (BUG-011).
-    if _ALLOW_PATTERN.search(full_with_slash) and (
+    # Build allow pattern dynamically from the detected project folder name.
+    # Only grant "allow" for paths that genuinely reside inside the workspace root
+    # (BUG-011: prevents UNC path \\server\share\<project>\... from matching).
+    allow_pattern = re.compile(r"/" + re.escape(project_dir) + r"(/|$)")
+    if allow_pattern.search(full_with_slash) and (
         norm.startswith(ws_clean + "/") or norm == ws_clean
     ):
         return "allow"
 
-    return "ask"
+    # Default: deny everything outside the project folder.
+    return "deny"
