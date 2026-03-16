@@ -7,6 +7,7 @@ import urllib.error
 import urllib.request
 
 from launcher.config import GITHUB_RELEASES_URL
+from launcher.core.github_auth import get_github_token
 
 _TIMEOUT_SECONDS: int = 5
 
@@ -34,9 +35,13 @@ def check_for_update(current_version: str) -> tuple[bool, str]:
     On any error, silently returns (False, current_version).
     """
     try:
+        headers: dict[str, str] = {"Accept": "application/vnd.github+json"}
+        token = get_github_token()
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
         req = urllib.request.Request(
             GITHUB_RELEASES_URL,
-            headers={"Accept": "application/vnd.github+json"},
+            headers=headers,
         )
         with urllib.request.urlopen(req, timeout=_TIMEOUT_SECONDS) as response:
             raw = response.read()

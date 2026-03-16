@@ -15,6 +15,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from launcher.config import GITHUB_REPO_NAME, GITHUB_REPO_OWNER
+from launcher.core.github_auth import get_github_token
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -154,7 +155,9 @@ def _compute_sha256(path: Path) -> str:
     return sha.hexdigest()
 
 
-def _fetch_sha256_companion(assets: list[dict], asset_name: str) -> str | None:
+def _fetch_sha256_companion(
+    assets: list[dict], asset_name: str, token: str | None = None
+) -> str | None:
     """Download the ``<asset_name>.sha256`` companion file and return the hash.
 
     Returns ``None`` if no companion asset exists or if the download fails.
@@ -166,7 +169,10 @@ def _fetch_sha256_companion(assets: list[dict], asset_name: str) -> str | None:
         url: str = asset.get("browser_download_url", "")
         try:
             _validate_download_url(url)
-            req = urllib.request.Request(url, headers={"Accept": "text/plain"})
+            headers: dict[str, str] = {"Accept": "text/plain"}
+            if token:
+                headers["Authorization"] = f"Bearer {token}"
+            req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(
                 req, timeout=_DOWNLOAD_TIMEOUT_SECONDS
             ) as resp:
@@ -199,11 +205,17 @@ def download_update(version: str) -> Path:
     extension = _detect_platform_extension()
     arch = _detect_architecture()
 
+    # Obtain an auth token once — used for all requests in this function
+    token = get_github_token()
+
     # --- fetch release metadata ---
     try:
+        meta_headers: dict[str, str] = {"Accept": "application/vnd.github+json"}
+        if token:
+            meta_headers["Authorization"] = f"Bearer {token}"
         meta_req = urllib.request.Request(
             release_url,
-            headers={"Accept": "application/vnd.github+json"},
+            headers=meta_headers,
         )
         with urllib.request.urlopen(
             meta_req, timeout=_DOWNLOAD_TIMEOUT_SECONDS
@@ -244,9 +256,12 @@ def download_update(version: str) -> Path:
     dest_path = Path(tmp_dir) / safe_filename
 
     try:
+        dl_headers: dict[str, str] = {"Accept": "application/octet-stream"}
+        if token:
+            dl_headers["Authorization"] = f"Bearer {token}"
         dl_req = urllib.request.Request(
             download_url,
-            headers={"Accept": "application/octet-stream"},
+            headers=dl_headers,
         )
         with urllib.request.urlopen(
             dl_req, timeout=_DOWNLOAD_TIMEOUT_SECONDS
@@ -267,7 +282,7 @@ def download_update(version: str) -> Path:
 
     # --- integrity verification ---
     actual_hash = _compute_sha256(dest_path)
-    expected_hash = _fetch_sha256_companion(assets, asset_name)
+    expected_hash = _fetch_sha256_companion(assets, asset_name, token=token)
 
     if expected_hash is not None:
         if actual_hash.lower() != expected_hash.lower():

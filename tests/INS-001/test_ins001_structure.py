@@ -129,10 +129,12 @@ def test_os_utils_get_platform() -> None:
 
 
 def test_updater_stub_returns_no_update() -> None:
-    """check_for_update() stub must report no update available."""
+    """check_for_update() gracefully returns no-update when the API is unreachable."""
+    from unittest.mock import patch  # noqa: PLC0415
     from launcher.core.updater import check_for_update  # noqa: PLC0415
 
-    available, latest = check_for_update("0.1.0")
+    with patch("launcher.core.updater.urllib.request.urlopen", side_effect=Exception("network unavailable")):
+        available, latest = check_for_update("0.1.0")
     assert available is False
     assert latest == "0.1.0"
 
