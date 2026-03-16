@@ -40,6 +40,9 @@ Templates (bundled inside Launcher)
 │   │   ├── main.py                   # Entry point
 │   │   ├── gui/                      # UI components
 │   │   ├── core/                     # Business logic
+│   │   │   ├── github_auth.py        # GitHub token provider (env vars / gh CLI)
+│   │   │   ├── updater.py            # Version check via GitHub Releases API
+│   │   │   └── downloader.py         # Asset download from GitHub Releases
 │   │   └── config.py                 # Constants
 │   └── installer/                    # Per-platform installer scripts
 ├── templates/                        # Bundled project templates
@@ -85,6 +88,8 @@ Templates (bundled inside Launcher)
 │   ├── FIX-015/                      # Tests for FIX-015 (Fix TS Logo Aspect Ratio)
 │   ├── FIX-016/                      # Tests for FIX-016 (Fix App Icon for Windows)
 │   ├── FIX-017/                      # Tests for FIX-017 (Bump Version to 1.0.2)
+│   ├── FIX-018/                      # Tests for FIX-018 (GitHub Auth for Private Repo)
+│   ├── FIX-019/                      # Tests for FIX-019 (Bump Version to 1.0.3)
 │   ├── GUI-001/                      # Tests for GUI-001 (Main Window Layout)
 │   ├── GUI-002/                      # Tests for GUI-002 (Project Type Selection)
 │   ├── GUI-003/                      # Tests for GUI-003 (Folder Name Input)
