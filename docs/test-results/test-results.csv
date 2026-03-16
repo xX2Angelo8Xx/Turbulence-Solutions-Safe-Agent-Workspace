@@ -1173,3 +1173,6 @@ TST-1186,FIX-018 full suite (Iteration 2),Unit,FIX-018,Pass,2026-03-16,Windows 1
 TST-1187,test_nonzero_exit_with_error_text_on_stdout_returns_none + test_nonzero_exit_error_text_not_used_as_auth_header,Regression,FIX-018,Pass,2026-03-16,Windows 11 + Python 3.11,Both BUG-047 regression tests pass after returncode guard added,Tester Agent Iteration 2
 TST-1188,FIX-019 version bump suite,Unit,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,12/12 pass â€” all 5 version locations verified at 1.0.3,Developer Agent
 TST-1189,Full suite regression after FIX-019,Regression,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,2074 passed / 1 pre-existing fail (INS-005 BUG-045) / 29 skipped â€” no FIX-019 regressions,Developer Agent
+TST-1190,FIX-019 Tester edge-case suite (19 tests),Unit,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,19/19 pass — semver format, version ordering, older-version regression, display version fallback, tag format,Tester Agent
+TST-1191,FIX-019 full suite (developer + Tester),Unit,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,31/31 pass (12 developer + 19 Tester edge-case),Tester Agent
+TST-1192,Full regression suite (Tester run),Regression,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,2074 passed / 1 pre-existing fail (INS-005 BUG-045) / 29 skipped — no FIX-019 regressions,Tester Agent
