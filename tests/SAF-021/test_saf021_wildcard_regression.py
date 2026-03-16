@@ -485,3 +485,155 @@ class TestCmdExeWildcardPatterns:
         """dir .v* — CMD dir command targeting .vscode prefix → denied."""
         decision, _ = sg.sanitize_terminal_command("dir .v*", WS)
         assert decision == "deny"
+
+    def test_dir_slash_b_dotg_star_denied(self):
+        """dir /b .g* — Windows /b flag before wildcard must not skip wildcard check."""
+        decision, _ = sg.sanitize_terminal_command("dir /b .g*", WS)
+        assert decision == "deny"
+
+    def test_dir_slash_s_n_star_denied(self):
+        """dir /s N* — Windows /s (recursive) flag before wildcard → denied."""
+        decision, _ = sg.sanitize_terminal_command("dir /s N*", WS)
+        assert decision == "deny"
+
+    def test_dir_slash_b_dotv_star_denied(self):
+        """dir /b .v* — Windows bare-format flag before .vscode wildcard → denied."""
+        decision, _ = sg.sanitize_terminal_command("dir /b .v*", WS)
+        assert decision == "deny"
+
+
+# ===========================================================================
+# Tester additions — Question-mark single-character wildcard bypass
+# ===========================================================================
+
+class TestQuestionMarkWildcard:
+    """The ? wildcard replaces exactly one character.
+
+    A rogue agent could use '?' to avoid matching literal deny zone names
+    while still having the pattern expand to a restricted folder at runtime.
+    e.g. '.githu?' expands to '.github', 'N?' expands to 'No' (prefix still
+    matches 'noagentzone').
+
+    SAF-020 includes '?' in its wildcard trigger characters.  All tests here
+    verify ? patterns are correctly denied.
+    """
+
+    def test_question_mark_dotgithu_denied(self):
+        """ls .githu? — single char wildcard resolving to .github → denied."""
+        decision, _ = sg.sanitize_terminal_command("ls .githu?", WS)
+        assert decision == "deny"
+
+    def test_question_mark_n_single_denied(self):
+        """ls N? — one-char wildcard; prefix 'n' matches noagentzone → denied."""
+        decision, _ = sg.sanitize_terminal_command("ls N?", WS)
+        assert decision == "deny"
+
+    def test_question_mark_dotvsco_double_denied(self):
+        """ls .vsco?? — two ? wildcards; prefix '.vsco' matches '.vscode' → denied."""
+        decision, _ = sg.sanitize_terminal_command("ls .vsco??", WS)
+        assert decision == "deny"
+
+    def test_question_mark_gci_dotgithu_denied(self):
+        """Get-ChildItem .githu? → denied (GCI alias, ? wildcard)."""
+        decision, _ = sg.sanitize_terminal_command("Get-ChildItem .githu?", WS)
+        assert decision == "deny"
+
+    def test_question_mark_mixed_star_and_qmark_denied(self):
+        """ls .g?* — ? then * wildcard; prefix '.g' matches .github → denied."""
+        decision, _ = sg.sanitize_terminal_command("ls .g?*", WS)
+        assert decision == "deny"
+
+    def test_question_mark_helper_dotgithu_qmark_true(self):
+        """Helper: _wildcard_prefix_matches_deny_zone('.githu?') is True."""
+        assert sg._wildcard_prefix_matches_deny_zone(".githu?") is True
+
+    def test_question_mark_helper_n_qmark_true(self):
+        """Helper: _wildcard_prefix_matches_deny_zone('N?') is True."""
+        assert sg._wildcard_prefix_matches_deny_zone("N?") is True
+
+    def test_question_mark_project_config_allowed(self):
+        """ls Project/?onfig.py — ? wildcard inside safe Project/ parent → allowed."""
+        decision, _ = sg.sanitize_terminal_command("ls Project/?onfig.py", WS)
+        assert decision == "allow"
+
+    def test_question_mark_helper_project_qmark_false(self):
+        """Helper: _wildcard_prefix_matches_deny_zone('Project/?onfig.py') is False."""
+        assert sg._wildcard_prefix_matches_deny_zone("Project/?onfig.py") is False
+
+
+# ===========================================================================
+# Tester additions — Chained commands with wildcard in second segment
+# ===========================================================================
+
+class TestChainedCommandsWithWildcard:
+    """When a terminal command uses ; or && to chain segments, the wildcard
+    check must fire on the LATER segment too.
+
+    A rogue agent might prepend an innocuous safe command to make the first
+    segment pass, hiding the dangerous wildcard in the second segment.
+    """
+
+    def test_semicolon_chain_ls_dotg_star_denied(self):
+        """echo ok; ls .g* — semicolon chain; second segment must be denied."""
+        decision, _ = sg.sanitize_terminal_command("echo ok; ls .g*", WS)
+        assert decision == "deny"
+
+    def test_and_chain_cat_dotg_star_denied(self):
+        """cd Project && cat .g* — AND-chain; second segment wildcard denied."""
+        decision, _ = sg.sanitize_terminal_command("cd Project && cat .g*", WS)
+        assert decision == "deny"
+
+    def test_semicolon_chain_gci_n_star_denied(self):
+        """echo safe; gci N* — N* in later segment must trigger deny."""
+        decision, _ = sg.sanitize_terminal_command("echo safe; gci N*", WS)
+        assert decision == "deny"
+
+    def test_and_chain_gci_g_star_with_flags_denied(self):
+        """cd Project && Get-ChildItem .g* -Name — flags after wildcard, chained."""
+        decision, _ = sg.sanitize_terminal_command(
+            "cd Project && Get-ChildItem .g* -Name", WS
+        )
+        assert decision == "deny"
+
+    def test_semicolon_chain_dir_dotv_star_denied(self):
+        """cd Project; dir .v* — semicolon chain; .v* in second segment denied."""
+        decision, _ = sg.sanitize_terminal_command("cd Project; dir .v*", WS)
+        assert decision == "deny"
+
+
+# ===========================================================================
+# Tester additions — Get-Content / Select-String with wildcard path
+# ===========================================================================
+
+class TestAllowlistedReadCommandsWithWildcard:
+    """Get-Content and Select-String are in the allowlist (SAF-014) with
+    path_args_restricted=True.  Wildcard paths targeting deny zones must still
+    be blocked even though these commands are 'allowed' for normal use.
+    """
+
+    def test_get_content_dotg_star_denied(self):
+        """Get-Content .g* — read contents of wildcard expansions → denied."""
+        decision, _ = sg.sanitize_terminal_command("Get-Content .g*", WS)
+        assert decision == "deny"
+
+    def test_get_content_n_star_path_denied(self):
+        """Get-Content N*\\README.md — deny zone wildcard in sub-path → denied."""
+        decision, _ = sg.sanitize_terminal_command(r"Get-Content N*\README.md", WS)
+        assert decision == "deny"
+
+    def test_select_string_dotg_star_denied(self):
+        """Select-String -Path .g*\\* -Pattern 'pass' → denied."""
+        decision, _ = sg.sanitize_terminal_command(
+            r"Select-String -Path .g*\* -Pattern pass", WS
+        )
+        assert decision == "deny"
+
+    def test_gc_alias_dotv_star_denied(self):
+        """gc .v*\\settings.json — 'gc' alias for Get-Content with wildcard → denied."""
+        decision, _ = sg.sanitize_terminal_command(r"gc .v*\settings.json", WS)
+        assert decision == "deny"
+
+    def test_get_content_project_star_allowed(self):
+        """Get-Content Project\\*.py — wildcard inside Project/ zone → allowed."""
+        decision, _ = sg.sanitize_terminal_command(r"Get-Content Project\*.py", WS)
+        assert decision == "allow"
