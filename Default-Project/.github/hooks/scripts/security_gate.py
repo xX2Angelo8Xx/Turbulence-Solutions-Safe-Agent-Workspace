@@ -547,6 +547,63 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         allow_arbitrary_paths=False,
         notes="Inherently recursive; ancestor-of-deny-zone check in SAF-006",
     ),
+    # Category L — Read-only file inspection commands (SAF-014)
+    "get-content": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell Get-Content; path args zone-checked",
+    ),
+    "gc": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Alias for Get-Content; path args zone-checked",
+    ),
+    "select-string": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell Select-String; path args zone-checked",
+    ),
+    "findstr": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Windows findstr; path args zone-checked",
+    ),
+    "grep": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Unix grep; path args zone-checked",
+    ),
+    "wc": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Unix word/line count; path args zone-checked",
+    ),
+    "file": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Unix file type detection; path args zone-checked",
+    ),
+    "stat": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Unix/Windows file info; path args zone-checked",
+    ),
 }
 
 # Allowed Python -m modules (Section 7.2 Category A sub-rules)
