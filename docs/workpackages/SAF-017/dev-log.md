@@ -72,6 +72,38 @@ SAF-017 intentionally changed behavior tested by two earlier WPs. Five affected 
 
 ---
 
+---
+
+## Iteration 2 — Bug Fixes (2026-03-16)
+
+### Summary
+Fixed two security vulnerabilities reported by the Tester (BUG-049, BUG-050).
+
+### BUG-049 — Fix: `python -m pip install` bypasses VIRTUAL_ENV check
+**Root cause:** The VIRTUAL_ENV guard in `_validate_args` only fired when `verb in ("pip", "pip3")`. Invoking pip as `python -m pip install` set `verb = "python"`, skipping the guard entirely.
+
+**Fix:** Inside the `-m` module handler (section 4 of `_validate_args`), added a check: when `module in ("pip", "pip3")`, extract the pip subcommand from `args[i + 2:]` and apply the same `install` → VIRTUAL_ENV validation as the direct `pip`/`pip3` verb path.
+
+### BUG-050 — Fix: VIRTUAL_ENV `startswith(ws_root)` path-boundary collision
+**Root cause:** `"c:/workspace2/.venv".startswith("c:/workspace")` returns `True` in Python — a directory that merely shares a string prefix passes the check even though it is not inside the workspace.
+
+**Fix:** Replaced `norm_venv.startswith(ws_root)` with `norm_venv.startswith(ws_norm + "/") and norm_venv != ws_norm` (where `ws_norm = ws_root.rstrip("/")`) in both the direct `pip`/`pip3` verb path and the new `python -m pip` path.
+
+### Files Changed
+| File | Change |
+|------|--------|
+| `Default-Project/.github/hooks/scripts/security_gate.py` | BUG-049 + BUG-050 fixes; re-ran update_hashes.py |
+| `templates/coding/.github/hooks/scripts/security_gate.py` | Synced same fixes; re-ran update_hashes.py |
+
+### Test Results
+| Suite | Result |
+|-------|--------|
+| `tests/SAF-017/test_saf017_edge_cases.py` (22 tests) | 22 PASS |
+| `tests/SAF-017/` (74 tests total) | 74 PASS |
+| Full suite | 2594 pass, 29 skip, 1 fail (INS-005 pre-existing) |
+
+---
+
 ## Known Limitations
 
 - The `python -c` inline code argument is intentionally not zone-checked (it is a code string, not a path). Malicious code within the string is the responsibility of the outer AI safety layer.

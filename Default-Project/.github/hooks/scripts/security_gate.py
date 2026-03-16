@@ -68,7 +68,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "a9648fad5241bc2f0d9ef4d68c1b3e79c21f1faeba6175
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "798a605eaaa65c22efb6683ffbacac0163e188dbaa0874c9e6bda1a3d83a0bce"
+_KNOWN_GOOD_GATE_HASH: str = "76e9a809fb1d2c7407ead326769a194f1dfebd150bf9027996d2faae4c1c3027"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1033,6 +1033,21 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                         return False
                     if _is_path_like(venv_target) and not _check_path_arg(venv_target, ws_root):
                         return False
+                # BUG-049: python -m pip install must apply the same VIRTUAL_ENV guard
+                if module in ("pip", "pip3"):
+                    remaining_args = args[i + 2:]
+                    pip_subcmd = next(
+                        (a.lower() for a in remaining_args if not a.startswith("-")),
+                        None,
+                    )
+                    if pip_subcmd == "install":
+                        virtual_env = os.environ.get("VIRTUAL_ENV", "")
+                        if not virtual_env:
+                            return False
+                        norm_venv = normalize_path(virtual_env)
+                        ws_norm = ws_root.rstrip("/")
+                        if not norm_venv.startswith(ws_norm + "/") and norm_venv != ws_norm:
+                            return False
                 break
 
     # SAF-017: pip install — only allowed when VIRTUAL_ENV is active inside project folder
@@ -1044,8 +1059,9 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                 # No venv active — deny to prevent global installations
                 return False
             norm_venv = normalize_path(virtual_env)
-            if not norm_venv.startswith(ws_root):
-                # Venv is outside project folder — deny
+            ws_norm = ws_root.rstrip("/")
+            if not norm_venv.startswith(ws_norm + "/") and norm_venv != ws_norm:
+                # Venv is outside project folder — deny (BUG-050: path-boundary safe)
                 return False
 
     # SAF-017: for python/python3/py with -c, the argument immediately after -c
