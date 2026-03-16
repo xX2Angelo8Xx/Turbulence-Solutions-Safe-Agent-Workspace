@@ -68,7 +68,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "a9648fad5241bc2f0d9ef4d68c1b3e79c21f1faeba6175
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "76e9a809fb1d2c7407ead326769a194f1dfebd150bf9027996d2faae4c1c3027"
+_KNOWN_GOOD_GATE_HASH: str = "18ed817d6a05adaea9184845dd351d93a51c17fa5f0149289e8da10c2c304118"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1457,6 +1457,56 @@ def validate_write_tool(data: dict, ws_root: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# SAF-018: multi_replace_string_in_file — validate ALL replacement filePaths
+# ---------------------------------------------------------------------------
+
+def validate_multi_replace_tool(data: dict, ws_root: str) -> str:
+    """SAF-018: Validate multi_replace_string_in_file tool calls.
+
+    The tool receives a ``replacements`` array where every entry contains a
+    ``filePath``.  ALL filePaths must be inside Project/ (zone == "allow").
+    If ANY filePath is outside, the entire operation is denied.
+
+    Fallback: when the payload uses the legacy flat ``filePath`` field instead
+    of the ``replacements`` array (e.g. in older tests or hand-crafted calls),
+    delegates to ``validate_write_tool`` for a single-path zone check.  This
+    preserves backward compatibility while keeping the deny-by-default posture.
+
+    Fails closed ("deny") when replacements is absent, not a list, or empty,
+    AND no flat filePath fallback is present.
+    """
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        tool_input = {}
+
+    replacements = tool_input.get("replacements")
+    if replacements is None:
+        # Fall back to top-level key for test convenience
+        replacements = data.get("replacements")
+
+    if replacements is None:
+        # No replacements array present — try legacy flat filePath fallback.
+        # validate_write_tool will fail closed if filePath is also absent.
+        return validate_write_tool(data, ws_root)
+
+    if not isinstance(replacements, list) or not replacements:
+        # Replacements key exists but is wrong type or empty — fail closed
+        return "deny"
+
+    for entry in replacements:
+        if not isinstance(entry, dict):
+            return "deny"
+        file_path = entry.get("filePath")
+        if not isinstance(file_path, str) or not file_path:
+            return "deny"
+        zone = zone_classifier.classify(file_path, ws_root)
+        if zone != "allow":
+            return "deny"
+
+    return "allow"
+
+
+# ---------------------------------------------------------------------------
 # SAF-006: Recursive enumeration protection
 # ---------------------------------------------------------------------------
 
@@ -1569,6 +1619,10 @@ def decide(data: dict, ws_root: str) -> str:
 
     # SAF-007: Write tools are restricted to Project/ only.  Any write
     # targeting a path outside Project/ is denied, even if zone would be "ask".
+    # SAF-018: multi_replace_string_in_file carries an array of replacements —
+    # each entry has its own filePath; all must be inside Project/.
+    if tool_name == "multi_replace_string_in_file":
+        return validate_multi_replace_tool(data, ws_root)
     if tool_name in _WRITE_TOOLS:
         return validate_write_tool(data, ws_root)
 
