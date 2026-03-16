@@ -1193,3 +1193,30 @@ TST-1206,test_decide_create_file_github_returns_deny,Unit/Security,SAF-013,Pass,
 TST-1207,test_response_json_never_ask,Unit/Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,permissionDecision in JSON is only allow or deny never ask,
 TST-1208,test_both_copies_identical,Integration,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,Default-Project and templates/coding security_gate.py are identical,
 TST-1209,Full regression suite (Developer run SAF-013 branch),Regression,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,2193 passed / 8 pre-existing failures / 29 skipped,8 pre-existing: 6 FIX-009 CSV encoding + 1 INS-005 installer + 1 SAF-008 hash not updated (SAF-025)
+TST-1210,test_decide_github_uppercase_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,decide() denies .GITHUB (uppercase) — case normalization working,Tester edge case
+TST-1211,test_decide_vscode_mixed_case_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,decide() denies .Vscode (mixed case),Tester edge case
+TST-1212,test_decide_noagentzone_uppercase_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,decide() denies NoAgentZone (mixed case),Tester edge case
+TST-1213,test_decide_path_traversal_to_github_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,decide() denies project/../.github/ traversal,Tester edge case
+TST-1214,test_decide_path_traversal_to_vscode_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,decide() denies project/../.vscode/ traversal,Tester edge case
+TST-1215,test_decide_root_level_file_returns_deny,Unit,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,decide() denies root-level workspace file (no subfolder),Tester edge case
+TST-1216,test_decide_workspace_root_itself_returns_deny,Unit,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,decide() denies workspace root path itself,Tester edge case
+TST-1217,test_always_allow_tool_with_github_path_returns_allow,Unit,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,always-allow tools are never blocked even with .github path,Tester edge case
+TST-1218,test_todo_write_always_returns_allow,Unit,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,TodoWrite always-allow tool returns allow,Tester edge case
+TST-1219,test_write_tool_vscode_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,replace_string_in_file targeting .vscode returns deny,Tester edge case
+TST-1220,test_write_tool_noagentzone_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,create_file targeting NoAgentZone returns deny,Tester edge case
+TST-1221,test_write_tool_edit_vscode_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,edit_file targeting .vscode returns deny,Tester edge case
+TST-1222,test_grep_search_include_ignored_files_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,grep_search with includeIgnoredFiles=true (bool) returns deny,Tester edge case
+TST-1223,test_grep_search_include_ignored_files_string_true_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,grep_search with includeIgnoredFiles='true' (string) returns deny,Tester edge case
+TST-1224,test_grep_search_include_pattern_github_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,grep_search with includePattern=.github/** returns deny,Tester edge case
+TST-1225,test_grep_search_include_pattern_project_returns_allow,Unit,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,grep_search with includePattern=project/**/*.py returns allow,Tester edge case
+TST-1226,test_terminal_with_github_path_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,cat .github/... denied — path zone check on terminal commands,Tester edge case
+TST-1227,test_terminal_with_noagentzone_path_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,cat NoAgentZone/... denied,Tester edge case
+TST-1228,test_terminal_obfuscation_python_c_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,python -c obfuscation pattern denied,Tester edge case
+TST-1229,test_decide_empty_tool_name_no_path_returns_deny,Unit,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,empty tool name with no path returns deny (fail closed),Tester edge case
+TST-1230,test_decide_missing_tool_name_key_no_path_returns_deny,Unit,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,missing tool_name key with no path returns deny,Tester edge case
+TST-1231,test_read_file_vscode_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,read_file targeting .vscode returns deny,Tester edge case
+TST-1232,test_list_dir_github_returns_deny,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,list_dir targeting .github returns deny,Tester edge case
+TST-1233,test_build_response_deny_never_contains_ask_string,Unit,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,build_response deny output contains no 'ask' string,Tester edge case
+TST-1234,test_build_response_allow_never_contains_ask_string,Unit,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,build_response allow output contains no 'ask' string,Tester edge case
+TST-1235,test_decision_matrix_never_produces_ask,Security,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,brute-force matrix: 18 tool/path combos all return allow or deny never ask,Tester edge case
+TST-1236,Full regression suite (Tester run SAF-013 branch),Regression,SAF-013,Pass,2026-03-16,Windows 11 + Python 3.11,2219 passed / 8 pre-existing failures / 29 skipped,8 pre-existing: FIX-009 encoding x6 + INS-005 installer + SAF-008 hash not updated; 26 new Tester edge-case tests all passing
