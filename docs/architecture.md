@@ -82,6 +82,9 @@ Templates (bundled inside Launcher)
 │   ├── FIX-012/                      # Tests for FIX-012 (Fix macOS/Windows CI directives)
 │   ├── FIX-013/                      # Tests for FIX-013 (Fix PyInstaller Template Path)
 │   ├── FIX-014/                      # Tests for FIX-014 (Bump Version to 1.0.1)
+│   ├── FIX-015/                      # Tests for FIX-015 (Fix TS Logo Aspect Ratio)
+│   ├── FIX-016/                      # Tests for FIX-016 (Fix App Icon for Windows)
+│   ├── FIX-017/                      # Tests for FIX-017 (Bump Version to 1.0.2)
 │   ├── GUI-001/                      # Tests for GUI-001 (Main Window Layout)
 │   ├── GUI-002/                      # Tests for GUI-002 (Project Type Selection)
 │   ├── GUI-003/                      # Tests for GUI-003 (Folder Name Input)
@@ -122,7 +125,8 @@ Templates (bundled inside Launcher)
 │   ├── test-results/
 │   │   └── test-results.csv          # Test execution records
 │   └── maintenance/                  # Maintenance audit logs (timestamped)
-├── TS-Logo.png                       # Company logo (used as app icon and GUI header)
+├── TS-Logo.png                       # Company logo (used in GUI header and non-Windows icon)
+├── TS-Logo.ico                       # Company logo in ICO format (Windows app icon)
 ├── .gitignore                        # Excludes .venv/, __pycache__/, build artifacts, etc.
 ├── .venv/                            # Workspace-local virtual environment (gitignored)
 └── pyproject.toml                    # Python packaging configuration
