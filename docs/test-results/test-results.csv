@@ -1173,9 +1173,9 @@ TST-1186,FIX-018 full suite (Iteration 2),Unit,FIX-018,Pass,2026-03-16,Windows 1
 TST-1187,test_nonzero_exit_with_error_text_on_stdout_returns_none + test_nonzero_exit_error_text_not_used_as_auth_header,Regression,FIX-018,Pass,2026-03-16,Windows 11 + Python 3.11,Both BUG-047 regression tests pass after returncode guard added,Tester Agent Iteration 2
 TST-1188,FIX-019 version bump suite,Unit,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,12/12 pass — all 5 version locations verified at 1.0.3,Developer Agent
 TST-1189,Full suite regression after FIX-019,Regression,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,2074 passed / 1 pre-existing fail (INS-005 BUG-045) / 29 skipped — no FIX-019 regressions,Developer Agent
-TST-1190,FIX-019 Tester edge-case suite (19 tests),Unit,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,19/19 pass � semver format, version ordering, older-version regression, display version fallback, tag format,Tester Agent
+TST-1190,FIX-019 Tester edge-case suite (19 tests),Unit,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,19/19 pass � semver format, version ordering, older-version regression, display version fallback, tag format,Tester Agent
 TST-1191,FIX-019 full suite (developer + Tester),Unit,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,31/31 pass (12 developer + 19 Tester edge-case),Tester Agent
-TST-1192,Full regression suite (Tester run),Regression,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,2074 passed / 1 pre-existing fail (INS-005 BUG-045) / 29 skipped � no FIX-019 regressions,Tester Agent
+TST-1192,Full regression suite (Tester run),Regression,FIX-019,Pass,2026-03-16,Windows 11 + Python 3.11,2074 passed / 1 pre-existing fail (INS-005 BUG-045) / 29 skipped � no FIX-019 regressions,Tester Agent
 TST-1193,SAF-012 Developer test suite (51 tests),Unit/Security,SAF-012,Pass,2026-03-16,Windows 11 + Python 3.11,51 passed in 0.33s,All Developer tests pass: detect_project_folder + classify + bypass attempts + type checks
 TST-1194,SAF-012 Tester edge-case suite (44 tests),Unit/Security,SAF-012,Pass,2026-03-16,Windows 11 + Python 3.11,44 passed in 0.22s,Tester-added edge cases: empty workspace; special folder names; workspace with spaces; empty path; WSL/GitBash paths; URL-encoded bypass; JSON double-escaped backslash
 TST-1195,SAF-012 combined suite (95 tests),Unit/Security/Integration,SAF-012,Pass,2026-03-16,Windows 11 + Python 3.11,95 passed in 0.55s,All SAF-012 tests pass (Developer 51 + Tester 44)
@@ -1339,3 +1339,18 @@ TST-1352,test_set_content_dollar_var_denied,Security,SAF-015,Pass,2026-03-16,Win
 TST-1353,test_out_file_dollar_var_denied,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,out-file dollar-var injection denied (bypass attempt),
 TST-1354,test_tee_dollar_var_denied,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,tee dollar-var injection denied (bypass attempt),
 TST-1355,Full regression suite (Developer run SAF-015 branch),Regression,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,2352 passed / 8 pre-existing failures / 29 skipped,Pre-existing: FIX-009 x6 plus INS-005 plus SAF-008 hash. Zero new regressions.
+TST-1356,SAF-015 Developer test suite (Tester verification run),Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,72 passed / 0 failed,All 72 Developer tests pass on Tester run.
+TST-1357,test_saf015_edge_cases — move-item direct coverage,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,4 passed,move-item allow/deny with both paths verified.
+TST-1358,test_saf015_edge_cases — cp and copy direct coverage,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,4 passed,cp and copy allow/deny verified.
+TST-1359,test_saf015_edge_cases — mkdir and new-item direct coverage,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,5 passed,mkdir and new-item allow/deny verified.
+TST-1360,test_saf015_edge_cases — piped write commands,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,6 passed,Piped commands zone-check all path tokens in the segment.
+TST-1361,test_saf015_edge_cases — PowerShell named parameters,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,8 passed,-Path/-FilePath/-Destination values are zone-checked.
+TST-1362,test_saf015_edge_cases — flags with project paths,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,6 passed,-Force/-Append/-Encoding/-a do not bypass zone check.
+TST-1363,test_saf015_edge_cases — quoted paths with spaces,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,4 passed,Quoted paths with spaces correctly allowed/denied.
+TST-1364,test_saf015_edge_cases — redirect operators with write commands,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,3 passed,> and >> redirect targets are zone-checked.
+TST-1365,test_saf015_edge_cases — mixed-case and all-uppercase verbs,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,6 passed,All verb case variants resolved correctly.
+TST-1366,test_saf015_edge_cases — copy-item asymmetric src/dest,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,3 passed,src-in-project+dest-outside and vice versa both denied.
+TST-1367,test_saf015_edge_cases — ni -ItemType Directory,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,2 passed,ni as directory creator passes zone check.
+TST-1368,test_saf015_edge_cases — tee-object -Variable vs -FilePath,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,2 passed,tee-object with no path allowed; with deny-zone FilePath denied.
+TST-1369,test_saf015_edge_cases — path traversal on Category J commands,Security,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,3 passed,mkdir/cp/move-item traversal attempts denied.
+TST-1370,Full regression suite (Tester run post edge-case additions),Regression,SAF-015,Pass,2026-03-16,Windows 11 + Python 3.11,2409 passed / 8 pre-existing failures / 29 skipped,Same pre-existing failures only. 57 new edge-case tests all pass.
