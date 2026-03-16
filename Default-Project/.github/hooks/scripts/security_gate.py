@@ -68,7 +68,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "a9648fad5241bc2f0d9ef4d68c1b3e79c21f1faeba6175
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "01c7ed253e9af8e8c3d1f77f1e0ece54891940c784aabb8c5f653032136f0f08"
+_KNOWN_GOOD_GATE_HASH: str = "bae5f238ae6e4af3e5144aaf5445f227bbe441cf48d494116ef527394f451707"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -130,13 +130,10 @@ _OBFUSCATION_PATTERNS: list[re.Pattern[str]] = [
 ]
 
 # Stage 5 fallback — explicit destructive patterns applied after allowlist passes
+# NOTE: rm, del, erase, rmdir, remove-item, ri are intentionally absent —
+# they are now in _COMMAND_ALLOWLIST (Category N) with path_args_restricted=True
+# and are zone-checked there rather than hard-denied here.
 _EXPLICIT_DENY_PATTERNS: list[re.Pattern[str]] = [
-    re.compile(r"\brm\s"),
-    re.compile(r"\bdel\b"),
-    re.compile(r"\berase\b"),
-    re.compile(r"\brmdir\b"),
-    re.compile(r"\bremove-item\b"),
-    re.compile(r"\bri\b"),
     re.compile(r"\bformat\b"),
     re.compile(r"\bfdisk\b"),
     re.compile(r"\bdiskpart\b"),
@@ -674,6 +671,51 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         path_args_restricted=True,
         allow_arbitrary_paths=False,
         notes="Alias for New-Item; path args zone-checked",
+    ),
+    # Category N — Delete commands (SAF-016)
+    # path_args_restricted=True: ALL path args must be inside project folder.
+    # When ANY path arg resolves outside, _validate_args returns False → deny.
+    "remove-item": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell Remove-Item; all path args zone-checked",
+    ),
+    "ri": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Alias for Remove-Item; all path args zone-checked",
+    ),
+    "rm": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Unix/POSIX rm; all path args zone-checked",
+    ),
+    "del": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Windows del; all path args zone-checked",
+    ),
+    "erase": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Windows erase (alias for del); all path args zone-checked",
+    ),
+    "rmdir": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Unix/Windows rmdir; all path args zone-checked",
     ),
 }
 

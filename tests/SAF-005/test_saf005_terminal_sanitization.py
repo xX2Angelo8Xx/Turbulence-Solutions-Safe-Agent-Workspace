@@ -187,14 +187,18 @@ def test_denied_unknown_verb():
     assert is_deny("badcmd argument")
 
 
-# T-022: rm → deny
+# T-022: rm is now in the allowlist (SAF-016) — bare filename without path
+# context is allowed; rm targeting .github/ is still denied.
 def test_denied_verb_rm():
-    assert is_deny("rm file.txt")
+    assert is_ask("rm file.txt")  # allowed — bare filename is not path-like
+    assert is_deny("rm .github/hooks/security_gate.py")  # denied — outside project
 
 
-# T-023: del → deny (explicit deny pattern)
+# T-023: del is now in the allowlist (SAF-016) — bare filename without path
+# context is allowed; del targeting .github/ is still denied.
 def test_denied_verb_del():
-    assert is_deny("del file.txt")
+    assert is_ask("del file.txt")  # allowed — bare filename is not path-like
+    assert is_deny("del .github/hooks/security_gate.py")  # denied — outside project
 
 
 # T-024: ls -R → deny (denied flag)
@@ -399,14 +403,16 @@ def test_bypass_variable_in_path():
 # Section 13.4 — Cross-Platform Tests
 # ---------------------------------------------------------------------------
 
-# T-062: rm (PowerShell alias) → deny
+# T-062: rm (PowerShell alias) is now in the allowlist (SAF-016)
 def test_platform_powershell_alias_rm():
-    assert is_deny("rm file.txt")
+    assert is_ask("rm file.txt")  # allowed — bare filename is not path-like
+    assert is_deny("rm .github/hooks/evil.py")  # denied — outside project folder
 
 
-# T-063: del (PowerShell/cmd alias) → deny
+# T-063: del (PowerShell/cmd alias) is now in the allowlist (SAF-016)
 def test_platform_powershell_alias_del():
-    assert is_deny("del file.txt")
+    assert is_ask("del file.txt")  # allowed — bare filename is not path-like
+    assert is_deny("del .github/hooks/evil.py")  # denied — outside project folder
 
 
 # T-064: Get-ChildItem -Recurse .github → deny
