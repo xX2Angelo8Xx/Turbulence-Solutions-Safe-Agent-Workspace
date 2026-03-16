@@ -923,10 +923,73 @@ _CHAIN_RE = re.compile(r";|&&|\|\|")
 # - starts with . (relative path like ./file or ../dir)
 _PATH_LIKE_RE = re.compile(r"[/\\]|\.\.")
 
+# SAF-020: Deny zone names (lowercase) used for wildcard prefix matching.
+# A wildcard token whose prefix matches the start of any of these names is denied.
+_WILDCARD_DENY_ZONES: tuple[str, ...] = (".github", ".vscode", "noagentzone")
+
 
 def _is_path_like(token: str) -> bool:
     """Return True if *token* looks like a file-system path argument."""
     return bool(_PATH_LIKE_RE.search(token)) or token.startswith(".")
+
+
+def _wildcard_prefix_matches_deny_zone(token: str) -> bool:
+    """SAF-020: Return True if a wildcard token could expand to a deny zone.
+
+    Conservative algorithm:
+    1. Normalize token to lowercase forward-slash form.
+    2. Split into path components.
+    3. Walk components; track whether we have entered a non-deny directory.
+    4. For the first wildcard component: if no non-deny parent was entered,
+       check if any deny zone name starts with the prefix before the wildcard.
+       A blank prefix (e.g. *.py at root) matches every deny zone — deny.
+    5. If any parent component IS a deny zone, deny.
+    6. Wildcards nested inside a non-deny parent (e.g. Project/*.py) are safe.
+
+    .. and empty components are treated as transparent (do not constitute a
+    safe parent directory).
+    """
+    if "*" not in token and "?" not in token:
+        return False
+
+    # Normalize to lowercase forward-slash for consistent matching
+    normalized = token.replace("\\", "/").lower()
+    parts = normalized.split("/")
+
+    entered_safe_dir = False  # True once we step into a non-deny directory
+
+    for part in parts:
+        if "*" not in part and "?" not in part:
+            # Non-wildcard component — classify it
+            clean = part.strip()
+            if clean in ("", ".", ".."):
+                # Transparent: dot, double-dot, or empty — do not mark as safe
+                continue
+            if clean in _WILDCARD_DENY_ZONES:
+                # Explicit deny zone in the path prefix — deny immediately
+                return True
+            # Entered a non-deny, non-transparent directory
+            entered_safe_dir = True
+        else:
+            # Wildcard component — extract the prefix before the first wildcard
+            wc_pos = min(part.find(c) for c in ("*", "?") if c in part)
+            comp_prefix = part[:wc_pos]
+
+            if entered_safe_dir:
+                # Wildcard is inside a non-deny parent directory — safe
+                return False
+
+            # Wildcard is at root level (or after only transparent components).
+            # Deny if any deny zone name starts with the component prefix.
+            # An empty prefix (e.g. "*.py") matches every deny zone → deny.
+            for zone in _WILDCARD_DENY_ZONES:
+                if zone.startswith(comp_prefix):
+                    return True
+
+            # Prefix does not match any deny zone at this level — safe
+            return False
+
+    return False
 
 
 def _normalize_terminal_command(raw: str) -> str:
@@ -966,9 +1029,13 @@ def _check_path_arg(token: str, ws_root: str) -> bool:
 
     Denies if:
     - Token contains '$' (variable reference — runtime value unknown)
+    - SAF-020: Token contains wildcards that could resolve to a deny zone
     - Resolved path zone returns 'deny'
     """
     if "$" in token:
+        return False
+    # SAF-020: Wildcard bypass prevention (defense in depth)
+    if _wildcard_prefix_matches_deny_zone(token):
         return False
     if not _is_path_like(token):
         return True  # not a path; no zone concern
@@ -1078,19 +1145,32 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
     # Commands like npm/yarn/pnpm with allow_arbitrary_paths=False will zone-check
     # any path-like argument even though path_args_restricted is False.
     if rule.path_args_restricted or not rule.allow_arbitrary_paths:
+        _prev_was_flag = False  # SAF-020: track flag-argument position
         for _idx, tok in enumerate(args):
             if _idx in _code_arg_indices:
+                _prev_was_flag = False
                 continue  # inline code string — not a path, skip zone check
             stripped = tok.strip("\"'")
-            # Skip pure flags
+            # Skip pure flags; the token that follows is a flag argument, not a
+            # standalone file glob — mark it so the wildcard check is skipped.
             if stripped.startswith("-"):
+                _prev_was_flag = True
                 continue
             # Skip environment assignment tokens
             if _ENV_ASSIGN_RE.match(stripped):
+                _prev_was_flag = False
                 continue
             # Dollar sign in any arg → unknown runtime value → deny
             if "$" in stripped:
                 return False
+            # SAF-020: Wildcard bypass — check ALL tokens, not just path-like ones.
+            # Tokens like "N*" are not caught by _is_path_like (no slash, no leading dot)
+            # but can still expand to deny zone directories.
+            # Exception: skip tokens that are flag arguments (e.g. -name '*.py') —
+            # these are filter patterns passed to the command, not shell-expanded globs.
+            if not _prev_was_flag and ("*" in stripped or "?" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
+                return False
+            _prev_was_flag = False
             if _is_path_like(stripped):
                 if not _check_path_arg(stripped, ws_root):
                     return False
@@ -1280,6 +1360,9 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                             continue
                         if "$" in stripped:
                             return ("deny", f"Exception-listed command has variable path arg: {_DENY_REASON}")
+                        # SAF-020: Wildcard bypass prevention for exception-listed commands
+                        if ("*" in stripped or "?" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
+                            return ("deny", f"Exception-listed command has wildcard targeting restricted zone: {_DENY_REASON}")
                         if _is_path_like(stripped):
                             zone = zone_classifier.classify(stripped, ws_root)
                             if zone == "deny":
