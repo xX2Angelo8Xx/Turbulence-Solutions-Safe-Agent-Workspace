@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import threading
 import tkinter.filedialog as filedialog
 import tkinter.messagebox as messagebox
@@ -9,7 +10,7 @@ from pathlib import Path
 
 import customtkinter as ctk
 
-from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, LOGO_PATH, TEMPLATES_DIR, VERSION, get_display_version
+from launcher.config import APP_NAME, COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TEXT, LOGO_ICO_PATH, LOGO_PATH, TEMPLATES_DIR, VERSION, get_display_version
 from launcher.core.updater import check_for_update
 from launcher.core.downloader import download_update
 from launcher.core.applier import apply_update
@@ -48,12 +49,17 @@ class App:
         self._coming_soon_options: set[str] = set()
         self._current_template: str = ""
         self._build_ui()
-        # Set window icon from TS-Logo.png (GUI-013).
+        # Set window icon from TS-Logo (GUI-013 / FIX-016).
+        # Windows: use wm_iconbitmap with .ico for correct taskbar icon.
+        # Other platforms: use iconphoto with .png.
         try:
-            from PIL import Image, ImageTk
-            _icon_img = Image.open(str(LOGO_PATH))
-            self._icon_photo = ImageTk.PhotoImage(_icon_img)
-            self._window.iconphoto(True, self._icon_photo)
+            if sys.platform == "win32":
+                self._window.wm_iconbitmap(str(LOGO_ICO_PATH))
+            else:
+                from PIL import Image, ImageTk
+                _icon_img = Image.open(str(LOGO_PATH))
+                self._icon_photo = ImageTk.PhotoImage(_icon_img)
+                self._window.iconphoto(True, self._icon_photo)
         except Exception:
             pass
         # Silent background update check on launch (GUI-009).

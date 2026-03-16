@@ -23,6 +23,13 @@ if getattr(sys, '_MEIPASS', None):
 else:
     LOGO_PATH: Path = Path(__file__).resolve().parent.parent.parent / "TS-Logo.png"
 
+# PyInstaller bundles TS-Logo.ico at _MEIPASS/TS-Logo.ico.
+# In development, TS-Logo.ico is at repo_root/ (3 levels up from config.py).
+if getattr(sys, '_MEIPASS', None):
+    LOGO_ICO_PATH: Path = Path(sys._MEIPASS) / "TS-Logo.ico"
+else:
+    LOGO_ICO_PATH: Path = Path(__file__).resolve().parent.parent.parent / "TS-Logo.ico"
+
 GITHUB_REPO_OWNER: str = "xX2Angelo8Xx"
 GITHUB_REPO_NAME: str = "Turbulence-Solutions-Safe-Agent-Workspace"
 GITHUB_RELEASES_URL: str = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/releases/latest"

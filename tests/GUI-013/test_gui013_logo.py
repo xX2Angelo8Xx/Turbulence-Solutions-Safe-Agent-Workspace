@@ -111,7 +111,7 @@ def test_spec_exe_has_icon_parameter():
 # ---------------------------------------------------------------------------
 
 def test_app_init_sets_icon_photo(monkeypatch):
-    """App.__init__ should attempt to set the window icon via iconphoto."""
+    """App.__init__ should attempt to set the window icon via iconphoto (non-Windows)."""
     import PIL.Image
     import PIL.ImageTk
 
@@ -120,11 +120,15 @@ def test_app_init_sets_icon_photo(monkeypatch):
 
     with (
         patch("launcher.gui.app.LOGO_PATH", REPO_ROOT / "TS-Logo.png"),
+        patch("launcher.gui.app.LOGO_ICO_PATH", REPO_ROOT / "TS-Logo.ico"),
         patch("launcher.gui.app.find_vscode", return_value=None),
         patch("threading.Thread"),
         patch.object(PIL.Image, "open", return_value=fake_image),
         patch.object(PIL.ImageTk, "PhotoImage", return_value=fake_photo),
+        patch("launcher.gui.app.sys") as mock_sys,
     ):
+        # Simulate non-Windows so the iconphoto branch is taken (platform-independent test)
+        mock_sys.platform = "linux"
         from launcher.gui.app import App
 
         app = App()
