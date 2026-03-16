@@ -135,3 +135,101 @@ def test_logo_preserves_aspect_ratio_square_image():
     """Square images get width == target_height."""
     result = _compute_proportional_width(100, 100, 50)
     assert result == 50
+
+
+# ---------------------------------------------------------------------------
+# Edge cases — Tester additions
+# ---------------------------------------------------------------------------
+
+
+def test_logo_zero_height_no_crash():
+    """Zero-height image: ZeroDivisionError is caught; App still initializes.
+
+    If PIL returns an image with height==0, the formula divides by zero.  The
+    surrounding try/except in _build_ui must absorb this so the app does not
+    crash.
+    """
+    _ctk_mock = sys.modules["customtkinter"]
+    _ctk_mock.reset_mock()
+
+    fake_img = MagicMock()
+    fake_img.width = 320
+    fake_img.height = 0  # triggers ZeroDivisionError inside _build_ui
+
+    with patch("PIL.Image.open", return_value=fake_img):
+        from launcher.gui.app import App
+        app = App()  # must not raise
+
+    # CTkImage must NOT have been called with a size kwarg (exception aborted
+    # the logo block before reaching ctk.CTkImage).
+    size_call_found = any(
+        "size" in c.kwargs for c in _ctk_mock.CTkImage.call_args_list
+    )
+    assert not size_call_found, (
+        "CTkImage should NOT have been called when height=0 triggers ZeroDivisionError"
+    )
+
+
+def test_logo_pil_open_failure_no_crash():
+    """PIL.Image.open failure is caught gracefully; App still initializes."""
+    _ctk_mock = sys.modules["customtkinter"]
+    _ctk_mock.reset_mock()
+
+    with patch("PIL.Image.open", side_effect=OSError("file not found")):
+        from launcher.gui.app import App
+        app = App()  # must not raise
+
+    # CTkImage must NOT have been called (exception aborted the logo block).
+    size_call_found = any(
+        "size" in c.kwargs for c in _ctk_mock.CTkImage.call_args_list
+    )
+    assert not size_call_found, (
+        "CTkImage should NOT have been called when PIL.Image.open raises OSError"
+    )
+
+
+def test_logo_very_wide_image_formula():
+    """Very wide image (10000×10) yields a very large but positive target width."""
+    result = _compute_proportional_width(10000, 10, 50)
+    assert result == 50000
+    assert result > 0
+
+
+def test_logo_very_tall_image_truncates_to_zero():
+    """Extremely tall image (10×10000) causes int() truncation to yield width 0.
+
+    int(10 * 50 / 10000) = int(0.05) = 0.  The code does not guard against
+    this — the try/except in _build_ui will catch the downstream CTkImage
+    failure in production.  This test documents the current behaviour.
+    """
+    result = _compute_proportional_width(10, 10000, 50)
+    assert result == 0
+
+
+def test_logo_1x1_image():
+    """1×1 image yields target width equal to target height (50)."""
+    result = _compute_proportional_width(1, 1, 50)
+    assert result == 50
+
+
+def test_logo_very_wide_image_ctk_called_with_large_width():
+    """App._build_ui passes the large computed width to CTkImage for extreme images."""
+    _ctk_mock = sys.modules["customtkinter"]
+    _ctk_mock.reset_mock()
+
+    fake_img = MagicMock()
+    fake_img.width = 10000
+    fake_img.height = 10  # target_width = int(10000 * 50/10) = 50000
+
+    with patch("PIL.Image.open", return_value=fake_img):
+        from launcher.gui.app import App
+        App()
+
+    size_arg = next(
+        (c.kwargs["size"] for c in _ctk_mock.CTkImage.call_args_list if "size" in c.kwargs),
+        None,
+    )
+    assert size_arg is not None, "CTkImage was not called with a size kwarg"
+    width, height = size_arg
+    assert height == 50, f"Expected height 50, got {height}"
+    assert width == 50000, f"Expected width 50000 for 10000×10 image, got {width}"

@@ -1127,3 +1127,10 @@ TST-1140,test_build_appimage_does_not_contain_old_version,Unit,FIX-017,Pass,2026
 TST-1141,test_all_five_versions_are_identical,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,All 5 version locations are consistent,
 TST-1142,test_all_versions_equal_expected,Unit,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,All 5 version locations equal 1.0.2,
 TST-1143,Full regression suite (1993 passed 29 skipped 1 pre-existing fail) - FIX-017 dev final run,Regression,FIX-017,Pass,2026-03-16,Windows 11 + Python 3.11,1993 passed / 29 skipped / 1 pre-existing fail (INS-005 filesandirs); 12 FIX-017 tests all pass; zero new regressions,Developer Agent final run
+TST-1144,test_logo_zero_height_no_crash,Edge/Regression,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,ZeroDivisionError caught by try/except; App initializes without crash,Tester Agent edge-case
+TST-1145,test_logo_pil_open_failure_no_crash,Edge/Regression,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,OSError from Image.open caught; App initializes without crash,Tester Agent edge-case
+TST-1146,test_logo_very_wide_image_formula,Edge/Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,10000x10 image yields width=50000 (positive and correct),Tester Agent edge-case
+TST-1147,test_logo_very_tall_image_truncates_to_zero,Edge/Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,10x10000 image yields width=0 via int() truncation (documented behavior),Tester Agent edge-case
+TST-1148,test_logo_1x1_image,Edge/Unit,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,1x1 image yields width=50 (equal to target height),Tester Agent edge-case
+TST-1149,test_logo_very_wide_image_ctk_called_with_large_width,Edge/Integration,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,App passes size=(50000 50) to CTkImage for 10000x10 image without crash,Tester Agent edge-case
+TST-1150,Full regression suite (1993 passed 29 skipped 1 pre-existing fail) - FIX-015 tester run,Regression,FIX-015,Pass,2026-03-16,Windows 11 + Python 3.11,1993 passed / 29 skipped / 1 pre-existing fail (INS-005); 16 FIX-015 tests all pass; zero new regressions,Tester Agent final run
