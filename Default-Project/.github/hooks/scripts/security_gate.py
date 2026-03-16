@@ -61,14 +61,14 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # Known-good SHA256 of Default-Project/.vscode/settings.json.
 # Updated by running .github/hooks/scripts/update_hashes.py after any
 # intentional admin change to settings.json.
-_KNOWN_GOOD_SETTINGS_HASH: str = "a9648fad5241bc2f0d9ef4d68c1b3e79c21f1faeba6175b622ed92ddf8598698"
+_KNOWN_GOOD_SETTINGS_HASH: str = "dc5771f867ea47f412b56fd1e026f2d141dad8da69937d638318bdf690072616"
 
 # Known-good SHA256 of security_gate.py in canonical form.
 # Canonical form: the file content with the value portion of this constant
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "18ed817d6a05adaea9184845dd351d93a51c17fa5f0149289e8da10c2c304118"
+_KNOWN_GOOD_GATE_HASH: str = "da23fdb4f68f2a7cb587767301a7acb585b7b2b3f594bb39b8b536b42fda1d90"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -949,7 +949,7 @@ def _wildcard_prefix_matches_deny_zone(token: str) -> bool:
     .. and empty components are treated as transparent (do not constitute a
     safe parent directory).
     """
-    if "*" not in token and "?" not in token:
+    if "*" not in token and "?" not in token and "[" not in token:
         return False
 
     # Normalize to lowercase forward-slash for consistent matching
@@ -959,7 +959,7 @@ def _wildcard_prefix_matches_deny_zone(token: str) -> bool:
     entered_safe_dir = False  # True once we step into a non-deny directory
 
     for part in parts:
-        if "*" not in part and "?" not in part:
+        if "*" not in part and "?" not in part and "[" not in part:
             # Non-wildcard component — classify it
             clean = part.strip()
             if clean in ("", ".", ".."):
@@ -972,7 +972,7 @@ def _wildcard_prefix_matches_deny_zone(token: str) -> bool:
             entered_safe_dir = True
         else:
             # Wildcard component — extract the prefix before the first wildcard
-            wc_pos = min(part.find(c) for c in ("*", "?") if c in part)
+            wc_pos = min(part.find(c) for c in ("*", "?", "[") if c in part)
             comp_prefix = part[:wc_pos]
 
             if entered_safe_dir:
@@ -1168,7 +1168,7 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
             # but can still expand to deny zone directories.
             # Exception: skip tokens that are flag arguments (e.g. -name '*.py') —
             # these are filter patterns passed to the command, not shell-expanded globs.
-            if not _prev_was_flag and ("*" in stripped or "?" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
+            if not _prev_was_flag and ("*" in stripped or "?" in stripped or "[" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
                 return False
             _prev_was_flag = False
             if _is_path_like(stripped):
@@ -1361,7 +1361,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                         if "$" in stripped:
                             return ("deny", f"Exception-listed command has variable path arg: {_DENY_REASON}")
                         # SAF-020: Wildcard bypass prevention for exception-listed commands
-                        if ("*" in stripped or "?" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
+                        if ("*" in stripped or "?" in stripped or "[" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
                             return ("deny", f"Exception-listed command has wildcard targeting restricted zone: {_DENY_REASON}")
                         if _is_path_like(stripped):
                             zone = zone_classifier.classify(stripped, ws_root)

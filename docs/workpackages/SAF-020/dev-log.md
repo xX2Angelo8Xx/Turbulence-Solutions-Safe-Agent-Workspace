@@ -55,3 +55,51 @@ Added a new function `_wildcard_prefix_matches_deny_zone(token)` that:
 
 ## Test Results
 All tests pass. See test-results.csv for run details.
+
+---
+
+## Iteration 2 — Fix BUG-051: Bracket Expression Wildcards
+
+**Date:** 2026-03-17  
+**Tester finding:** Bracket expression wildcards `[...]` (e.g., `[.g]*`, `[Nn]*`, `[.v]*`) bypassed detection because the `wc_pos` calculation only searched for `*` and `?`, yielding prefix `[.g]` instead of the true empty prefix.
+
+### Root Cause
+In `_wildcard_prefix_matches_deny_zone`, the prefix before the first wildcard character was computed as:
+```python
+wc_pos = min(part.find(c) for c in ("*", "?") if c in part)
+```
+For `[.g]*`, `*` is at index 4, so `comp_prefix = "[.g]"`. No deny zone starts with `[.g]` → incorrectly allowed.
+
+### Fix Applied
+Three changes to `_wildcard_prefix_matches_deny_zone` in both `security_gate.py` files:
+
+1. **Early-exit guard** — added `"[" not in token` so pure bracket expressions (no `*`/`?`) are also evaluated:
+   ```python
+   if "*" not in token and "?" not in token and "[" not in token:
+       return False
+   ```
+
+2. **Part wildcard detection** — added `"[" not in part` so bracket-containing components enter the wildcard branch:
+   ```python
+   if "*" not in part and "?" not in part and "[" not in part:
+   ```
+
+3. **`wc_pos` calculation** — added `"["` to the searched characters so the prefix is extracted before the first `[`:
+   ```python
+   wc_pos = min(part.find(c) for c in ("*", "?", "[") if c in part)
+   ```
+   For `[.g]*`: `[` is at index 0 → `comp_prefix = ""` → empty prefix matches all deny zones → deny ✓  
+   For `N[abc]*`: `[` is at index 1 → `comp_prefix = "n"` → `noagentzone` starts with `n` → deny ✓
+
+4. **Caller sites** — added `"[" in stripped` to the trigger condition in `_validate_args` step 5 and in the exception-listed command validation, ensuring pure bracket expressions (`[.g][it]hub`) are also sent to the helper:
+   ```python
+   if not _prev_was_flag and ("*" in stripped or "?" in stripped or "[" in stripped) and ...
+   ```
+
+### Files Changed
+- `Default-Project/.github/hooks/scripts/security_gate.py` — bracket wildcard fix + hash update
+- `templates/coding/.github/hooks/scripts/security_gate.py` — synced mirror + hash update
+
+### Test Results (Iteration 2)
+- SAF-020 suite: **107/107 passed** (includes 7 previously-failing Tester edge cases)
+- Full regression: **2782 passed, 1 failed (INS-005 pre-existing), 29 skipped**
