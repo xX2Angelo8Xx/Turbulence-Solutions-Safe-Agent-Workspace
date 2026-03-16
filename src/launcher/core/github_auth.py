@@ -34,9 +34,10 @@ def get_github_token() -> str | None:
             text=True,
             timeout=3,
         )
-        token = result.stdout.strip()
-        if token:
-            return token
+        if result.returncode == 0:
+            token = result.stdout.strip()
+            if token:
+                return token
     except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
         # gh not installed, timed out, or OS-level error — fall through to None
         pass
