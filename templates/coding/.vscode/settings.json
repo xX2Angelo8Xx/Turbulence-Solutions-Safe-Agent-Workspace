@@ -8,7 +8,11 @@
     ".vscode": true
   },
   "chat.tools.global.autoApprove": false,
-  "chat.tools.edits.autoApprove": [],
+  "chat.tools.edits.autoApprove": [
+    "replace_string_in_file",
+    "multi_replace_string_in_file",
+    "create_file"
+  ],
   "chat.tools.terminal.sandbox.enabled": true,
   "github.copilot.chat.agent.autoFix": false,
   "chat.mcp.discovery.enabled": {
