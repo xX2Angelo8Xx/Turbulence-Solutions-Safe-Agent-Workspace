@@ -1168,3 +1168,6 @@ TST-1181,test_all_sources_fail_returns_none,Unit,FIX-018,Pass,2026-03-16,Windows
 TST-1182,test_permission_error_from_subprocess_returns_none,Unit,FIX-018,Pass,2026-03-16,Windows 11 + Python 3.11,PermissionError (OSError subclass) from subprocess returns None,Tester Agent edge-case
 TST-1183,test_env_vars_missing_from_os_environ_entirely,Unit,FIX-018,Pass,2026-03-16,Windows 11 + Python 3.11,GITHUB_TOKEN and GH_TOKEN absent from env + CLI fails returns None,Tester Agent edge-case
 TST-1184,test_check_for_update_survives_get_token_exception,Unit,FIX-018,Pass,2026-03-16,Windows 11 + Python 3.11,check_for_update returns (False current) even if get_github_token raises,Tester Agent edge-case
+TST-1185,Full suite regression (Iteration 2),Regression,FIX-018,Pass,2026-03-16,Windows 11 + Python 3.11,2062 passed / 1 pre-existing fail (INS-005 BUG-045) / 29 skipped — no FIX-018 regressions,Tester Agent Iteration 2
+TST-1186,FIX-018 full suite (Iteration 2),Unit,FIX-018,Pass,2026-03-16,Windows 11 + Python 3.11,47/47 FIX-018 tests pass (34 developer + 13 Tester edge-case),Tester Agent Iteration 2
+TST-1187,test_nonzero_exit_with_error_text_on_stdout_returns_none + test_nonzero_exit_error_text_not_used_as_auth_header,Regression,FIX-018,Pass,2026-03-16,Windows 11 + Python 3.11,Both BUG-047 regression tests pass after returncode guard added,Tester Agent Iteration 2

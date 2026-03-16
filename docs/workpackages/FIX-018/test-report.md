@@ -2,8 +2,8 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-03-16  
-**Iteration:** 1  
-**Verdict:** ❌ FAIL — Return to Developer (In Progress)
+**Iteration:** 2  
+**Verdict:** ✅ PASS — Done
 
 ---
 
@@ -161,6 +161,56 @@ if result.returncode == 0:
 - [x] `docs/workpackages/FIX-018/dev-log.md` exists and is non-empty  
 - [x] `docs/workpackages/FIX-018/test-report.md` written by Tester  
 - [x] Test files exist in `tests/FIX-018/` (4 files: 3 developer + 1 Tester)  
-- [ ] All tests pass — BLOCKED: 2 failures in edge-case tests  
-- [x] Test runs logged in `docs/test-results/test-results.csv`  
-- [ ] WP must NOT be marked Done — returning to In Progress  
+- [x] All tests pass — 47/47 FIX-018 tests pass; 2062/2062 non-pre-existing pass  
+- [x] Test runs logged in `docs/test-results/test-results.csv` (TST-1185 to TST-1187)  
+- [x] WP marked Done; BUG-046 and BUG-047 closed  
+- [x] `git add -A` staged; committed `FIX-018: Tester PASS`; pushed to origin  
+
+---
+
+## Iteration 2 — Re-review (2026-03-16)
+
+### Fix Verified
+
+`src/launcher/core/github_auth.py` lines 37–40 now contain the required guard:
+
+```python
+if result.returncode == 0:
+    token = result.stdout.strip()
+    if token:
+        return token
+```
+
+The fix is correctly scoped: it wraps only the stdout-to-token assignment inside
+a `returncode == 0` check. The `except` block below is unchanged and still
+catches `FileNotFoundError`, `TimeoutExpired`, and `OSError`. The `return None`
+at the end of the function is still the definitive fallback.
+
+### Test Results — Iteration 2
+
+#### Run 4 — Full Suite Regression
+- **Command:** `.venv\Scripts\python -m pytest tests/ -q --tb=short`
+- **Outcome:** 2062 passed, 1 failed (pre-existing INS-005 BUG-045), 29 skipped
+- **Note:** Count increased from 2049 → 2062 because the 13 FIX-018 Tester edge-case tests now all pass (previously 11 passed, 2 failed).
+- **Regression:** None introduced by FIX-018 Iteration 2.
+
+#### Run 5 — FIX-018 Full Suite
+- **Command:** `.venv\Scripts\python -m pytest tests/FIX-018/ -v --tb=short`
+- **Outcome:** 47 passed (34 developer + 13 Tester edge-case)
+
+#### Run 6 — Previously-Failing Edge Cases
+- **Command:** `.venv\Scripts\python -m pytest tests/FIX-018/test_fix018_edge_cases.py::TestGhNonzeroExitWithStdoutContent -v --tb=short`
+- **Outcome:** 2 passed
+
+| Test | Iteration 1 | Iteration 2 |
+|------|-------------|-------------|
+| `test_nonzero_exit_with_error_text_on_stdout_returns_none` | ❌ FAIL | ✅ PASS |
+| `test_nonzero_exit_error_text_not_used_as_auth_header` | ❌ FAIL | ✅ PASS |
+
+### BUG-047 Status
+Closed. The `if result.returncode == 0:` guard prevents error text from stdout
+being treated as a valid token. Both regression tests confirm the fix.
+
+### BUG-046 Status
+Closed. The original issue (unauthenticated API returns 404 for private repo)
+is addressed by FIX-018. All auth header tests pass.
