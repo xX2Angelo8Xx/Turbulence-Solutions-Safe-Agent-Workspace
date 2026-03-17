@@ -342,3 +342,94 @@ class TestIntegration:
     def test_get_errors_in_exempt_tools(self):
         # TST-1472 — get_errors must be present in _EXEMPT_TOOLS
         assert "get_errors" in sg._EXEMPT_TOOLS
+
+
+# ===========================================================================
+# Tester Edge Cases  (TST-1475 to TST-1484)
+# ===========================================================================
+
+class TestTesterEdgeCases:
+    """Edge-case tests added by the Tester Agent beyond the Developer's suite."""
+
+    # --- Folder-only paths (directory with no filename)
+
+    def test_folder_path_to_github_deny(self):
+        # TST-1475 — directory path equal to .github root (no filename) → deny
+        data = {"filePaths": [f"{WS}/.github"]}
+        assert sg.validate_get_errors(data, WS) == "deny"
+
+    def test_folder_path_to_noagentzone_deny(self):
+        # TST-1476 — directory path equal to NoAgentZone root (no filename) → deny
+        data = {"filePaths": [f"{WS}/NoAgentZone"]}
+        assert sg.validate_get_errors(data, WS) == "deny"
+
+    # --- Unicode paths
+
+    def test_unicode_path_in_project_allow(self):
+        # TST-1477 — Unicode characters in a project-folder path → allow
+        data = {"filePaths": [f"{WS}/project/données_config.py"]}
+        assert sg.validate_get_errors(data, WS) == "allow"
+
+    def test_unicode_path_to_noagentzone_deny(self):
+        # TST-1478 — Unicode path inside NoAgentZone → deny
+        data = {"filePaths": [f"{WS}/NoAgentZone/données_secrètes.txt"]}
+        assert sg.validate_get_errors(data, WS) == "deny"
+
+    # --- Very large arrays
+
+    def test_large_array_all_project_allow(self):
+        # TST-1479 — 1000 distinct project-folder paths, all valid → allow
+        paths = [f"{WS}/project/module_{i}.py" for i in range(1000)]
+        data = {"filePaths": paths}
+        assert sg.validate_get_errors(data, WS) == "allow"
+
+    def test_large_array_last_element_restricted_deny(self):
+        # TST-1480 — 999 valid project paths + 1 .github path at the end → deny
+        paths = [f"{WS}/project/module_{i}.py" for i in range(999)]
+        paths.append(f"{WS}/.github/hooks/security_gate.py")
+        data = {"filePaths": paths}
+        assert sg.validate_get_errors(data, WS) == "deny"
+
+    # --- Additional type-safety bypass attempts
+
+    def test_dict_as_file_paths_deny(self):
+        # TST-1481 — filePaths as dict (not a list) → deny (fail closed)
+        data = {"filePaths": {"path": f"{WS}/project/main.py"}}
+        assert sg.validate_get_errors(data, WS) == "deny"
+
+    def test_boolean_element_in_paths_deny(self):
+        # TST-1482 — boolean element inside filePaths list → deny (bool is not str)
+        data = {
+            "tool_name": "get_errors",
+            "tool_input": {"filePaths": [True]},
+        }
+        assert sg.decide(data, WS) == "deny"
+
+    # --- Deep path traversal
+
+    def test_deep_traversal_to_vscode_deny(self):
+        # TST-1483 — four-level ascending traversal from project subfolder reaches
+        # workspace-root .vscode → deny
+        data = {
+            "tool_name": "get_errors",
+            "tool_input": {
+                "filePaths": [f"{WS}/project/a/b/c/../../../../.vscode/settings.json"],
+            },
+        }
+        assert sg.decide(data, WS) == "deny"
+
+    # --- Mixed path categories (additional variants)
+
+    def test_mixed_project_and_vscode_deny(self):
+        # TST-1484 — two project paths + one workspace-root .vscode path → deny
+        data = {
+            "tool_name": "get_errors",
+            "tool_input": {
+                "filePaths": [
+                    f"{WS}/project/app.py",
+                    f"{WS}/project/utils.py",
+                    f"{WS}/.vscode/settings.json",
+                ],
+            },
+        }
+        assert sg.decide(data, WS) == "deny"

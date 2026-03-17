@@ -1459,3 +1459,15 @@ TST-1471,test_realworld_github_file_in_list_deny,Integration,SAF-023,Pass,2026-0
 TST-1472,test_get_errors_in_exempt_tools,Integration,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,get_errors present in _EXEMPT_TOOLS set,
 TST-1473,SAF-023 Developer - 34-test suite,Security,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,34 passed,"Unit(14) + Security(6) + Bypass(6) + Cross-platform(4) + Integration(4) = 34 tests"
 TST-1474,SAF-023 Developer - full regression suite,Regression,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,2930 passed / 1 pre-existing / 29 skipped,Only pre-existing INS-005 BUG-045 failure. No new regressions.
+TST-1475,test_folder_path_to_github_deny,Unit,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,Folder-only .github directory path -> deny,Tester edge case
+TST-1476,test_folder_path_to_noagentzone_deny,Unit,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,Folder-only NoAgentZone directory path -> deny,Tester edge case
+TST-1477,test_unicode_path_in_project_allow,Unit,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,Unicode characters in project-folder path -> allow,Tester edge case
+TST-1478,test_unicode_path_to_noagentzone_deny,Unit,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,Unicode characters in NoAgentZone path -> deny,Tester edge case
+TST-1479,test_large_array_all_project_allow,Unit,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,1000 project paths all valid -> allow,Tester edge case
+TST-1480,test_large_array_last_element_restricted_deny,Security,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,999 valid project paths + 1 .github path -> deny,Tester edge case
+TST-1481,test_dict_as_file_paths_deny,Security,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,filePaths as dict (not list) -> deny fail closed,Tester edge case
+TST-1482,test_boolean_element_in_paths_deny,Security,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,Boolean element in filePaths list -> deny,Tester edge case
+TST-1483,test_deep_traversal_to_vscode_deny,Security,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,4-level path traversal to workspace-root .vscode -> deny,Tester edge case
+TST-1484,test_mixed_project_and_vscode_deny,Security,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,Two project paths + one .vscode path -> deny,Tester edge case
+TST-1485,SAF-023 Tester - 10 edge-case tests,Security,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,10 passed,"Folder-only(2) + Unicode(2) + LargeArray(2) + TypeSafety(2) + Traversal(1) + Mixed(1)"
+TST-1486,SAF-023 Tester - full regression suite,Regression,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,2940 passed / 1 pre-existing / 29 skipped,Only pre-existing INS-005 failure. No new regressions. 44 SAF-023 tests pass.
