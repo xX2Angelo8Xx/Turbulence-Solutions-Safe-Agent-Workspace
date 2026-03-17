@@ -80,6 +80,28 @@ File: `tests/DOC-004/test_doc004_project_readme_placeholders.py`
 
 ---
 
+## Iteration 2 — 2026-03-17 (Post-Tester FAIL)
+
+### Tester Findings (from test-report.md)
+
+BUG-053: Both README files were corrupted by a prior session that prepended a German "Mathematik Demo (Streamlit)" README without a trailing newline. The result was `# {{PROJECT_NAME}}` appended mid-line to the final German bullet point, making it invisible as a Markdown H1. The Developer's original tests only did substring checks and missed the structural issue.
+
+### Fix Applied
+
+Removed the entire German preamble (lines 1–26, "Mathematik Demo (Streamlit)" content) from both files. Each file now begins cleanly with `# {{PROJECT_NAME}}` as the first line followed by a blank line and the Turbulence Solutions boilerplate.
+
+Files changed:
+- `Default-Project/Project/README.md` — removed German content, fixed standalone H1
+- `templates/coding/Project/README.md` — same fix (files are identical)
+
+### Tests Run
+
+- DOC-004 suite (23 tests = 13 dev + 10 Tester edge-case): **23/23 passed**
+- Full regression: **3121 passed / 2 pre-existing failures / 29 skipped / 1 xfailed**
+  - Pre-existing: FIX-009 (TST-1557 dup) + INS-005 (BUG-045); zero new failures
+
+---
+
 ## Known Limitations
 
 None. The change is a targeted one-line-per-file placeholder substitution.
