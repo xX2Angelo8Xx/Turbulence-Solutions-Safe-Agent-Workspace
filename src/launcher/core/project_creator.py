@@ -31,8 +31,11 @@ def create_project(
             f"Destination path does not exist or is not a directory: {destination}"
         )
 
+    # Prepend the TS-SAE- brand prefix to the folder name.
+    prefixed_name = f"TS-SAE-{folder_name}"
+
     # Guard against path-traversal in folder_name (e.g. "../../etc").
-    target = (destination / folder_name).resolve()
+    target = (destination / prefixed_name).resolve()
     if not target.is_relative_to(destination.resolve()):
         raise ValueError(
             "Invalid folder name: path traversal attempt detected"

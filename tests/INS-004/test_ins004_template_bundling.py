@@ -277,7 +277,7 @@ def test_template_discoverable_and_copyable():
     with tempfile.TemporaryDirectory() as tmp:
         result = create_project(coding_path, Path(tmp), "test-project")
         assert result.is_dir(), f"Copied project directory does not exist: {result}"
-        assert result.name == "test-project"
+        assert result.name == "TS-SAE-test-project"
         # Safety spot-checks: key files must propagate into the copy
         assert (result / ".vscode" / "settings.json").is_file()
         assert (result / ".github" / "hooks" / "require-approval.json").is_file()

@@ -152,8 +152,9 @@ def test_project_creator_rejects_path_traversal() -> None:
         template = dest / "tpl"
         template.mkdir()
 
+        # With TS-SAE- prefix, 3 levels of traversal are needed to escape dest.
         try:
-            create_project(template, dest, "../../etc")
+            create_project(template, dest, "../../../etc")
             assert False, "Expected ValueError was not raised"
         except ValueError as exc:
             assert "path traversal" in str(exc).lower()
@@ -182,15 +183,14 @@ def test_project_creator_rejects_prefix_match_bypass() -> None:
         template = base_path / "tpl"
         template.mkdir()
 
-        # '../foobar' resolves to a sibling that shares the 'foo' prefix.
-        # startswith() incorrectly allows this; is_relative_to() correctly blocks it.
+        # With the TS-SAE- prefix, '../foobar' no longer escapes dest (the prefix
+        # absorbs one traversal level). Use '../../../foobar' which escapes even
+        # with the TS-SAE- prefix, ensuring is_relative_to() still guards correctly.
         try:
-            create_project(template, dest, "../foobar")
+            create_project(template, dest, "../../../foobar")
             assert False, (
-                "Expected ValueError was not raised — BUG-001 path-traversal "
-                "prefix-match bypass is still present in project_creator.py. "
-                "Replace str(target).startswith(str(destination.resolve())) "
-                "with target.is_relative_to(destination.resolve())."
+                "Expected ValueError was not raised — the path-traversal "
+                "guard in project_creator.py is no longer effective."
             )
         except ValueError as exc:
             assert "path traversal" in str(exc).lower()

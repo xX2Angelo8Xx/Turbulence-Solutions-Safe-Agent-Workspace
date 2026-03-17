@@ -1493,3 +1493,5 @@ TST-1505,test_main_unknown_tool_deny_is_generic,Security,SAF-024,Pass,2026-03-17
 TST-1506,test_deny_reason_same_both_copies,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,_DENY_REASON byte-for-byte identical in Default-Project and templates copies,Tester edge-case
 TST-1507,test_sanitize_terminal_f_string_prefixes_no_zone_names,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,All sanitize_terminal f-string deny reason prefixes contain no zone names,Tester edge-case
 TST-1508,SAF-024 Tester - full regression suite,Regression,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,2960 passed / 1 pre-existing (INS-005) / 29 skipped,No new regressions. 20 SAF-024 tests pass (10 dev + 10 tester).
+TST-1509,GUI-015 unit tests - create_project prefix,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,15 passed,All 15 GUI-015 tests green. Verifies TS-SAE- prefix in folder name and returned path.
+TST-1510,GUI-015 full regression suite,Regression,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,2975 passed / 1 pre-existing (INS-005) / 29 skipped,No new regressions introduced by GUI-015.

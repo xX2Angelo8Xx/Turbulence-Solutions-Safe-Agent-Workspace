@@ -368,10 +368,10 @@ class TestOnCreateProjectAdditionalIntegration:
 
     def test_duplicate_folder_check_uses_stripped_name(self, tmp_path: Path):
         """The app strips the name before passing it to check_duplicate_folder;
-        a folder named 'myproject' must still be detected when the user types
-        ' myproject ' (with surrounding spaces)."""
-        (tmp_path / "myproject").mkdir()
-        # The app strips input — so ' myproject ' becomes 'myproject'
+        a folder named 'TS-SAE-myproject' must still be detected when the user
+        types ' myproject ' (with surrounding spaces)."""
+        (tmp_path / "TS-SAE-myproject").mkdir()
+        # The app strips input — so ' myproject ' becomes 'myproject', then prefixed
         app = _make_app(project_name=" myproject ", destination=str(tmp_path))
         app._on_create_project()
         # Since the stripped name matches the existing folder, a duplicate error

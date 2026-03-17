@@ -381,7 +381,7 @@ class TestCreateProjectCoreFunction:
         dest = tmp_path / "dest"
         dest.mkdir()
         result = create_project(template, dest, "my-project")
-        assert result == dest / "my-project"
+        assert result == dest / "TS-SAE-my-project"
 
     def test_files_are_actually_copied(self, tmp_path):
         from launcher.core.project_creator import create_project
@@ -425,8 +425,9 @@ class TestCreateProjectCoreFunction:
         template.mkdir()
         dest = tmp_path / "dest"
         dest.mkdir()
+        # With the TS-SAE- prefix, 3 levels are needed to escape dest.
         with pytest.raises(ValueError, match="path traversal"):
-            create_project(template, dest, "../../etc")
+            create_project(template, dest, "../../../etc")
 
     def test_path_traversal_dotdot_slash_raises_valueerror(self, tmp_path):
         from launcher.core.project_creator import create_project
@@ -434,8 +435,9 @@ class TestCreateProjectCoreFunction:
         template.mkdir()
         dest = tmp_path / "dest"
         dest.mkdir()
+        # With the TS-SAE- prefix, 3 levels are needed to escape dest.
         with pytest.raises(ValueError, match="path traversal"):
-            create_project(template, dest, "../sibling")
+            create_project(template, dest, "../../../sibling")
 
     def test_existing_target_directory_raises_error(self, tmp_path):
         """shutil.copytree raises FileExistsError when target already exists."""
@@ -446,7 +448,7 @@ class TestCreateProjectCoreFunction:
         (template / "a.txt").write_text("x")
         dest = tmp_path / "dest"
         dest.mkdir()
-        (dest / "proj").mkdir()  # pre-create target → copytree fails
+        (dest / "TS-SAE-proj").mkdir()  # pre-create target → copytree fails
         with pytest.raises(Exception):
             create_project(template, dest, "proj")
 

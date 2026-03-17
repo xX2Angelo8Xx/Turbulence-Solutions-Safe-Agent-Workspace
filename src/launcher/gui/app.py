@@ -287,9 +287,9 @@ class App:
             self.destination_error_label.configure(text=dest_error)
             return
 
-        if check_duplicate_folder(folder_name, destination_str):
+        if check_duplicate_folder(f"TS-SAE-{folder_name}", destination_str):
             self.project_name_error_label.configure(
-                text=f'A folder named "{folder_name}" already exists at the destination.'
+                text=f'A folder named "TS-SAE-{folder_name}" already exists at the destination.'
             )
             return
 
