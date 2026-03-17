@@ -69,7 +69,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "51213c4b53cbcb46242b666e1d0eb9322b5eafeae608432fa0f9df0ea94e0ab5"
+_KNOWN_GOOD_GATE_HASH: str = "edd089f7bcbc9317f8bb461933a4bc7aed3dd5895eb0cd81dc74c68c0132bca8"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -78,11 +78,7 @@ _INTEGRITY_WARNING: str = (
     "changes and run update_hashes.py to re-approve the security files."
 )
 
-_DENY_REASON = (
-    "BLOCKED: .github, .vscode, and NoAgentZone are permanently restricted. "
-    "This denial is enforced by a PreToolUse hook and cannot be bypassed. "
-    "Do NOT retry this action or attempt alternative paths to access these folders."
-)
+_DENY_REASON = "Access denied. This action has been blocked by the workspace security policy."
 
 
 # ---------------------------------------------------------------------------

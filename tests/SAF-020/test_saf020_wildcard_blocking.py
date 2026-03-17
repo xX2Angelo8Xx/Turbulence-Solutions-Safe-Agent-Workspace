@@ -239,10 +239,10 @@ class TestWildcardBlockingInSanitize:
         assert decision == "allow"
 
     def test_deny_reason_contains_blocked(self):
-        """Deny decision must include a human-readable reason with 'BLOCKED'."""
+        """Deny decision must include a human-readable reason (generic message)."""
         _, reason = sg.sanitize_terminal_command("Get-ChildItem .g*", WS)
         assert reason is not None
-        assert "BLOCKED" in reason
+        assert "Access denied" in reason or "blocked" in reason.lower()
 
 
 # ===========================================================================

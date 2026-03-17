@@ -1471,3 +1471,14 @@ TST-1483,test_deep_traversal_to_vscode_deny,Security,SAF-023,Pass,2026-03-17,Win
 TST-1484,test_mixed_project_and_vscode_deny,Security,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,Two project paths + one .vscode path -> deny,Tester edge case
 TST-1485,SAF-023 Tester - 10 edge-case tests,Security,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,10 passed,"Folder-only(2) + Unicode(2) + LargeArray(2) + TypeSafety(2) + Traversal(1) + Mixed(1)"
 TST-1486,SAF-023 Tester - full regression suite,Regression,SAF-023,Pass,2026-03-17,Windows 11 + Python 3.11,2940 passed / 1 pre-existing / 29 skipped,Only pre-existing INS-005 failure. No new regressions. 44 SAF-023 tests pass.
+TST-1487,test_deny_reason_is_generic_text,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,_DENY_REASON equals the approved generic message exactly,
+TST-1488,test_deny_reason_no_github_reference,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,_DENY_REASON does not reveal .github zone name,
+TST-1489,test_deny_reason_no_vscode_reference,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,_DENY_REASON does not reveal .vscode zone name,
+TST-1490,test_deny_reason_no_noagentzone_reference,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,_DENY_REASON does not reveal NoAgentZone name,
+TST-1491,test_deny_reason_no_blocked_prefix,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,_DENY_REASON does not start with old BLOCKED: prefix,
+TST-1492,test_main_stdout_generic_on_deny,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,main() deny reason matches generic message end-to-end,
+TST-1493,test_main_stdout_no_zone_names_on_deny,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,main() stdout deny reason contains no zone names,
+TST-1494,test_sanitize_terminal_deny_reason_no_zone_names,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,All sanitize_terminal_command deny paths contain no zone names,
+TST-1495,test_deny_reason_constant_is_str,Unit,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,_DENY_REASON is a plain str not tuple or bytes,
+TST-1496,test_templates_deny_reason_matches,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,templates/coding/ security_gate.py contains same generic _DENY_REASON,
+TST-1497,SAF-024 Developer - full regression suite,Regression,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,2950 passed / 1 pre-existing / 29 skipped,Only pre-existing INS-005 failure. No new regressions. 10 SAF-024 tests pass.
