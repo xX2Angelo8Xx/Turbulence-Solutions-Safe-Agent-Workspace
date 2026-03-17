@@ -108,7 +108,7 @@ class App:
         self.project_name_entry = make_label_entry_row(
             self._window,
             label_text="Project Name:",
-            placeholder="my-project",
+            placeholder="MatlabDemo",
             row=1,
         )
 
@@ -315,7 +315,7 @@ class App:
 
         messagebox.showinfo(
             "Project Created",
-            f'Project "{folder_name}" created successfully at:\n{created_path}',
+            f'Project "TS-SAE-{folder_name}" created successfully at:\n{created_path}',
         )
 
         # Open the new project in VS Code if the checkbox is checked (GUI-006).
