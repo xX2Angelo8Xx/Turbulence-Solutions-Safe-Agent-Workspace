@@ -23,10 +23,10 @@ SETUP_ISS = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
 BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 
-EXPECTED_VERSION = "1.0.3"
-PREVIOUS_VERSION = "1.0.2"
-SKIP_VERSION_1 = "1.0.1"
-SKIP_VERSION_2 = "1.0.0"
+EXPECTED_VERSION = "2.0.0"
+PREVIOUS_VERSION = "1.0.3"
+SKIP_VERSION_1 = "1.0.2"
+SKIP_VERSION_2 = "1.0.1"
 
 
 def _load_config():
@@ -94,17 +94,17 @@ class TestVersionOrdering:
             f"New version {mod.VERSION} is not greater than previous {PREVIOUS_VERSION}"
         )
 
-    def test_new_version_patch_incremented_by_one(self):
-        """Patch component must be incremented by exactly 1 from 1.0.2."""
+    def test_new_version_major_incremented_by_one(self):
+        """Major component must be incremented by exactly 1 from 1.0.3; minor/patch reset to 0."""
         mod = _load_config()
         new_parts = [int(x) for x in mod.VERSION.split(".")]
         prev_parts = [int(x) for x in PREVIOUS_VERSION.split(".")]
-        assert new_parts[0] == prev_parts[0], "Major version must be unchanged"
-        assert new_parts[1] == prev_parts[1], "Minor version must be unchanged"
-        assert new_parts[2] == prev_parts[2] + 1, (
-            f"Patch version must increment by 1: expected {prev_parts[2] + 1}, "
-            f"got {new_parts[2]}"
+        assert new_parts[0] == prev_parts[0] + 1, (
+            f"Major version must increment by 1: expected {prev_parts[0] + 1}, "
+            f"got {new_parts[0]}"
         )
+        assert new_parts[1] == 0, "Minor version must be reset to 0 after major bump"
+        assert new_parts[2] == 0, "Patch version must be reset to 0 after major bump"
 
 
 # ---------------------------------------------------------------------------

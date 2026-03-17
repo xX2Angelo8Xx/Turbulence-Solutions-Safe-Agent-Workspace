@@ -19,7 +19,7 @@ BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 SRC_LAUNCHER_DIR = REPO_ROOT / "src" / "launcher"
 
-EXPECTED_VERSION = "1.0.3"
+EXPECTED_VERSION = "2.0.0"
 OLD_VERSION = "1.0.0"
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 

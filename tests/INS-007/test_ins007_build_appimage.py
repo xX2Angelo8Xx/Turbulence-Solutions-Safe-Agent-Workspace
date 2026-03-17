@@ -327,7 +327,7 @@ class TestSecurity:
 class TestMetadata:
     def test_app_version_embedded(self):
         content = read_script()
-        assert "1.0.3" in content, "Script must embed version 1.0.3"
+        assert "2.0.0" in content, "Script must embed version 2.0.0"
 
     def test_publisher_referenced(self):
         content = read_script()

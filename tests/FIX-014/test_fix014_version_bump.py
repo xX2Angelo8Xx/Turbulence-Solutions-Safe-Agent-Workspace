@@ -15,7 +15,7 @@ SETUP_ISS = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
 BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 
-EXPECTED_VERSION = "1.0.3"
+EXPECTED_VERSION = "2.0.0"
 
 
 # ---------------------------------------------------------------------------

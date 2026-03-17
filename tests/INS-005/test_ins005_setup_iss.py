@@ -37,7 +37,7 @@ class TestSetupValues:
 
     def test_app_version(self):
         content = read_iss()
-        assert 'MyAppVersion "1.0.3"' in content
+        assert 'MyAppVersion "2.0.0"' in content
 
     def test_app_publisher(self):
         content = read_iss()
