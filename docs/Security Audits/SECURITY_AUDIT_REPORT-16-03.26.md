@@ -524,7 +524,3 @@ The framework's security posture is strong at blocking access to restricted zone
 
 *Report generated during a controlled security audit. All access attempts were conducted under explicit authorization from the workspace administrator.*
 
-
-Issues - Tested on Windowns 11 x86:
-TS Logo completely stretched out.
-TS Logo not as App Icon when starting the launcher/running the launcher
