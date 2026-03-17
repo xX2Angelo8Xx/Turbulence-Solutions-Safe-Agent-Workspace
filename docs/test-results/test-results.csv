@@ -1495,3 +1495,17 @@ TST-1507,test_sanitize_terminal_f_string_prefixes_no_zone_names,Security,SAF-024
 TST-1508,SAF-024 Tester - full regression suite,Regression,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,2960 passed / 1 pre-existing (INS-005) / 29 skipped,No new regressions. 20 SAF-024 tests pass (10 dev + 10 tester).
 TST-1509,GUI-015 unit tests - create_project prefix,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,15 passed,All 15 GUI-015 tests green. Verifies TS-SAE- prefix in folder name and returned path.
 TST-1510,GUI-015 full regression suite,Regression,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,2975 passed / 1 pre-existing (INS-005) / 29 skipped,No new regressions introduced by GUI-015.
+TST-1511,test_hyphen_in_name,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,TS-SAE-My-Project folder created,Tester edge-case
+TST-1512,test_underscore_in_name,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,TS-SAE-My_Project folder created,Tester edge-case
+TST-1513,test_dot_in_name,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,TS-SAE-v1.0.0 folder created,Tester edge-case
+TST-1514,test_digits_in_name,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,TS-SAE-Project2025 folder created,Tester edge-case
+TST-1515,test_prefix_is_exactly_ts_sae_uppercase_hyphen,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,Prefix is exactly TS-SAE- with uppercase and hyphens,Tester edge-case
+TST-1516,test_empty_name_creates_prefix_only_folder,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,Empty folder_name creates TS-SAE- folder,Tester edge-case
+TST-1517,test_100_char_name_receives_prefix,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,100-char name prefixed to TS-SAE-XXX... on disk,Tester edge-case
+TST-1518,test_latin_extended_unicode,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,TS-SAE-Café folder created,Tester edge-case
+TST-1519,test_cjk_unicode_name,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,TS-SAE-プロジェクト folder created,Tester edge-case
+TST-1520,test_mixed_case_preserved,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,Mixed case preserved in folder name,Tester edge-case
+TST-1521,test_all_lowercase_not_capitalised,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,Lowercase folder_name not capitalised,Tester edge-case
+TST-1522,test_all_uppercase_preserved,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,Uppercase folder_name not lowercased,Tester edge-case
+TST-1523,test_two_level_traversal_absorbed_stays_in_dest,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,2-level traversal absorbed by TS-SAE- prefix — result inside dest,Tester edge-case
+TST-1524,GUI-015 Tester - full regression suite,Regression,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,2988 passed / 1 pre-existing (INS-005/BUG-045) / 29 skipped,No new regressions. 28 GUI-015 tests pass (15 dev + 13 tester).
