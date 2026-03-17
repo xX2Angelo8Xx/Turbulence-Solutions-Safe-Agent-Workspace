@@ -186,9 +186,9 @@ def test_validate_grep_search_include_ignored_files_string_true_denied():
 
 
 def test_validate_grep_search_no_params_no_path_asks():
-    # TST-290 — no special params, no filePath → deny (fail-closed: no path = deny)
+    # TST-290 — no special params, no filePath → allow (FIX-021: VS Code search.exclude hides restricted content)
     data = {"tool_name": "grep_search", "query": "hello"}
-    assert sg.validate_grep_search(data, WS) == "deny"
+    assert sg.validate_grep_search(data, WS) == "allow"
 
 
 def test_validate_grep_search_no_params_project_path_allowed():
@@ -212,14 +212,14 @@ def test_validate_grep_search_no_params_deny_path_denied():
 
 
 def test_validate_grep_search_include_ignored_false_not_denied():
-    # TST-293 — includeIgnoredFiles=False: no bypass attempt, but no path → deny (fail-closed)
+    # TST-293 — includeIgnoredFiles=False: no bypass attempt, no path → allow (FIX-021)
     data = {
         "tool_name": "grep_search",
         "query": "anything",
         "includeIgnoredFiles": False,
     }
     result = sg.validate_grep_search(data, WS)
-    assert result == "deny"
+    assert result == "allow"
 
 
 def test_validate_grep_search_tool_input_nested_format():
@@ -239,23 +239,23 @@ def test_validate_grep_search_tool_input_nested_format():
 # ===========================================================================
 
 def test_validate_semantic_search_basic_returns_ask():
-    # TST-295 — any semantic_search call returns "deny" in 2-tier model
+    # TST-295 — semantic_search returns "allow" in FIX-021 model (VS Code search.exclude hides restricted content)
     data = {"tool_name": "semantic_search", "query": "find all functions"}
-    assert sg.validate_semantic_search(data, WS) == "deny"
+    assert sg.validate_semantic_search(data, WS) == "allow"
 
 
 def test_validate_semantic_search_protected_query_still_ask():
-    # TST-296 — query containing protected path name still returns "deny" in 2-tier
-    # (query is search text, not a path; semantic_search is always denied)
+    # TST-296 — query containing protected path name returns "allow" (FIX-021)
+    # (query is search text not a path; VS Code search.exclude hides restricted content)
     data = {"tool_name": "semantic_search", "query": ".github/secret hook"}
-    assert sg.validate_semantic_search(data, WS) == "deny"
+    assert sg.validate_semantic_search(data, WS) == "allow"
 
 
 def test_validate_semantic_search_never_returns_allow():
-    # TST-297 — semantic_search must never be auto-allowed
+    # TST-297 — semantic_search returns "allow" after FIX-021 (VS Code search.exclude hides restricted content)
     data = {"tool_name": "semantic_search", "query": "safe innocuous query"}
     result = sg.validate_semantic_search(data, WS)
-    assert result != "allow", f"semantic_search must not return allow; got {result!r}"
+    assert result == "allow", f"semantic_search must return allow after FIX-021; got {result!r}"
 
 
 # ===========================================================================
@@ -361,11 +361,10 @@ def test_grep_search_star_star_github_bypass():
 
 
 def test_semantic_search_cannot_be_allowed_bypass():
-    # TST-307 — bypass attempt: semantic_search must never return "allow"
-    # even with a seemingly safe query; always requires human review
+    # TST-307 — FIX-021: semantic_search is now allowed; VS Code search.exclude hides restricted content
     data = {"tool_name": "semantic_search", "query": "project utility functions"}
     result = sg.decide(data, WS)
-    assert result != "allow", f"semantic_search bypass: got {result!r}, expected ask"
+    assert result == "allow", f"semantic_search should return allow after FIX-021; got {result!r}"
 
 
 # ===========================================================================
@@ -406,9 +405,9 @@ def test_decide_grep_search_clean_params_no_path_asks():
 
 
 def test_decide_semantic_search_always_ask():
-    # TST-311 — full decide() pipeline: semantic_search always → deny in 2-tier
+    # TST-311 — full decide() pipeline: semantic_search → allow after FIX-021
     data = {"tool_name": "semantic_search", "query": "list all public methods"}
-    assert sg.decide(data, WS) == "deny"
+    assert sg.decide(data, WS) == "allow"
 
 
 def test_decide_grep_search_include_ignored_denied():

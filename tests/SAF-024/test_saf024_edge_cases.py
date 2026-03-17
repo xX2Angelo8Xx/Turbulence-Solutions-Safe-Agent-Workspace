@@ -165,19 +165,24 @@ def test_main_grep_search_deny_is_generic(monkeypatch, capsys):
 # ===========================================================================
 
 def test_main_semantic_search_deny_is_generic(monkeypatch, capsys):
-    # TST-615 — semantic_search is always denied (no safe path parameter);
-    # the JSON output must contain the generic deny message
+    # TST-615 \u2014 FIX-021: semantic_search is now allowed; VS Code search.exclude hides
+    # restricted content. Verify that decide() returns "allow" for semantic_search.
     payload = {
         "tool_name": "semantic_search",
         "query": "NoAgentZone contents",
         "filePath": WS,
     }
-    reason = _get_stdout_reason(monkeypatch, capsys, payload)
-    assert reason == _GENERIC_MESSAGE, (
-        f"semantic_search deny reason is not the generic message.\n"
-        f"  Actual: {reason!r}"
+    monkeypatch.setattr(sg, "verify_file_integrity", lambda: True)
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps(payload)))
+    monkeypatch.setattr(os, "getcwd", lambda: WS)
+    with pytest.raises(SystemExit):
+        sg.main()
+    data = json.loads(capsys.readouterr().out)
+    decision = data["hookSpecificOutput"]["permissionDecision"]
+    assert decision == "allow", (
+        f"semantic_search should return allow after FIX-021.\n"
+        f"  Actual decision: {decision!r}"
     )
-    _assert_no_zones(reason, "semantic_search: ")
 
 
 # ===========================================================================

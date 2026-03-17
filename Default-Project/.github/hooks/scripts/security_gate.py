@@ -69,7 +69,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "edd089f7bcbc9317f8bb461933a4bc7aed3dd5895eb0cd81dc74c68c0132bca8"
+_KNOWN_GOOD_GATE_HASH: str = "e2177f323699a75dee135656f27df65ac2223be37d6221caa54dddb9d8d62e12"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1492,7 +1492,8 @@ def validate_grep_search(data: dict, ws_root: str) -> str:
     # the payload (e.g. a filePath passed alongside the query).
     raw_path = extract_path(data)
     if raw_path is None:
-        return "deny"
+        # FIX-021: grep_search has no filePath — VS Code search.exclude hides restricted content
+        return "allow"
     zone = zone_classifier.classify(raw_path, ws_root)
     if zone == "allow":
         return "allow"
@@ -1502,14 +1503,14 @@ def validate_grep_search(data: dict, ws_root: str) -> str:
 def validate_semantic_search(data: dict, ws_root: str) -> str:
     """SAF-003: Validate ``semantic_search`` tool call.
 
-    ``semantic_search`` indexes the entire workspace with no path-restriction
-    parameter.  Every call is denied because we cannot guarantee it only
-    accesses the project folder.  Fail closed in the 2-tier model.
+    VS Code's search.exclude settings hide restricted content from semantic
+    index.  Allow semantic search.
 
     The ``data`` and ``ws_root`` parameters are accepted for API consistency
     but are not used in the current policy.
     """
-    return "deny"
+    # FIX-021: VS Code search.exclude hides restricted content from semantic index
+    return "allow"
 
 
 # ---------------------------------------------------------------------------
@@ -1741,6 +1742,21 @@ def decide(data: dict, ws_root: str) -> str:
     # field is inspected rather than a single filePath.
     if tool_name == "get_errors":
         return validate_get_errors(data, ws_root)
+
+    # FIX-021: file_search has no filePath — VS Code files.exclude hides zones
+    if tool_name == "file_search":
+        tool_input = data.get("tool_input") or {}
+        if not isinstance(tool_input, dict):
+            tool_input = {}
+        query = tool_input.get("query") or data.get("query") or ""
+        if isinstance(query, str):
+            query_lower = query.lower()
+            for zone_name in (".github", ".vscode", "noagentzone"):
+                if zone_name in query_lower:
+                    return "deny"
+            if ".." in query:
+                return "deny"
+        return "allow"
 
     # SAF-007: Write tools are restricted to Project/ only.  Any write
     # targeting a path outside Project/ is denied, even if zone would be "ask".

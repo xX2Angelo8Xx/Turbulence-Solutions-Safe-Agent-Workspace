@@ -122,25 +122,19 @@ def test_af2_grep_brace_expansion_bypass():
 # ---------------------------------------------------------------------------
 
 def test_af3_semantic_search_never_allow():
-    # TST-525 — regression AF-3: semantic_search must never be auto-allowed,
-    # even when the payload contains no restricted paths.  Pre-SAF-003,
-    # semantic_search bypassed zone checks entirely.  After SAF-013 (2-tier
-    # gate), unverifiable tools return "deny" instead of "ask".
+    # TST-525 — FIX-021: semantic_search is now allowed; VS Code search.exclude hides restricted content.
     data = {"tool_name": "semantic_search", "query": "utility function"}
     result = sg.decide(data, WS)
-    assert result != "allow"
-    assert result == "deny"
+    assert result == "allow"
 
 
 def test_af3_semantic_search_nested_input():
-    # TST-526 — regression AF-3: semantic_search in VS Code nested format
-    # must not be auto-allowed; the query text is never treated as a path.
-    # After SAF-013 (2-tier gate), unverifiable tools return "deny".
+    # TST-526 — FIX-021: semantic_search in VS Code nested format is now allowed.
     data = {
         "tool_name": "semantic_search",
         "tool_input": {"query": "security gate implementation"},
     }
-    assert sg.decide(data, WS) == "deny"
+    assert sg.decide(data, WS) == "allow"
 
 
 # ---------------------------------------------------------------------------
@@ -281,9 +275,9 @@ def test_tools_multi_replace_vscode():
 
 def test_tools_grep_safe_no_path():
     # TST-539 — grep_search with no includePattern and no filePath.
-    # After SAF-013 (2-tier gate), unverifiable search tools return "deny".
+    # FIX-021: VS Code search.exclude hides restricted content → allow.
     data = {"tool_name": "grep_search", "query": "TODO"}
-    assert sg.decide(data, WS) == "deny"
+    assert sg.decide(data, WS) == "allow"
 
 
 def test_tools_grep_blocked_include():
@@ -297,9 +291,9 @@ def test_tools_grep_blocked_include():
 
 
 def test_tools_semantic_search():
-    # TST-541 — semantic_search never returns allow; after SAF-013 returns deny.
+    # TST-541 — semantic_search; FIX-021: VS Code search.exclude hides restricted content → allow.
     data = {"tool_name": "semantic_search", "query": "authentication logic"}
-    assert sg.decide(data, WS) == "deny"
+    assert sg.decide(data, WS) == "allow"
 
 
 # -- Read tools --
@@ -531,12 +525,12 @@ def test_nested_grep_include_github():
 
 def test_nested_grep_safe():
     # TST-566 — VS Code nested format → grep_search with safe params.
-    # After SAF-013 (2-tier gate), grep_search without a scoped path returns "deny".
+    # FIX-021: grep_search without a scoped path returns "allow".
     data = {
         "tool_name": "grep_search",
         "tool_input": {"query": "def main"},
     }
-    assert sg.decide(data, WS) == "deny"
+    assert sg.decide(data, WS) == "allow"
 
 
 def test_nested_terminal_safe():
@@ -570,9 +564,9 @@ def test_nested_always_allow():
 
 
 def test_nested_semantic_search_asks():
-    # TST-570 — VS Code nested format → semantic_search → deny (after SAF-013 2-tier gate).
+    # TST-570 — VS Code nested format → semantic_search → allow (FIX-021).
     data = {
         "tool_name": "semantic_search",
         "tool_input": {"query": "password storage implementation"},
     }
-    assert sg.decide(data, WS) == "deny"
+    assert sg.decide(data, WS) == "allow"

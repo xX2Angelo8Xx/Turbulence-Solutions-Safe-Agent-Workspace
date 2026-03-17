@@ -88,11 +88,11 @@ def test_sanitize_terminal_rm_rf_returns_deny(sg):
 # ---------------------------------------------------------------------------
 
 def test_grep_search_no_path_returns_deny(sg):
-    """grep_search with no includePattern and no path field must return deny."""
+    """grep_search with no includePattern and no path field returns allow (FIX-021)."""
     data = {"tool_name": "grep_search", "query": "something"}
     result = sg.validate_grep_search(data, WS)
-    assert result == "deny", (
-        f"validate_grep_search returned {result!r} instead of 'deny' for no-path call"
+    assert result == "allow", (
+        f"validate_grep_search returned {result!r} instead of 'allow' for no-path call"
     )
 
 
@@ -101,11 +101,11 @@ def test_grep_search_no_path_returns_deny(sg):
 # ---------------------------------------------------------------------------
 
 def test_semantic_search_always_returns_deny(sg):
-    """validate_semantic_search must always return 'deny' in the 2-tier model."""
+    """validate_semantic_search returns 'allow' after FIX-021 (VS Code search.exclude hides restricted content)."""
     data = {"tool_name": "semantic_search", "query": "something"}
     result = sg.validate_semantic_search(data, WS)
-    assert result == "deny", (
-        f"validate_semantic_search returned {result!r} instead of 'deny'"
+    assert result == "allow", (
+        f"validate_semantic_search returned {result!r} instead of 'allow'"
     )
 
 
@@ -168,7 +168,7 @@ def test_response_json_never_ask(sg):
         ("create_file", f"{WS}/project/readme.txt", "allow"),
         ("create_file", f"{WS}/.github/hook.py", "deny"),
         ("some_unknown_tool", f"{WS}/project/x.py", "deny"),
-        ("semantic_search", None, "deny"),
+        ("semantic_search", None, "allow"),  # FIX-021: VS Code search.exclude hides restricted content
     ]
 
     for tool_name, file_path, expected in scenarios:
