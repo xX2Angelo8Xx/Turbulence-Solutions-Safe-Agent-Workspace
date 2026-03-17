@@ -97,6 +97,14 @@ cat > "${APP_BUNDLE}/Contents/Info.plist" << PLIST
 PLIST
 
 # ---------------------------------------------------------------------------
+# Step 3.5: Ad-hoc code signing
+# ---------------------------------------------------------------------------
+echo "Step 3.5: Code signing..."
+codesign --deep --force --sign - "${APP_BUNDLE}"
+echo "Verifying code signature..."
+codesign --verify --deep --strict "${APP_BUNDLE}"
+
+# ---------------------------------------------------------------------------
 # Step 4: Create DMG with hdiutil
 # ---------------------------------------------------------------------------
 echo "==> Creating DMG: ${DMG_FILENAME}"
