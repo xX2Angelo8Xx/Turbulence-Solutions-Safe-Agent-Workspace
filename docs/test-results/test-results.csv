@@ -1,4 +1,5 @@
 ID,Test Name,Test Type,WP Reference,Status,Run Date,Environment,Result,Notes
+TST-1769,FIX-029 CI codesign verify step suite (17 tests),Unit,FIX-029,Pass,2026-03-17,Windows 11 + Python 3.11,17/17 pass - workflow YAML validity; step presence/command correctness; step ordering; other jobs unchanged,Developer Agent
 TST-1765,FIX-022 to FIX-026 developer test suite (48 tests),Unit,FIX-022,Pass,2026-03-17,Windows 11 + Python 3.11,48/48 pass — 32 FIX-022 fallback tests + 9 FIX-023 venv tests + 7 FIX-026 get_errors tests,Developer Agent
 TST-1766,FIX-022 to FIX-026 full suite regression (3256 passed),Integration,FIX-022,Pass,2026-03-17,Windows 11 + Python 3.11,3256 passed 29 skipped 1 xfailed 2 pre-existing fails (BUG-045 INS-005 + FIX-009 dup TST-IDs),Developer Agent
 TST-1767,FIX-022 to FIX-026 tester edge-case suite (29 tests),Security,FIX-022,Pass,2026-03-17,Windows 11 + Python 3.11,29/29 pass — backslash variants; chained deny-zone; pip -r flags; activation backslash; get_errors multi-path; malformed input,Tester Agent

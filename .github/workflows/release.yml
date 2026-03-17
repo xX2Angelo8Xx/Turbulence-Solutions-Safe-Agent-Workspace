@@ -52,6 +52,9 @@ jobs:
           chmod +x src/installer/macos/build_dmg.sh
           src/installer/macos/build_dmg.sh arm64
 
+      - name: Verify Code Signing
+        run: codesign --verify --deep --strict dist/AgentEnvironmentLauncher.app && echo "Code signing verification passed"
+
       - name: Upload macOS ARM DMG
         uses: actions/upload-artifact@v4
         with:
