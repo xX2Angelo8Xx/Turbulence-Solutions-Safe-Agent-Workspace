@@ -1,0 +1,227 @@
+"""SAF-022: Tests for NoAgentZone VS Code Exclude Settings.
+
+Verifies that **/NoAgentZone is present in both files.exclude and
+search.exclude sections of both settings.json files, that the two
+settings.json files are identical, and that the security_gate.py
+hashes are correct for the updated files.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+from pathlib import Path
+
+import pytest
+
+# ---------------------------------------------------------------------------
+# Fixtures / paths
+# ---------------------------------------------------------------------------
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_SETTINGS = REPO_ROOT / "Default-Project" / ".vscode" / "settings.json"
+TEMPLATE_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
+DEFAULT_GATE = REPO_ROOT / "Default-Project" / ".github" / "hooks" / "scripts" / "security_gate.py"
+TEMPLATE_GATE = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
+
+EXCLUDE_KEY = "**/NoAgentZone"
+
+
+# ---------------------------------------------------------------------------
+# Helper
+# ---------------------------------------------------------------------------
+
+def _load_settings(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _extract_settings_hash(gate_path: Path) -> str:
+    """Extract the _KNOWN_GOOD_SETTINGS_HASH value from security_gate.py."""
+    content = gate_path.read_text(encoding="utf-8")
+    match = re.search(r'_KNOWN_GOOD_SETTINGS_HASH: str = "([0-9a-fA-F]{64})"', content)
+    assert match, f"_KNOWN_GOOD_SETTINGS_HASH not found in {gate_path}"
+    return match.group(1)
+
+
+# ---------------------------------------------------------------------------
+# Protection tests — NoAgentZone exclusion is present and correct
+# ---------------------------------------------------------------------------
+
+class TestDefaultSettingsExclusion:
+    """Default-Project settings.json contains NoAgentZone exclusions."""
+
+    def test_files_exclude_noagentzone_present(self):
+        settings = _load_settings(DEFAULT_SETTINGS)
+        assert "files.exclude" in settings, "files.exclude key missing"
+        assert EXCLUDE_KEY in settings["files.exclude"], (
+            f"{EXCLUDE_KEY} not found in files.exclude"
+        )
+
+    def test_files_exclude_noagentzone_is_true(self):
+        settings = _load_settings(DEFAULT_SETTINGS)
+        assert settings["files.exclude"][EXCLUDE_KEY] is True, (
+            f"{EXCLUDE_KEY} must be true in files.exclude"
+        )
+
+    def test_search_exclude_noagentzone_present(self):
+        settings = _load_settings(DEFAULT_SETTINGS)
+        assert "search.exclude" in settings, "search.exclude key missing"
+        assert EXCLUDE_KEY in settings["search.exclude"], (
+            f"{EXCLUDE_KEY} not found in search.exclude"
+        )
+
+    def test_search_exclude_noagentzone_is_true(self):
+        settings = _load_settings(DEFAULT_SETTINGS)
+        assert settings["search.exclude"][EXCLUDE_KEY] is True, (
+            f"{EXCLUDE_KEY} must be true in search.exclude"
+        )
+
+    def test_existing_excludes_still_present(self):
+        """Original .github and .vscode exclusions must not have been removed."""
+        settings = _load_settings(DEFAULT_SETTINGS)
+        for section in ("files.exclude", "search.exclude"):
+            assert settings[section].get(".github") is True, (
+                f".github exclusion missing from {section}"
+            )
+            assert settings[section].get(".vscode") is True, (
+                f".vscode exclusion missing from {section}"
+            )
+
+
+class TestTemplateSettingsExclusion:
+    """templates/coding settings.json contains NoAgentZone exclusions."""
+
+    def test_files_exclude_noagentzone_present(self):
+        settings = _load_settings(TEMPLATE_SETTINGS)
+        assert "files.exclude" in settings, "files.exclude key missing"
+        assert EXCLUDE_KEY in settings["files.exclude"], (
+            f"{EXCLUDE_KEY} not found in files.exclude"
+        )
+
+    def test_files_exclude_noagentzone_is_true(self):
+        settings = _load_settings(TEMPLATE_SETTINGS)
+        assert settings["files.exclude"][EXCLUDE_KEY] is True
+
+    def test_search_exclude_noagentzone_present(self):
+        settings = _load_settings(TEMPLATE_SETTINGS)
+        assert "search.exclude" in settings, "search.exclude key missing"
+        assert EXCLUDE_KEY in settings["search.exclude"], (
+            f"{EXCLUDE_KEY} not found in search.exclude"
+        )
+
+    def test_search_exclude_noagentzone_is_true(self):
+        settings = _load_settings(TEMPLATE_SETTINGS)
+        assert settings["search.exclude"][EXCLUDE_KEY] is True
+
+    def test_existing_excludes_still_present(self):
+        settings = _load_settings(TEMPLATE_SETTINGS)
+        for section in ("files.exclude", "search.exclude"):
+            assert settings[section].get(".github") is True
+            assert settings[section].get(".vscode") is True
+
+
+# ---------------------------------------------------------------------------
+# Sync tests — both files must be identical
+# ---------------------------------------------------------------------------
+
+class TestSettingsSync:
+    """Both settings.json files must be identical."""
+
+    def test_settings_files_are_identical(self):
+        default_content = DEFAULT_SETTINGS.read_bytes()
+        template_content = TEMPLATE_SETTINGS.read_bytes()
+        assert default_content == template_content, (
+            "Default-Project and templates/coding settings.json are out of sync"
+        )
+
+    def test_security_gate_files_are_identical(self):
+        default_content = DEFAULT_GATE.read_bytes()
+        template_content = TEMPLATE_GATE.read_bytes()
+        assert default_content == template_content, (
+            "Default-Project and templates/coding security_gate.py are out of sync"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Hash integrity tests — security_gate.py embedded hash matches settings.json
+# ---------------------------------------------------------------------------
+
+class TestHashIntegrity:
+    """security_gate.py must embed the correct hash for settings.json."""
+
+    def test_default_gate_settings_hash_matches(self):
+        actual_hash = _sha256_file(DEFAULT_SETTINGS)
+        embedded_hash = _extract_settings_hash(DEFAULT_GATE)
+        assert actual_hash == embedded_hash, (
+            f"Default security_gate.py settings hash mismatch.\n"
+            f"  Actual   : {actual_hash}\n"
+            f"  Embedded : {embedded_hash}"
+        )
+
+    def test_template_gate_settings_hash_matches(self):
+        actual_hash = _sha256_file(TEMPLATE_SETTINGS)
+        embedded_hash = _extract_settings_hash(TEMPLATE_GATE)
+        assert actual_hash == embedded_hash, (
+            f"Template security_gate.py settings hash mismatch.\n"
+            f"  Actual   : {actual_hash}\n"
+            f"  Embedded : {embedded_hash}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Bypass-attempt tests — verify the exclusion value cannot be trivially bypassed
+# ---------------------------------------------------------------------------
+
+class TestBypassAttempt:
+    """Attempt to verify the exclusion cannot be trivially weakened."""
+
+    def test_noagentzone_not_set_to_false_in_files_exclude(self):
+        """Exclusion value must be True; False would mean VS Code shows the folder."""
+        for label, path in [("Default-Project", DEFAULT_SETTINGS),
+                             ("templates/coding", TEMPLATE_SETTINGS)]:
+            settings = _load_settings(path)
+            val = settings.get("files.exclude", {}).get(EXCLUDE_KEY)
+            assert val is True, (
+                f"[{label}] files.exclude[{EXCLUDE_KEY!r}] = {val!r}, expected True"
+            )
+
+    def test_noagentzone_not_set_to_false_in_search_exclude(self):
+        """Exclusion value must be True; False means VS Code would still search it."""
+        for label, path in [("Default-Project", DEFAULT_SETTINGS),
+                             ("templates/coding", TEMPLATE_SETTINGS)]:
+            settings = _load_settings(path)
+            val = settings.get("search.exclude", {}).get(EXCLUDE_KEY)
+            assert val is True, (
+                f"[{label}] search.exclude[{EXCLUDE_KEY!r}] = {val!r}, expected True"
+            )
+
+    def test_settings_json_is_valid_json(self):
+        """Malformed settings.json would silently disable all exclusions."""
+        for path in (DEFAULT_SETTINGS, TEMPLATE_SETTINGS):
+            try:
+                json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError as exc:
+                pytest.fail(f"{path.name} is not valid JSON: {exc}")
+
+    def test_exclude_key_uses_glob_pattern(self):
+        """**/NoAgentZone pattern matches at any depth; 'NoAgentZone' alone would not."""
+        for label, path in [("Default-Project", DEFAULT_SETTINGS),
+                             ("templates/coding", TEMPLATE_SETTINGS)]:
+            settings = _load_settings(path)
+            files_keys = set(settings.get("files.exclude", {}).keys())
+            search_keys = set(settings.get("search.exclude", {}).keys())
+            assert EXCLUDE_KEY in files_keys, (
+                f"[{label}] Glob pattern {EXCLUDE_KEY!r} missing from files.exclude; "
+                f"plain 'NoAgentZone' without ** would not match nested directories."
+            )
+            assert EXCLUDE_KEY in search_keys, (
+                f"[{label}] Glob pattern {EXCLUDE_KEY!r} missing from search.exclude"
+            )

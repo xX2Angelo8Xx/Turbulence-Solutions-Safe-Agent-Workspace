@@ -1387,3 +1387,21 @@ TST-1399,SAF-021 wildcard regression suite (58 tests),Security,SAF-021,Pass,2026
 TST-1400,SAF-021 full regression suite,Regression,SAF-021,Pass,2026-03-17,Windows 11 + Python 3.11,2840 passed / 1 pre-existing / 29 skipped,58 new SAF-021 tests. Only pre-existing INS-005 filesandirs failure (BUG-045). No regressions.
 TST-1401,SAF-021 Tester – SAF-021 suite with 22 edge-case additions (80 tests),Security,SAF-021,Pass,2026-03-17,Windows 11 + Python 3.11,80 passed,"Tester additions: ? wildcard class (9 tests); dir /b /s flag variants (3 tests); chained commands with wildcard in later segment (5 tests); Get-Content / Select-String with wildcard path (5 tests). All 80 pass."
 TST-1402,SAF-021 Tester – full regression suite,Regression,SAF-021,Pass,2026-03-17,Windows 11 + Python 3.11,2862 passed / 1 pre-existing / 29 skipped,22 additional Tester edge-case tests. Only pre-existing INS-005 BUG-045 failure. No new regressions.
+TST-1403,test_files_exclude_noagentzone_present (Default),Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,**/NoAgentZone present in Default-Project files.exclude,
+TST-1404,test_files_exclude_noagentzone_is_true (Default),Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,**/NoAgentZone value is true in Default-Project files.exclude,
+TST-1405,test_search_exclude_noagentzone_present (Default),Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,**/NoAgentZone present in Default-Project search.exclude,
+TST-1406,test_search_exclude_noagentzone_is_true (Default),Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,**/NoAgentZone value is true in Default-Project search.exclude,
+TST-1407,test_existing_excludes_still_present (Default),Regression,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,.github and .vscode exclusions preserved in Default-Project,
+TST-1408,test_files_exclude_noagentzone_present (Template),Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,**/NoAgentZone present in templates/coding files.exclude,
+TST-1409,test_files_exclude_noagentzone_is_true (Template),Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,**/NoAgentZone value is true in templates/coding files.exclude,
+TST-1410,test_search_exclude_noagentzone_present (Template),Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,**/NoAgentZone present in templates/coding search.exclude,
+TST-1411,test_search_exclude_noagentzone_is_true (Template),Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,**/NoAgentZone value is true in templates/coding search.exclude,
+TST-1412,test_existing_excludes_still_present (Template),Regression,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,.github and .vscode exclusions preserved in templates/coding,
+TST-1413,test_settings_files_are_identical,Integration,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,Both settings.json files are byte-identical,
+TST-1414,test_security_gate_files_are_identical,Integration,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,Both security_gate.py files are byte-identical,
+TST-1415,test_default_gate_settings_hash_matches,Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,Default security_gate.py embedded hash matches settings.json,
+TST-1416,test_template_gate_settings_hash_matches,Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,Template security_gate.py embedded hash matches settings.json,
+TST-1417,test_noagentzone_not_set_to_false_in_files_exclude,Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,Bypass attempt: exclusion value must be true in files.exclude,
+TST-1418,test_noagentzone_not_set_to_false_in_search_exclude,Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,Bypass attempt: exclusion value must be true in search.exclude,
+TST-1419,test_settings_json_is_valid_json,Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,Bypass attempt: both settings.json files are valid JSON,
+TST-1420,test_exclude_key_uses_glob_pattern,Security,SAF-022,Pass,2026-03-17,Windows 11 + Python 3.11,Bypass attempt: glob pattern **/NoAgentZone used (not bare name),

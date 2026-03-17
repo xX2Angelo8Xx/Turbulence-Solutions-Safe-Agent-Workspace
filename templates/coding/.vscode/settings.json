@@ -1,11 +1,13 @@
 {
   "files.exclude": {
     ".github": true,
-    ".vscode": true
+    ".vscode": true,
+    "**/NoAgentZone": true
   },
   "search.exclude": {
     ".github": true,
-    ".vscode": true
+    ".vscode": true,
+    "**/NoAgentZone": true
   },
   "chat.tools.global.autoApprove": false,
   "chat.tools.edits.autoApprove": [

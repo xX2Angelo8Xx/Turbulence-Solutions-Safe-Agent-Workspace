@@ -61,14 +61,14 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # Known-good SHA256 of Default-Project/.vscode/settings.json.
 # Updated by running .github/hooks/scripts/update_hashes.py after any
 # intentional admin change to settings.json.
-_KNOWN_GOOD_SETTINGS_HASH: str = "dc5771f867ea47f412b56fd1e026f2d141dad8da69937d638318bdf690072616"
+_KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca4f7b07a04351200e40"
 
 # Known-good SHA256 of security_gate.py in canonical form.
 # Canonical form: the file content with the value portion of this constant
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "da23fdb4f68f2a7cb587767301a7acb585b7b2b3f594bb39b8b536b42fda1d90"
+_KNOWN_GOOD_GATE_HASH: str = "2d3ba750aa744bc98573e1a3270633008791fd601f9dc9bcfd680f0a3be47ac0"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
