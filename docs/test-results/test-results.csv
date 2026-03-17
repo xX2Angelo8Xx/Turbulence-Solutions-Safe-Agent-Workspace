@@ -1521,7 +1521,7 @@ TST-1533,GUI-016 full regression suite,Regression,GUI-016,Pass,2026-03-17,Window
 TST-1534,test_empty_folder_name_does_not_raise_and_project_folder_preserved,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Empty folder_name does not raise; guard blocks rename; Project/ preserved
 TST-1535,test_name_conflicts_with_existing_vscode_dir,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Rename blocked when folder_name matches existing .vscode dir in template
 TST-1536,test_name_conflicts_with_existing_github_dir,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Rename blocked when folder_name matches existing .github dir in template
-TST-1537,GUI-016 Tester full regression suite,Regression,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,11 passed (GUI-016) / 2996 total / 1 pre-existing (INS-005) / 29 skipped,Tester pass — all 11 GUI-016 tests pass; no regressions
+TST-1537,GUI-016 Tester full regression suite,Regression,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,11 passed (GUI-016) / 2996 total / 1 pre-existing (INS-005) / 29 skipped,Tester pass ï¿½ all 11 GUI-016 tests pass; no regressions
 TST-1538,test_placeholder_text_is_matlab_demo,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Project name entry placeholder is 'MatlabDemo'
 TST-1539,test_placeholder_is_not_old_value,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Old placeholder 'my-project' is no longer used
 TST-1540,test_success_message_contains_ts_sae_prefix,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,showinfo called with TS-SAE-{name} in message
@@ -1533,3 +1533,12 @@ TST-1545,test_duplicate_error_label_shows_ts_sae_prefix,Unit,GUI-017,Pass,2026-0
 TST-1546,test_duplicate_error_label_does_not_use_bare_name,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Error label always includes TS-SAE- prefix
 TST-1547,test_various_project_names_all_prefixed_in_success_message,Integration,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Multiple names all produce TS-SAE- prefixed success messages
 TST-1548,GUI-017 full regression suite,Regression,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,3006 passed / 7 pre-existing failures (6 FIX-009 unicode + 1 INS-005) / skipped,No new regressions introduced by GUI-017
+TST-1549,test_empty_name_fails_validation_before_duplicate_check,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Empty name fails validation; duplicate check never called
+TST-1550,test_empty_name_sets_error_label,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Empty name sets non-empty error label
+TST-1551,test_whitespace_only_name_fails_validation,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Whitespace-only name stripped to empty; fails validation
+TST-1552,test_special_char_name_fails_before_duplicate_check (x6 params),Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Names with @/space/!/./# all fail validation before duplicate check
+TST-1553,test_special_char_error_label_does_not_contain_ts_sae,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Validation error label does not contain TS-SAE- prefix
+TST-1554,test_success_message_does_not_contain_my_project_placeholder,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Old my-project placeholder not present in success message path
+TST-1555,test_duplicate_error_does_not_use_old_bare_name_format,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Duplicate error uses TS-SAE- prefixed name exclusively
+TST-1556,test_name_starting_with_ts_sae_gets_double_prefix_in_duplicate_check,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Prefix always added consistently; no silent stripping of typed prefix
+TST-1557,GUI-017 Tester full suite (23 tests),Regression,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,23 passed,All developer and tester tests pass; 7 pre-existing unrelated failures
