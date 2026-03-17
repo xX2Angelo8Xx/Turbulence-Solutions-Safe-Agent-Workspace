@@ -2,6 +2,53 @@
 
 **Tester:** Tester Agent
 **Date:** 2026-03-17
+**Iteration:** 2 (re-test after BUG-053 fix)
+
+---
+
+## Iteration 2 — PASS
+
+### Summary
+
+Developer fixed BUG-053 by removing the stray German "Mathematik Demo (Streamlit)" content
+from both README files. Both files now begin cleanly with `# {{PROJECT_NAME}}` on their first
+line, followed by a blank line and the Turbulence Solutions boilerplate body text.
+
+All 23 DOC-004 tests pass (13 developer unit/integration + 10 tester structural edge-case).
+Full regression suite: **3121 passed / 2 pre-existing failures / 29 skipped / 1 xfailed**.
+Zero new failures introduced by DOC-004.
+
+**Verdict: PASS — DOC-004 marked Done.**
+
+### File Verification
+
+| File | First non-empty line | H1 count | German content | Identical to other |
+|------|---------------------|----------|----------------|--------------------|
+| `Default-Project/Project/README.md` | `# {{PROJECT_NAME}}` ✓ | 1 ✓ | None ✓ | Yes ✓ |
+| `templates/coding/Project/README.md` | `# {{PROJECT_NAME}}` ✓ | 1 ✓ | None ✓ | Yes ✓ |
+
+### Test Results
+
+| Suite | Tests | Result | TST IDs |
+|-------|-------|--------|---------|
+| DOC-004 developer suite | 13 | 13 passed | TST-1613 – TST-1626 |
+| DOC-004 tester edge-case suite | 10 | 10 passed | TST-1628 (re-run) |
+| Full regression | 3152 | 3121 passed / 2 pre-existing failures | TST-1631 |
+
+Pre-existing failures (unchanged from Iteration 1):
+- `test_no_duplicate_tst_ids` (FIX-009, TST-1557 duplicate from GUI-017)
+- `test_uninstall_delete_type_is_filesandirs` (INS-005, BUG-045)
+
+### BUG-053
+
+Closed — both README files verified clean.
+
+---
+
+## Iteration 1 — FAIL (historical record)
+
+**Tester:** Tester Agent
+**Date:** 2026-03-17
 **Iteration:** 1
 
 ---
