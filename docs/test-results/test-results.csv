@@ -1598,3 +1598,18 @@ TST-1609,test_default_project_file_has_no_bom,Unit,DOC-003,Pass,2026-03-17,Windo
 TST-1610,test_templates_coding_file_has_no_bom,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,templates/coding file has no UTF-8 BOM (Tester edge-case)
 TST-1611,DOC-003 full suite Tester run (17 tests),Regression,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,17 passed / 0 failures,All 6 developer + 11 Tester edge-case tests pass
 TST-1612,Full regression suite Tester DOC-003 review,Regression,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,3087 passed / 2 pre-existing failures / 29 skipped / 1 xfailed,2 pre-existing: FIX-009 dup TST-1557 (GUI-017) + INS-005 BUG-045; zero new regressions introduced by DOC-003
+TST-1613,test_default_readme_exists,Unit,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Default-Project/Project/README.md exists on disk
+TST-1614,test_default_readme_contains_project_name_placeholder,Unit,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,{{PROJECT_NAME}} token present in Default-Project README
+TST-1615,test_default_readme_h1_uses_placeholder,Unit,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,H1 heading is # {{PROJECT_NAME}} in Default-Project README
+TST-1616,test_default_readme_no_hardcoded_project_heading,Unit,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,No bare # Project line in Default-Project README
+TST-1617,test_template_readme_exists,Unit,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,templates/coding/Project/README.md exists on disk
+TST-1618,test_template_readme_contains_project_name_placeholder,Unit,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,{{PROJECT_NAME}} token present in templates/coding README
+TST-1619,test_template_readme_h1_uses_placeholder,Unit,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,H1 heading is # {{PROJECT_NAME}} in templates/coding README
+TST-1620,test_template_readme_no_hardcoded_project_heading,Unit,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,No bare # Project line in templates/coding README
+TST-1621,test_both_readmes_are_identical,Unit,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Default-Project and templates/coding README files are identical
+TST-1622,test_replace_placeholder_substitutes_project_name,Integration,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,replace_template_placeholders() replaces {{PROJECT_NAME}} token
+TST-1623,test_replace_placeholder_produces_correct_heading,Integration,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Heading becomes # Falcon after replacement
+TST-1624,test_replace_placeholder_works_with_hyphenated_name,Integration,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Hyphenated project name My-Awesome-Project works correctly
+TST-1625,test_replace_placeholder_idempotent_after_no_placeholder,Integration,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,No-op when file contains no placeholders
+TST-1626,DOC-004 full suite (13 tests),Regression,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,13 passed / 0 failures,All 13 tests pass; placeholder usage and replacement verified
+TST-1627,Full regression suite DOC-004 developer run,Regression,DOC-004,Pass,2026-03-17,Windows 11 + Python 3.11,3111 passed / 2 pre-existing failures / 29 skipped / 1 xfailed,Pre-existing: FIX-009 dup TST-1557 + INS-005 BUG-045; zero new failures from DOC-004

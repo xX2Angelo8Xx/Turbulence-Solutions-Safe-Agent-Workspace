@@ -24,7 +24,7 @@ streamlit run app.py
 ```
 
 Inhalt:
-- `app.py`: Streamlit-App mit zwei kleinen Demos (Quadratische Funktion, Sinuswellen).# Project
+- `app.py`: Streamlit-App mit zwei kleinen Demos (Quadratische Funktion, Sinuswellen).# {{PROJECT_NAME}}
 
 This is the designated working directory for Turbulence Solutions projects.
 
