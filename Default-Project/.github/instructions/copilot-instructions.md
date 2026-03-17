@@ -6,7 +6,7 @@ Turbulence Solutions
 
 ## Workspace Rules
 
-- The `Project/` folder is the designated working directory. Place all project files there.
+- The `{{PROJECT_NAME}}/` folder is the designated working directory. Place all project files there.
 - The `NoAgentZone/` folder is strictly off-limits. Never read, write, or reference files in it.
 - The `.github/` and `.vscode/` folders contain administrator configurations. Do not access or modify them.
 - All output must be in English.
