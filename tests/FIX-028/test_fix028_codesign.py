@@ -183,3 +183,154 @@ def test_step_35_label_present():
     """Script should label the new step as Step 3.5 for clarity."""
     text = _script_text()
     assert "3.5" in text, "Step 3.5 label not found in build_dmg.sh"
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case additions
+# ---------------------------------------------------------------------------
+
+def test_verify_comes_after_sign():
+    """codesign --verify must appear AFTER codesign --sign (not before)."""
+    text = _script_text()
+    lines = text.splitlines()
+
+    sign_indices = [
+        i for i, line in enumerate(lines)
+        if "codesign" in line and "--sign" in line
+    ]
+    verify_indices = [
+        i for i, line in enumerate(lines)
+        if "codesign" in line and "--verify" in line
+    ]
+
+    assert sign_indices, "No codesign --sign line found"
+    assert verify_indices, "No codesign --verify line found"
+
+    assert max(sign_indices) < min(verify_indices), (
+        "codesign --verify must appear AFTER codesign --sign "
+        f"(sign at lines {sign_indices}, verify at lines {verify_indices})"
+    )
+
+
+def test_no_hardcoded_credentials():
+    """No Apple Developer ID, certificate name, TEAM_ID, APPLE_ID, or keychain
+    references should appear in the codesign command — only '-' for ad-hoc."""
+    text = _script_text()
+    # Collect all codesign lines
+    codesign_lines = [
+        line for line in text.splitlines()
+        if "codesign" in line.lower()
+    ]
+    combined = " ".join(codesign_lines).lower()
+
+    # These strings indicate a real Apple Developer identity is referenced
+    forbidden_patterns = [
+        "developer id",
+        "apple development",
+        "apple distribution",
+        "team_id",
+        "teamid",
+        "apple_id",
+        "appleid",
+        "certificate",
+        "keychain",
+        "p12",
+        ".cer",
+        ".p12",
+    ]
+    for pattern in forbidden_patterns:
+        assert pattern not in combined, (
+            f"Forbidden credential reference '{pattern}' found in codesign "
+            "command — use ad-hoc '-' only, no Apple Developer credentials"
+        )
+
+
+def test_app_bundle_quoted_in_codesign():
+    """APP_BUNDLE must be double-quoted in the codesign command (path-with-spaces
+    safety)."""
+    text = _script_text()
+    sign_lines = [
+        line for line in text.splitlines()
+        if "codesign" in line and "--sign" in line
+    ]
+    assert sign_lines, "No codesign --sign line found"
+    # Accept either "${APP_BUNDLE}" or "$APP_BUNDLE" that is double-quoted
+    assert any('"${APP_BUNDLE}"' in line or '"$APP_BUNDLE"' in line
+               for line in sign_lines), (
+        'APP_BUNDLE must be double-quoted: "${APP_BUNDLE}" in codesign command'
+    )
+
+
+def test_verify_app_bundle_quoted():
+    """APP_BUNDLE must be double-quoted in the codesign --verify command."""
+    text = _script_text()
+    verify_lines = [
+        line for line in text.splitlines()
+        if "codesign" in line and "--verify" in line
+    ]
+    assert verify_lines, "No codesign --verify line found"
+    assert any('"${APP_BUNDLE}"' in line or '"$APP_BUNDLE"' in line
+               for line in verify_lines), (
+        'APP_BUNDLE must be double-quoted: "${APP_BUNDLE}" in codesign --verify command'
+    )
+
+
+def test_sign_identity_is_exactly_adhoc():
+    """The sign identity must be exactly '-' (ad-hoc), not a certificate name."""
+    text = _script_text()
+    sign_lines = [
+        line for line in text.splitlines()
+        if "codesign" in line and "--sign" in line
+    ]
+    assert sign_lines, "No codesign --sign line found"
+    # --sign - must be present with a dash as the identity token
+    # Ensure no --sign 'Developer ID...' or --sign "cert name" is used instead
+    import re as _re
+    for line in sign_lines:
+        match = _re.search(r'--sign\s+(\S+)', line)
+        if match:
+            identity = match.group(1).strip('"\'')
+            assert identity == "-", (
+                f"Sign identity must be '-' for ad-hoc signing, got: '{identity}'"
+            )
+
+
+def test_pipefail_set_in_script():
+    """Script must use 'set -euo pipefail' so codesign failures abort the build."""
+    text = _script_text()
+    assert "pipefail" in text, (
+        "'set -euo pipefail' not found — codesign failures may be silently ignored"
+    )
+
+
+def test_codesign_step_between_infoplist_and_hdiutil():
+    """Step 3.5 codesign must come AFTER Info.plist write (Step 3) and BEFORE
+    hdiutil (Step 4). Confirms the bundle is fully assembled before signing."""
+    text = _script_text()
+    lines = text.splitlines()
+
+    plist_indices = [
+        i for i, line in enumerate(lines)
+        if "Info.plist" in line or "PLIST" in line
+    ]
+    sign_indices = [
+        i for i, line in enumerate(lines)
+        if "codesign" in line and "--sign" in line
+    ]
+    hdiutil_indices = [
+        i for i, line in enumerate(lines)
+        if line.strip().startswith("hdiutil")
+    ]
+
+    assert plist_indices, "No Info.plist reference found"
+    assert sign_indices, "No codesign --sign line found"
+    assert hdiutil_indices, "No hdiutil line found"
+
+    assert max(plist_indices) < min(sign_indices), (
+        "codesign signing must come AFTER the Info.plist block is written "
+        f"(plist refs at lines {plist_indices}, sign at lines {sign_indices})"
+    )
+    assert max(sign_indices) < min(hdiutil_indices), (
+        "codesign signing must come BEFORE hdiutil create "
+        f"(sign at lines {sign_indices}, hdiutil at lines {hdiutil_indices})"
+    )

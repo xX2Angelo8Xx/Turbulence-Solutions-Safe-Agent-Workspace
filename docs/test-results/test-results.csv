@@ -1,4 +1,5 @@
 ID,Test Name,Test Type,WP Reference,Status,Run Date,Environment,Result,Notes
+TST-599,FIX-003 INS-004 template sync suite (66 tests),Unit,FIX-003,Pass,2026-03-13,Windows 11 + Python 3.11,66/66 pass — test_vscode_settings_content_matches_default_project and test_template_non_json_files_match_default_project_byte_for_byte now pass; all 66 INS-004 tests pass,Developer Agent Iteration 1
 TST-001,test_src_dir_exists,Unit,INS-001,Pass,2026-03-10,Windows 11 + Python 3.11,src/ directory exists,
 TST-002,test_launcher_dir_exists,Unit,INS-001,Pass,2026-03-10,Windows 11 + Python 3.11,src/launcher/ directory exists,
 TST-003,test_launcher_main_exists,Unit,INS-001,Pass,2026-03-10,Windows 11 + Python 3.11,src/launcher/main.py exists,
@@ -1641,3 +1642,5 @@ TST-1652,FIX-020 Tester suite (21 tests — 6 dev + 15 tester edge-cases),Unit,F
 TST-1653,Full regression suite FIX-020 Tester run,Regression,FIX-020,Pass,2026-03-17,Windows 11 + Python 3.11,3156 passed / 2 pre-existing failures / 29 skipped / 1 xfailed,Pre-existing: FIX-009 dup TST-1557 + INS-005 BUG-045; zero new failures from FIX-020 tester additions
 TST-1654,FIX-028 codesign tests (12 tests),Unit,FIX-028,Pass,2026-03-17,Windows 11 + Python 3.11,12 passed / 0 failures,codesign present; --deep --force --sign -; verify step; ordering before hdiutil; CRLF hygiene; APP_BUNDLE variable; Step 3.5 label
 TST-1655,Full regression suite FIX-028,Regression,FIX-028,Pass,2026-03-17,Windows 11 + Python 3.11,3168 passed / 2 pre-existing failures / 29 skipped / 1 xfailed,Pre-existing: FIX-009 dup TST-1557 + INS-005 BUG-045; zero new failures from FIX-028
+TST-1656,FIX-028 Tester edge-case suite (7 tests),Unit,FIX-028,Pass,2026-03-17,Windows 11 + Python 3.11,7 passed / 0 failures,verify-after-sign ordering; no hardcoded credentials; APP_BUNDLE double-quoted in sign+verify; ad-hoc identity exactly '-'; pipefail present; codesign between Info.plist and hdiutil
+TST-1657,Full regression suite FIX-028 Tester run,Regression,FIX-028,Pass,2026-03-17,Windows 11 + Python 3.11,3175 passed / 2 pre-existing failures / 29 skipped / 1 xfailed,Pre-existing: FIX-009 dup TST-1557 + INS-005 BUG-045; zero new failures from FIX-028 tester additions
