@@ -179,9 +179,9 @@ def test_py_m_venv_project_allowed(sg):
     assert _allow(sg, "py -m venv project/.venv")
 
 
-def test_python_m_venv_dot_venv_at_root_denied(sg):
-    """.venv at workspace root is NOT inside project/ — must be denied."""
-    assert _deny(sg, "python -m venv .venv")
+def test_python_m_venv_dot_venv_at_root_allowed_via_fallback(sg):
+    """.venv resolves to project/.venv via FIX-023 fallback — allowed."""
+    assert _allow(sg, "python -m venv .venv")
 
 
 def test_python_m_venv_github_denied(sg):

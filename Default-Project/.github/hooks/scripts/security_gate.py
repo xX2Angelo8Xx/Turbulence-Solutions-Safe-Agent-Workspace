@@ -8,6 +8,7 @@ import posixpath
 import re
 import shlex
 import sys
+from pathlib import Path
 from typing import Optional
 
 # SAF-002: zone classification is delegated to the dedicated module.
@@ -69,7 +70,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "e2177f323699a75dee135656f27df65ac2223be37d6221caa54dddb9d8d62e12"
+_KNOWN_GOOD_GATE_HASH: str = "bd68677aa4a5cf3a77b6aae164ef82520003d7b8dad4fccb3b302dae71dc6033"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1044,6 +1045,49 @@ def _check_path_arg(token: str, ws_root: str) -> bool:
     return zone != "deny"
 
 
+# FIX-022: Verb category safe for project-folder fallback (read/execute only).
+# Destructive commands (rm, del, remove-item, etc.) are intentionally excluded
+# to prevent `rm ./root_config.json` from being mis-classified as project-local.
+_PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
+    "python", "python3", "py", "pip", "pip3",
+    "cat", "type", "get-content", "gc", "select-string",
+    "findstr", "grep", "wc", "file", "stat",
+    "get-childitem", "gci", "ls", "dir",
+    "more", "head", "tail", "less",
+    "pytest", "mypy", "flake8", "black", "isort", "ruff",
+    "code", "dotnet", "node", "npm", "npx",
+})
+
+
+def _try_project_fallback(norm_relative: str, ws_root: str) -> bool:
+    """Try resolving a relative path against the detected project folder.
+
+    When the agent CWD is the project folder, relative paths like
+    ``src/app.py`` resolve against ws_root as ``ws_root/src/app.py``
+    (outside the project) instead of ``ws_root/<project>/src/app.py``.
+    This helper retries classification with the project prefix.
+
+    Returns True only if the path resolves inside the project folder.
+    """
+    # Only handle truly relative paths
+    if re.match(r"^[a-z]:", norm_relative.lower()) or norm_relative.startswith("/"):
+        return False
+    parts = [p for p in norm_relative.split("/") if p and p not in (".", "..")]
+    if not parts or parts[0] == "~":
+        return False
+    # Never fallback into a deny zone
+    if any(p.lower() in (".github", ".vscode", "noagentzone") for p in parts):
+        return False
+    try:
+        project_dir = zone_classifier.detect_project_folder(Path(ws_root))
+        project_path = posixpath.normpath(
+            ws_root.rstrip("/") + "/" + project_dir + "/" + norm_relative
+        )
+        return zone_classifier.classify(project_path, ws_root) == "allow"
+    except (RuntimeError, OSError):
+        return False
+
+
 def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                    ws_root: str) -> bool:
     """Stage 5 argument validation.  Returns True (safe) or False (deny).
@@ -1082,6 +1126,9 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
         elif first_arg not in rule.allowed_subcommands:
             return False
 
+    # FIX-023: Track arg indices already validated by step 4 so step 5 skips them
+    _step4_validated_indices: set[int] = set()
+
     # 4. Python -m module check
     if verb in ("python", "python3", "py"):
         # Walk args; if -m is found, the next token must be an approved module
@@ -1096,7 +1143,11 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                     if "$" in venv_target:
                         return False
                     if _is_path_like(venv_target) and not _check_path_arg(venv_target, ws_root):
-                        return False
+                        # FIX-023: Try project-folder fallback for venv target
+                        norm_vt = posixpath.normpath(venv_target.replace("\\", "/"))
+                        if not _try_project_fallback(norm_vt, ws_root):
+                            return False
+                    _step4_validated_indices.add(i + 2)
                 # BUG-049: python -m pip install must apply the same VIRTUAL_ENV guard
                 if module in ("pip", "pip3"):
                     remaining_args = args[i + 2:]
@@ -1144,9 +1195,9 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
     if rule.path_args_restricted or not rule.allow_arbitrary_paths:
         _prev_was_flag = False  # SAF-020: track flag-argument position
         for _idx, tok in enumerate(args):
-            if _idx in _code_arg_indices:
+            if _idx in _code_arg_indices or _idx in _step4_validated_indices:
                 _prev_was_flag = False
-                continue  # inline code string — not a path, skip zone check
+                continue  # already validated or inline code — skip zone check
             stripped = tok.strip("\"'")
             # Skip pure flags; the token that follows is a flag argument, not a
             # standalone file glob — mark it so the wildcard check is skipped.
@@ -1170,6 +1221,21 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
             _prev_was_flag = False
             if _is_path_like(stripped):
                 if not _check_path_arg(stripped, ws_root):
+                    # FIX-022: For read/execute verbs, try project-folder fallback.
+                    # Guards: no wildcards (already denied by _check_path_arg).
+                    # For single-segment paths (e.g. "tests" from "tests/"),
+                    # only fallback when the original token ends with "/" to
+                    # distinguish directory refs from bare root files like
+                    # ./root_config.json. Multi-segment paths (src/app.py)
+                    # always get the fallback.
+                    if verb.lower() in _PROJECT_FALLBACK_VERBS:
+                        if "*" not in stripped and "?" not in stripped and "[" not in stripped:
+                            norm_fb = posixpath.normpath(stripped.replace("\\", "/"))
+                            parts_fb = [p for p in norm_fb.split("/") if p and p not in (".", "..")]
+                            if len(parts_fb) >= 2 or (len(parts_fb) == 1 and stripped.rstrip().endswith("/")):
+                                if _try_project_fallback(norm_fb, ws_root):
+                                    _prev_was_flag = False
+                                    continue
                     return False
 
     # 6. Shell redirect zone check (BUG-013 / BUG-016).
@@ -1321,6 +1387,15 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                 pass
             elif re.match(r"^pip3\.\d+$", verb_lower):
                 verb_lower = "pip3"
+
+            # FIX-022: venv activation scripts (.venv/Scripts/Activate.ps1 etc.)
+            if verb_lower.endswith(("activate", "activate.bat", "activate.ps1")):
+                if _check_path_arg(verb, ws_root):
+                    continue  # Activation script inside allowed zone
+                norm_act = posixpath.normpath(verb.replace("\\", "/"))
+                if _try_project_fallback(norm_act, ws_root):
+                    continue  # Activation script inside project folder
+                return ("deny", f"Activation script outside project folder: {_DENY_REASON}")
 
             # Lowercase the ls -R flag variant: ls -R vs ls -r both denied
             lowered_segment = segment.lower()
@@ -1621,7 +1696,10 @@ def validate_get_errors(data: dict, ws_root: str) -> str:
             return "deny"
         zone = zone_classifier.classify(path, ws_root)
         if zone == "deny":
-            return "deny"
+            # FIX-026: Try project-folder fallback for relative paths
+            norm_p = posixpath.normpath(path.replace("\\", "/"))
+            if not _try_project_fallback(norm_p, ws_root):
+                return "deny"
 
     return "allow"
 
