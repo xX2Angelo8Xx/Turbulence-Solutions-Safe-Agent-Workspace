@@ -146,3 +146,78 @@ class TestOtherJobsUnchanged:
 
     def test_release_job_present(self, workflow: dict):
         assert "release" in workflow["jobs"]
+
+    def test_release_job_has_no_codesign_step(self, workflow: dict):
+        steps = workflow["jobs"]["release"]["steps"]
+        names = _step_names(steps)
+        assert "Verify Code Signing" not in names
+
+
+class TestVerifyStepSafeguards:
+    """Edge-case guard tests: the step must always execute and cannot be silenced."""
+
+    def test_step_has_no_continue_on_error(self, macos_steps: list):
+        """continue-on-error: true would make a failing codesign pass silently."""
+        step = next(s for s in macos_steps if s.get("name") == "Verify Code Signing")
+        assert step.get("continue-on-error", False) is not True, (
+            "Verify Code Signing must NOT have continue-on-error: true"
+        )
+
+    def test_step_has_no_if_condition(self, macos_steps: list):
+        """An 'if:' condition could cause the step to be skipped unexpectedly."""
+        step = next(s for s in macos_steps if s.get("name") == "Verify Code Signing")
+        assert "if" not in step, (
+            "Verify Code Signing must not have an 'if:' condition that could skip it"
+        )
+
+    def test_step_has_no_shell_override(self, macos_steps: list):
+        """No custom shell override — must use the default runner shell."""
+        step = next(s for s in macos_steps if s.get("name") == "Verify Code Signing")
+        assert "shell" not in step, (
+            "Verify Code Signing must not override the default shell"
+        )
+
+    def test_only_one_codesign_verify_step_in_entire_workflow(self, workflow: dict):
+        """There should be exactly one Verify Code Signing step across all jobs."""
+        count = 0
+        for job in workflow["jobs"].values():
+            for step in job.get("steps", []):
+                if step.get("name") == "Verify Code Signing":
+                    count += 1
+        assert count == 1, (
+            f"Expected exactly 1 'Verify Code Signing' step in the workflow, found {count}"
+        )
+
+    def test_step_run_contains_strict_flag(self, macos_steps: list):
+        """The --strict flag is required for macOS 14+ Gatekeeper compatibility."""
+        step = next(s for s in macos_steps if s.get("name") == "Verify Code Signing")
+        assert "--strict" in step["run"]
+
+    def test_step_run_contains_deep_flag(self, macos_steps: list):
+        """The --deep flag must be present to check nested components."""
+        step = next(s for s in macos_steps if s.get("name") == "Verify Code Signing")
+        assert "--deep" in step["run"]
+
+
+class TestWorkflowTriggerIntegrity:
+    """The workflow trigger must not have changed.
+
+    Note: YAML's ``on:`` key is a reserved boolean — yaml.safe_load parses it
+    as Python ``True``, not the string ``"on"``.
+    """
+
+    def test_workflow_triggers_on_push(self, workflow: dict):
+        # yaml.safe_load maps the YAML `on:` key to Python ``True``
+        triggers = workflow[True]
+        assert "push" in triggers
+
+    def test_push_trigger_uses_version_tags(self, workflow: dict):
+        triggers = workflow[True]
+        tags = triggers["push"]["tags"]
+        assert "v*.*.*" in tags, f"Expected 'v*.*.*' tag pattern, got: {tags}"
+
+    def test_no_pull_request_trigger(self, workflow: dict):
+        triggers = workflow[True]
+        assert "pull_request" not in triggers and \
+               "pull_request_target" not in triggers, \
+               "Workflow must not have a pull_request trigger (security risk)"
