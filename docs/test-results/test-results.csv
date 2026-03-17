@@ -1555,3 +1555,22 @@ TST-1567,test_multiple_md_files_all_replaced,Unit,DOC-001,Pass,2026-03-17,Window
 TST-1568,test_create_project_replaces_placeholders,Integration,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,create_project() replaces placeholders in copied template
 TST-1569,test_create_project_non_md_untouched,Integration,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,create_project() does not modify non-.md files in template
 TST-1557,GUI-017 Tester full suite (23 tests),Regression,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,23 passed,All developer and tester tests pass; 7 pre-existing unrelated failures
+TST-1570,test_name_with_hyphens_replaced_in_project_name,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Hyphenated project name substituted verbatim in .md file
+TST-1571,test_name_with_hyphens_workspace_name,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,TS-SAE- prefix correctly applied to hyphenated project name
+TST-1572,test_name_with_leading_hyphen,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Project name starting with hyphen substituted without error
+TST-1573,test_name_with_consecutive_hyphens,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Consecutive hyphens in name substituted correctly
+TST-1574,test_long_name_replaced_project,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,200-character project name substituted correctly
+TST-1575,test_long_name_replaced_workspace,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,200-character name produces correct TS-SAE- workspace token
+TST-1576,test_long_name_multiple_occurrences,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,All 10 occurrences of long name replaced in file
+TST-1577,test_five_levels_deep,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.md file 5 directory levels deep is found and replaced
+TST-1578,test_mixed_depth_all_replaced,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Files at top / mid / 7-levels-deep all replaced in single pass
+TST-1579,test_readonly_md_with_no_placeholder_not_written,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Read-only .md without placeholders skipped without PermissionError
+TST-1580,test_readonly_md_with_placeholder_raises_or_skips,Unit,DOC-001,XFail,2026-03-17,Windows 11 + Python 3.11,XFail,Read-only .md with placeholder raises PermissionError on write — logged as BUG-052
+TST-1581,test_only_project_name,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.md file with only PROJECT_NAME placeholder handled correctly
+TST-1582,test_only_workspace_name,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.md file with only WORKSPACE_NAME placeholder handled correctly
+TST-1583,test_project_name_placeholder_repeated_workspace_absent,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,50 occurrences of PROJECT_NAME all replaced; WORKSPACE_NAME absence causes no error
+TST-1584,test_file_with_only_project,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,File A (PROJECT_NAME only) / File B (WORKSPACE_NAME only) / File C (both) all resolved
+TST-1585,test_no_cross_contamination_between_files,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,No content from one file bleeds into another
+TST-1586,test_some_files_no_placeholder,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Static .md file untouched; placeholder file updated correctly
+TST-1587,test_mixed_file_types_in_same_directory,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Only .md file in mixed-type directory is processed
+TST-1588,DOC-001 full suite (31 tests + 1 xfail),Regression,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,30 passed / 1 xfailed / 0 failures,All developer and tester tests pass; 2 pre-existing unrelated failures (GUI-017 dup TST-1557 + INS-005)
