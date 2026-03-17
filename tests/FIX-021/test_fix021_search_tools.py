@@ -266,3 +266,89 @@ def test_file_search_dotdot_nested_denied():
         "tool_input": {"query": "project/../../.vscode"},
     }
     assert sg.decide(data, WS) == "deny"
+
+
+# ===========================================================================
+# TESTER edge-case additions (TST-1682 – TST-1690)
+# ===========================================================================
+
+# TST-1682: file_search — .VSCODE (fully uppercase) must still be denied
+def test_file_search_vscode_mixed_case_denied():
+    """TST-1682: file_search with .VSCODE in query (uppercase) -> deny (case-insensitive check)."""
+    data = {"tool_name": "file_search", "query": ".VSCODE/settings.json"}
+    assert sg.decide(data, WS) == "deny"
+
+
+# TST-1683: file_search — .GitHub (camelCase) must still be denied
+def test_file_search_github_camelcase_denied():
+    """TST-1683: file_search with .GitHub in query (camelCase) -> deny (case-insensitive check)."""
+    data = {"tool_name": "file_search", "query": ".GitHub/workflows/**"}
+    assert sg.decide(data, WS) == "deny"
+
+
+# TST-1684: file_search — empty string query -> allow
+def test_file_search_empty_string_query_allow():
+    """TST-1684: file_search with empty string query -> allow (no restricted names present)."""
+    data = {"tool_name": "file_search", "query": ""}
+    assert sg.decide(data, WS) == "allow"
+
+
+# TST-1685: file_search — whitespace-only query -> allow
+def test_file_search_whitespace_query_allow():
+    """TST-1685: file_search with whitespace-only query -> allow."""
+    data = {"tool_name": "file_search", "query": "   "}
+    assert sg.decide(data, WS) == "allow"
+
+
+# TST-1686: file_search — tool_input present but empty dict -> allow
+def test_file_search_tool_input_empty_dict_allow():
+    """TST-1686: file_search with tool_input={} and no top-level query -> allow."""
+    data = {"tool_name": "file_search", "tool_input": {}}
+    assert sg.decide(data, WS) == "allow"
+
+
+# TST-1687: grep_search — explicit project-scoped includePattern -> allow
+def test_grep_search_explicit_project_include_pattern_allow(tmp_path):
+    """TST-1687: grep_search with includePattern='Project/**' -> allow (project zone).
+
+    Uses a real temporary workspace so detect_project_folder can scan the directory.
+    """
+    (tmp_path / "Project").mkdir()
+    ws = str(tmp_path).replace("\\", "/").lower()
+    data = {
+        "tool_name": "grep_search",
+        "query": "def test_",
+        "includePattern": "Project/**",
+    }
+    assert sg.decide(data, ws) == "allow"
+
+
+# TST-1688: grep_search — uppercase .GITHUB/** includePattern -> deny
+def test_grep_search_uppercase_github_include_pattern_denied():
+    """TST-1688: grep_search with includePattern='.GITHUB/**' -> deny (zone_classifier normalizes to lowercase)."""
+    data = {
+        "tool_name": "grep_search",
+        "query": "secret",
+        "includePattern": ".GITHUB/**",
+    }
+    assert sg.decide(data, WS) == "deny"
+
+
+# TST-1689: file_search — path traversal combined with .github -> deny
+def test_file_search_traversal_combined_with_github_denied():
+    """TST-1689: file_search with 'src/../.github/hooks' -> deny (both .. and .github trigger)."""
+    data = {"tool_name": "file_search", "query": "src/../.github/hooks"}
+    assert sg.decide(data, WS) == "deny"
+
+
+# TST-1690: grep_search — nested tool_input with .vscode includePattern -> deny
+def test_grep_search_nested_vscode_include_pattern_denied():
+    """TST-1690: grep_search with .vscode includePattern in nested tool_input -> deny."""
+    data = {
+        "tool_name": "grep_search",
+        "tool_input": {
+            "query": "editor settings",
+            "includePattern": ".vscode/**",
+        },
+    }
+    assert sg.decide(data, WS) == "deny"
