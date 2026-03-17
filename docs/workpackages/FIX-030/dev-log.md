@@ -43,7 +43,7 @@ FIX-014 (→1.0.1), FIX-017 (→1.0.2), FIX-019 (→1.0.3), and FIX-020 (→2.0.
 
 ## Test Results
 
-All 6 FIX-030 tests pass. See `docs/test-results/test-results.csv` (TST-1772).
+All 6 FIX-030 tests pass. See `docs/test-results/test-results.csv` (TST-1774).
 
 ---
 
