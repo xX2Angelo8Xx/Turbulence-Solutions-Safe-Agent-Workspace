@@ -1585,3 +1585,16 @@ TST-1596,test_templates_coding_no_bare_project_folder,Unit,DOC-003,Pass,2026-03-
 TST-1597,test_files_are_identical,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Both template copilot-instructions.md files are byte-for-byte identical
 TST-1598,test_placeholder_replaced_in_copy,Integration,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Simulated replace_template_placeholders() substitutes {{PROJECT_NAME}} with actual project name correctly
 TST-1599,DOC-003 full suite,Regression,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,6 passed / 0 failures / 3087 total (2 pre-existing failures),6 DOC-003 tests pass; pre-existing failures in FIX-009 and INS-005 unrelated to DOC-003
+TST-1600,test_placeholder_count_exactly_one_in_default_project,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Exactly 1 {{PROJECT_NAME}} placeholder in Default-Project file (Tester edge-case)
+TST-1601,test_placeholder_count_exactly_one_in_templates_coding,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Exactly 1 {{PROJECT_NAME}} placeholder in templates/coding file (Tester edge-case)
+TST-1602,test_noagentzone_reference_unchanged_in_default_project,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,NoAgentZone/ literal reference unchanged (Tester edge-case)
+TST-1603,test_github_reference_unchanged_in_default_project,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.github/ literal reference unchanged (Tester edge-case)
+TST-1604,test_vscode_reference_unchanged_in_default_project,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.vscode/ literal reference unchanged (Tester edge-case)
+TST-1605,test_placeholder_is_in_workspace_rules_section,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Placeholder appears under ## Workspace Rules heading (Tester edge-case)
+TST-1606,test_replacement_with_hyphenated_project_name,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,My-Cool-Project replacement works correctly (Tester edge-case)
+TST-1607,test_replacement_with_underscored_project_name,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,my_project_42 replacement works correctly (Tester edge-case)
+TST-1608,test_replacement_with_numeric_suffix_project_name,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Project2025 replacement works correctly (Tester edge-case)
+TST-1609,test_default_project_file_has_no_bom,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Default-Project file has no UTF-8 BOM (Tester edge-case)
+TST-1610,test_templates_coding_file_has_no_bom,Unit,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,templates/coding file has no UTF-8 BOM (Tester edge-case)
+TST-1611,DOC-003 full suite Tester run (17 tests),Regression,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,17 passed / 0 failures,All 6 developer + 11 Tester edge-case tests pass
+TST-1612,Full regression suite Tester DOC-003 review,Regression,DOC-003,Pass,2026-03-17,Windows 11 + Python 3.11,3087 passed / 2 pre-existing failures / 29 skipped / 1 xfailed,2 pre-existing: FIX-009 dup TST-1557 (GUI-017) + INS-005 BUG-045; zero new regressions introduced by DOC-003
