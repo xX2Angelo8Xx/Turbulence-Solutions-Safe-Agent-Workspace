@@ -36,6 +36,7 @@ _EXEMPT_TOOLS: frozenset = frozenset({
     "Edit", "Write", "list_dir", "search", "grep_search",
     "semantic_search", "file_search", "Glob", "agent", "Agent",
     "runSubagent", "search_subagent",
+    "get_errors",  # SAF-023: handled early in decide(); listed here to pass unknown-tool guard
 })
 
 # SAF-007: Tool names that perform file write operations.
@@ -68,7 +69,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "2d3ba750aa744bc98573e1a3270633008791fd601f9dc9bcfd680f0a3be47ac0"
+_KNOWN_GOOD_GATE_HASH: str = "51213c4b53cbcb46242b666e1d0eb9322b5eafeae608432fa0f9df0ea94e0ab5"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1590,6 +1591,45 @@ def validate_multi_replace_tool(data: dict, ws_root: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# SAF-023: get_errors — filePaths array zone validation
+# ---------------------------------------------------------------------------
+
+def validate_get_errors(data: dict, ws_root: str) -> str:
+    """SAF-023: Validate get_errors tool calls.
+
+    When filePaths is absent or empty -> allow (VS Code scopes automatically).
+    When filePaths is present -> zone-check every path; deny if ANY is in a
+    restricted zone.
+    """
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        tool_input = {}
+
+    # Prefer nested tool_input key (VS Code hook format); fall back to
+    # top-level dict key (test / flat format).
+    file_paths = tool_input.get("filePaths")
+    if file_paths is None:
+        file_paths = data.get("filePaths")
+
+    # No filePaths provided or empty array -> allow
+    if not file_paths:
+        return "allow"
+
+    if not isinstance(file_paths, list):
+        # Unexpected type for filePaths -> fail closed
+        return "deny"
+
+    for path in file_paths:
+        if not isinstance(path, str) or not path:
+            return "deny"
+        zone = zone_classifier.classify(path, ws_root)
+        if zone == "deny":
+            return "deny"
+
+    return "allow"
+
+
+# ---------------------------------------------------------------------------
 # SAF-006: Recursive enumeration protection
 # ---------------------------------------------------------------------------
 
@@ -1699,6 +1739,12 @@ def decide(data: dict, ws_root: str) -> str:
         return validate_semantic_search(data, ws_root)
     if tool_name == "grep_search":
         return validate_grep_search(data, ws_root)
+
+    # SAF-023: get_errors carries an optional filePaths array; each path must
+    # be zone-checked.  Handled before the _EXEMPT_TOOLS fallback so the array
+    # field is inspected rather than a single filePath.
+    if tool_name == "get_errors":
+        return validate_get_errors(data, ws_root)
 
     # SAF-007: Write tools are restricted to Project/ only.  Any write
     # targeting a path outside Project/ is denied, even if zone would be "ask".
