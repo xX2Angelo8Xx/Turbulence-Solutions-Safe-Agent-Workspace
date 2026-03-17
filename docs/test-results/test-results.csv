@@ -1,4 +1,5 @@
 ID,Test Name,Test Type,WP Reference,Status,Run Date,Environment,Result,Notes
+TST-1774,FIX-030 version bump tests (6 tests),Unit,FIX-030,Pass,2026-03-17,Windows 11 + Python 3.11,6 passed / 0 failures,All 5 version locations updated to 2.0.1; test_no_old_version_in_version_files confirms 2.0.0 absent
 TST-1772,FIX-029 Tester Iteration 2 - INS-015 regression fix verification (28 tests),Unit,FIX-029,Pass,2026-03-17,Windows 11 + Python 3.11,28/28 pass - test_macos_arm_has_5_steps now asserts 6 steps and passes; all 27 FIX-029 tests pass,Tester Agent Iteration 2
 TST-1773,FIX-029 Tester Iteration 2 full regression suite,Regression,FIX-029,Pass,2026-03-17,Windows 11 + Python 3.11,3307 passed / 7 pre-existing failures / 29 skipped / 1 xfailed / 0 new failures from FIX-029,Pre-existing: 6x FIX-009 encoding corruption + INS-005 BUG-045; INS-015 regression from Iter 1 is now fixed
 TST-1769,FIX-029 CI codesign verify step suite (17 tests),Unit,FIX-029,Pass,2026-03-17,Windows 11 + Python 3.11,17/17 pass - workflow YAML validity; step presence/command correctness; step ordering; other jobs unchanged,Developer Agent
