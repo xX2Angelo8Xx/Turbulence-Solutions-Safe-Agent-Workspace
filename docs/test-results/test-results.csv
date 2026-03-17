@@ -1482,3 +1482,14 @@ TST-1494,test_sanitize_terminal_deny_reason_no_zone_names,Security,SAF-024,Pass,
 TST-1495,test_deny_reason_constant_is_str,Unit,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,_DENY_REASON is a plain str not tuple or bytes,
 TST-1496,test_templates_deny_reason_matches,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,templates/coding/ security_gate.py contains same generic _DENY_REASON,
 TST-1497,SAF-024 Developer - full regression suite,Regression,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,2950 passed / 1 pre-existing / 29 skipped,Only pre-existing INS-005 failure. No new regressions. 10 SAF-024 tests pass.
+TST-1498,test_main_write_tool_deny_is_generic,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,write tool (create_file targeting .vscode) produces generic deny in JSON stdout,Tester edge-case
+TST-1499,test_main_multi_replace_deny_is_generic,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,multi_replace_string_in_file targeting .github produces generic deny in JSON stdout,Tester edge-case
+TST-1500,test_main_get_errors_deny_is_generic,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,get_errors with .vscode filePath produces generic deny in JSON stdout,Tester edge-case
+TST-1501,test_main_grep_search_deny_is_generic,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,grep_search with .github includePattern produces generic deny in JSON stdout,Tester edge-case
+TST-1502,test_main_semantic_search_deny_is_generic,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,semantic_search always produces generic deny in JSON stdout,Tester edge-case
+TST-1503,test_sanitize_terminal_all_paths_generic,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,Extended sanitize_terminal_command deny paths (empty cmd / sudo / format) produce no zone names,Tester edge-case
+TST-1504,test_internal_comments_still_reference_zones,Unit,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,Zone names preserved in security_gate.py internal code/comments for maintainability,Tester edge-case
+TST-1505,test_main_unknown_tool_deny_is_generic,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,Unknown non-exempt tool produces generic deny in JSON stdout,Tester edge-case
+TST-1506,test_deny_reason_same_both_copies,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,_DENY_REASON byte-for-byte identical in Default-Project and templates copies,Tester edge-case
+TST-1507,test_sanitize_terminal_f_string_prefixes_no_zone_names,Security,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,All sanitize_terminal f-string deny reason prefixes contain no zone names,Tester edge-case
+TST-1508,SAF-024 Tester - full regression suite,Regression,SAF-024,Pass,2026-03-17,Windows 11 + Python 3.11,2960 passed / 1 pre-existing (INS-005) / 29 skipped,No new regressions. 20 SAF-024 tests pass (10 dev + 10 tester).
