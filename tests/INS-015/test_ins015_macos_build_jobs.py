@@ -95,9 +95,9 @@ def test_macos_intel_has_5_steps(intel_steps):
 
 
 def test_macos_arm_has_5_steps(arm_steps):
-    """macos-arm-build must have exactly 5 steps."""
-    assert len(arm_steps) == 5, (
-        f"Expected 5 steps, got {len(arm_steps)}: "
+    """macos-arm-build must have exactly 6 steps."""
+    assert len(arm_steps) == 6, (
+        f"Expected 6 steps, got {len(arm_steps)}: "
         + str([s.get("name") or s.get("uses") for s in arm_steps])
     )
 
