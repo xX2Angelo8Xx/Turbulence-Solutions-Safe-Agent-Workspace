@@ -50,7 +50,38 @@ def create_project(
     if internal_project.is_dir() and not renamed_project.exists():
         internal_project.rename(renamed_project)
 
+    # Replace placeholder tokens in all .md files within the new project tree.
+    replace_template_placeholders(target, folder_name)
+
     return target
+
+
+def replace_template_placeholders(project_dir: Path, project_name: str) -> None:
+    """Replace placeholder tokens in all .md files under *project_dir*.
+
+    Tokens replaced:
+      {{PROJECT_NAME}}    → project_name
+      {{WORKSPACE_NAME}}  → TS-SAE-{project_name}
+
+    Only .md files are processed. Non-.md files and binary files are skipped.
+    The function is idempotent: if no placeholder is found the file is not written.
+    """
+    workspace_name = f"TS-SAE-{project_name}"
+
+    for file_path in project_dir.rglob("*.md"):
+        if not file_path.is_file():
+            continue
+        try:
+            original = file_path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            # Skip files that cannot be decoded as UTF-8 (e.g. binary files).
+            continue
+
+        updated = original.replace("{{PROJECT_NAME}}", project_name)
+        updated = updated.replace("{{WORKSPACE_NAME}}", workspace_name)
+
+        if updated != original:
+            file_path.write_text(updated, encoding="utf-8")
 
 
 def list_templates(templates_dir: Path) -> list[str]:

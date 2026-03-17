@@ -1541,4 +1541,17 @@ TST-1553,test_special_char_error_label_does_not_contain_ts_sae,Unit,GUI-017,Pass
 TST-1554,test_success_message_does_not_contain_my_project_placeholder,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Old my-project placeholder not present in success message path
 TST-1555,test_duplicate_error_does_not_use_old_bare_name_format,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Duplicate error uses TS-SAE- prefixed name exclusively
 TST-1556,test_name_starting_with_ts_sae_gets_double_prefix_in_duplicate_check,Unit,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Prefix always added consistently; no silent stripping of typed prefix
+TST-1557,test_md_project_name_replaced,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,{{PROJECT_NAME}} in .md file replaced with project_name
+TST-1558,test_md_workspace_name_replaced,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,{{WORKSPACE_NAME}} in .md file replaced with TS-SAE-{project_name}
+TST-1559,test_both_placeholders_replaced,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Both tokens replaced in same .md file
+TST-1560,test_non_md_file_untouched,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.txt file with tokens is not modified
+TST-1561,test_py_file_untouched,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.py file with tokens is not modified
+TST-1562,test_binary_file_skipped,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Binary .md file skipped without corruption
+TST-1563,test_nested_md_replaced,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Placeholder in nested subdirectory .md file is replaced
+TST-1564,test_idempotent,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Running replacement twice produces same result
+TST-1565,test_no_placeholder_file_not_rewritten,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.md file without placeholders is not rewritten
+TST-1566,test_empty_project_name,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Empty project_name replaces tokens with empty string
+TST-1567,test_multiple_md_files_all_replaced,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,All .md files in tree are processed
+TST-1568,test_create_project_replaces_placeholders,Integration,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,create_project() replaces placeholders in copied template
+TST-1569,test_create_project_non_md_untouched,Integration,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,create_project() does not modify non-.md files in template
 TST-1557,GUI-017 Tester full suite (23 tests),Regression,GUI-017,Pass,2026-03-17,Windows 11 + Python 3.11,23 passed,All developer and tester tests pass; 7 pre-existing unrelated failures
