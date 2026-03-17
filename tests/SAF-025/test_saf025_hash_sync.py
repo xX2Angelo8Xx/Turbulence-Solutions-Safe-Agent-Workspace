@@ -273,3 +273,87 @@ def test_verify_file_integrity_passes_templates_copy():
     assert embedded_gate == actual_gate, (
         f"templates/coding embedded gate hash does not match canonical gate hash"
     )
+
+
+# ===========================================================================
+# TST-1645: Hash constants appear exactly once in security_gate.py
+# ===========================================================================
+
+def test_hash_constants_appear_exactly_once():
+    # TST-1645 (Tester edge-case) — Each hash constant must appear exactly once.
+    # More than one occurrence would mean a duplicate definition that could
+    # confuse update_hashes.py and lead to stale embedded hashes.
+    content = _DP_GATE.read_bytes()
+
+    settings_occurrences = len(re.findall(rb'_KNOWN_GOOD_SETTINGS_HASH: str = "[0-9a-fA-F]{64}"', content))
+    gate_occurrences = len(re.findall(rb'_KNOWN_GOOD_GATE_HASH: str = "[0-9a-fA-F]{64}"', content))
+
+    assert settings_occurrences == 1, (
+        f"_KNOWN_GOOD_SETTINGS_HASH constant appears {settings_occurrences} times "
+        f"in security_gate.py — expected exactly 1"
+    )
+    assert gate_occurrences == 1, (
+        f"_KNOWN_GOOD_GATE_HASH constant appears {gate_occurrences} times "
+        f"in security_gate.py — expected exactly 1"
+    )
+
+
+# ===========================================================================
+# TST-1646: Canonical gate hash is NOT affected by settings hash value
+# ===========================================================================
+
+def test_canonical_hash_independent_of_settings_hash():
+    # TST-1646 (Tester edge-case) — The canonical hash computation only zeros
+    # _KNOWN_GOOD_GATE_HASH, not _KNOWN_GOOD_SETTINGS_HASH. If settings hash were
+    # also zeroed, the canonical computation would be wrong.
+    content = _DP_GATE.read_bytes()
+
+    # Compute canonical hash using the standard (gate-only zeroing) approach
+    canonical_standard = re.sub(
+        rb'(?<=_KNOWN_GOOD_GATE_HASH: str = ")[0-9a-fA-F]{64}',
+        b"0" * 64,
+        content,
+    )
+    hash_standard = hashlib.sha256(canonical_standard).hexdigest()
+
+    # Compute with BOTH constants zeroed out
+    canonical_both = re.sub(
+        rb'(?<=_KNOWN_GOOD_SETTINGS_HASH: str = ")[0-9a-fA-F]{64}',
+        b"0" * 64,
+        canonical_standard,
+    )
+    hash_both = hashlib.sha256(canonical_both).hexdigest()
+
+    # The two hashes MUST differ — if they are equal, the settings hash constant
+    # does not appear in the file at all, which is a bug.
+    assert hash_standard != hash_both, (
+        "Canonical hash is identical whether or not settings hash is zeroed. "
+        "_KNOWN_GOOD_SETTINGS_HASH may be absent from security_gate.py."
+    )
+
+    # The embedded gate hash must match the STANDARD (gate-only) approach, not
+    # the both-zeroed approach.
+    m = re.search(rb'_KNOWN_GOOD_GATE_HASH: str = "([0-9a-f]{64})"', content)
+    assert m is not None, "_KNOWN_GOOD_GATE_HASH not found"
+    embedded = m.group(1).decode()
+    assert embedded == hash_standard, (
+        "Embedded gate hash does not match gate-only canonical hash. "
+        "update_hashes.py may be zeroing too many constants."
+    )
+
+
+# ===========================================================================
+# TST-1647: No __pycache__ in templates/coding
+# ===========================================================================
+
+def test_no_pycache_in_templates_coding():
+    # TST-1647 (Tester edge-case) — Importing security_gate from the
+    # templates/coding location must not create a __pycache__ directory there.
+    # Such a directory would pollute the template that gets copied to agent
+    # workspaces on first use.
+    tc_pycache = _TC_SCRIPTS / "__pycache__"
+    assert not tc_pycache.exists(), (
+        f"__pycache__ directory was created inside templates/coding: {tc_pycache}. "
+        "This pollutes the template. The import chain must avoid writing bytecode "
+        "into templates/coding (use sys.path with Default-Project only)."
+    )
