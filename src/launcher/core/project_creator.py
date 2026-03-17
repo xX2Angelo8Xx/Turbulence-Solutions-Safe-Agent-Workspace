@@ -42,6 +42,14 @@ def create_project(
         )
 
     shutil.copytree(str(template_path), str(target))
+
+    # Rename the internal "Project/" subfolder to match the user's project name.
+    # This gives the working folder a meaningful name (e.g. "MatlabDemo/").
+    internal_project = target / "Project"
+    renamed_project = target / folder_name
+    if internal_project.is_dir() and not renamed_project.exists():
+        internal_project.rename(renamed_project)
+
     return target
 
 

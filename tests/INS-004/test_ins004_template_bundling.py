@@ -282,7 +282,8 @@ def test_template_discoverable_and_copyable():
         assert (result / ".vscode" / "settings.json").is_file()
         assert (result / ".github" / "hooks" / "require-approval.json").is_file()
         assert (result / ".github" / "hooks" / "scripts" / "security_gate.py").is_file()
-        assert (result / "Project" / "app.py").is_file()
+        # GUI-016: 'Project/' is renamed to the user's project name after copytree.
+        assert (result / "test-project" / "app.py").is_file()
 
 
 # ---------------------------------------------------------------------------

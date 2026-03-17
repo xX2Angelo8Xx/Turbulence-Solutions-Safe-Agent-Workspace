@@ -1509,3 +1509,12 @@ TST-1521,test_all_lowercase_not_capitalised,Unit,GUI-015,Pass,2026-03-17,Windows
 TST-1522,test_all_uppercase_preserved,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,Uppercase folder_name not lowercased,Tester edge-case
 TST-1523,test_two_level_traversal_absorbed_stays_in_dest,Unit,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,2-level traversal absorbed by TS-SAE- prefix — result inside dest,Tester edge-case
 TST-1524,GUI-015 Tester - full regression suite,Regression,GUI-015,Pass,2026-03-17,Windows 11 + Python 3.11,2988 passed / 1 pre-existing (INS-005/BUG-045) / 29 skipped,No new regressions. 28 GUI-015 tests pass (15 dev + 13 tester).
+TST-1525,test_project_folder_renamed_to_user_name,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Project/ renamed to user's name
+TST-1526,test_original_project_folder_no_longer_exists,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Original Project/ folder removed after rename
+TST-1527,test_renamed_folder_contents_preserved,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,app.py exists under renamed folder
+TST-1528,test_root_folder_still_ts_sae_prefixed,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Root folder still TS-SAE-prefixed
+TST-1529,test_no_project_folder_does_not_raise,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,No exception when template has no Project/ folder
+TST-1530,test_different_project_name,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Rename works with Alpha123
+TST-1531,test_project_name_with_spaces,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Rename works with names containing spaces
+TST-1532,test_rename_does_not_collide_when_project_name_equals_project,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,folder_name=='Project' leaves folder intact (no self-rename)
+TST-1533,GUI-016 full regression suite,Regression,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,2996 passed / 1 pre-existing (INS-005) / 29 skipped,No new regressions introduced by GUI-016.
