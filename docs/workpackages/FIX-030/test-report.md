@@ -4,7 +4,7 @@
 **Tester:** Tester Agent  
 **Date:** 2026-03-17  
 **Branch:** fix/FIX-030-version-bump  
-**Verdict:** ❌ FAIL — Return to Developer  
+**Verdict:** ✅ PASS (Iteration 2)  
 
 ---
 
@@ -96,7 +96,62 @@ Reference counts from the previous baseline:
 
 ---
 
-## 5. Verdict: FAIL
+## 5. Verdict (Iteration 1): FAIL
+
+**(See Iteration 2 below for final outcome.)**
+
+Developer was returned the WP with the following TODOs:
+- Update all 38 stale version-snapshot tests across 12 files from `"2.0.0"` to `"2.0.1"`.
+
+---
+
+## 6. Iteration 2 — Re-Review (2026-03-17)
+
+**Developer fix:** Updated `EXPECTED_VERSION` constant (or direct assert value) to `"2.0.1"` in all 12 affected test files (38 tests total).
+
+### 6a. Spot-check of fixed test files
+
+| File | Key Change | Verified |
+|------|-----------|---------|
+| `tests/FIX-014/test_fix014_version_bump.py` | `EXPECTED_VERSION = "2.0.1"` | ✅ |
+| `tests/FIX-017/test_fix017_version_bump.py` | `EXPECTED_VERSION = "2.0.1"` | ✅ |
+| `tests/FIX-019/test_fix019_version_bump.py` | `EXPECTED_VERSION = "2.0.1"` | ✅ |
+| `tests/FIX-019/test_fix019_edge_cases.py` | `EXPECTED_VERSION = "2.0.1"` | ✅ |
+| `tests/FIX-020/test_fix020_version_bump.py` | `EXPECTED_VERSION = "2.0.1"` | ✅ |
+| `tests/FIX-020/test_fix020_edge_cases.py` | `EXPECTED_VERSION = "2.0.1"` | ✅ |
+| `tests/FIX-014/test_fix014_edge_cases.py` | `EXPECTED_VERSION = "2.0.1"` | ✅ |
+| `tests/FIX-010/test_fix010_cicd_pipeline.py` | `'MyAppVersion "2.0.1"'`; `'APP_VERSION="2.0.1"'` | ✅ |
+| `tests/INS-005/test_ins005_setup_iss.py` | `'MyAppVersion "2.0.1"'` | ✅ |
+| `tests/INS-006/test_ins006_build_dmg.py` | `"2.0.1"` | ✅ |
+| `tests/INS-007/test_ins007_build_appimage.py` | `"2.0.1"` | ✅ |
+
+### 6b. Source version locations re-verified
+
+| File | Value | Status |
+|------|-------|--------|
+| `src/launcher/config.py` | `VERSION: str = "2.0.1"` | ✅ |
+| `pyproject.toml` | `version = "2.0.1"` | ✅ |
+| `src/installer/windows/setup.iss` | `#define MyAppVersion "2.0.1"` | ✅ |
+| `src/installer/macos/build_dmg.sh` | `APP_VERSION="2.0.1"` | ✅ |
+| `src/installer/linux/build_appimage.sh` | `APP_VERSION="2.0.1"` | ✅ |
+
+### 6c. Full Regression Suite — Iteration 2
+
+**Command:** `.venv\Scripts\python -m pytest tests/ -q --tb=short`  
+**Result:** ✅ **3 failed (all pre-existing), 3328 passed, 29 skipped, 1 xfailed**  
+**TST logged:** TST-1777
+
+| Failure | Pre-existing? |
+|---------|--------------|
+| `FIX-009::test_tst_ids_sequential_no_gaps_in_renumbered_range` | ✅ Pre-existing |
+| `FIX-009::test_no_duplicate_tst_ids` | ✅ Pre-existing |
+| `INS-005::test_uninstall_delete_type_is_filesandirs` | ✅ Pre-existing (BUG-045) |
+
+All 38 version-snapshot regressions are resolved. No new failures introduced.
+
+---
+
+## 7. Final Verdict: ✅ PASS
 
 ### Reason
 
