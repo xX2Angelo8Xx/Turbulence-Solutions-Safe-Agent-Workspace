@@ -1518,3 +1518,7 @@ TST-1530,test_different_project_name,Unit,GUI-016,Pass,2026-03-17,Windows 11 + P
 TST-1531,test_project_name_with_spaces,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Rename works with names containing spaces
 TST-1532,test_rename_does_not_collide_when_project_name_equals_project,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,folder_name=='Project' leaves folder intact (no self-rename)
 TST-1533,GUI-016 full regression suite,Regression,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,2996 passed / 1 pre-existing (INS-005) / 29 skipped,No new regressions introduced by GUI-016.
+TST-1534,test_empty_folder_name_does_not_raise_and_project_folder_preserved,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Empty folder_name does not raise; guard blocks rename; Project/ preserved
+TST-1535,test_name_conflicts_with_existing_vscode_dir,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Rename blocked when folder_name matches existing .vscode dir in template
+TST-1536,test_name_conflicts_with_existing_github_dir,Unit,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Rename blocked when folder_name matches existing .github dir in template
+TST-1537,GUI-016 Tester full regression suite,Regression,GUI-016,Pass,2026-03-17,Windows 11 + Python 3.11,11 passed (GUI-016) / 2996 total / 1 pre-existing (INS-005) / 29 skipped,Tester pass — all 11 GUI-016 tests pass; no regressions

@@ -119,3 +119,54 @@ class TestRenameProjectFolder:
         # The folder must still be "Project" because rename target == source
         assert (result / "Project").is_dir()
         assert (result / "Project" / "main.py").is_file()
+
+    def test_empty_folder_name_does_not_raise_and_project_folder_preserved(
+        self, tmp_template_with_project: Path, tmp_dest: Path
+    ) -> None:
+        """An empty folder_name must not raise — guard prevents rename onto the root target."""
+        # Path(target) / "" resolves to target itself, so renamed_project.exists() is
+        # True immediately after copytree, causing the guard to skip the rename safely.
+        result = create_project(tmp_template_with_project, tmp_dest, "")
+        assert result.is_dir()
+        # Project/ must not have been renamed — it stays as "Project"
+        assert (result / "Project").is_dir()
+
+    def test_name_conflicts_with_existing_vscode_dir(
+        self, tmp_dest: Path, tmp_path: Path
+    ) -> None:
+        """If folder_name matches an existing dir in the template ('.vscode'), rename is blocked."""
+        template = tmp_path / "template_vscode"
+        template.mkdir()
+        (template / "README.md").write_text("readme")
+        project_dir = template / "Project"
+        project_dir.mkdir()
+        (project_dir / "app.py").write_text("# app")
+        vscode_dir = template / ".vscode"
+        vscode_dir.mkdir()
+        (vscode_dir / "settings.json").write_text("{}")
+
+        result = create_project(template, tmp_dest, ".vscode")
+        # Rename is blocked because .vscode already exists — Project/ is preserved
+        assert (result / "Project").is_dir()
+        assert (result / ".vscode").is_dir()
+        assert (result / ".vscode" / "settings.json").is_file()
+
+    def test_name_conflicts_with_existing_github_dir(
+        self, tmp_dest: Path, tmp_path: Path
+    ) -> None:
+        """If folder_name matches .github (an existing dir in the template), rename is blocked."""
+        template = tmp_path / "template_github"
+        template.mkdir()
+        (template / "README.md").write_text("readme")
+        project_dir = template / "Project"
+        project_dir.mkdir()
+        (project_dir / "main.py").write_text("# main")
+        github_dir = template / ".github"
+        github_dir.mkdir()
+        (github_dir / "CODEOWNERS").write_text("* @team")
+
+        result = create_project(template, tmp_dest, ".github")
+        # Rename is blocked because .github already exists — Project/ is preserved
+        assert (result / "Project").is_dir()
+        assert (result / ".github").is_dir()
+        assert (result / ".github" / "CODEOWNERS").is_file()
