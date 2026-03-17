@@ -1565,7 +1565,7 @@ TST-1576,test_long_name_multiple_occurrences,Unit,DOC-001,Pass,2026-03-17,Window
 TST-1577,test_five_levels_deep,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.md file 5 directory levels deep is found and replaced
 TST-1578,test_mixed_depth_all_replaced,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Files at top / mid / 7-levels-deep all replaced in single pass
 TST-1579,test_readonly_md_with_no_placeholder_not_written,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Read-only .md without placeholders skipped without PermissionError
-TST-1580,test_readonly_md_with_placeholder_raises_or_skips,Unit,DOC-001,XFail,2026-03-17,Windows 11 + Python 3.11,XFail,Read-only .md with placeholder raises PermissionError on write — logged as BUG-052
+TST-1580,test_readonly_md_with_placeholder_raises_or_skips,Unit,DOC-001,XFail,2026-03-17,Windows 11 + Python 3.11,XFail,Read-only .md with placeholder raises PermissionError on write ï¿½ logged as BUG-052
 TST-1581,test_only_project_name,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.md file with only PROJECT_NAME placeholder handled correctly
 TST-1582,test_only_workspace_name,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,.md file with only WORKSPACE_NAME placeholder handled correctly
 TST-1583,test_project_name_placeholder_repeated_workspace_absent,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,50 occurrences of PROJECT_NAME all replaced; WORKSPACE_NAME absence causes no error
@@ -1574,3 +1574,5 @@ TST-1585,test_no_cross_contamination_between_files,Unit,DOC-001,Pass,2026-03-17,
 TST-1586,test_some_files_no_placeholder,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Static .md file untouched; placeholder file updated correctly
 TST-1587,test_mixed_file_types_in_same_directory,Unit,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,Pass,Only .md file in mixed-type directory is processed
 TST-1588,DOC-001 full suite (31 tests + 1 xfail),Regression,DOC-001,Pass,2026-03-17,Windows 11 + Python 3.11,30 passed / 1 xfailed / 0 failures,All developer and tester tests pass; 2 pre-existing unrelated failures (GUI-017 dup TST-1557 + INS-005)
+TST-1589,test_doc002_readme_placeholders (17 tests),Unit/Integration,DOC-002,Pass,2026-03-17,Windows 11 + Python 3.11,17 passed / 0 failures,Static content checks + replace_template_placeholders unit tests + create_project integration tests; all pass
+TST-1590,DOC-002 full suite regression,Regression,DOC-002,Pass,2026-03-17,Windows 11 + Python 3.11,3063 passed / 7 pre-existing failures / 29 skipped / 1 xfailed,17 new DOC-002 tests pass; no regressions; pre-existing failures in FIX-009 and INS-005 are unrelated
