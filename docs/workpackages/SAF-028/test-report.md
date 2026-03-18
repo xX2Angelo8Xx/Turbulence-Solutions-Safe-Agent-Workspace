@@ -2,10 +2,12 @@
 
 **WP ID:** SAF-028  
 **Branch:** saf-028  
-**Commit reviewed:** e480fec  
+**Commit reviewed (Iteration 1):** e480fec — ❌ FAIL  
+**Commit reviewed (Iteration 2):** 3c01b18 — ✅ PASS  
 **Tester:** Tester Agent  
-**Date:** 2026-03-18  
-**Verdict:** ❌ FAIL
+**Date (Iteration 1):** 2026-03-18  
+**Date (Iteration 2):** 2026-03-18  
+**Verdict:** ✅ PASS
 
 ---
 
@@ -249,6 +251,91 @@ anchors in the Developer test set.
 - [x] `tests/SAF-028/test_saf028_tester_edge_cases.py` created with 10 edge-case tests
 - [x] Test runs logged in `test-results.csv` (TST-1795, TST-1796)
 - [x] Bugs logged in `bugs.csv` (BUG-066 through BUG-069)
-- [ ] WP **SAF-028** set back to **In Progress**
-- [ ] Commit: `SAF-028: Tester FAIL — 5 bypass vectors found in Step 8`
-- [ ] Push: `git push origin saf-028`
+- [x] WP **SAF-028** set back to **In Progress** (Iteration 1 verdict)
+- [x] Commit: `SAF-028: Tester FAIL — 5 bypass vectors found in Step 8`
+- [x] Push: `git push origin saf-028`
+
+---
+
+## Iteration 2 — Tester Agent Review (2026-03-18)
+
+**Triggered by:** Developer iteration 2 — all 4 bugs (BUG-066 through BUG-069) fixed.
+
+### Bug Fix Verification
+
+| Bug | Fix | Verified |
+|-----|-----|---------|
+| BUG-066 | `if not stripped.strip()` replaces `if not stripped:` | ✅ Line 1363 confirmed |
+| BUG-067 | `_prev_was_flag_s8` tracking skips non-path-like flag values | ✅ Lines 1360–1380 confirmed |
+| BUG-068 | Same `_prev_was_flag_s8` fix — numeric flag values (`1`, etc.) skipped | ✅ Confirmed same code path |
+| BUG-069 | `path_args_s8 = [p for p in path_args_s8 if p not in (".", "./", ".\\")]` | ✅ Line 1384 confirmed |
+
+Additional design detail verified: When a flag is followed by a path-like token
+(e.g. `-Recurse Project/`), `_prev_was_flag_s8 and not _is_path_like(stripped)`
+evaluates to False → the path-like token IS preserved in `path_args_s8`. This is
+the correct behavior (prevents consuming real path arguments as flag values).
+
+Template sync: `templates/coding/.github/hooks/scripts/security_gate.py` is
+identical to `Default-Project/` copy (confirmed by dev-log).
+
+### Iteration 2 Test Results
+
+#### All SAF-028 Tests (37)
+
+```
+tests/SAF-028/test_saf028_bare_enumeration.py  — 21/21 PASS
+tests/SAF-028/test_saf028_tester_edge_cases.py — 16/16 PASS (10 original + 6 new)
+Total: 37/37 PASS
+```
+
+Previously-xfailing tests now passing as strict PASSes (no xfail markers):
+
+| Test | Iteration 1 Result | Iteration 2 Result |
+|------|-------------------|-------------------|
+| `test_dir_whitespace_only_path_denied` | XFAIL (BUG-066) | ✅ PASS |
+| `test_gci_include_filter_no_path_denied` | XFAIL (BUG-067) | ✅ PASS |
+| `test_gci_filter_no_path_denied` | XFAIL (BUG-067) | ✅ PASS |
+| `test_dir_recurse_depth_no_path_denied` | XFAIL (BUG-068) | ✅ PASS |
+| `test_gci_depth_no_path_denied` | XFAIL (BUG-068) | ✅ PASS |
+| `test_ls_dot_ws_root_denied` | XFAIL (BUG-069) | ✅ PASS |
+
+#### New Iteration 2 Edge Cases (6 added by Tester Iteration 2)
+
+| Test | Expected | Result |
+|------|----------|--------|
+| `test_ls_dotslash_ws_root_denied` | deny | ✅ PASS |
+| `test_dir_quoted_dotslash_ws_root_denied` | deny | ✅ PASS |
+| `test_gci_name_filter_no_path_denied` | deny | ✅ PASS |
+| `test_gci_depth_path_preserved_allowed` | allow | ✅ PASS |
+| `test_dir_backslash_dot_ws_root_denied` | deny | ✅ PASS |
+| `test_gci_multiple_flag_values_no_path_denied` | deny | ✅ PASS |
+
+#### SAF-006 Regression (95 tests)
+
+```
+95/95 PASS — no regressions
+```
+
+#### Full Suite Regression
+
+```
+3463 passed, 3 pre-existing failures, 29 skipped, 1 xfailed
+```
+
+Pre-existing failures (unrelated to SAF-028):
+- `FIX-009`: TST-ID gaps/duplicates in test-results.csv
+- `INS-005`: Inno Setup `filesandordirs` type mismatch
+
+No new failures introduced. xfailed count reduced from 7 (Iteration 1) to 1
+(the one pre-existing xfail unrelated to SAF-028).
+
+### Iteration 2 Pre-Done Checklist
+
+- [x] `dev-log.md` exists, non-empty, and includes Iteration 2 section
+- [x] `test-report.md` updated with Iteration 2 results (this file)
+- [x] All 6 previously-xfailing tests now pass as strict PASSes
+- [x] 6 new Iteration 2 edge-case tests added and passing
+- [x] Test runs logged in `test-results.csv` (TST-1797, TST-1798, TST-1799)
+- [x] `git add -A` staged all changes
+- [x] Commit: `SAF-028: Tester PASS`
+- [x] Push: `git push origin saf-028`

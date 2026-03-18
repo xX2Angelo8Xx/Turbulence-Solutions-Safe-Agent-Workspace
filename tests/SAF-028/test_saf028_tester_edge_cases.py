@@ -156,3 +156,66 @@ def test_ls_dot_ws_root_denied():
     Actual (BUG): ALLOW — zone classifier returns 'allow' for workspace root.
     """
     assert is_deny("ls .")
+
+
+# ===========================================================================
+# ITERATION 2 EDGE CASES — additional tests added after BUG-066/067/068/069
+# fixes to verify boundary conditions of the fix implementations.
+# ===========================================================================
+
+def test_ls_dotslash_ws_root_denied():
+    """`ls ./` from workspace root — './' is same as '.' → DENY.
+
+    BUG-069 fix filters both '.' and './' from path_args_s8.
+    './'' is a common CWD reference that should not bypass the ancestor check.
+    """
+    assert is_deny("ls ./")
+
+
+def test_dir_quoted_dotslash_ws_root_denied():
+    """`dir "./"` — quoted './' is stripped to './' and filtered → DENY.
+
+    The BUG-069 filter catches the raw string './' after quote stripping.
+    Quoted form should not bypass the filter.
+    """
+    assert is_deny('dir "./"')
+
+
+def test_gci_name_filter_no_path_denied():
+    """`gci -Name *.py` — -Name flag value should not count as a path argument.
+
+    Expected: DENY — '*.py' (value of -Name) is non-path-like → _prev_was_flag
+    skip applies → path_args_s8 empty → CWD check fires → DENY.
+    """
+    assert is_deny("gci -Name *.py")
+
+
+def test_gci_depth_path_preserved_allowed():
+    """`gci -Depth 2 /workspace/project` — numeric value skipped, explicit
+    path to project folder is preserved in path_args_s8 → ALLOW.
+
+    After BUG-068 fix: '2' (flag value) is consumed by _prev_was_flag_s8 skip.
+    The explicit absolute project path '/workspace/project' is path-like and is
+    preserved in path_args_s8.  CWD check never fires; Step 5 zone-classifies
+    the path as allow → overall allow.
+    """
+    assert is_allow("gci -Depth 2 /workspace/project")
+
+
+def test_dir_backslash_dot_ws_root_denied():
+    r"""`dir .\ ` from workspace root — '.\' is Windows CWD reference → DENY.
+
+    BUG-069 fix filters '.\' from path_args_s8.  The Windows-style current-
+    directory reference should be treated the same as '.' and './'.
+    """
+    assert is_deny("dir .\\")
+
+
+def test_gci_multiple_flag_values_no_path_denied():
+    """`gci -Include *.py -Exclude *.pyc` — two flag values, no path → DENY.
+
+    Both '*.py' and '*.pyc' are non-path-like tokens following a flag, so they
+    are consumed by _prev_was_flag_s8.  path_args_s8 remains empty → CWD
+    ancestor check fires → DENY from workspace root.
+    """
+    assert is_deny("gci -Include *.py -Exclude *.pyc")
