@@ -2,46 +2,65 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-03-18  
-**Iteration:** 1
+**Iteration:** 2 (Re-test after BUG-063, BUG-064, BUG-065 fixes)
 
 ---
 
 ## Summary
 
-**FAIL.** The `_scan_python_inline_code()` implementation passes the developer's 50 tests but contains 3 bypass vulnerabilities in Category B (obfuscation) and Category C (network). Tester edge-case tests revealed that `import requests` without a method call, aliased requests imports, `from http import server/client`, and bare `import codecs` all bypass the scanner. These violate acceptance criteria AC-3 and AC-4 of US-027.
+**PASS.** All 3 bugs identified in Iteration 1 have been correctly fixed. All 81 tests pass (50 original developer tests + 6 new bug-regression tests added by developer + 25 Tester edge-case tests). The 5 previously-failing bypass-vector tests now all return `False` (DENIED) as required. All SAF-017 regressions are clean. The full suite shows only pre-existing failures (FIX-009 encoding corruption, INS-005 BUG-045, SAF-028 unimplemented) — none caused by SAF-026 changes.
 
 ---
 
-## Tests Executed
+## Iteration 1 Summary (Historical)
+
+**FAIL.** The `_scan_python_inline_code()` implementation passed the developer's 50 tests but contained 3 bypass vulnerabilities in Category B (obfuscation) and Category C (network). Tester edge-case tests revealed that `import requests` without a method call, aliased requests imports, `from http import server/client`, and bare `import codecs` all bypassed the scanner. These violated acceptance criteria AC-3 and AC-4 of US-027.
+
+---
+
+## Iteration 2 — Tests Executed
 
 | Test | Type | Result | Notes |
 |------|------|--------|-------|
-| Developer suite (50 tests) — `tests/SAF-026/test_saf026_python_c_scanning.py` | Unit + Security | PASS 50/50 | All developer tests pass |
-| Tester edge-case suite (25 tests) — `tests/SAF-026/test_saf026_edge_cases.py` | Security | FAIL 20/25 | 5 failures: bypass vectors |
-| SAF-017 regression (74 tests) | Regression | PASS 74/74 | No regressions from SAF-026 changes |
-| Full suite regression (−SAF-028) | Regression | FAIL | 5 new failures from edge-case suite + 3 pre-existing (BUG-063, BUG-064, BUG-065 logged) |
+| Developer suite (50 tests) — `tests/SAF-026/test_saf026_python_c_scanning.py` | Unit + Security | PASS 50/50 | All original developer tests pass |
+| Developer bug-regression tests (6 new) — `tests/SAF-026/test_saf026_python_c_scanning.py` | Regression | PASS 6/6 | BUG-063/064/065 regression tests (requests alone, aliased requests, from http import server, from http import client, codecs alone, codecs.encode) |
+| Tester edge-case suite (25 tests) — `tests/SAF-026/test_saf026_edge_cases.py` | Security | PASS 25/25 | All 5 previously-failing bypass tests now pass |
+| SAF-017 regression (74 tests) | Regression | PASS 74/74 | No regressions from SAF-026 pattern changes |
+| Full suite regression | Regression | PASS (effectively) | 3435 passed / 15 pre-existing only / 29 skipped / 1 xfailed — 0 new SAF-026 failures |
 
 ---
 
-## Bugs Found
+## Iteration 2 — Bug Fix Verification
 
-- **BUG-063**: `import requests` bypasses Category C scanner — `\brequests\.` regex requires a dot; bare import and aliased imports allowed  
-- **BUG-064**: `from http import server` / `from http import client` bypass Category C scanner — substring `"http.server"` / `"http.client"` not matched by from-import syntax  
-- **BUG-065**: `import codecs` alone bypasses Category B scanner — only `"codecs.decode"` is in the deny list; bare codecs import and `codecs.encode` are not blocked  
+| Bug | Fix Applied | Verification |
+|-----|-------------|--------------|
+| BUG-063 (requests regex) | `\brequests\.` → `\brequests\b` in `_scan_python_inline_code()` | `test_requests_import_alone_denied` PASS; `test_requests_import_aliased_denied` PASS |
+| BUG-064 (http from-import) | Added `"http"` to Category C net list (replacing only `"http.client"` and `"http.server"`) | `test_from_http_import_server_denied` PASS; `test_from_http_import_client_denied` PASS |
+| BUG-065 (bare codecs) | Changed `"codecs.decode"` → `"codecs"` in Category B pattern list | `test_codecs_import_alone_denied` PASS; `test_codecs_encode_rot13_denied` PASS |
 
-All three are logged in `docs/bugs/bugs.csv`.
+Both `Default-Project/.github/hooks/scripts/security_gate.py` and `templates/coding/.github/hooks/scripts/security_gate.py` contain identical fixes.
 
 ---
 
-## Failing Tests
+## Previously Iteration 1 — Bugs Found
 
-| Test Name | Root Cause | Bug |
+- **BUG-063**: `import requests` bypassed Category C scanner — `\brequests\.` regex required a dot; bare import and aliased imports were allowed  
+- **BUG-064**: `from http import server` / `from http import client` bypassed Category C scanner — substring `"http.server"` / `"http.client"` not matched by from-import syntax  
+- **BUG-065**: `import codecs` alone bypassed Category B scanner — only `"codecs.decode"` was in the deny list; bare codecs import and `codecs.encode` were not blocked  
+
+All three were logged in `docs/bugs/bugs.csv`. All three are now fixed.
+
+---
+
+## Previously Iteration 1 — Failing Tests (Now Fixed)
+
+| Test Name | Root Cause (Fixed) | Bug |
 |-----------|-----------|-----|
-| `test_requests_import_alone_denied` | `re.search(r'\brequests\.', low)` misses bare `import requests` | BUG-063 |
-| `test_requests_import_aliased_denied` | Aliased use `import requests as r; r.get(...)` has no `requests.` — not caught | BUG-063 |
-| `test_from_http_import_server_denied` | `"http.server"` not a substring of `"from http import server"` | BUG-064 |
-| `test_from_http_import_client_denied` | `"http.client"` not a substring of `"from http import client"` | BUG-064 |
-| `test_codecs_import_alone_denied` | Only `"codecs.decode"` checked; bare `import codecs` allowed | BUG-065 |
+| `test_requests_import_alone_denied` | `re.search(r'\brequests\.', low)` missed bare `import requests` | BUG-063 ✓ |
+| `test_requests_import_aliased_denied` | Aliased use `import requests as r; r.get(...)` had no `requests.` | BUG-063 ✓ |
+| `test_from_http_import_server_denied` | `"http.server"` not a substring of `"from http import server"` | BUG-064 ✓ |
+| `test_from_http_import_client_denied` | `"http.client"` not a substring of `"from http import client"` | BUG-064 ✓ |
+| `test_codecs_import_alone_denied` | Only `"codecs.decode"` checked; bare `import codecs` was allowed | BUG-065 ✓ |
 
 ---
 
@@ -76,11 +95,17 @@ _scan_python_inline_code("import codecs; codecs.encode('x', 'rot_13')")   # → 
 
 - [ ] **Fix BUG-065 (codecs):** Change `"codecs.decode"` to `"codecs"` in the Category B pattern list. `"codecs"` alone is a narrow enough token that false-positive risk is negligible.
 
-- [ ] **After fixing:** Run `update_hashes.py` to refresh `_KNOWN_GOOD_GATE_HASH` in security_gate.py.
+- [x] **Fix BUG-063 (requests):** DONE — `re.search(r'\brequests\b', low)` 
 
-- [ ] **After fixing:** Sync `templates/coding/.github/hooks/scripts/security_gate.py` with Default-Project (byte-identical check must pass).
+- [x] **Fix BUG-064 (http from-import):** DONE — `"http"` added to Category C net list  
 
-- [ ] **Re-run full test suite** and confirm: (a) all 50 developer tests still pass, (b) all 25 Tester edge-case tests now pass, (c) no new regressions.
+- [x] **Fix BUG-065 (codecs):** DONE — `"codecs"` replaces `"codecs.decode"` in Category B  
+
+- [x] **After fixing:** `update_hashes.py` run; `_KNOWN_GOOD_GATE_HASH` updated.
+
+- [x] **After fixing:** `templates/coding/.github/hooks/scripts/security_gate.py` synced with Default-Project.
+
+- [x] **Re-run full test suite:** (a) all 50 developer tests pass ✓, (b) all 25 Tester edge-case tests pass ✓, (c) no new regressions ✓
 
 ---
 
@@ -94,4 +119,4 @@ _scan_python_inline_code("import codecs; codecs.encode('x', 'rot_13')")   # → 
 
 ## Verdict
 
-**FAIL** — Return SAF-026 to `In Progress`. Developer must fix BUG-063, BUG-064, and BUG-065, then re-submit for Tester review.
+**PASS (Iteration 2)** — All 81 tests pass. BUG-063, BUG-064, and BUG-065 are verified fixed. SAF-026 set to `Done`.
