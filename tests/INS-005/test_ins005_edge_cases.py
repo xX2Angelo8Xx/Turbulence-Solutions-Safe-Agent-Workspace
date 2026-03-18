@@ -192,11 +192,11 @@ class TestShortcutsAndUninstaller:
             "Desktop shortcut task must have 'Flags: unchecked' so it is opt-in only"
         )
 
-    def test_uninstall_delete_type_is_filesandirs(self):
-        """UninstallDelete entry must use 'filesandirs' to clean up the entire install tree."""
+    def test_uninstall_delete_type_is_filesandordirs(self):
+        """UninstallDelete entry must use 'filesandordirs' to clean up the entire install tree."""
         content = read_iss()
-        assert re.search(r"Type:\s*filesandirs", content), (
-            "UninstallDelete must use 'Type: filesandirs' to remove all installed files"
+        assert re.search(r"Type:\s*filesandordirs", content), (
+            "UninstallDelete must use 'Type: filesandordirs' to remove all installed files"
         )
 
     def test_uninstall_targets_app_macro(self):
