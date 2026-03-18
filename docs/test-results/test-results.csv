@@ -1695,3 +1695,9 @@ TST-1787,SAF-026 BUG-063/064/065 fix -- SAF-017 regression (74 tests),Regression
 TST-1810,FIX-034 Developer test suite re-run by Tester (40 tests),Unit,FIX-034,Pass,2026-03-18,Windows 11 + Python 3.11,40 passed / 0 failures,Tester verified: all 40 developer tests pass
 TST-1811,FIX-034 Tester edge-case suite (17 tests),Security,FIX-034,Pass,2026-03-18,Windows 11 + Python 3.11,17 passed / 0 failures,Path traversal; unicode RLO; null bytes; venv-name variants; whitespace padding; non-venv PS1; pipe bypass; double activation
 TST-1812,FIX-034 Tester regression suite (FIX-034+033+023+SAF-020+032 - 294 tests),Regression,FIX-034,Pass,2026-03-18,Windows 11 + Python 3.11,294 passed / 0 failures,Zero regressions across all related workpackages
+"TST-1813","FIX-037","test_script_contains_dist_info_find_command","PASS","2026-03-18","Developer Agent"
+"TST-1814","FIX-037","test_dist_info_removal_before_codesign","PASS","2026-03-18","Developer Agent"
+"TST-1815","FIX-037","test_removal_targets_internal_directory","PASS","2026-03-18","Developer Agent"
+"TST-1816","FIX-037","test_removal_uses_rm_rf","PASS","2026-03-18","Developer Agent"
+"TST-1817","FIX-037","test_codesign_steps_still_present","PASS","2026-03-18","Developer Agent"
+"TST-1818","FIX-037","test_error_suppression_present","PASS","2026-03-18","Developer Agent"

@@ -97,6 +97,13 @@ cat > "${APP_BUNDLE}/Contents/Info.plist" << PLIST
 PLIST
 
 # ---------------------------------------------------------------------------
+# Step 3.1: Remove .dist-info directories (Python package metadata not needed
+# at runtime; macOS codesign cannot process them as bundle subcomponents)
+# ---------------------------------------------------------------------------
+echo "==> Removing .dist-info directories from bundle..."
+find "${APP_BUNDLE}/Contents/MacOS/_internal" -type d -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true
+
+# ---------------------------------------------------------------------------
 # Step 3.5: Ad-hoc code signing (bottom-up to avoid python3.11 dir issue)
 # ---------------------------------------------------------------------------
 echo "Step 3.5: Code signing (bottom-up)..."
