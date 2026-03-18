@@ -1,4 +1,6 @@
 ID,Test Name,Test Type,WP Reference,Status,Run Date,Environment,Result,Notes
+TST-1796,SAF-028 Tester full suite regression,Regression,SAF-028,Pass,2026-03-18,Windows 11 + Python 3.11,3451 passed / 3 pre-existing failures / 29 skipped / 7 xfailed,Pre-existing: FIX-009 TST-ID gaps+duplicates + INS-005 BUG-045; 6 new xfailed = 5 bypass vectors found; Tester Agent
+TST-1795,SAF-028 Tester edge-case bypass tests (10 tests),Security,SAF-028,Fail,2026-03-18,Windows 11 + Python 3.11,4 passed / 6 xfailed (BUG-066 BUG-067 BUG-068 BUG-069),Bypass vectors: whitespace-only arg; flag values (-Include/-Filter/-Depth); explicit dot path; Tester Agent
 TST-1791,SAF-028 bare enumeration protection (21 tests),Security,SAF-028,Pass,2026-03-18,Windows 11 + Python 3.11,21 passed / 0 failures,Step 8 CWD ancestor check implemented; all bare listing verb tests pass; Developer Agent
 TST-1792,SAF-028 SAF-006 regression (65 tests),Regression,SAF-006,Pass,2026-03-18,Windows 11 + Python 3.11,65 passed / 0 failures,No regressions in SAF-006 recursive enumeration protection; Developer Agent
 TST-1793,SAF-028 SAF-026 regression (111 tests),Regression,SAF-026,Pass,2026-03-18,Windows 11 + Python 3.11,111 passed / 0 failures,No regressions in SAF-026; Developer Agent

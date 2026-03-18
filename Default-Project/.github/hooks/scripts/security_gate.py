@@ -70,7 +70,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "04a2c46373be6a3fdd9ca29f85b6d610e8d037dea7a200c2231856f64eed3e70"
+_KNOWN_GOOD_GATE_HASH: str = "6e7ba5a031f62af8a627a6f263d0fd2ba4ed4bb24996e244536042eafa292704"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1357,17 +1357,31 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
     if verb in _BARE_LISTING_VERBS:
         _WIN_FLAG_RE_S8 = re.compile(r'^/[a-zA-Z0-9]{1,2}$')
         path_args_s8 = []
+        _prev_was_flag_s8 = False
         for tok in args:
             stripped = tok.strip("\"'")
-            if not stripped:  # empty quoted string — not a real path
+            if not stripped.strip():  # empty or whitespace-only — not a real path
+                _prev_was_flag_s8 = False
                 continue
             if stripped.startswith("-"):
+                _prev_was_flag_s8 = True
                 continue
             if _WIN_FLAG_RE_S8.match(stripped):
+                _prev_was_flag_s8 = False  # Windows short flags don't take values
                 continue
             if _ENV_ASSIGN_RE.match(stripped):
+                _prev_was_flag_s8 = False
                 continue
+            if _prev_was_flag_s8 and not _is_path_like(stripped):
+                # Non-path token immediately following a flag is the flag's
+                # value (e.g. -Depth 1, -Include *.py) — not a path argument.
+                _prev_was_flag_s8 = False
+                continue
+            _prev_was_flag_s8 = False
             path_args_s8.append(stripped)
+
+        # BUG-069: bare '.' means CWD — treat as no-path-arg for this check
+        path_args_s8 = [p for p in path_args_s8 if p not in (".", "./", ".\\")]
 
         if not path_args_s8:
             # No explicit path arg — use CWD as implicit target

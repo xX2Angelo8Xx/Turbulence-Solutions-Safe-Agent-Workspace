@@ -88,3 +88,40 @@ Test file: `tests/SAF-028/test_saf028_bare_enumeration.py`
 ## Known Limitations
 
 None. The fix is narrow in scope and does not affect any other security checks.
+
+---
+
+## Iteration 2 — 2026-03-18
+
+**Triggered by:** Tester Agent review (test-report.md) — 4 bypass vectors found.
+
+### Bugs Fixed
+
+| Bug | Command | Fix Applied |
+|-----|---------|-------------|
+| BUG-066 | `dir "   "` | Changed `if not stripped:` → `if not stripped.strip():` to exclude whitespace-only tokens |
+| BUG-067 | `gci -Include *.py`, `gci -Filter *.py` | Added `_prev_was_flag_s8` tracking; non-path tokens following a flag are skipped as flag values |
+| BUG-068 | `dir -Recurse -Depth 1`, `Get-ChildItem -Depth 1` | Same `_prev_was_flag_s8` fix covers numeric flag values |
+| BUG-069 | `ls .` | After collecting `path_args_s8`, filter out `.` and `./` — bare dot is semantically CWD |
+
+### Implementation Notes
+
+- `_prev_was_flag_s8` uses a path-aware skip: if the token following a `-`-prefixed flag IS `_is_path_like()`, it is still added to `path_args_s8` (handles `-Recurse Project/` correctly — `Project/` must not be consumed as `-Recurse`'s "value").
+- Windows-style short flags (`/b`, `/a`) set `_prev_was_flag_s8 = False` since they do not consume a following value token.
+- Hash constant `_KNOWN_GOOD_GATE_HASH` re-updated via `update_hashes.py`.
+- Template at `templates/coding/.github/hooks/scripts/security_gate.py` re-synced.
+- `@pytest.mark.xfail` markers removed from 6 tests in `test_saf028_tester_edge_cases.py`.
+
+### Files Changed
+
+1. `Default-Project/.github/hooks/scripts/security_gate.py` — Step 8 bugfixes + hash updated
+2. `templates/coding/.github/hooks/scripts/security_gate.py` — synced
+3. `tests/SAF-028/test_saf028_tester_edge_cases.py` — xfail markers removed
+
+### Test Results
+
+| Suite | Pass | Fail |
+|-------|------|------|
+| tests/SAF-028/ (all) | 31 | 0 |
+| tests/SAF-006/ | 65 | 0 |
+| tests/SAF-026/ | 111 | 0 |
