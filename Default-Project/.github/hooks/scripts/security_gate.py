@@ -70,7 +70,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "d05bafc08230c5cf7ce2edf736652f1258dd05004b5e7c65a087a436cef4591a"
+_KNOWN_GOOD_GATE_HASH: str = "cc63c8b7100c9cbf1fb7b6bc529987df91b5446d6dd6191106c2f4c1f0105c7a"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1296,7 +1296,21 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                         if "*" not in stripped and "?" not in stripped and "[" not in stripped:
                             norm_fb = posixpath.normpath(stripped.replace("\\", "/"))
                             parts_fb = [p for p in norm_fb.split("/") if p and p not in (".", "..")]
-                            if len(parts_fb) >= 2 or (len(parts_fb) == 1 and stripped.rstrip().endswith("/")):
+                            # FIX-033: dot-prefix single-segment names (.venv, .env,
+                            # .gitignore) are always filesystem paths — include them
+                            # in the project-folder fallback without requiring a
+                            # trailing slash.  We test norm_fb (not raw stripped) so
+                            # that "./file.txt" (stripped starts with ".", but
+                            # norm_fb is "file.txt") is NOT included.  
+                            # _try_project_fallback already rejects deny-zone names
+                            # (.github, .vscode, noagentzone).
+                            if len(parts_fb) >= 2 or (
+                                len(parts_fb) == 1
+                                and (
+                                    stripped.rstrip().endswith("/")
+                                    or norm_fb.startswith(".")
+                                )
+                            ):
                                 if _try_project_fallback(norm_fb, ws_root):
                                     _prev_was_flag = False
                                     continue
@@ -1318,13 +1332,20 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                     return False
                 if _is_path_like(target):
                     if not _check_path_arg(target, ws_root):
-                        # FIX-032: try project-folder fallback for redirect targets.
+                        # FIX-032/033: try project-folder fallback for redirect targets.
                         # Applies the same multi-segment guard as step 5 to prevent
                         # bare single-segment names from resolving project-locally.
+                        # FIX-033: dot-prefix names (.env, .gitignore) are always paths.
+                        # Use norm_redir (not raw target) so that "./file" does not
+                        # incorrectly match the dot-prefix condition.
                         norm_redir = posixpath.normpath(target.replace("\\", "/"))
                         parts_redir = [p for p in norm_redir.split("/") if p and p not in (".", "..")]
                         if len(parts_redir) >= 2 or (
-                            len(parts_redir) == 1 and target.rstrip().endswith("/")
+                            len(parts_redir) == 1
+                            and (
+                                target.rstrip().endswith("/")
+                                or norm_redir.startswith(".")
+                            )
                         ):
                             if _try_project_fallback(norm_redir, ws_root):
                                 continue  # allowed via project-folder fallback
@@ -1338,11 +1359,18 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                     return False
                 if _is_path_like(target):
                     if not _check_path_arg(target, ws_root):
-                        # FIX-032: try project-folder fallback for embedded redirect targets.
+                        # FIX-032/033: try project-folder fallback for embedded redirect targets.
+                        # FIX-033: dot-prefix names (.env, .gitignore) are always paths.
+                        # Use norm_emb (not raw target) so that "./file" does not
+                        # incorrectly match the dot-prefix condition.
                         norm_emb = posixpath.normpath(target.replace("\\", "/"))
                         parts_emb = [p for p in norm_emb.split("/") if p and p not in (".", "..")]
                         if len(parts_emb) >= 2 or (
-                            len(parts_emb) == 1 and target.rstrip().endswith("/")
+                            len(parts_emb) == 1
+                            and (
+                                target.rstrip().endswith("/")
+                                or norm_emb.startswith(".")
+                            )
                         ):
                             if _try_project_fallback(norm_emb, ws_root):
                                 continue  # allowed via project-folder fallback
@@ -1495,6 +1523,20 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
 
             verb = _extract_verb(tokens)
             verb_lower = verb.lower()
+
+            # FIX-033: PowerShell $env: variable assignment.
+            # Pattern: $env:VAR_NAME = 'value'
+            # Allow when value resolves inside the project folder; deny otherwise.
+            # This must be checked BEFORE the generic $-verb deny guard below.
+            if verb_lower.startswith("$env:") and len(tokens) >= 3 and tokens[1] == "=":
+                env_value = tokens[2].strip("\"'")
+                if "$" not in env_value:
+                    norm_env_val = posixpath.normpath(env_value.replace("\\", "/"))
+                    if zone_classifier.classify(norm_env_val, ws_root) == "allow":
+                        continue  # value is explicitly inside project folder
+                    if _try_project_fallback(norm_env_val, ws_root):
+                        continue  # value resolves to project folder via fallback
+                return ("deny", f"$env: assignment value is outside allowed zone: {_DENY_REASON}")
 
             # Stage 4 — deny variable-substitution primary verbs
             if verb.startswith("$") or "${" in verb or "$(" in verb:
