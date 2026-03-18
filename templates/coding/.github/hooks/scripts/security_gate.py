@@ -38,6 +38,9 @@ _EXEMPT_TOOLS: frozenset = frozenset({
     "semantic_search", "file_search", "Glob", "agent", "Agent",
     "runSubagent", "search_subagent",
     "get_errors",  # SAF-023: handled early in decide(); listed here to pass unknown-tool guard
+    # FIX-035: VS Code/Copilot deferred development tools — safe to allow;
+    # handled early in decide() before the path-check block.
+    "install_python_packages", "configure_python_environment", "fetch_webpage",
 })
 
 # SAF-007: Tool names that perform file write operations.
@@ -70,7 +73,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "6497c27cabbad9cc1ac54dc0c0ece518e1cc56122b17f491b11fa5b608cb175d"
+_KNOWN_GOOD_GATE_HASH: str = "ccaa2cf83a74f7e8e2d265b4d43f3daef764a4eb235279c34296e0d47ea71f0a"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2050,6 +2053,12 @@ def decide(data: dict, ws_root: str) -> str:
                     return "deny"
             if ".." in query:
                 return "deny"
+        return "allow"
+
+    # FIX-035: Deferred development tools — safe to allow unconditionally.
+    # These VS Code/Copilot tools carry no file-system path argument and do not
+    # execute arbitrary commands; they are needed for standard dev workflows.
+    if tool_name in ("install_python_packages", "configure_python_environment", "fetch_webpage"):
         return "allow"
 
     # SAF-007: Write tools are restricted to Project/ only.  Any write
