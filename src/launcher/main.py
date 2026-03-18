@@ -2,6 +2,8 @@
 
 Run directly with:
     python src/launcher/main.py
+
+Note: v2.1.2 test build for verifying Windows update restart fix.
 """
 
 from __future__ import annotations
