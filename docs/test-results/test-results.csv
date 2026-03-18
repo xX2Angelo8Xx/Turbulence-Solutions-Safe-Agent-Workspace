@@ -1701,3 +1701,6 @@ TST-1812,FIX-034 Tester regression suite (FIX-034+033+023+SAF-020+032 - 294 test
 "TST-1816","FIX-037","test_removal_uses_rm_rf","PASS","2026-03-18","Developer Agent"
 "TST-1817","FIX-037","test_codesign_steps_still_present","PASS","2026-03-18","Developer Agent"
 "TST-1818","FIX-037","test_error_suppression_present","PASS","2026-03-18","Developer Agent"
+TST-1819,FIX-037 Developer test suite re-run by Tester (6 tests),Unit,FIX-037,Pass,2026-03-18,Windows 11 + Python 3.11,6 passed / 0 failures,All 6 developer tests pass: find cmd present + before codesign + targets _internal + rm -rf + codesign steps + error suppression
+TST-1820,FIX-037 Tester edge-case suite (10 tests),Unit,FIX-037,Pass,2026-03-18,Windows 11 + Python 3.11,10 passed / 0 failures,Batch+ form; egg-info not targeted; glob precision; -type d flag; echo/log; APP_BUNDLE variable; step label; ordering vs Step3; no STAGING_DIR; strict mode preserved
+TST-1821,FIX-037 Tester full regression suite (3616 tests),Regression,FIX-037,Pass,2026-03-18,Windows 11 + Python 3.11,3616 passed / 50 pre-existing failures / 29 skipped,50 pre-existing failures all in version-pin tests (FIX-009/010/014/017/019/020/030/INS-005/006/007) predating FIX-036 version bump -- zero regressions introduced by FIX-037
