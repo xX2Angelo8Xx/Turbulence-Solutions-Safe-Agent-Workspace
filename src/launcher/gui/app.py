@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 import threading
+import time
 import tkinter.filedialog as filedialog
 import tkinter.messagebox as messagebox
 from pathlib import Path
@@ -378,6 +379,9 @@ class App:
                     lambda: self._on_install_error(f"Download failed: {exc}"),
                 )
                 return
+            # Update UI to inform the user before os._exit() terminates the process.
+            self._window.after(0, self._on_install_starting)
+            time.sleep(0.5)
             try:
                 apply_update(installer_path)
             except Exception as exc:  # noqa: BLE001
@@ -387,6 +391,12 @@ class App:
                 )
 
         threading.Thread(target=_download_and_apply, daemon=True).start()
+
+    def _on_install_starting(self) -> None:
+        """Update UI to indicate the installer is launching."""
+        self.download_install_button.configure(state="disabled", text="Installing...")
+        self.update_banner.configure(text="Installing update... App will restart.")
+        self.update_banner.grid()
 
     def _on_install_error(self, message: str) -> None:
         """Restore the install button and show an error dialog."""

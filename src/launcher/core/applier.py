@@ -67,7 +67,11 @@ def _apply_windows(installer_path: Path) -> None:
         [str(installer_path), "/SILENT", "/CLOSEAPPLICATIONS"],
         shell=False,
     )
-    sys.exit(0)
+    # os._exit() instead of sys.exit() — sys.exit() from a daemon thread
+    # only raises SystemExit in that thread; the main thread (tkinter
+    # mainloop) continues running.  os._exit() terminates the entire
+    # process from any thread.
+    os._exit(0)
 
 
 def _find_app_bundle(directory: Path) -> Path:
