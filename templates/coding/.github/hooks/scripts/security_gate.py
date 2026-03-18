@@ -70,7 +70,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "cc63c8b7100c9cbf1fb7b6bc529987df91b5446d6dd6191106c2f4c1f0105c7a"
+_KNOWN_GOOD_GATE_HASH: str = "6497c27cabbad9cc1ac54dc0c0ece518e1cc56122b17f491b11fa5b608cb175d"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -145,6 +145,26 @@ _EXPLICIT_DENY_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"-enc(?:odedcommand)?\s+[A-Za-z0-9+/=]{20,}"),
     re.compile(r"\bupdate_hashes\b"),  # SAF-026: block direct execution of update_hashes
 ]
+
+
+# FIX-034: Pre-scan pattern for venv activation commands.
+# Detected BEFORE Stage 3 obfuscation patterns so that `source` (P-22) and
+# POSIX dot-source (P-23) false-positives on legitimate activations are avoided.
+# Also handles the PowerShell call-operator form (& path\Activate.ps1) whose
+# verb would otherwise reach the unknown-verb deny path.
+# Matches both forward-slash and back-slash path separators (re.IGNORECASE).
+_VENV_ACTIVATION_SEG_RE: re.Pattern[str] = re.compile(
+    r'^(?:&\s+|source\s+|\.\s+)?'           # optional: & / source / POSIX dot (with space)
+    r'(?P<path>'
+    r'(?:[^\s]*[/\\])?'                       # optional directory prefix ending with separator
+    r'\.?venv'                                # .venv or venv directory name
+    r'[/\\]'                                  # separator after venv dir
+    r'(?:scripts?[/\\]activate(?:\.(?:bat|ps1))?'   # Windows/PS: Scripts/activate[.bat|.ps1]
+    r'|bin[/\\]activate)'                            # Unix: bin/activate
+    r')'
+    r'\s*$',
+    re.IGNORECASE,
+)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -1503,17 +1523,47 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
         if not normalized:
             return ("deny", "Empty command after normalization.")
 
-        lowered = normalized.lower()
+        # FIX-034: Early venv activation pass — runs BEFORE Stage 3 obfuscation
+        # pre-scan to prevent false positives: P-22 (source) fires on
+        # `source .venv/bin/activate`; P-23 (POSIX dot-source) fires on
+        # `. .venv/Scripts/activate`.  Also handles the PowerShell call-operator
+        # form `& .venv/Scripts/Activate.ps1` whose verb (`&`) is not in the
+        # allowlist.  Validated venv segments are excluded from Stage 3 and 4.
+        all_segments = _split_segments(normalized)
+        if not all_segments:
+            return ("deny", "No executable segments found.")
 
-        # Stage 3 — obfuscation pre-scan (all 28 patterns, lowercased input)
+        _venv_seg_indices: set[int] = set()
+        for _vi, _vseg in enumerate(all_segments):
+            _vm = _VENV_ACTIVATION_SEG_RE.match(_vseg.strip())
+            if _vm:
+                _venv_path = _vm.group("path")
+                _norm_venv = posixpath.normpath(
+                    _venv_path.replace("\\", "/").lower()
+                )
+                if zone_classifier.classify(_norm_venv, ws_root) == "allow":
+                    _venv_seg_indices.add(_vi)
+                elif _try_project_fallback(_norm_venv, ws_root):
+                    _venv_seg_indices.add(_vi)
+                else:
+                    return ("deny", f"Venv activation outside allowed zone: {_DENY_REASON}")
+
+        # All segments are validated venv activations — allow immediately
+        if len(_venv_seg_indices) == len(all_segments):
+            return ("allow", None)
+
+        # Stage 3 — obfuscation pre-scan on non-venv segments only
+        lowered = " ; ".join(
+            s for i, s in enumerate(all_segments) if i not in _venv_seg_indices
+        ).lower()
         for pattern in _OBFUSCATION_PATTERNS:
             if pattern.search(lowered):
                 return ("deny", f"Command blocked by obfuscation pre-scan: {_DENY_REASON}")
 
-        # Stage 4 — split into segments; evaluate each independently
-        segments = _split_segments(normalized)
+        # Stage 4 — split into segments; evaluate each non-venv segment independently
+        segments = [s for i, s in enumerate(all_segments) if i not in _venv_seg_indices]
         if not segments:
-            return ("deny", "No executable segments found.")
+            return ("allow", None)
 
         for segment in segments:
             tokens = _tokenize_segment(segment)
