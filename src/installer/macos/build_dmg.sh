@@ -97,10 +97,30 @@ cat > "${APP_BUNDLE}/Contents/Info.plist" << PLIST
 PLIST
 
 # ---------------------------------------------------------------------------
-# Step 3.5: Ad-hoc code signing
+# Step 3.5: Ad-hoc code signing (bottom-up to avoid python3.11 dir issue)
 # ---------------------------------------------------------------------------
-echo "Step 3.5: Code signing..."
-codesign --deep --force --sign - "${APP_BUNDLE}"
+echo "Step 3.5: Code signing (bottom-up)..."
+
+# Sign individual shared libraries (.dylib and .so) inside _internal/
+echo "  Signing .dylib files..."
+find "${APP_BUNDLE}/Contents/MacOS/_internal" -name "*.dylib" -exec codesign --force --sign - {} \;
+echo "  Signing .so files..."
+find "${APP_BUNDLE}/Contents/MacOS/_internal" -name "*.so" -exec codesign --force --sign - {} \;
+
+# Sign embedded Python.framework (valid nested bundle — use --deep)
+if [ -d "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" ]; then
+    echo "  Signing Python.framework..."
+    codesign --deep --force --sign - "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework"
+fi
+
+# Sign the main executable
+echo "  Signing main executable..."
+codesign --force --sign - "${APP_BUNDLE}/Contents/MacOS/launcher"
+
+# Sign the .app bundle (NO --deep — avoids python3.11 directory issue)
+echo "  Signing .app bundle..."
+codesign --force --sign - "${APP_BUNDLE}"
+
 echo "Verifying code signature..."
 codesign --verify --deep --strict "${APP_BUNDLE}"
 

@@ -3,11 +3,13 @@ FIX-028 — Tests for ad-hoc code signing step in build_dmg.sh
 
 Verifies:
 - codesign invocation is present in the script
-- --deep flag is present
+- --deep flag is present for Python.framework (but NOT on the final .app bundle)
 - --sign - (ad-hoc signing) is present
 - codesign --verify step is present
 - The signing step appears before hdiutil (DMG creation)
 - No CRLF line endings (LF-only)
+
+Updated for FIX-031 bottom-up signing pattern.
 """
 import re
 from pathlib import Path
@@ -35,17 +37,29 @@ def test_codesign_invocation_present():
 
 
 def test_deep_flag_present():
-    """The --deep flag must be present in the codesign signing command."""
+    """--deep must be present for Python.framework signing (valid nested bundle).
+    The final .app bundle signing must NOT use --deep (avoids python3.11 dir issue).
+    """
     text = _script_text()
-    # Must appear in a codesign line that is NOT the verify-only line
     sign_lines = [
         line for line in text.splitlines()
         if "codesign" in line and "--sign" in line
     ]
     assert sign_lines, "No codesign --sign line found"
-    assert any("--deep" in line for line in sign_lines), (
-        "--deep flag not found in codesign signing command"
+    # Python.framework signing must use --deep — it IS a valid nested bundle
+    assert any("--deep" in line and "Python.framework" in line for line in sign_lines), (
+        "--deep flag not found in Python.framework codesign signing command"
     )
+    # The final .app bundle signing must NOT use --deep
+    app_bundle_lines = [
+        line for line in sign_lines
+        if line.rstrip().endswith('"${APP_BUNDLE}"')
+    ]
+    if app_bundle_lines:
+        assert not any("--deep" in line for line in app_bundle_lines), (
+            "--deep must NOT be present when signing the final .app bundle "
+            "(use bottom-up signing to avoid python3.11 directory issue)"
+        )
 
 
 def test_adhoc_sign_flag_present():
@@ -334,3 +348,40 @@ def test_codesign_step_between_infoplist_and_hdiutil():
         "codesign signing must come BEFORE hdiutil create "
         f"(sign at lines {sign_indices}, hdiutil at lines {hdiutil_indices})"
     )
+
+
+# ---------------------------------------------------------------------------
+# FIX-031 bottom-up signing pattern tests (added for updated signing approach)
+# ---------------------------------------------------------------------------
+
+def test_find_dylib_signing_present():
+    """build_dmg.sh must use find to sign .dylib files before signing the bundle."""
+    text = _script_text()
+    lines = text.splitlines()
+    assert any(
+        "find" in line and "*.dylib" in line and "codesign" in line
+        for line in lines
+    ), "find ... *.dylib ... codesign pattern not found in build_dmg.sh"
+
+
+def test_find_so_signing_present():
+    """build_dmg.sh must use find to sign .so files before signing the bundle."""
+    text = _script_text()
+    lines = text.splitlines()
+    assert any(
+        "find" in line and "*.so" in line and "codesign" in line
+        for line in lines
+    ), "find ... *.so ... codesign pattern not found in build_dmg.sh"
+
+
+def test_python_framework_signing_uses_deep():
+    """Python.framework must be signed with --deep (it is a valid nested bundle)."""
+    text = _script_text()
+    sign_lines = [
+        line for line in text.splitlines()
+        if "codesign" in line and "--sign" in line
+    ]
+    assert any(
+        "--deep" in line and "Python.framework" in line
+        for line in sign_lines
+    ), "--deep not found on Python.framework codesign line"
