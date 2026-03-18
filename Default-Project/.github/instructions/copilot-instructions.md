@@ -31,3 +31,17 @@ Turbulence Solutions
 - Be concise and direct.
 - When uncertain, ask clarifying questions using the ask_questions tool.
 - Explain your reasoning when making architectural decisions.
+
+## Known Tool Limitations
+
+Some terminal commands are blocked by the security hook. Use the listed alternatives:
+
+| Blocked | Use Instead |
+|---------|-------------|
+| `Out-File` | `Set-Content` or `>` redirect |
+| `dir` / `ls` / `Get-ChildItem` (no path argument) | `list_dir` tool |
+| `Get-ChildItem -Recurse` (no path argument) | `list_dir` tool or `file_search` tool |
+| `pip install` via terminal | `install_python_packages` tool |
+| Venv activation (`.\venv\Scripts\activate`) | Run `venv\Scripts\python.exe` directly |
+| Venv python (`venv\Scripts\python.exe -c "..."`) | Use system `python` command |
+| `memory` tool | Not available (blocked by design) |

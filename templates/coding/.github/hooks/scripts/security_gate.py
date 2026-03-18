@@ -73,7 +73,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "623c80d355b2a69390d8c95e896b1ecbd33a3dc73d8f2a
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "1ba42febb549c3848dc7934aa2285eaf73a70d42a05c5b4229cff370c4710f64"
+_KNOWN_GOOD_GATE_HASH: str = "6dc4b2529d689126480cff8bca24aa45da9ad72549e64bbb21833a9e251ce335"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
