@@ -81,7 +81,12 @@ def replace_template_placeholders(project_dir: Path, project_name: str) -> None:
         updated = updated.replace("{{WORKSPACE_NAME}}", workspace_name)
 
         if updated != original:
-            file_path.write_text(updated, encoding="utf-8")
+            try:
+                file_path.write_text(updated, encoding="utf-8")
+            except OSError:
+                # Skip read-only or otherwise unwritable files (mirrors the
+                # read-guard above — silently continue rather than raising).
+                continue
 
 
 def list_templates(templates_dir: Path) -> list[str]:
