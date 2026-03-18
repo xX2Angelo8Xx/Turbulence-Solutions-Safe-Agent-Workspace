@@ -1336,11 +1336,20 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                             # norm_fb is "file.txt") is NOT included.  
                             # _try_project_fallback already rejects deny-zone names
                             # (.github, .vscode, noagentzone).
-                            if len(parts_fb) >= 2 or (
-                                len(parts_fb) == 1
-                                and (
-                                    stripped.rstrip().endswith("/")
-                                    or norm_fb.startswith(".")
+                            # SAF-031: bare "." = project root; allowed for pip/python
+                            # editable installs (pip install -e .) but denied for
+                            # read/list/delete commands (ls ., cat ., rm .).
+                            if norm_fb == "." and verb.lower() in ("python", "python3", "py", "pip", "pip3"):
+                                _prev_was_flag = False
+                                continue
+                            if (
+                                len(parts_fb) >= 2
+                                or (
+                                    len(parts_fb) == 1
+                                    and (
+                                        stripped.rstrip().endswith("/")
+                                        or norm_fb.startswith(".")
+                                    )
                                 )
                             ):
                                 if _try_project_fallback(norm_fb, ws_root):
