@@ -70,7 +70,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "bd68677aa4a5cf3a77b6aae164ef82520003d7b8dad4fccb3b302dae71dc6033"
+_KNOWN_GOOD_GATE_HASH: str = "a36926ef5a4ab144aa3fa8e68f941f065ac19cdf8a94f6964d897119973eb198"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -143,6 +143,7 @@ _EXPLICIT_DENY_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"\bsudo\b"),
     re.compile(r"\brunas\b"),
     re.compile(r"-enc(?:odedcommand)?\s+[A-Za-z0-9+/=]{20,}"),
+    re.compile(r"\bupdate_hashes\b"),  # SAF-026: block direct execution of update_hashes
 ]
 
 
@@ -1088,6 +1089,55 @@ def _try_project_fallback(norm_relative: str, ws_root: str) -> bool:
         return False
 
 
+# SAF-026: Scan inline Python code passed via -c for dangerous patterns.
+def _scan_python_inline_code(code_str: str) -> bool:
+    """Return True if inline Python code is safe, False if dangerous patterns detected."""
+    low = code_str.lower()
+
+    # Category A: Deny-zone paths
+    for zone in ("noagentzone", ".github", ".vscode"):
+        if zone in low:
+            return False
+
+    # Category B: Obfuscation/encoding
+    for pat in ("base64", "b64decode", "codecs.decode", "fromhex(", "bytearray(", "chr("):
+        if pat in low:
+            return False
+
+    # Category C: Network
+    for net in ("urllib", "http.client", "http.server", "socket", "ftplib", "smtplib", "xmlrpc"):
+        if net in low:
+            return False
+    if re.search(r'\brequests\.', low):
+        return False
+
+    # Category D: Filesystem escape
+    for esc in ("expanduser", "expandvars"):
+        if esc in low:
+            return False
+    if "../" in low or "..\\" in low or "..\\\\" in code_str:
+        return False
+    if re.search(r'(?:^|["\x27\s,=(])/(?:etc|usr|home|tmp|var|root|opt|mnt|dev)\b', low):
+        return False
+    if re.search(r'[A-Za-z]:\\', code_str):
+        return False
+
+    # Category E: Infrastructure
+    for infra in ("update_hashes", "security_gate", "zone_classifier", "require-approval", "require_approval"):
+        if infra in low:
+            return False
+
+    # Category F: Dynamic execution
+    for dyn in ("__import__", "importlib", "eval(", "exec(", "getattr(", "setattr(", "delattr("):
+        if dyn in low:
+            return False
+    # compile( is dangerous unless it is re.compile(
+    if "compile(" in low and not re.search(r're\.compile\(', low):
+        return False
+
+    return True
+
+
 def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                    ws_root: str) -> bool:
     """Stage 5 argument validation.  Returns True (safe) or False (deny).
@@ -1187,6 +1237,13 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
         for _ci, _ctok in enumerate(args):
             if _ctok.lower() == "-c" and _ci + 1 < len(args):
                 _code_arg_indices.add(_ci + 1)
+
+    # SAF-026: Scan inline code content for dangerous patterns
+    for _ci_idx in _code_arg_indices:
+        if _ci_idx < len(args):
+            _code_content = args[_ci_idx].strip("\"'")
+            if not _scan_python_inline_code(_code_content):
+                return False
 
     # 5. Path argument zone checks
     # Enforce when path_args_restricted=True OR allow_arbitrary_paths=False (BUG-015).

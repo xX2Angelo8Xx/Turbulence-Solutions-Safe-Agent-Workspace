@@ -188,8 +188,14 @@ def test_python_c_with_os_system_rm_is_intentionally_allowed(sg):
 
 
 def test_python_c_os_import_no_semicolons_allowed(sg):
-    """python -c inline code without semicolons passes through as one segment."""
-    assert _allow(sg, 'python -c "x = __import__(\'os\')"')
+    """python -c inline code without semicolons passes through as one segment.
+
+    Updated by SAF-026: the original example used __import__('os') which is now
+    correctly blocked by SAF-026 inline-code scanning.  The test intent (verifying
+    that no-semicolon -c code passes as a single segment) is preserved; the example
+    is replaced with a safe equivalent.
+    """
+    assert _allow(sg, 'python -c "import os"')
 
 
 # ---------------------------------------------------------------------------
