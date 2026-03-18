@@ -70,7 +70,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "2244b36c2c9a7218fece6b101832afe9da98f0c9ac0f2e95930c29346350c00d"
+_KNOWN_GOOD_GATE_HASH: str = "04a2c46373be6a3fdd9ca29f85b6d610e8d037dea7a200c2231856f64eed3e70"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1350,6 +1350,31 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
             if _is_ancestor_of_deny_zone(pa, ws_root):
                 return False
 
+    # Step 8 — SAF-028: Bare listing CWD ancestor check
+    # When a bare listing verb (dir, ls, Get-ChildItem, gci, tree, find) is
+    # run with no real path argument, the implicit target is the CWD.  If the
+    # CWD is an ancestor of any deny zone (e.g. the workspace root), deny it.
+    if verb in _BARE_LISTING_VERBS:
+        _WIN_FLAG_RE_S8 = re.compile(r'^/[a-zA-Z0-9]{1,2}$')
+        path_args_s8 = []
+        for tok in args:
+            stripped = tok.strip("\"'")
+            if not stripped:  # empty quoted string — not a real path
+                continue
+            if stripped.startswith("-"):
+                continue
+            if _WIN_FLAG_RE_S8.match(stripped):
+                continue
+            if _ENV_ASSIGN_RE.match(stripped):
+                continue
+            path_args_s8.append(stripped)
+
+        if not path_args_s8:
+            # No explicit path arg — use CWD as implicit target
+            cwd = os.getcwd()
+            if _is_ancestor_of_deny_zone(cwd, ws_root):
+                return False
+
     return True
 
 
@@ -1775,6 +1800,9 @@ _RECURSIVE_FLAG_MAP: dict[str, frozenset[str]] = {
     "get-childitem": frozenset({"-recurse", "-r"}),
     "gci": frozenset({"-recurse", "-r"}),
 }
+
+# SAF-028: All bare listing verbs subject to CWD ancestor check (Step 8)
+_BARE_LISTING_VERBS: frozenset = frozenset({"dir", "ls", "get-childitem", "gci", "tree", "find"})
 
 
 def _is_ancestor_of_deny_zone(path: str, ws_root: str) -> bool:
