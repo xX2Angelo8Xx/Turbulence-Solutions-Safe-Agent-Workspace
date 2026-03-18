@@ -70,7 +70,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "6e7ba5a031f62af8a627a6f263d0fd2ba4ed4bb24996e244536042eafa292704"
+_KNOWN_GOOD_GATE_HASH: str = "d05bafc08230c5cf7ce2edf736652f1258dd05004b5e7c65a087a436cef4591a"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1049,6 +1049,9 @@ def _check_path_arg(token: str, ws_root: str) -> bool:
 # FIX-022: Verb category safe for project-folder fallback (read/execute only).
 # Destructive commands (rm, del, remove-item, etc.) are intentionally excluded
 # to prevent `rm ./root_config.json` from being mis-classified as project-local.
+# FIX-032: PS write cmdlets and copy/move cmdlets added — fallback only allows
+# paths that resolve inside the project folder, so write access to restricted
+# zones cannot be granted via this path.
 _PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
     "python", "python3", "py", "pip", "pip3",
     "cat", "type", "get-content", "gc", "select-string",
@@ -1057,6 +1060,10 @@ _PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
     "more", "head", "tail", "less",
     "pytest", "mypy", "flake8", "black", "isort", "ruff",
     "code", "dotnet", "node", "npm", "npx",
+    # FIX-032: PS write cmdlets — zone-checked, project-folder fallback allowed
+    "set-content", "sc", "add-content", "ac", "out-file",
+    # FIX-032: Copy/move cmdlets — both source and dest zone-checked
+    "copy-item", "cp", "copy", "mv", "move", "move-item",
 })
 
 
@@ -1311,6 +1318,16 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                     return False
                 if _is_path_like(target):
                     if not _check_path_arg(target, ws_root):
+                        # FIX-032: try project-folder fallback for redirect targets.
+                        # Applies the same multi-segment guard as step 5 to prevent
+                        # bare single-segment names from resolving project-locally.
+                        norm_redir = posixpath.normpath(target.replace("\\", "/"))
+                        parts_redir = [p for p in norm_redir.split("/") if p and p not in (".", "..")]
+                        if len(parts_redir) >= 2 or (
+                            len(parts_redir) == 1 and target.rstrip().endswith("/")
+                        ):
+                            if _try_project_fallback(norm_redir, ws_root):
+                                continue  # allowed via project-folder fallback
                         return False
         else:
             # Embedded redirect: ">>" or ">" is part of the token itself.
@@ -1321,6 +1338,14 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                     return False
                 if _is_path_like(target):
                     if not _check_path_arg(target, ws_root):
+                        # FIX-032: try project-folder fallback for embedded redirect targets.
+                        norm_emb = posixpath.normpath(target.replace("\\", "/"))
+                        parts_emb = [p for p in norm_emb.split("/") if p and p not in (".", "..")]
+                        if len(parts_emb) >= 2 or (
+                            len(parts_emb) == 1 and target.rstrip().endswith("/")
+                        ):
+                            if _try_project_fallback(norm_emb, ws_root):
+                                continue  # allowed via project-folder fallback
                         return False
 
     # Step 7 — SAF-006: Recursive enumeration ancestor check
