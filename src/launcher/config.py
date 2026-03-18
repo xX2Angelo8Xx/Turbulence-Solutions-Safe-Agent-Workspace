@@ -37,6 +37,10 @@ GITHUB_RELEASES_URL: str = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{G
 
 def get_display_version() -> str:
     """Return the installed package version, falling back to VERSION constant."""
+    # In PyInstaller bundles, always use the VERSION constant — importlib.metadata
+    # may read stale .dist-info from a previous overlay install (BUG-075).
+    if getattr(sys, '_MEIPASS', None):
+        return VERSION
     try:
         from importlib.metadata import version, PackageNotFoundError
         return version("agent-environment-launcher")
