@@ -73,7 +73,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "623c80d355b2a69390d8c95e896b1ecbd33a3dc73d8f2a
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "8f67333d018dfdefc0ffe9312c0236b007aa414d3a5a4cff733c3a57957ab5ce"
+_KNOWN_GOOD_GATE_HASH: str = "4f7c1fb7bc4918dffecdc1d688d1a4e45d6fb122e21e3a55a64f4577ccd3c91b"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1089,6 +1089,12 @@ _PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
     "copy-item", "cp", "copy", "mv", "move", "move-item",
 })
 
+# SAF-029: PowerShell delete cmdlets that receive project-folder fallback for
+# single-segment dot-prefix paths only (e.g. .venv, .git, .pytest_cache, .env).
+# Unix rm/del/erase/rmdir are intentionally excluded — FIX-033 requires
+# `rm .env` to be denied and the full rm family must not get path fallback.
+_DELETE_DOT_FALLBACK_VERBS: frozenset[str] = frozenset({"remove-item", "ri"})
+
 
 def _try_project_fallback(norm_relative: str, ws_root: str) -> bool:
     """Try resolving a relative path against the detected project folder.
@@ -1334,6 +1340,17 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                                     or norm_fb.startswith(".")
                                 )
                             ):
+                                if _try_project_fallback(norm_fb, ws_root):
+                                    _prev_was_flag = False
+                                    continue
+                    elif verb.lower() in _DELETE_DOT_FALLBACK_VERBS:
+                        # SAF-029: allow single-segment dot-prefix non-deny-zone
+                        # paths (e.g. .venv, .git) via project-folder fallback.
+                        # Multi-segment paths remain denied (FIX-022 intact).
+                        if "*" not in stripped and "?" not in stripped and "[" not in stripped:
+                            norm_fb = posixpath.normpath(stripped.replace("\\", "/"))
+                            parts_fb = [p for p in norm_fb.split("/") if p and p not in (".", "..")]
+                            if len(parts_fb) == 1 and norm_fb.startswith("."):
                                 if _try_project_fallback(norm_fb, ws_root):
                                     _prev_was_flag = False
                                     continue
