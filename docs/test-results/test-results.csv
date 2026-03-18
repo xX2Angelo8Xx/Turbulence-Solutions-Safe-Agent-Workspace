@@ -1,4 +1,5 @@
 ﻿ID,Test Name,Test Type,WP Reference,Status,Run Date,Environment,Result,Notes
+TST-1810,FIX-036 version consistency (7 tests),Unit,FIX-036,Pass,2026-03-18,Windows 11 + Python 3.11,7 passed / 0 failures,All 5 version locations + architecture.md reference verified at 2.1.0
 TST-1809,FIX-034 full suite regression (3618 tests),Regression,FIX-034,Pass,2026-03-18,Windows 11 + Python 3.11,3618 passed / 4 pre-existing failures / 29 skipped / 1 xfailed,Pre-existing: FIX-009 + INS-005; 0 new failures introduced by FIX-034
 TST-1808,FIX-034 regression suites (FIX-023+FIX-033+SAF-020 â€” 184 tests),Regression,FIX-034,Pass,2026-03-18,Windows 11 + Python 3.11,184 passed / 0 failures,All venv+dot-prefix+wildcard regression suites green
 TST-1807,FIX-034 unit tests (40 tests),Unit,FIX-034,Pass,2026-03-18,Windows 11 + Python 3.11,40 passed / 0 failures,source form / & operator / POSIX dot-source / direct execution / denial / chain security / deactivate
