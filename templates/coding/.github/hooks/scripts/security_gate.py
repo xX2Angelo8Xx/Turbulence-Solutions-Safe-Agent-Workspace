@@ -73,7 +73,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "623c80d355b2a69390d8c95e896b1ecbd33a3dc73d8f2a
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "6dc4b2529d689126480cff8bca24aa45da9ad72549e64bbb21833a9e251ce335"
+_KNOWN_GOOD_GATE_HASH: str = "3278488d46c9fccef4a09bfe8457874abcaa782f98dc99db7e0de778c66832ad"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1853,6 +1853,10 @@ def validate_write_tool(data: dict, ws_root: str) -> str:
 
     zone = zone_classifier.classify(raw_path, ws_root)
     if zone == "allow":
+        # SAF-032: Block access to .git internals even within the project folder.
+        # Covers create_file, replace_string_in_file, edit_file, write_file, etc.
+        if zone_classifier.is_git_internals(raw_path):
+            return "deny"
         return "allow"
     return "deny"
 
@@ -1902,6 +1906,9 @@ def validate_multi_replace_tool(data: dict, ws_root: str) -> str:
             return "deny"
         zone = zone_classifier.classify(file_path, ws_root)
         if zone != "allow":
+            return "deny"
+        # SAF-032: Block access to .git internals even within the project folder.
+        if zone_classifier.is_git_internals(file_path):
             return "deny"
 
     return "allow"
@@ -2114,6 +2121,11 @@ def decide(data: dict, ws_root: str) -> str:
     # relative-path resolution internally.
     zone = zone_classifier.classify(raw_path, ws_root)
     if zone == "allow":
+        # SAF-032: Block file tools from accessing .git internals even when the
+        # path is inside the project folder (allow zone).  Covers read_file,
+        # list_dir, edit_notebook_file, and any other exempt tool.
+        if zone_classifier.is_git_internals(raw_path):
+            return "deny"
         return "allow"
     return "deny"
 

@@ -120,6 +120,35 @@ def normalize_path(p: str) -> str:
     return p
 
 
+def is_git_internals(path: str) -> bool:
+    """Return True if the path is inside or is the .git directory.
+
+    Accepts a raw or already-normalized path string.
+    The path is normalized before the check so that:
+    - Case variations (.GIT/ on Windows) are lowercased → caught
+    - Backslashes (.git\\config) are converted → caught
+    - Path traversal (src/../../.git/config) is resolved → caught
+
+    Parameters
+    ----------
+    path : str
+        Raw or normalized path string to test.
+
+    Returns
+    -------
+    bool
+        True if the path IS the .git directory or resides inside it.
+    """
+    norm = normalize_path(path)
+    # After normalize_path:
+    #   - all slashes are forward slashes
+    #   - path is lowercase
+    #   - '..' sequences are resolved
+    #   - trailing slashes are stripped
+    # Match either "/.git/" (inside .git subdir) or ending "/.git" (the dir itself)
+    return "/.git/" in norm or norm.endswith("/.git")
+
+
 def classify(raw_path: str, ws_root: str) -> ZoneDecision:
     """Classify *raw_path* against the 2-tier zone system.
 
