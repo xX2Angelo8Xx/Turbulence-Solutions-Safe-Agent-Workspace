@@ -92,3 +92,42 @@ All 22 tests pass. See `docs/test-results/test-results.csv` for logged run.
 
 - The `compile(` denial uses a negative lookbehind `(?<!re\.)` to avoid false-positive on `re.compile(`. Other legitimate uses of `compile()` (e.g. `ast.compile`) are also denied — acceptable per fail-closed policy.
 - The absolute-path Windows pattern `[A-Za-z]:\\` catches any drive letter. This is intentional.
+
+---
+
+## Iteration 2 — Bug Fixes (2026-03-18)
+
+Returned from Tester with 3 pattern-matching bugs found.
+
+### Bugs Fixed
+
+**BUG-063** (`requests` regex too strict):
+- Changed `re.search(r'\brequests\.', low)` → `re.search(r'\brequests\b', low)`
+- `import requests` alone and `import requests as r` are now correctly denied.
+
+**BUG-064** (`http.client`/`http.server` too specific):
+- Replaced `"http.client", "http.server"` entries in category C with single `"http"` keyword.
+- `from http import server` and `from http import client` are now correctly denied.
+
+**BUG-065** (`codecs.decode` too specific):
+- Changed `"codecs.decode"` → `"codecs"` in category B pattern list.
+- `import codecs` alone and `codecs.encode(...)` are now correctly denied.
+
+### Files Changed
+
+- `Default-Project/.github/hooks/scripts/security_gate.py` — applied 3 pattern fixes
+- `templates/coding/.github/hooks/scripts/security_gate.py` — synced from Default-Project
+- `tests/SAF-026/test_saf026_python_c_scanning.py` — added 6 regression tests
+
+### Regression Tests Added
+
+- `test_requests_import_alone_denied` — `import requests` denied (BUG-063)
+- `test_requests_aliased_denied` — `import requests as r; r.get(...)` denied (BUG-063)
+- `test_from_http_import_server_denied` — `from http import server` denied (BUG-064)
+- `test_from_http_import_client_denied` — `from http import client` denied (BUG-064)
+- `test_codecs_import_alone_denied` — `import codecs` denied (BUG-065)
+- `test_codecs_encode_denied` — `codecs.encode(...)` denied (BUG-065)
+
+### Test Results
+
+81 SAF-026 tests pass. 74 SAF-017 tests pass (no regressions).

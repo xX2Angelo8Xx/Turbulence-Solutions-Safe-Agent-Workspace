@@ -70,7 +70,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "fcffb52f64514d8d77d3985b8fa9dd1160cb6cff7b72ca
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "a36926ef5a4ab144aa3fa8e68f941f065ac19cdf8a94f6964d897119973eb198"
+_KNOWN_GOOD_GATE_HASH: str = "2244b36c2c9a7218fece6b101832afe9da98f0c9ac0f2e95930c29346350c00d"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1100,15 +1100,15 @@ def _scan_python_inline_code(code_str: str) -> bool:
             return False
 
     # Category B: Obfuscation/encoding
-    for pat in ("base64", "b64decode", "codecs.decode", "fromhex(", "bytearray(", "chr("):
+    for pat in ("base64", "b64decode", "codecs", "fromhex(", "bytearray(", "chr("):
         if pat in low:
             return False
 
     # Category C: Network
-    for net in ("urllib", "http.client", "http.server", "socket", "ftplib", "smtplib", "xmlrpc"):
+    for net in ("urllib", "http", "socket", "ftplib", "smtplib", "xmlrpc"):
         if net in low:
             return False
-    if re.search(r'\brequests\.', low):
+    if re.search(r'\brequests\b', low):
         return False
 
     # Category D: Filesystem escape

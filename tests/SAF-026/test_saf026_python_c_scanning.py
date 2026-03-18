@@ -308,6 +308,40 @@ def test_full_py_c_safe(sg):
     assert result == "allow", f"Expected allow, got {result!r}"
 
 
+# ---------------------------------------------------------------------------
+# Regression tests — BUG-063, BUG-064, BUG-065
+# ---------------------------------------------------------------------------
+
+def test_requests_import_alone_denied(sg):
+    """BUG-063: 'import requests' alone (no dot) must be denied."""
+    assert sg._scan_python_inline_code("import requests") is False
+
+
+def test_requests_aliased_denied(sg):
+    """BUG-063: 'import requests as r; r.get(...)' must be denied."""
+    assert sg._scan_python_inline_code("import requests as r; r.get('http://example.com')") is False
+
+
+def test_from_http_import_server_denied(sg):
+    """BUG-064: 'from http import server' must be denied."""
+    assert sg._scan_python_inline_code("from http import server") is False
+
+
+def test_from_http_import_client_denied(sg):
+    """BUG-064: 'from http import client' must be denied."""
+    assert sg._scan_python_inline_code("from http import client") is False
+
+
+def test_codecs_import_alone_denied(sg):
+    """BUG-065: 'import codecs' alone must be denied."""
+    assert sg._scan_python_inline_code("import codecs") is False
+
+
+def test_codecs_encode_denied(sg):
+    """BUG-065: 'codecs.encode(...)' must be denied."""
+    assert sg._scan_python_inline_code("codecs.encode('hello', 'rot_13')") is False
+
+
 def test_update_hashes_terminal_denied(sg):
     """Direct execution of update_hashes.py via terminal should be denied."""
     result, _ = sg.sanitize_terminal_command(
