@@ -120,9 +120,12 @@ if [ -d "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" ]; then
     codesign --deep --force --sign - "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework"
 fi
 
-# Sign the main executable
-echo "  Signing main executable..."
-codesign --force --sign - "${APP_BUNDLE}/Contents/MacOS/launcher"
+# NOTE: The launcher is CFBundleExecutable declared in Info.plist.
+# Signing it via Contents/MacOS/launcher triggers macOS bundle validation,
+# which recurses into _internal/ and fails on non-code data files (e.g. PNGs).
+# PyInstaller already ad-hoc signs the binary during the build step
+# ("Re-signing the EXE"). The signature is preserved when the binary is
+# copied into the .app via `cp -R`, so no re-sign is needed here.
 
 # Verify individual code signatures
 # NOTE: Bundle-level signing is intentionally skipped. PyInstaller bundles
@@ -130,7 +133,8 @@ codesign --force --sign - "${APP_BUNDLE}/Contents/MacOS/launcher"
 # which codesign cannot handle as bundle subcomponents. The individual
 # bottom-up signing above is sufficient for macOS Apple Silicon execution.
 echo "Verifying code signatures..."
-codesign --verify "${APP_BUNDLE}/Contents/MacOS/launcher" && echo "  Main executable: OK"
+# Verify the pre-bundle binary (has PyInstaller ad-hoc signature; bundle copy inherits it)
+codesign --verify "${DIST_DIR}/launcher/launcher" && echo "  Main executable (pre-bundle): OK"
 if [ -d "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" ]; then
     codesign --verify --deep "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" && echo "  Python.framework: OK"
 fi

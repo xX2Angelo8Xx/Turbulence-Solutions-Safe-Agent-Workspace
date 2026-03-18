@@ -54,7 +54,7 @@ jobs:
 
       - name: Verify Code Signing
         run: |
-          codesign --verify dist/AgentEnvironmentLauncher.app/Contents/MacOS/launcher && echo "Main executable signature valid"
+          codesign --verify dist/launcher/launcher && echo "Main executable signature valid"
           codesign --verify --deep dist/AgentEnvironmentLauncher.app/Contents/MacOS/_internal/Python.framework && echo "Python.framework signature valid"
           echo "Code signing verification passed"
 
