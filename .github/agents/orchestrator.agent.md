@@ -45,6 +45,17 @@ When a Tester marks a WP as `Done`:
 9. Proceed to the next WP — **do not ask the user for confirmation** to continue.
 10. Only report back to the user after all assigned WPs are complete (or if a blocker is encountered).
 
+## CI/CD Pipeline Trigger
+
+After completing a development phase or when a new version is committed and tagged:
+1. **Verify the tag exists** on main: `git tag -l "v*"` to confirm the version tag is present.
+2. **Verify the tag was pushed** to remote: `git ls-remote --tags origin` to confirm the tag reached GitHub.
+3. The CI/CD pipeline (`.github/workflows/release.yml`) triggers automatically on tag pushes matching `v*.*.*`. Pushing the tag is sufficient — no manual workflow dispatch is needed.
+4. **If the tag was created but not yet pushed**, push it: `git push origin <tag-name>`.
+5. **If the tag needs to be (re)created** (e.g., after a post-tag fix): delete the old tag locally and remotely (`git tag -d <tag> && git push origin --delete <tag>`), then recreate and push (`git tag -a <tag> -m "<message>" && git push origin <tag>`).
+6. **Log the CI/CD trigger** in your session context, noting the tag name and commit hash.
+7. Inform the user that the CI/CD pipeline has been triggered and they can monitor progress on GitHub Actions.
+
 ## WP Splitting
 
 If a WP is too large for a single Developer to implement atomically:
