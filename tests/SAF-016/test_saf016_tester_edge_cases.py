@@ -125,21 +125,14 @@ def test_remove_item_tilde_slash_denied(sg):
 
 
 def test_rm_bare_tilde_current_behaviour(sg):
-    """rm ~ — bare tilde without slash is NOT recognised as path-like by the
-    path classifier (_is_path_like returns False for tokens with no slash,
-    backslash, '..' or leading dot).  Current behaviour: ALLOW.
+    """rm ~ — bare tilde is now recognised as path-like (SAF-030 fix).
 
-    This is a documented design limitation: the security gate cannot expand
-    shell tilde (~) without a sub-shell; it only zone-checks tokens that look
-    like file-system paths.  Documented as a known limitation in SAF-016 dev-log.
-    Logged as BUG in bugs.csv for future hardening.
+    SAF-030 added a tilde check to _is_path_like() so that bare ~ and ~/path
+    tokens are treated as file-system paths and zone-checked.  Since ~ resolves
+    to HOME (outside the project folder), the zone classifier returns 'deny'.
+    Previously this was a known bug (BUG-048) where rm ~ was allowed.
     """
-    # Document current behaviour — NOT an assertion of desired security outcome.
-    decision, _ = sg.sanitize_terminal_command("rm ~", WS)
-    assert decision == "allow", (
-        "BUG known: bare tilde is not path-like so it bypasses zone checking. "
-        "See bugs.csv for the logged issue."
-    )
+    assert deny(sg, "rm ~")
 
 
 # ---------------------------------------------------------------------------

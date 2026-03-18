@@ -73,7 +73,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "623c80d355b2a69390d8c95e896b1ecbd33a3dc73d8f2a
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "4f7c1fb7bc4918dffecdc1d688d1a4e45d6fb122e21e3a55a64f4577ccd3c91b"
+_KNOWN_GOOD_GATE_HASH: str = "1ba42febb549c3848dc7934aa2285eaf73a70d42a05c5b4229cff370c4710f64"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -952,6 +952,9 @@ _WILDCARD_DENY_ZONES: tuple[str, ...] = (".github", ".vscode", "noagentzone")
 
 def _is_path_like(token: str) -> bool:
     """Return True if *token* looks like a file-system path argument."""
+    # SAF-030: bare tilde and tilde-prefixed paths expand to HOME (outside project)
+    if token == "~" or token.startswith("~/") or token.startswith("~\\"):
+        return True
     return bool(_PATH_LIKE_RE.search(token)) or token.startswith(".")
 
 
