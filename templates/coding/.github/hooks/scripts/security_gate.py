@@ -73,7 +73,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "623c80d355b2a69390d8c95e896b1ecbd33a3dc73d8f2a
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "3278488d46c9fccef4a09bfe8457874abcaa782f98dc99db7e0de778c66832ad"
+_KNOWN_GOOD_GATE_HASH: str = "71e119471a937c44c365378f73bf7977c3c42d564c7a824548b3328e39407cbe"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -146,7 +146,7 @@ _EXPLICIT_DENY_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"\bsudo\b"),
     re.compile(r"\brunas\b"),
     re.compile(r"-enc(?:odedcommand)?\s+[A-Za-z0-9+/=]{20,}"),
-    re.compile(r"\bupdate_hashes\b"),  # SAF-026: block direct execution of update_hashes
+    re.compile(r"update_hashes"),  # SAF-033: block any command containing 'update_hashes' (substring, case-insensitive via lowered_segment)
 ]
 
 
