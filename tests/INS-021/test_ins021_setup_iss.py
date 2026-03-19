@@ -215,3 +215,164 @@ def test_python_embed_exists_function_preserved(iss_content: str):
 def test_python_embed_files_entry_present(iss_content: str):
     """INS-018 python-embed [Files] entry is still present."""
     assert r"{app}\python-embed" in iss_content
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests — INS-021
+# ---------------------------------------------------------------------------
+
+def test_needs_add_path_semicolon_wrapping(iss_content: str):
+    """NeedsAddPath wraps both the target and the existing PATH with semicolons.
+
+    Without this wrapping, 'C:\\Foo\\bin' would falsely match 'C:\\Foo\\bin2'.
+    The implementation must produce ';'+Lowercase(PathToAdd)+';' and
+    ';'+Lowercase(OldPath)+';' to guarantee an exact-segment match.
+    """
+    # Both the Pos argument (needle) and the haystack must include the wrapping.
+    assert "';' + Lowercase(PathToAdd) + ';'" in iss_content or (
+        # Accept alternative style: ';' + Lowercase(...) + ';'
+        re.search(
+            r"';'\s*\+\s*Lowercase\s*\(\s*PathToAdd\s*\)\s*\+\s*';'",
+            iss_content,
+        )
+    ), "NeedsAddPath must wrap PathToAdd with semicolons for exact-segment match"
+    assert "';' + Lowercase(OldPath) + ';'" in iss_content or (
+        re.search(
+            r"';'\s*\+\s*Lowercase\s*\(\s*OldPath\s*\)\s*\+\s*';'",
+            iss_content,
+        )
+    ), "NeedsAddPath must wrap OldPath with semicolons to prevent partial matches"
+
+
+def test_needs_add_path_early_exit_when_registry_missing(iss_content: str):
+    """NeedsAddPath returns True (add path) when registry key does not exist.
+
+    If RegQueryStringValue fails (no PATH key yet), NeedsAddPath must not
+    crash and must return True so the entry gets added.
+    """
+    # The function must contain a branch that sets Result := True and calls Exit
+    # immediately after a failed RegQueryStringValue call.
+    assert re.search(
+        r"Result\s*:=\s*True\s*;[\s\S]*?Exit\s*;",
+        iss_content,
+    ), "NeedsAddPath must set Result := True and call Exit when registry is absent"
+
+
+def test_needs_add_path_uses_pos_function(iss_content: str):
+    """NeedsAddPath uses Pos() to locate the path in the existing PATH string."""
+    # Pos() is the Pascal substring-search function used for the membership test.
+    assert re.search(r"\bPos\s*\(", iss_content), (
+        "NeedsAddPath must use Pos() for case-insensitive substring search"
+    )
+
+
+def test_registry_root_is_hkcu_not_hklm(iss_content: str):
+    """PATH is modified in HKCU (per-user), never HKLM (system-wide).
+
+    Writing to HKLM would require elevation and affect all users, which is
+    both a security concern and a privilege violation for a user-level shim.
+    """
+    # Verify HKCU is used and HKLM is absent from the Registry section.
+    lines = iss_content.splitlines()
+    in_registry = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped == "[Registry]":
+            in_registry = True
+            continue
+        if in_registry and stripped.startswith("[") and stripped != "[Registry]":
+            break
+        if in_registry and "Root:" in line:
+            assert "HKCU" in line, f"Registry entry must use HKCU, got: {line}"
+            assert "HKLM" not in line, (
+                f"Registry entry must NOT use HKLM (machine-wide): {line}"
+            )
+
+
+def test_python_path_txt_written_to_localappdata(iss_content: str):
+    """python-path.txt is written to {localappdata}\\TurbulenceSolutions, not {app}.
+
+    The config file must be user-local so the shim can read it without
+    elevation and from any working directory.
+    """
+    # CurStepChanged must expand {localappdata} for ConfigDir, not {app}.
+    assert re.search(
+        r"ExpandConstant\s*\(\s*['\"]?\{localappdata\}",
+        iss_content,
+    ), "ConfigDir must use {localappdata} via ExpandConstant, not {app}"
+
+
+def test_config_dir_exists_check_before_create_dir(iss_content: str):
+    """DirExists is checked before CreateDir to avoid a duplicate-directory error.
+
+    Calling CreateDir on an existing directory is a no-op in Pascal, but the
+    explicit guard makes the intent clear and avoids relying on implementation
+    details of the Inno Setup runtime.
+    """
+    assert "DirExists" in iss_content, (
+        "CurStepChanged must check DirExists before calling CreateDir"
+    )
+    assert "CreateDir" in iss_content, (
+        "CurStepChanged must call CreateDir to ensure the config directory exists"
+    )
+    # DirExists must appear before CreateDir in the source.
+    dir_exists_pos = iss_content.index("DirExists")
+    create_dir_pos = iss_content.index("CreateDir")
+    assert dir_exists_pos < create_dir_pos, (
+        "DirExists check must appear before CreateDir call"
+    )
+
+
+def test_uninstall_strips_leading_and_trailing_semicolons(iss_content: str):
+    """CurUninstallStepChanged trims leading and trailing semicolons from NewPath.
+
+    After removing ';BinDir' from the wrapped path, the resulting string may
+    still start or end with ';'. Both while-loops must be present to produce a
+    clean PATH value.
+    """
+    # The implementation uses while loops checking NewPath[1] and
+    # NewPath[Length(NewPath)] to strip residual semicolons.
+    assert re.search(
+        r"while\s*\(.*NewPath\s*\[\s*1\s*\]\s*=\s*';'",
+        iss_content,
+    ), "Uninstall cleanup must strip leading semicolons via while loop"
+    assert re.search(
+        r"while\s*\(.*NewPath\s*\[\s*Length\s*\(\s*NewPath\s*\)\s*\]\s*=\s*';'",
+        iss_content,
+    ), "Uninstall cleanup must strip trailing semicolons via while loop"
+
+
+def test_uninstall_exits_early_if_path_not_found(iss_content: str):
+    """CurUninstallStepChanged exits early when the bin dir is not in PATH.
+
+    If StartPos = 0 the entry was never added (or already removed), so the
+    procedure must return without modifying the registry.
+    """
+    assert re.search(
+        r"StartPos\s*=\s*0\s*\)",
+        iss_content,
+    ) or "StartPos = 0" in iss_content, (
+        "Uninstall PATH cleanup must exit early when StartPos = 0"
+    )
+    assert re.search(
+        r"if\s+StartPos\s*=\s*0\s+then",
+        iss_content,
+    ), "Must guard with 'if StartPos = 0 then Exit'"
+
+
+def test_registry_check_uses_expand_constant(iss_content: str):
+    """The Registry [Check] guard calls ExpandConstant to resolve {localappdata}.
+
+    Without ExpandConstant the literal string '{localappdata}\\...' would be
+    passed to NeedsAddPath instead of the resolved path, causing NeedsAddPath
+    to never match the actual PATH value.
+    """
+    # The Registry section's Check line must contain ExpandConstant.
+    for line in iss_content.splitlines():
+        if "NeedsAddPath" in line and "Check:" in line:
+            assert "ExpandConstant" in line, (
+                "Registry Check must wrap path in ExpandConstant: " + line
+            )
+            break
+    else:
+        pytest.fail("No [Registry] line with 'Check: NeedsAddPath' found")
