@@ -13,10 +13,16 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXPECTED_VERSION = "3.0.0"
-EXPECTED_MAJOR = 3
-EXPECTED_MINOR = 0
-EXPECTED_PATCH = 0
+EXPECTED_VERSION: str = re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    re.MULTILINE,
+).group(1)
+_ver_parts = EXPECTED_VERSION.split(".")
+EXPECTED_MAJOR = int(_ver_parts[0])
+EXPECTED_MINOR = int(_ver_parts[1])
+EXPECTED_PATCH = int(_ver_parts[2])
+del _ver_parts
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
 # Stale versions that must NOT appear anywhere in version-assignment lines

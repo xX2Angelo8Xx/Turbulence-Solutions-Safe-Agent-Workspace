@@ -9,7 +9,11 @@ from pathlib import Path
 # Resolve repo root relative to this test file (tests/FIX-030/ -> repo root)
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-EXPECTED_VERSION = "3.0.0"
+EXPECTED_VERSION: str = re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    re.MULTILINE,
+).group(1)
 OLD_VERSION = "2.0.0"
 
 
