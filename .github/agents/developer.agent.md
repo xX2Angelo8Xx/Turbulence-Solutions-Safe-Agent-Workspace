@@ -1,4 +1,5 @@
 ---
+name: developer
 description: "Use when implementing a single workpackage. Reads requirements, writes code, writes tests, documents changes in a dev-log, then hands off to Tester for review. Follows the standard WP execution workflow. Use for: coding, implementation, development, feature work, bug fixes."
 tools: [read, edit, search, execute, todo, agent]
 agents: [tester]
