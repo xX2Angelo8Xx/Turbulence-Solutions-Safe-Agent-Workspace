@@ -544,3 +544,87 @@ The secondary finding — `.git/hooks/` writability via file tools — adds a pe
 **Report filed by:** GitHub Copilot (Claude Opus 4.6)  
 **Date:** March 18, 2026  
 **Classification:** SECURITY AUDIT — V3.0.0 HARDENING RECOMMENDATIONS
+
+---
+
+## 10. V3.0.0 Implementation Decisions
+
+**Date:** March 19, 2026  
+**Author:** Developer Agent (GitHub Copilot)
+
+This section documents which recommendations from Section 6 were acted upon during the V3.0.0 hardening sprint, which were deferred, and the rationale behind each decision.
+
+---
+
+### 10.1 Implemented Recommendations
+
+#### R2 — Block `create_file` in `.git/` Directories → **Implemented as SAF-032**
+
+SAF-032 added `.git/` as a fully protected path in `zone_classifier.py`. All write-capable file tools (`create_file`, `replace_string_in_file`, `multi_replace_string_in_file`) and all read tools (`read_file`, `list_dir`) are now denied when the resolved path contains `/.git/` or `\.git\`. This closes the `.git/hooks/` malicious-hook planting vector that was exploited during the V3.0.0 audit.
+
+#### R3 — Make Security Infrastructure Read-Only at OS Level → **Documented as admin post-deployment step (not automated)**
+
+Automating `icacls` ACL changes via an installer script introduces its own risks (irreversible state, edge cases on different Windows editions, and elevated-privilege requirements). Instead, this recommendation is documented here as a **recommended one-time administrator action** to perform after deploying the SAE on any workstation:
+
+```powershell
+# Run as Administrator once after deployment
+icacls ".github\hooks\scripts\*" /deny "%USERNAME%:(W,M,D)"
+icacls ".vscode\settings.json" /deny "%USERNAME%:(W,M,D)"
+icacls ".github\hooks\require-approval.json" /deny "%USERNAME%:(W,M,D)"
+```
+
+This is not enforced by the installer because it requires elevated privileges and may conflict with legitimate developer workflows (e.g., updating the security gate itself). The decision was to document rather than automate.
+
+#### R4 — Harmonize `.git/` Access Rules Between File Tools and Terminal → **Implemented as part of SAF-032**
+
+Prior to SAF-032, there was an asymmetry: the terminal blocked `.git/` via the dot-prefix pattern, but `read_file` and `list_dir` did not. SAF-032 resolved this by applying the `.git/` block consistently across all file tools (both read and write), option (a) from the recommendation. The terminal-side block was already in place and required no changes.
+
+#### R6 — Remove/Protect `update_hashes.py` → **Implemented as SAF-033**
+
+SAF-033 strengthened the terminal sanitizer to deny any command containing the token `update_hashes` (case-insensitive). This prevents agents from executing the hash re-signing script, neutralizing the integrity-check defeat chain described in the audit. The file remains on disk and readable (so the hash verification process can still validate it), but agents cannot execute it. Only an administrator running a terminal outside the SAE hook context can execute it.
+
+---
+
+### 10.2 Deferred / Not Implemented Recommendations
+
+#### R1 — Sandbox Python File Execution → **Not implemented**
+
+**Rationale:** The workspace is explicitly designed for agentic Python development. Agents must be able to create and run arbitrary Python projects as their primary use case. A container sandbox (Option A) or restricted user account (Option B) would break this entirely. A Python execution wrapper (Option C) or static analysis pre-check (Option D) would produce excessive false positives and block legitimate workflows. The risk is accepted: agents operating inside the `AgentZone` project folder have full Python execution rights within that folder. The zone boundaries remain enforced by the security gate.
+
+#### R5 — Block Network Access from Terminal Subprocesses → **Not implemented**
+
+**Rationale:** Blocking outbound network access from the agent's terminal process tree would break fundamental Python workflows: `pip install`, HTTP API testing, downloading model weights, and any network-enabled Python project that a developer asks the agent to build. The network risk is accepted in exchange for full workflow capability.
+
+#### R7 — Add Python File Static Analysis Pre-Check → **Partially covered by existing SAF-026**
+
+**Rationale:** SAF-026 already blocks the `python -c` inline execution vector via the terminal sanitizer's command scanning. R7 recommends extending this to full static analysis of `.py` files before execution — scanning for suspicious imports and path references. This is deferred because: (1) the false-positive rate would be high for legitimate projects that use `os`, `pathlib`, `subprocess`, etc.; (2) agents rightly use these modules in normal development. Deferred to a future audit cycle.
+
+#### R8 — Restrict `git` Command Scope → **Not implemented**
+
+**Rationale:** Agents require unrestricted `git` access as part of their core workflow. `git add`, `git commit`, `git push`, `git log`, `git diff`, `git status`, `git checkout`, and `git merge` are all routine operations. Restricting `git clone` or `git config` would require parsing git subcommands in the hook, adding complexity without proportionate benefit. Deferred.
+
+#### R9 — Add Runtime Monitoring and Alerts → **Not implemented (nice-to-have, deferred)**
+
+**Rationale:** Runtime monitoring of Python file executions with content hashing and stdout/stderr capture would provide useful audit trail data. However, this is a non-trivial infrastructure investment and is not a blocking security requirement given the current threat model. Deferred to a future sprint as a nice-to-have enhancement.
+
+#### R10 — Explicitly Block `file_search` Patterns Matching Zone Name Prefixes → **Not implemented**
+
+**Rationale:** VS Code's `files.exclude` setting already prevents `file_search` from returning results inside `NoAgentZone`, `.github`, and other protected directories. The audit noted this as LOW priority. No additional blocking is needed because the underlying filesystem visibility is already restricted at the IDE level.
+
+#### R11 — Consider Ephemeral Project Folders → **Not implemented**
+
+**Rationale:** Ephemeral project folders (fresh copy per session) would eliminate persistent state accumulation but would break developer workflow continuity. Developers expect their code, history, and session state to persist between agent sessions. This is a fundamental architectural trade-off, not a security gap. Not suitable for the current product design.
+
+---
+
+### 10.3 Additional V3.0.0 Change: FIX-046 (Default-Project Removal)
+
+FIX-046 removed the `Default-Project/` directory from the repository. This directory was an original development copy that had become 100% redundant with `templates/coding/`. Maintaining both caused sync bugs (BUG-030) and created confusion about which copy was authoritative. All references in tests, documentation, and source comments were updated to point to `templates/coding/`. The removal reduces the attack surface by eliminating a duplicate copy of the security infrastructure that could drift out of sync.
+
+---
+
+### 10.4 Overall Philosophy
+
+> **"The workspace is designed for maximum agent freedom inside the project folder; we harden the boundaries, not restrict what happens inside."**
+
+The V3.0.0 security model enforces strict access controls at the **zone boundaries**: agents cannot reach `NoAgentZone`, `.github/`, `.vscode/`, `.git/`, or system paths. Inside the `AgentZone` project folder, agents have full capability — creating, editing, and executing Python code, running git operations, and making network requests. This is intentional. The product's value proposition depends on agents doing real development work, which requires genuine system access within the designated workspace. Security hardening focuses on preventing escape from the project folder, not on restricting what agents can do while inside it.
