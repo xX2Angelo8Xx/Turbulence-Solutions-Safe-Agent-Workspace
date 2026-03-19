@@ -64,6 +64,18 @@ def _prevent_background_updates():
 
 
 @pytest.fixture(autouse=True)
+def _mock_verify_ts_python():
+    """Prevent real ts-python execution during tests (SAF-034).
+
+    Only patches the app.py local binding so that _on_create_project() does
+    not abort due to a missing ts-python shim in the test environment.
+    SAF-034 tests override this fixture locally with their own patch values.
+    """
+    with patch("launcher.gui.app.verify_ts_python", return_value=(True, "3.11.0 (mocked)")):
+        yield
+
+
+@pytest.fixture(autouse=True)
 def _prevent_vscode_detection():
     """Prevent shutil.which from finding a real VS Code installation.
 

@@ -16,7 +16,7 @@ from launcher.core.updater import check_for_update
 from launcher.core.downloader import download_update
 from launcher.core.applier import apply_update
 from launcher.core.project_creator import create_project, is_template_ready, list_templates
-from launcher.core.shim_config import read_python_path, write_python_path
+from launcher.core.shim_config import read_python_path, verify_ts_python, write_python_path
 from launcher.core.vscode import find_vscode, open_in_vscode
 from launcher.gui.components import make_browse_row, make_label_entry_row
 from launcher.gui.validation import (
@@ -323,6 +323,16 @@ class App:
             return
 
         template_path = TEMPLATES_DIR / raw_template
+        # Pre-flight: verify ts-python is accessible before creating the workspace.
+        shim_ok, shim_msg = verify_ts_python()
+        if not shim_ok:
+            messagebox.showerror(
+                "Python Runtime Unavailable",
+                "The bundled Python runtime is not accessible. "
+                "Please reinstall the launcher or use Settings > Relocate Python Runtime.\n\n"
+                f"Details: {shim_msg}",
+            )
+            return
         try:
             created_path = create_project(template_path, Path(destination_str), folder_name)
         except Exception as exc:
