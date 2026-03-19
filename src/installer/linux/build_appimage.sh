@@ -84,6 +84,12 @@ else
     echo "==> python-embed not populated — skipping (Linux uses system/PyInstaller Python)"
 fi
 
+# FIX-057: Bundle the ts-python shim inside the AppImage for first-launch deployment
+echo "==> Bundling ts-python shim..."
+mkdir -p "${APPDIR}/usr/share/shims"
+cp "src/installer/shims/ts-python" "${APPDIR}/usr/share/shims/ts-python"
+chmod +x "${APPDIR}/usr/share/shims/ts-python"
+
 # ---------------------------------------------------------------------------
 # Step 3: Write .desktop file
 # ---------------------------------------------------------------------------
