@@ -85,3 +85,80 @@ def test_timeout_preserved():
     data = json.loads(REQUIRE_APPROVAL_PATH.read_text(encoding="utf-8"))
     hook = data["hooks"]["PreToolUse"][0]
     assert hook["timeout"] == 15
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests
+# ---------------------------------------------------------------------------
+
+
+def test_file_encoding_no_bom():
+    """File must be UTF-8 without BOM (BOMs break JSON parsers in some tools)."""
+    raw = REQUIRE_APPROVAL_PATH.read_bytes()
+    assert not raw.startswith(b"\xef\xbb\xbf"), (
+        "require-approval.json must not have a UTF-8 BOM"
+    )
+    # Ensure the bytes are valid UTF-8
+    raw.decode("utf-8")
+
+
+def test_command_and_windows_fields_are_identical():
+    """The 'command' and 'windows' fields must be exactly the same string.
+
+    Both platforms should invoke the security gate with identical arguments.
+    """
+    data = json.loads(REQUIRE_APPROVAL_PATH.read_text(encoding="utf-8"))
+    hook = data["hooks"]["PreToolUse"][0]
+    assert hook["command"] == hook["windows"], (
+        f"'command' and 'windows' fields differ:\n"
+        f"  command: {hook['command']!r}\n"
+        f"  windows: {hook['windows']!r}"
+    )
+
+
+def test_pretooluse_has_exactly_one_hook():
+    """PreToolUse list must contain exactly one hook entry (no duplicates, no gaps)."""
+    data = json.loads(REQUIRE_APPROVAL_PATH.read_text(encoding="utf-8"))
+    entries = data["hooks"]["PreToolUse"]
+    assert isinstance(entries, list), "PreToolUse must be a list"
+    assert len(entries) == 1, (
+        f"Expected exactly 1 PreToolUse hook, found {len(entries)}"
+    )
+
+
+def test_ts_python_command_is_lowercase():
+    """ts-python in both fields must be exactly lowercase — no mixed-case variants."""
+    data = json.loads(REQUIRE_APPROVAL_PATH.read_text(encoding="utf-8"))
+    hook = data["hooks"]["PreToolUse"][0]
+    for field in ("command", "windows"):
+        assert hook[field].startswith("ts-python "), (
+            f"Field '{field}' must start with lowercase 'ts-python ': {hook[field]!r}"
+        )
+
+
+def test_no_trailing_whitespace_in_command_fields():
+    """Command fields must not have leading or trailing whitespace."""
+    data = json.loads(REQUIRE_APPROVAL_PATH.read_text(encoding="utf-8"))
+    hook = data["hooks"]["PreToolUse"][0]
+    for field in ("command", "windows"):
+        assert hook[field] == hook[field].strip(), (
+            f"Field '{field}' has unexpected leading/trailing whitespace: {hook[field]!r}"
+        )
+
+
+def test_hook_has_required_fields():
+    """Hook entry must contain all four required fields: type, command, windows, timeout."""
+    data = json.loads(REQUIRE_APPROVAL_PATH.read_text(encoding="utf-8"))
+    hook = data["hooks"]["PreToolUse"][0]
+    required = {"type", "command", "windows", "timeout"}
+    missing = required - hook.keys()
+    assert not missing, f"Hook is missing required fields: {missing}"
+
+
+def test_hook_has_no_unexpected_fields():
+    """Hook entry must not contain fields beyond the four expected ones."""
+    data = json.loads(REQUIRE_APPROVAL_PATH.read_text(encoding="utf-8"))
+    hook = data["hooks"]["PreToolUse"][0]
+    allowed = {"type", "command", "windows", "timeout"}
+    extra = set(hook.keys()) - allowed
+    assert not extra, f"Hook has unexpected extra fields: {extra}"
