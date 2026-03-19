@@ -15,7 +15,7 @@ import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_README = REPO_ROOT / "Default-Project" / "Project" / "README.md"
+DEFAULT_README = REPO_ROOT / "templates" / "coding" / "Project" / "README.md"
 TEMPLATE_README = REPO_ROOT / "templates" / "coding" / "Project" / "README.md"
 
 
@@ -37,7 +37,7 @@ def test_default_readme_placeholder_is_standalone_line():
     in the middle of another line such as a bullet-point or prose paragraph."""
     lines = _lines(DEFAULT_README)
     assert "# {{PROJECT_NAME}}" in lines, (
-        "# {{PROJECT_NAME}} is not a standalone line in Default-Project/Project/README.md. "
+        "# {{PROJECT_NAME}} is not a standalone line in templates/coding/Project/README.md. "
         "It is currently embedded mid-line after German bullet-point text on line 27."
     )
 
@@ -108,7 +108,7 @@ def test_default_readme_no_german_content():
     '# Mathematik Demo' which is present due to a prior session edit."""
     content = _content(DEFAULT_README)
     assert "Mathematik Demo" not in content, (
-        "Default-Project README contains German session content 'Mathematik Demo' "
+        "templates/coding README contains German session content 'Mathematik Demo' "
         "that does not belong in a project folder template."
     )
 

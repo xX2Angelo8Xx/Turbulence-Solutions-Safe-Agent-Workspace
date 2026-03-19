@@ -1,4 +1,4 @@
-"""Tests for Default-Project/.github/hooks/scripts/zone_classifier.py
+"""Tests for templates/coding/.github/hooks/scripts/zone_classifier.py
 
 SAF-002 — Zone Enforcement Logic
 
@@ -19,14 +19,14 @@ import pytest
 
 # ---------------------------------------------------------------------------
 # Make zone_classifier (and security_gate) importable from their
-# non-standard location inside Default-Project/.github/hooks/scripts/
+# non-standard location inside templates/coding/.github/hooks/scripts/
 # ---------------------------------------------------------------------------
 _SCRIPTS_DIR = os.path.abspath(
     os.path.join(
         os.path.dirname(__file__),
         "..",
         "..",
-        "Default-Project",
+        "templates", "coding",
         ".github",
         "hooks",
         "scripts",

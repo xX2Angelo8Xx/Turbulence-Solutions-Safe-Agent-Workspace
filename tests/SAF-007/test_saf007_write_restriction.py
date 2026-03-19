@@ -21,14 +21,14 @@ import pytest
 
 # ---------------------------------------------------------------------------
 # Make security_gate (and zone_classifier) importable from their
-# non-standard location inside Default-Project/.github/hooks/scripts/
+# non-standard location inside templates/coding/.github/hooks/scripts/
 # ---------------------------------------------------------------------------
 _SCRIPTS_DIR = os.path.abspath(
     os.path.join(
         os.path.dirname(__file__),
         "..",
         "..",
-        "Default-Project",
+        "templates", "coding",
         ".github",
         "hooks",
         "scripts",

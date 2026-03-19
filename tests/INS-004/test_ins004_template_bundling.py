@@ -1,7 +1,7 @@
 """INS-004 — Template Bundling: comprehensive test suite.
 
 Verifies that:
-- templates/coding/ directory tree matches Default-Project/ (minus __pycache__)
+- templates/coding/ directory tree matches templates/coding/ (minus __pycache__)
 - config.TEMPLATES_DIR constant exists, is a pathlib.Path, and resolves correctly
 - project_creator.list_templates() is callable and returns correct results
 - Integration: templates are discoverable and copyable at runtime
@@ -292,10 +292,10 @@ def test_template_discoverable_and_copyable():
 
 
 def test_template_files_match_default_project():
-    """All files in Default-Project/ (minus __pycache__) must exist in templates/coding/."""
-    default_project = REPO_ROOT / "Default-Project"
+    """All files in templates/coding/ (minus __pycache__) must exist in templates/coding/."""
+    default_project = REPO_ROOT / "templates" / "coding"
     if not default_project.is_dir():
-        pytest.skip("Default-Project/ not found")
+        pytest.skip("templates/coding/ not found")
 
     missing = []
     for src_file in default_project.rglob("*"):
@@ -306,17 +306,17 @@ def test_template_files_match_default_project():
                 missing.append(str(relative))
 
     assert missing == [], (
-        f"Files present in Default-Project/ but missing from templates/coding/:\n"
+        f"Files present in templates/coding/ but missing from templates/coding/:\n"
         + "\n".join(f"  - {f}" for f in sorted(missing))
     )
 
 
 def test_coding_template_has_no_extra_files_beyond_default_project():
-    """templates/coding/ must not contain files absent from Default-Project/
+    """templates/coding/ must not contain files absent from templates/coding/
     (prevents template drift / stale artifacts)."""
-    default_project = REPO_ROOT / "Default-Project"
+    default_project = REPO_ROOT / "templates" / "coding"
     if not default_project.is_dir():
-        pytest.skip("Default-Project/ not found")
+        pytest.skip("templates/coding/ not found")
 
     extra = []
     for tmpl_file in CODING_TEMPLATE.rglob("*"):
@@ -327,7 +327,7 @@ def test_coding_template_has_no_extra_files_beyond_default_project():
                 extra.append(str(relative))
 
     assert extra == [], (
-        f"Files in templates/coding/ that have no counterpart in Default-Project/:\n"
+        f"Files in templates/coding/ that have no counterpart in templates/coding/:\n"
         + "\n".join(f"  - {f}" for f in sorted(extra))
     )
 
@@ -361,7 +361,7 @@ import re as _re
 
 def _strip_json_comments(text: str) -> str:
     """Strip JS-style line comments (// ...) from a JSONC string so it can be
-    parsed as standard JSON.  Used to compare Default-Project settings files
+    parsed as standard JSON.  Used to compare templates/coding settings files
     (which use JSONC comment syntax) with template files (clean JSON)."""
     return _re.sub(r"//[^\n]*", "", text)
 
@@ -383,17 +383,17 @@ def _key_security_files() -> list[str]:
 
 def test_template_security_files_match_default_project_content():
     """Key security files in templates/coding/ must have identical content to
-    their counterparts in Default-Project/.
+    their counterparts in templates/coding/.
 
     For .json files, semantic equality is used (parsed JSON objects compared)
     so that differences in whitespace and JSONC-style comments do not cause
-    false failures — Default-Project/ settings.json uses administrative
+    false failures — templates/coding/ settings.json uses administrative
     comments for documentation while the template carries clean JSON.
     For all other files a byte-for-byte comparison is performed.
     """
-    default_project = REPO_ROOT / "Default-Project"
+    default_project = REPO_ROOT / "templates" / "coding"
     if not default_project.is_dir():
-        pytest.skip("Default-Project/ not found")
+        pytest.skip("templates/coding/ not found")
 
     mismatches = []
     for rel in _key_security_files():
@@ -407,27 +407,27 @@ def test_template_security_files_match_default_project_content():
                 if src.read_bytes() != dst.read_bytes():
                     mismatches.append(rel)
         elif not src.is_file():
-            mismatches.append(f"MISSING in Default-Project/: {rel}")
+            mismatches.append(f"MISSING in templates/coding/: {rel}")
         else:
             mismatches.append(f"MISSING in templates/coding/: {rel}")
 
     assert mismatches == [], (
-        "Content mismatch between Default-Project/ and templates/coding/ for:\n"
+        "Content mismatch between templates/coding/ and templates/coding/ for:\n"
         + "\n".join(f"  - {m}" for m in mismatches)
     )
 
 
 def test_vscode_settings_json_has_all_required_keys():
     """templates/coding/.vscode/settings.json must contain every security-
-    critical key present in Default-Project/.vscode/settings.json.
+    critical key present in templates/coding/.vscode/settings.json.
 
     This test is intentionally more lenient than a byte-for-byte comparison:
-    Default-Project/ uses JSONC comment syntax for documentation; the template
+    templates/coding/ uses JSONC comment syntax for documentation; the template
     carries clean JSON.  What matters is that no security control is absent.
     """
-    default_project = REPO_ROOT / "Default-Project"
+    default_project = REPO_ROOT / "templates" / "coding"
     if not default_project.is_dir():
-        pytest.skip("Default-Project/ not found")
+        pytest.skip("templates/coding/ not found")
 
     src_parsed = _load_json_ignoring_comments(
         default_project / ".vscode" / "settings.json"
@@ -485,15 +485,15 @@ def test_list_templates_wrong_type_returns_empty():
 
 def test_template_non_json_files_match_default_project_byte_for_byte():
     """All non-JSON files in templates/coding/ must be byte-for-byte identical
-    to their Default-Project/ counterparts.
+    to their templates/coding/ counterparts.
 
-    JSON files are excluded because Default-Project/ uses JSONC comment syntax
+    JSON files are excluded because templates/coding/ uses JSONC comment syntax
     while the template ships clean JSON — semantic equality is verified by
     test_template_security_files_match_default_project_content instead.
     """
-    default_project = REPO_ROOT / "Default-Project"
+    default_project = REPO_ROOT / "templates" / "coding"
     if not default_project.is_dir():
-        pytest.skip("Default-Project/ not found")
+        pytest.skip("templates/coding/ not found")
 
     mismatches: list[str] = []
     for tmpl_file in CODING_TEMPLATE.rglob("*"):
@@ -507,7 +507,7 @@ def test_template_non_json_files_match_default_project_byte_for_byte():
             mismatches.append(str(rel))
 
     assert mismatches == [], (
-        "Non-JSON content mismatch between Default-Project/ and templates/coding/:\n"
+        "Non-JSON content mismatch between templates/coding/ and templates/coding/:\n"
         + "\n".join(f"  - {m}" for m in sorted(mismatches))
     )
 

@@ -17,7 +17,7 @@ REPO_ROOT = os.path.abspath(
 
 DEFAULT_PROJECT_FILE = os.path.join(
     REPO_ROOT,
-    "Default-Project",
+    "templates", "coding",
     ".github",
     "instructions",
     "copilot-instructions.md",
@@ -39,23 +39,23 @@ def _read(path: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Default-Project file
+# templates/coding file
 # ---------------------------------------------------------------------------
 
 def test_default_project_uses_placeholder():
-    """{{PROJECT_NAME}} must appear in the Default-Project copilot-instructions."""
+    """{{PROJECT_NAME}} must appear in the templates/coding copilot-instructions."""
     content = _read(DEFAULT_PROJECT_FILE)
     assert "{{PROJECT_NAME}}" in content, (
-        "Expected {{PROJECT_NAME}} placeholder in Default-Project copilot-instructions.md"
+        "Expected {{PROJECT_NAME}} placeholder in templates/coding copilot-instructions.md"
     )
 
 
 def test_default_project_no_bare_project_folder():
-    """The bare literal `Project/` folder reference must not appear in the Default-Project file."""
+    """The bare literal `Project/` folder reference must not appear in the templates/coding file."""
     content = _read(DEFAULT_PROJECT_FILE)
     # Match backtick-quoted 'Project/' as a folder reference (not part of a URL or WP ID).
     assert not re.search(r"`Project/`", content), (
-        "Found hardcoded `Project/` folder reference in Default-Project copilot-instructions.md; "
+        "Found hardcoded `Project/` folder reference in templates/coding copilot-instructions.md; "
         "it should use {{PROJECT_NAME}}/ instead."
     )
 
@@ -90,7 +90,7 @@ def test_files_are_identical():
     default_content = _read(DEFAULT_PROJECT_FILE)
     templates_content = _read(TEMPLATES_CODING_FILE)
     assert default_content == templates_content, (
-        "Default-Project and templates/coding copilot-instructions.md are out of sync; "
+        "templates/coding and templates/coding copilot-instructions.md are out of sync; "
         "they must be identical."
     )
 

@@ -27,12 +27,13 @@ from unittest.mock import patch
 import pytest
 
 # ---------------------------------------------------------------------------
-# Fixture: import zone_classifier from Default-Project scripts directory
+# Fixture: import zone_classifier from templates/coding scripts directory
 # ---------------------------------------------------------------------------
 
 SCRIPTS_DIR = str(
     Path(__file__).parents[2]
-    / "Default-Project"
+    / "templates"
+    / "coding"
     / ".github"
     / "hooks"
     / "scripts"
@@ -41,7 +42,7 @@ SCRIPTS_DIR = str(
 
 @pytest.fixture(scope="module")
 def zc():
-    """Import zone_classifier from the Default-Project scripts directory."""
+    """Import zone_classifier from the templates/coding scripts directory."""
     if SCRIPTS_DIR not in sys.path:
         sys.path.insert(0, SCRIPTS_DIR)
     import zone_classifier as _zc

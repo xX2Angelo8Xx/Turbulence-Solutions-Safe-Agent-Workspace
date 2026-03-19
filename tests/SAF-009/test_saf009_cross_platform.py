@@ -34,14 +34,14 @@ import pytest
 
 # ---------------------------------------------------------------------------
 # Make security_gate (and zone_classifier) importable from their
-# non-standard location inside Default-Project/.github/hooks/scripts/
+# non-standard location inside templates/coding/.github/hooks/scripts/
 # ---------------------------------------------------------------------------
 _SCRIPTS_DIR = os.path.abspath(
     os.path.join(
         os.path.dirname(__file__),
         "..",
         "..",
-        "Default-Project",
+        "templates", "coding",
         ".github",
         "hooks",
         "scripts",
@@ -180,7 +180,7 @@ def test_af5_integrity_constants_not_zeroed():
 def test_af5_verify_integrity_function_callable():
     # TST-530 — regression AF-5: verify_file_integrity() must exist and be
     # callable.  Its specific pass/fail result depends on whether the actual
-    # Default-Project/ files are present; the important thing is that the
+    # templates/coding/ files are present; the important thing is that the
     # function is present and does not raise an exception when called.
     assert callable(sg.verify_file_integrity)
     result = sg.verify_file_integrity()

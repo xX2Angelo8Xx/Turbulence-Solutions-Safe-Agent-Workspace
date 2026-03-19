@@ -20,7 +20,8 @@ import pytest
 
 SCRIPTS_DIR = str(
     Path(__file__).parents[2]
-    / "Default-Project"
+    / "templates"
+    / "coding"
     / ".github"
     / "hooks"
     / "scripts"

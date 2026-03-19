@@ -52,7 +52,7 @@ Agents may create temporary output files (e.g., pytest output captures, debug lo
 
 Rules:
 1. **Allowed locations:** `docs/workpackages/<WP-ID>/`, `tests/<WP-ID>/`
-2. **Forbidden locations:** Repository root, `src/`, `docs/` (top-level), `Default-Project/`, `templates/`
+2. **Forbidden locations:** Repository root, `src/`, `docs/` (top-level), `templates/`
 3. **Cleanup required:** The agent who creates temporary files **must** delete them before handing off the WP. Use `os.remove()` or equivalent after processing.
 4. **Never delete:** Test scripts (`test_*.py`), dev-log.md, test-report.md, or any file that is part of the WP's permanent deliverables.
 5. **Naming convention:** Prefix temporary files with `tmp_` to make them easily identifiable.
@@ -145,7 +145,7 @@ For subsequent iterations (after Tester feedback), append a new section:
 ## Rules for All Agents
 
 - **One agent per workpackage.** Never work on multiple WPs simultaneously.
-- **Restricted zones:** Never access `.github/`, `.vscode/`, or `NoAgentZone/` in `Default-Project/` unless the WP explicitly requires it.
+- **Restricted zones:** Never access `.github/`, `.vscode/`, or `NoAgentZone/` in `templates/coding/` unless the WP explicitly requires it.
 - **When uncertain:** Stop and ask — do not guess.
 - **Context discipline:** Read only what you need. Do not preemptively load all documentation.
 - **No self-review:** The agent who implements a WP must NOT be the one who reviews it.

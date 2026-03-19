@@ -10,7 +10,7 @@ This project has the highest security classification. Prioritize safety over con
 ## Non-Negotiable Rules
 - Every code change **MUST** reference a workpackage ID.
 - No secrets, credentials, or API keys in source code — ever.
-- Never access `.github/`, `.vscode/`, or `NoAgentZone/` in `Default-Project/` unless your workpackage explicitly requires it.
+- Never access `.github/`, `.vscode/`, or `NoAgentZone/` in `templates/coding/` unless your workpackage explicitly requires it.
 - One agent/person per workpackage. One workpackage per branch.
 - When uncertain, stop and ask — do not guess.
 - **All agent operations are fully autonomous once kicked off by the Orchestrator.** Never prompt for user input, never run interactive commands, never require human approval during WP execution. Exceptions: Story Writer (human approval before saving stories), Maintenance agent (human approval before implementing fixes).
@@ -28,7 +28,7 @@ This project has the highest security classification. Prioritize safety over con
 | `docs/user-stories/user-stories.csv` | User stories |
 | `docs/bugs/bugs.csv` | Bug tracking |
 | `docs/test-results/test-results.csv` | Test execution records |
-| `Default-Project/` | Template shipped to users — **never modify for testing** |
+| `templates/coding/` | Coding template shipped to users — **never modify for testing** |
 
 ## Rules & Workflows
 All detailed rules, workflows, and protocols are in **`docs/work-rules/index.md`** — the central hub. Read it to find the specific rule file for your task.

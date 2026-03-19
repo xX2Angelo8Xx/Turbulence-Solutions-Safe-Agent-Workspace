@@ -38,9 +38,9 @@ import pytest
 # ---------------------------------------------------------------------------
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_SCRIPTS_DIR = _REPO_ROOT / "Default-Project" / ".github" / "hooks" / "scripts"
+_SCRIPTS_DIR = _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts"
 _GATE_PATH = _SCRIPTS_DIR / "security_gate.py"
-_SETTINGS_PATH = _REPO_ROOT / "Default-Project" / ".vscode" / "settings.json"
+_SETTINGS_PATH = _REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
 _UPDATE_HASHES_PATH = _SCRIPTS_DIR / "update_hashes.py"
 
 # Import module under test (already on sys.path from the main test file,
@@ -185,8 +185,8 @@ def test_bug027_resolved_update_hashes_at_commented_path():
         "security_gate.py should contain a comment referencing "
         ".github/hooks/scripts/update_hashes.py"
     )
-    # The referenced path is relative to Default-Project/ workspace root.
-    workspace_root = _REPO_ROOT / "Default-Project"
+    # The referenced path is relative to templates/coding/ workspace root.
+    workspace_root = _REPO_ROOT / "templates" / "coding"
     referenced_path = workspace_root / ".github" / "hooks" / "scripts" / "update_hashes.py"
     assert referenced_path.is_file(), (
         f"BUG-027 regression: update_hashes.py missing from {referenced_path}"

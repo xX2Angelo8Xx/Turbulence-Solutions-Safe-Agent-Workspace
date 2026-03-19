@@ -1,7 +1,7 @@
 """
 Tests for SAF-019: Update VS Code Settings for Auto-Approve.
 
-Verifies that both Default-Project/.vscode/settings.json and
+Verifies that both templates/coding/.vscode/settings.json and
 templates/coding/.vscode/settings.json contain the correct auto-approve
 configuration.
 """
@@ -12,7 +12,7 @@ import pathlib
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 SETTINGS_PATHS = [
-    REPO_ROOT / "Default-Project" / ".vscode" / "settings.json",
+    REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json",
     REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json",
 ]
 

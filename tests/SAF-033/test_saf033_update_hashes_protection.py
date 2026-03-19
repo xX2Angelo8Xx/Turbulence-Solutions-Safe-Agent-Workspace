@@ -9,7 +9,7 @@ Covers:
 5. Bypass-attempt tests do not circumvent the block
 6. Regression: normal python commands still allowed
 7. Pattern verification: _EXPLICIT_DENY_PATTERNS contains the correct pattern
-8. Both security_gate.py copies (Default-Project and templates/coding) are identical
+8. security_gate.py in templates/coding has the correct update_hashes deny pattern
 9. update_hashes.py script file still exists on disk (not deleted by SAF-033)
 """
 import sys
@@ -20,12 +20,13 @@ from unittest.mock import patch
 import pytest
 
 # ---------------------------------------------------------------------------
-# Fixtures — load security_gate from Default-Project
+# Fixtures \u2014 load security_gate from templates/coding
 # ---------------------------------------------------------------------------
 
 SCRIPTS_DIR = str(
     Path(__file__).parents[2]
-    / "Default-Project"
+    / "templates"
+    / "coding"
     / ".github"
     / "hooks"
     / "scripts"
@@ -236,11 +237,12 @@ def test_python_m_pip_list_still_allowed(sg):
 # ---------------------------------------------------------------------------
 
 def test_both_copies_have_identical_deny_pattern():
-    """Default-Project and templates/coding security_gate.py must have
+    """templates/coding security_gate.py must have
     the same update_hashes deny pattern (no word-boundary anchors)."""
     dp_file = (
         Path(__file__).parents[2]
-        / "Default-Project"
+        / "templates"
+        / "coding"
         / ".github"
         / "hooks"
         / "scripts"
@@ -270,11 +272,11 @@ def test_both_copies_have_identical_deny_pattern():
         None,
     )
 
-    assert dp_pattern_line is not None, "Default-Project copy missing SAF-033 update_hashes pattern"
+    assert dp_pattern_line is not None, "templates/coding copy missing SAF-033 update_hashes pattern"
     assert tc_pattern_line is not None, "templates/coding copy missing SAF-033 update_hashes pattern"
     assert dp_pattern_line == tc_pattern_line, (
         f"Pattern lines differ between copies:\n"
-        f"  Default-Project: {dp_pattern_line!r}\n"
+        f"  templates/coding pattern: {dp_pattern_line!r}\n"
         f"  templates/coding: {tc_pattern_line!r}"
     )
 
@@ -286,7 +288,8 @@ def test_pattern_has_no_word_boundary_in_source():
     """
     dp_file = (
         Path(__file__).parents[2]
-        / "Default-Project"
+        / "templates"
+        / "coding"
         / ".github"
         / "hooks"
         / "scripts"
@@ -304,16 +307,17 @@ def test_pattern_has_no_word_boundary_in_source():
 # ---------------------------------------------------------------------------
 
 def test_update_hashes_script_exists_default_project():
-    """update_hashes.py must still exist in Default-Project (not deleted by SAF-033)."""
+    """update_hashes.py must still exist in templates/coding (not deleted by SAF-033)."""
     script = (
         Path(__file__).parents[2]
-        / "Default-Project"
+        / "templates"
+        / "coding"
         / ".github"
         / "hooks"
         / "scripts"
         / "update_hashes.py"
     )
-    assert script.exists(), f"update_hashes.py missing from Default-Project: {script}"
+    assert script.exists(), f"update_hashes.py missing from templates/coding: {script}"
 
 
 def test_update_hashes_script_exists_templates_coding():

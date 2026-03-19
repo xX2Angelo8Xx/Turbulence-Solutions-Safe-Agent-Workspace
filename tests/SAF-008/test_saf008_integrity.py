@@ -1,4 +1,4 @@
-﻿"""Tests for SAF-008: Hook File Integrity
+"""Tests for SAF-008: Hook File Integrity
 
 Verifies that security_gate.py computes SHA256 hashes of security_gate.py
 and .vscode/settings.json on startup, compares them against embedded
@@ -45,7 +45,7 @@ _SCRIPTS_DIR = os.path.abspath(
         os.path.dirname(__file__),
         "..",
         "..",
-        "Default-Project",
+        "templates", "coding",
         ".github",
         "hooks",
         "scripts",
@@ -57,16 +57,16 @@ if _SCRIPTS_DIR not in sys.path:
 import security_gate as sg  # noqa: E402
 
 # ---------------------------------------------------------------------------
-# Path to the real Default-Project files (for integration-style checks)
+# Path to the real templates/coding files (for integration-style checks)
 # ---------------------------------------------------------------------------
 _REPO_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..")
 )
 _REAL_GATE_FILE = os.path.join(
-    _REPO_ROOT, "Default-Project", ".github", "hooks", "scripts", "security_gate.py"
+    _REPO_ROOT, "templates", "coding", ".github", "hooks", "scripts", "security_gate.py"
 )
 _REAL_SETTINGS_FILE = os.path.join(
-    _REPO_ROOT, "Default-Project", ".vscode", "settings.json"
+    _REPO_ROOT, "templates", "coding", ".vscode", "settings.json"
 )
 
 
@@ -167,11 +167,11 @@ def test_compute_gate_canonical_hash_independent_of_gate_hash(tmp_path):
 # ===========================================================================
 
 def test_verify_file_integrity_passes_with_good_hashes():
-    # TST-452 - The real Default-Project files should pass integrity check
+    # TST-452 - The real templates/coding files should pass integrity check
     # because update_hashes.py was run to embed their current hashes.
     result = sg.verify_file_integrity()
     assert result is True, (
-        "verify_file_integrity() returned False against the real Default-Project "
+        "verify_file_integrity() returned False against the real templates/coding "
         "files.  This means update_hashes.py was not run after the last code "
         "change, or a file was modified without re-running update_hashes.py."
     )

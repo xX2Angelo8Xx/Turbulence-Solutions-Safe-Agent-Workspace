@@ -4,7 +4,7 @@ DOC-005 Tests: Known Tool Limitations section in copilot-instructions.md
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_FILE = REPO_ROOT / "Default-Project" / ".github" / "instructions" / "copilot-instructions.md"
+DEFAULT_FILE = REPO_ROOT / "templates" / "coding" / ".github" / "instructions" / "copilot-instructions.md"
 TEMPLATE_FILE = REPO_ROOT / "templates" / "coding" / ".github" / "instructions" / "copilot-instructions.md"
 
 HEADING = "## Known Tool Limitations"
@@ -38,7 +38,7 @@ def test_both_files_are_identical():
     default_content = _read(DEFAULT_FILE)
     template_content = _read(TEMPLATE_FILE)
     assert default_content == template_content, (
-        "Default-Project and templates/coding copilot-instructions.md are not identical"
+        "templates/coding and templates/coding copilot-instructions.md are not identical"
     )
 
 

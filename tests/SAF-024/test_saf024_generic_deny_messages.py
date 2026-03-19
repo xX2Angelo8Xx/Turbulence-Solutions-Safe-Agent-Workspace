@@ -34,7 +34,7 @@ _SCRIPTS_DIR = os.path.abspath(
         os.path.dirname(__file__),
         "..",
         "..",
-        "Default-Project",
+        "templates", "coding",
         ".github",
         "hooks",
         "scripts",
@@ -215,12 +215,12 @@ def test_deny_reason_constant_is_str():
 
 
 # ===========================================================================
-# TST-610: templates/coding/ security_gate.py _DENY_REASON matches Default-Project/
+# TST-610: templates/coding/ security_gate.py _DENY_REASON is correct
 # ===========================================================================
 
 def test_templates_deny_reason_matches():
     # TST-610 — the templates version must contain the same generic _DENY_REASON
-    # as the Default-Project version (sync check via file content inspection)
+    # (sync check via file content inspection)
     template_gate = os.path.join(_TEMPLATE_SCRIPTS_DIR, "security_gate.py")
     assert os.path.isfile(template_gate), (
         f"templates/coding/ security_gate.py not found at: {template_gate}"

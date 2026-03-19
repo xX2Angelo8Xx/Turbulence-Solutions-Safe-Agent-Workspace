@@ -1,6 +1,6 @@
 """Tests for DOC-004: Project Folder README.md placeholder usage.
 
-Verifies that both Default-Project/Project/README.md and
+Verifies that both templates/coding/Project/README.md and
 templates/coding/Project/README.md:
   - Contain the {{PROJECT_NAME}} placeholder in the H1 heading
   - Do NOT contain a hardcoded '# Project' heading
@@ -16,7 +16,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_README = REPO_ROOT / "Default-Project" / "Project" / "README.md"
+DEFAULT_README = REPO_ROOT / "templates" / "coding" / "Project" / "README.md"
 TEMPLATE_README = REPO_ROOT / "templates" / "coding" / "Project" / "README.md"
 
 
@@ -25,29 +25,29 @@ def _read(path: Path) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Static content tests — Default-Project/Project/README.md
+# Static content tests — templates/coding/Project/README.md
 # ---------------------------------------------------------------------------
 
 
 def test_default_readme_exists():
-    """Default-Project/Project/README.md must exist."""
+    """templates/coding/Project/README.md must exist."""
     assert DEFAULT_README.exists(), f"Missing: {DEFAULT_README}"
 
 
 def test_default_readme_contains_project_name_placeholder():
-    """Default-Project README must contain {{PROJECT_NAME}} placeholder."""
+    """templates/coding README must contain {{PROJECT_NAME}} placeholder."""
     content = _read(DEFAULT_README)
     assert "{{PROJECT_NAME}}" in content
 
 
 def test_default_readme_h1_uses_placeholder():
-    """Default-Project README H1 heading must use {{PROJECT_NAME}}."""
+    """templates/coding README H1 heading must use {{PROJECT_NAME}}."""
     content = _read(DEFAULT_README)
     assert "# {{PROJECT_NAME}}" in content
 
 
 def test_default_readme_no_hardcoded_project_heading():
-    """Default-Project README must not have a bare '# Project' H1 heading."""
+    """templates/coding README must not have a bare '# Project' H1 heading."""
     content = _read(DEFAULT_README)
     # Allow '# Project' only if followed by a non-space char (e.g., '#Name'),
     # but a standalone '# Project' on its own line is forbidden.
@@ -94,9 +94,9 @@ def test_template_readme_no_hardcoded_project_heading():
 
 
 def test_both_readmes_are_identical():
-    """Default-Project and templates/coding README must have identical content."""
+    """templates/coding and templates/coding README must have identical content."""
     assert _read(DEFAULT_README) == _read(TEMPLATE_README), (
-        "Default-Project/Project/README.md and templates/coding/Project/README.md differ"
+        "templates/coding/Project/README.md and templates/coding/Project/README.md differ"
     )
 
 

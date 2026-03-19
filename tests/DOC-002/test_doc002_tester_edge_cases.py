@@ -7,9 +7,9 @@ from pathlib import Path
 from launcher.core.project_creator import replace_template_placeholders, create_project
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_DEFAULT_README = _REPO_ROOT / "Default-Project" / "README.md"
+_DEFAULT_README = _REPO_ROOT / "templates" / "coding" / "README.md"
 _TEMPLATE_README = _REPO_ROOT / "templates" / "coding" / "README.md"
-_NOAGENTZONE_README = _REPO_ROOT / "Default-Project" / "NoAgentZone" / "README.md"
+_NOAGENTZONE_README = _REPO_ROOT / "templates" / "coding" / "NoAgentZone" / "README.md"
 
 
 def _write(path: Path, content: str) -> None:
@@ -25,7 +25,7 @@ class TestPlaceholderCount:
     """Verify that each template README has exactly 4 occurrences of {{PROJECT_NAME}}."""
 
     def test_default_readme_has_exactly_four_placeholder_occurrences(self):
-        """Default-Project/README.md contains exactly 4 {{PROJECT_NAME}} tokens."""
+        """templates/coding/README.md contains exactly 4 {{PROJECT_NAME}} tokens."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
         count = content.count("{{PROJECT_NAME}}")
         assert count == 4, f"Expected 4 occurrences but found {count}"
@@ -37,7 +37,7 @@ class TestPlaceholderCount:
         assert count == 4, f"Expected 4 occurrences but found {count}"
 
     def test_no_workspace_name_placeholder_in_default_readme(self):
-        """Default-Project/README.md does not contain {{WORKSPACE_NAME}} (design decision)."""
+        """templates/coding/README.md does not contain {{WORKSPACE_NAME}} (design decision)."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
         assert "{{WORKSPACE_NAME}}" not in content
 
@@ -127,7 +127,7 @@ class TestAllOccurrencesInActualTemplate:
     """Verify that after replacement, all 4 occurrences in an actual-content copy are resolved."""
 
     def test_all_four_actual_readme_occurrences_replaced(self, tmp_path):
-        """Copy of Default-Project/README.md has all 4 {{PROJECT_NAME}} tokens replaced."""
+        """Copy of templates/coding/README.md has all 4 {{PROJECT_NAME}} tokens replaced."""
         readme_src = _DEFAULT_README.read_text(encoding="utf-8")
         dest_readme = tmp_path / "README.md"
         _write(dest_readme, readme_src)

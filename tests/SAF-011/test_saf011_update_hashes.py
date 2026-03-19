@@ -41,14 +41,14 @@ import pytest
 # ---------------------------------------------------------------------------
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_SCRIPTS_DIR = _REPO_ROOT / "Default-Project" / ".github" / "hooks" / "scripts"
+_SCRIPTS_DIR = _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts"
 _TEMPLATE_SCRIPTS_DIR = (
     _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts"
 )
 _UPDATE_HASHES_PATH = _SCRIPTS_DIR / "update_hashes.py"
 _TEMPLATE_UPDATE_HASHES_PATH = _TEMPLATE_SCRIPTS_DIR / "update_hashes.py"
 _GATE_PATH = _SCRIPTS_DIR / "security_gate.py"
-_SETTINGS_PATH = _REPO_ROOT / "Default-Project" / ".vscode" / "settings.json"
+_SETTINGS_PATH = _REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
 
 # ---------------------------------------------------------------------------
 # Import the module under test from its non-standard location
@@ -61,7 +61,7 @@ import update_hashes as uh  # noqa: E402
 
 
 # ===========================================================================
-# TST-624: Script exists in Default-Project
+# TST-624: Script exists in templates/coding
 # ===========================================================================
 
 def test_script_exists_default_project():
@@ -363,12 +363,12 @@ def test_embedded_hashes_are_64_lowercase_hex():
 
 
 # ===========================================================================
-# TST-640: Default-Project and templates copies are byte-for-byte identical
+# TST-640: templates/coding and templates copies are byte-for-byte identical
 # ===========================================================================
 
 def test_scripts_are_byte_for_byte_identical():
     default_bytes = _UPDATE_HASHES_PATH.read_bytes()
     template_bytes = _TEMPLATE_UPDATE_HASHES_PATH.read_bytes()
     assert default_bytes == template_bytes, (
-        "Default-Project and templates copies of update_hashes.py differ"
+        "templates/coding and templates copies of update_hashes.py differ"
     )

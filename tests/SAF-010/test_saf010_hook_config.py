@@ -1,7 +1,7 @@
 """
 Tests for SAF-010 — Hook Integration Config
 
-Verifies that Default-Project/.github/hooks/require-approval.json:
+Verifies that templates/coding/.github/hooks/require-approval.json:
   - Exists at the correct path
   - Is well-formed JSON
   - Has the correct VS Code hook structure
@@ -20,9 +20,9 @@ import pytest
 # ---------------------------------------------------------------------------
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_CONFIG_PATH = _REPO_ROOT / "Default-Project" / ".github" / "hooks" / "require-approval.json"
-_SCRIPTS_DIR = _REPO_ROOT / "Default-Project" / ".github" / "hooks" / "scripts"
-_SETTINGS_PATH = _REPO_ROOT / "Default-Project" / ".vscode" / "settings.json"
+_CONFIG_PATH = _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "require-approval.json"
+_SCRIPTS_DIR = _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts"
+_SETTINGS_PATH = _REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
 
 
 # ---------------------------------------------------------------------------

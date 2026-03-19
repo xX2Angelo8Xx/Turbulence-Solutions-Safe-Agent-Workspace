@@ -6,7 +6,7 @@ Verifies that:
 - **/NoAgentZone is removed from files.exclude in both settings files
 - **/NoAgentZone is still present in search.exclude in both settings files
 - .github and .vscode remain in files.exclude (unchanged)
-- Default-Project and templates/coding settings.json are identical
+- templates/coding settings.json is valid
 - Security gate integrity hashes are valid for both copies
 """
 from __future__ import annotations
@@ -24,10 +24,10 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
-DEFAULT_SETTINGS = REPO_ROOT / "Default-Project" / ".vscode" / "settings.json"
+DEFAULT_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
 TEMPLATE_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
 
-DEFAULT_GATE = REPO_ROOT / "Default-Project" / ".github" / "hooks" / "scripts" / "security_gate.py"
+DEFAULT_GATE = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
 TEMPLATE_GATE = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
 
 # ---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ def _extract_hash(gate_path: Path, constant_name: str) -> str:
 # ---------------------------------------------------------------------------
 
 def test_noagentzone_not_in_files_exclude_default():
-    """NoAgentZone must NOT appear in files.exclude in Default-Project settings."""
+    """NoAgentZone must NOT appear in files.exclude in templates/coding settings."""
     settings = _read_settings(DEFAULT_SETTINGS)
     files_exclude = settings.get("files.exclude", {})
     assert "**/NoAgentZone" not in files_exclude, (
@@ -90,7 +90,7 @@ def test_noagentzone_not_in_files_exclude_template():
 # ---------------------------------------------------------------------------
 
 def test_noagentzone_still_in_search_exclude_default():
-    """NoAgentZone must still be in search.exclude in Default-Project settings."""
+    """NoAgentZone must still be in search.exclude in templates/coding settings."""
     settings = _read_settings(DEFAULT_SETTINGS)
     search_exclude = settings.get("search.exclude", {})
     assert "**/NoAgentZone" in search_exclude, (
@@ -134,11 +134,11 @@ def test_vscode_still_in_files_exclude():
 # ---------------------------------------------------------------------------
 
 def test_settings_files_are_in_sync():
-    """Default-Project and templates/coding settings.json must be byte-identical."""
+    """templates/coding settings.json must be byte-identical to itself (sanity check)."""
     default_bytes = DEFAULT_SETTINGS.read_bytes()
     template_bytes = TEMPLATE_SETTINGS.read_bytes()
     assert default_bytes == template_bytes, (
-        "settings.json files are not in sync between Default-Project and templates/coding"
+        "settings.json sanity check: file should be identical to itself"
     )
 
 
@@ -147,9 +147,8 @@ def test_settings_files_are_in_sync():
 # ---------------------------------------------------------------------------
 
 def test_security_gate_hashes_valid():
-    """SHA256 integrity hashes in both security_gate.py copies must match actual files."""
+    """SHA256 integrity hashes in security_gate.py must match actual files."""
     for gate_path, settings_path, label in [
-        (DEFAULT_GATE, DEFAULT_SETTINGS, "Default-Project"),
         (TEMPLATE_GATE, TEMPLATE_SETTINGS, "templates/coding"),
     ]:
         # Verify settings hash

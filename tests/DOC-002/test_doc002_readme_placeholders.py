@@ -11,7 +11,7 @@ from launcher.core.project_creator import replace_template_placeholders, create_
 
 # Resolve template file paths relative to this test file's location.
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_DEFAULT_README = _REPO_ROOT / "Default-Project" / "README.md"
+_DEFAULT_README = _REPO_ROOT / "templates" / "coding" / "README.md"
 _TEMPLATE_README = _REPO_ROOT / "templates" / "coding" / "README.md"
 _CODING_TEMPLATE = _REPO_ROOT / "templates" / "coding"
 
@@ -33,12 +33,12 @@ class TestTemplateFilesContainPlaceholder:
     """Verify that the template README files have been updated with {{PROJECT_NAME}}."""
 
     def test_default_readme_folder_table_uses_placeholder(self):
-        """Default-Project/README.md folder table row uses {{PROJECT_NAME}}/ not Project/."""
+        """templates/coding/README.md folder table row uses {{PROJECT_NAME}}/ not Project/."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
         assert "{{PROJECT_NAME}}/" in content
 
     def test_default_readme_no_hardcoded_project_folder(self):
-        """Default-Project/README.md does not have hardcoded `Project/` as a folder entry."""
+        """templates/coding/README.md does not have hardcoded `Project/` as a folder entry."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
         # The backtick-wrapped folder name `Project/` must not appear.
         assert "`Project/`" not in content
@@ -54,7 +54,7 @@ class TestTemplateFilesContainPlaceholder:
         assert "`Project/`" not in content
 
     def test_both_template_files_are_identical(self):
-        """Default-Project/README.md and templates/coding/README.md have the same content."""
+        """templates/coding/README.md and templates/coding/README.md have the same content."""
         default_content = _DEFAULT_README.read_text(encoding="utf-8")
         template_content = _TEMPLATE_README.read_text(encoding="utf-8")
         assert default_content == template_content

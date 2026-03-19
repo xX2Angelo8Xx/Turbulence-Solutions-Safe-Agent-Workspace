@@ -19,9 +19,9 @@ import pytest
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SETTINGS = REPO_ROOT / "Default-Project" / ".vscode" / "settings.json"
+DEFAULT_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
 TEMPLATE_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
-DEFAULT_GATE = REPO_ROOT / "Default-Project" / ".github" / "hooks" / "scripts" / "security_gate.py"
+DEFAULT_GATE = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
 TEMPLATE_GATE = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
 
 EXCLUDE_KEY = "**/NoAgentZone"
@@ -56,7 +56,7 @@ def _extract_settings_hash(gate_path: Path) -> str:
 # ---------------------------------------------------------------------------
 
 class TestDefaultSettingsExclusion:
-    """Default-Project settings.json contains NoAgentZone exclusions."""
+    """templates/coding settings.json contains NoAgentZone exclusions."""
 
     def test_files_exclude_noagentzone_present(self):
         settings = _load_settings(DEFAULT_SETTINGS)
@@ -139,14 +139,14 @@ class TestSettingsSync:
         default_content = DEFAULT_SETTINGS.read_bytes()
         template_content = TEMPLATE_SETTINGS.read_bytes()
         assert default_content == template_content, (
-            "Default-Project and templates/coding settings.json are out of sync"
+            "templates/coding and templates/coding settings.json are out of sync"
         )
 
     def test_security_gate_files_are_identical(self):
         default_content = DEFAULT_GATE.read_bytes()
         template_content = TEMPLATE_GATE.read_bytes()
         assert default_content == template_content, (
-            "Default-Project and templates/coding security_gate.py are out of sync"
+            "templates/coding and templates/coding security_gate.py are out of sync"
         )
 
 
@@ -185,7 +185,7 @@ class TestBypassAttempt:
 
     def test_noagentzone_not_set_to_false_in_files_exclude(self):
         """Exclusion value must be True; False would mean VS Code shows the folder."""
-        for label, path in [("Default-Project", DEFAULT_SETTINGS),
+        for label, path in [("templates", "coding", DEFAULT_SETTINGS),
                              ("templates/coding", TEMPLATE_SETTINGS)]:
             settings = _load_settings(path)
             val = settings.get("files.exclude", {}).get(EXCLUDE_KEY)
@@ -195,7 +195,7 @@ class TestBypassAttempt:
 
     def test_noagentzone_not_set_to_false_in_search_exclude(self):
         """Exclusion value must be True; False means VS Code would still search it."""
-        for label, path in [("Default-Project", DEFAULT_SETTINGS),
+        for label, path in [("templates", "coding", DEFAULT_SETTINGS),
                              ("templates/coding", TEMPLATE_SETTINGS)]:
             settings = _load_settings(path)
             val = settings.get("search.exclude", {}).get(EXCLUDE_KEY)
@@ -213,7 +213,7 @@ class TestBypassAttempt:
 
     def test_exclude_key_uses_glob_pattern(self):
         """**/NoAgentZone pattern matches at any depth; 'NoAgentZone' alone would not."""
-        for label, path in [("Default-Project", DEFAULT_SETTINGS),
+        for label, path in [("templates", "coding", DEFAULT_SETTINGS),
                              ("templates/coding", TEMPLATE_SETTINGS)]:
             settings = _load_settings(path)
             files_keys = set(settings.get("files.exclude", {}).keys())

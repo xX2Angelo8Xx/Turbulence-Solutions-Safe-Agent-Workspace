@@ -12,7 +12,7 @@ Installer (.exe / .dmg / .AppImage)
         └── Optionally opens VS Code with the new workspace
 
 Templates (bundled inside Launcher)
-  └── coding/          ← Default-Project template
+  └── coding/          ← Coding workspace template (shipped to users)
   └── creative-marketing/   ← Marketing/creative template
 ```
 
@@ -30,11 +30,6 @@ Templates (bundled inside Launcher)
 │   │   └── copilot-instructions.md   # Landing page — auto-loaded for all agents
 │   └── workflows/
 │       └── release.yml               # CI/CD: build + release on version tag push
-├── Default-Project/                  # "Coding" template (shipped to users)
-│   ├── .github/                      # Hook scripts, Copilot config
-│   ├── .vscode/                      # VS Code security settings
-│   ├── NoAgentZone/                  # Blocked from all AI access
-│   └── Project/                      # Agent working directory
 ├── src/                              # Launcher source
 │   ├── launcher/
 │   │   ├── main.py                   # Entry point

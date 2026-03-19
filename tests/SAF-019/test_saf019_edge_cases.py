@@ -17,7 +17,7 @@ import pathlib
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 SETTINGS_PATHS = {
-    "default_project": REPO_ROOT / "Default-Project" / ".vscode" / "settings.json",
+    "default_project": REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json",
     "templates_coding": REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json",
 }
 
@@ -36,7 +36,7 @@ class TestNoDuplicates:
     def test_default_project_no_duplicate_tools(self):
         tools = _load("default_project")["chat.tools.edits.autoApprove"]
         assert len(tools) == len(set(tools)), (
-            f"Duplicate tool names in Default-Project settings: {tools}"
+            f"Duplicate tool names in templates/coding settings: {tools}"
         )
 
     def test_templates_coding_no_duplicate_tools(self):
@@ -95,7 +95,7 @@ class TestNoUnexpectedAutoApproveKeys:
         found_auto_approve_keys = {k for k in data if "autoApprove" in k}
         unexpected = found_auto_approve_keys - allowed_auto_approve_keys
         assert not unexpected, (
-            f"Unexpected auto-approve keys in Default-Project settings: {unexpected}"
+            f"Unexpected auto-approve keys in templates/coding settings: {unexpected}"
         )
 
     def test_templates_coding_no_unexpected_auto_approve_keys(self):
@@ -118,7 +118,7 @@ class TestToolOrderSync:
         tools_default = _load("default_project")["chat.tools.edits.autoApprove"]
         tools_templates = _load("templates_coding")["chat.tools.edits.autoApprove"]
         assert tools_default == tools_templates, (
-            f"Tool order mismatch:\n  Default-Project: {tools_default}\n"
+            f"Tool order mismatch:\n  templates/coding: {tools_default}\n"
             f"  templates/coding: {tools_templates}"
         )
 
@@ -129,7 +129,7 @@ class TestExactToolSetEquality:
     def test_default_project_exact_tool_set(self):
         tools = _load("default_project")["chat.tools.edits.autoApprove"]
         assert set(tools) == set(EXPECTED_TOOLS), (
-            f"Tool set mismatch in Default-Project.\n"
+            f"Tool set mismatch in templates/coding.\n"
             f"  Expected: {set(EXPECTED_TOOLS)}\n"
             f"  Got:      {set(tools)}"
         )
@@ -152,7 +152,7 @@ class TestFullSettingsSync:
         assert d1 == d2, (
             "settings.json files are not fully identical.\n"
             + "\n".join(
-                f"  Key '{k}': Default-Project={d1.get(k)!r}, templates/coding={d2.get(k)!r}"
+                f"  Key '{k}': templates/coding={d1.get(k)!r}, templates/coding={d2.get(k)!r}"
                 for k in set(d1) | set(d2)
                 if d1.get(k) != d2.get(k)
             )

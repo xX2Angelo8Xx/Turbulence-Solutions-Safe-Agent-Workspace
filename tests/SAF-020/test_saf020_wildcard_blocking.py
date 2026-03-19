@@ -24,7 +24,7 @@ _REPO_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..")
 )
 _SCRIPTS_DIR = os.path.join(
-    _REPO_ROOT, "Default-Project", ".github", "hooks", "scripts"
+    _REPO_ROOT, "templates", "coding", ".github", "hooks", "scripts"
 )
 _TEMPLATES_SCRIPTS_DIR = os.path.join(
     _REPO_ROOT, "templates", "coding", ".github", "hooks", "scripts"

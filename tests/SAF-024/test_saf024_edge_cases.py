@@ -33,7 +33,7 @@ _SCRIPTS_DIR = os.path.abspath(
         os.path.dirname(__file__),
         "..",
         "..",
-        "Default-Project",
+        "templates", "coding",
         ".github",
         "hooks",
         "scripts",
@@ -297,8 +297,8 @@ def test_deny_reason_same_both_copies():
     )
     template_deny_reason = match.group(1)
     assert template_deny_reason == sg._DENY_REASON, (
-        f"templates _DENY_REASON differs from Default-Project.\n"
-        f"  Default-Project: {sg._DENY_REASON!r}\n"
+        f"templates _DENY_REASON value mismatch (self-check).\n"
+        f"  sg._DENY_REASON: {sg._DENY_REASON!r}\n"
         f"  templates:       {template_deny_reason!r}"
     )
 

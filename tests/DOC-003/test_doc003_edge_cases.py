@@ -15,7 +15,7 @@ REPO_ROOT = os.path.abspath(
 
 DEFAULT_PROJECT_FILE = os.path.join(
     REPO_ROOT,
-    "Default-Project",
+    "templates", "coding",
     ".github",
     "instructions",
     "copilot-instructions.md",
@@ -51,7 +51,7 @@ def test_placeholder_count_exactly_one_in_default_project():
     content = _read(DEFAULT_PROJECT_FILE)
     count = content.count("{{PROJECT_NAME}}")
     assert count == 1, (
-        f"Expected exactly 1 {{{{PROJECT_NAME}}}} in Default-Project file, found {count}"
+        f"Expected exactly 1 {{{{PROJECT_NAME}}}} in templates/coding file, found {count}"
     )
 
 
@@ -72,7 +72,7 @@ def test_noagentzone_reference_unchanged_in_default_project():
     """NoAgentZone/ must remain a literal string — it is not dynamic."""
     content = _read(DEFAULT_PROJECT_FILE)
     assert "`NoAgentZone/`" in content, (
-        "Expected literal `NoAgentZone/` in Default-Project copilot-instructions.md"
+        "Expected literal `NoAgentZone/` in templates/coding copilot-instructions.md"
     )
 
 
@@ -80,7 +80,7 @@ def test_github_reference_unchanged_in_default_project():
     """`.github/` must remain a literal string."""
     content = _read(DEFAULT_PROJECT_FILE)
     assert "`.github/`" in content, (
-        "Expected literal `.github/` in Default-Project copilot-instructions.md"
+        "Expected literal `.github/` in templates/coding copilot-instructions.md"
     )
 
 
@@ -88,7 +88,7 @@ def test_vscode_reference_unchanged_in_default_project():
     """`.vscode/` must remain a literal string."""
     content = _read(DEFAULT_PROJECT_FILE)
     assert "`.vscode/`" in content, (
-        "Expected literal `.vscode/` in Default-Project copilot-instructions.md"
+        "Expected literal `.vscode/` in templates/coding copilot-instructions.md"
     )
 
 
@@ -169,7 +169,7 @@ def test_default_project_file_has_no_bom():
     with open(DEFAULT_PROJECT_FILE, "rb") as fh:
         bom = fh.read(3)
     assert bom != b"\xef\xbb\xbf", (
-        "Default-Project copilot-instructions.md has a UTF-8 BOM; remove it."
+        "templates/coding copilot-instructions.md has a UTF-8 BOM; remove it."
     )
 
 

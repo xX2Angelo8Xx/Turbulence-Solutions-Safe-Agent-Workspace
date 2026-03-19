@@ -1,4 +1,4 @@
-"""Tests for Default-Project/.github/hooks/scripts/security_gate.py
+"""Tests for templates/coding/.github/hooks/scripts/security_gate.py
 
 Covers:
   - TST-033 to TST-081: 49 core tests (unit, integration, security, cross-platform)
@@ -21,7 +21,7 @@ _SCRIPTS_DIR = os.path.abspath(
         os.path.dirname(__file__),
         "..",
         "..",
-        "Default-Project",
+        "templates", "coding",
         ".github",
         "hooks",
         "scripts",

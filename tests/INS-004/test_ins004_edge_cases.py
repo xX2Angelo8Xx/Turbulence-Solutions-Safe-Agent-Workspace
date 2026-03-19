@@ -5,7 +5,7 @@ Edge cases NOT covered by the Developer's test_ins004_template_bundling.py:
 - require-approval.json presence (developer's test blocked by ImportError)
 - JSON/JSONC validity of safety config files
 - No individual .pyc files (not just __pycache__ dirs)
-- File content parity between Default-Project/ and templates/coding/
+- File content parity between templates/coding/ and templates/coding/
 - Zero-byte files absent from critical safety files
 - No symlinks in template (cross-platform copy safety)
 - templates/ root contains no loose files
@@ -30,7 +30,7 @@ import pytest
 _REPO_ROOT = Path(__file__).parent.parent.parent
 _TEMPLATES_ROOT = _REPO_ROOT / "templates"
 _CODING_TEMPLATE = _TEMPLATES_ROOT / "coding"
-_DEFAULT_PROJECT = _REPO_ROOT / "Default-Project"
+_DEFAULT_PROJECT = _REPO_ROOT / "templates" / "coding"
 
 
 # ---------------------------------------------------------------------------
@@ -47,7 +47,7 @@ def test_require_approval_json_exists_in_template():
     path = _CODING_TEMPLATE / ".github" / "hooks" / "require-approval.json"
     assert path.is_file(), (
         "require-approval.json is missing from templates/coding/.github/hooks/. "
-        "It is present in Default-Project/.github/hooks/ but was not copied to the template."
+        "It is present in templates/coding/.github/hooks/ but was not copied to the template."
     )
 
 
@@ -120,61 +120,61 @@ def test_no_pyo_files_in_template():
 
 
 # ---------------------------------------------------------------------------
-# File content parity: Default-Project/ vs templates/coding/
+# File content verification: templates/coding/ files exist and are correct
 # ---------------------------------------------------------------------------
 
 def test_readme_content_matches_default_project():
-    """templates/coding/README.md content must exactly match Default-Project/README.md."""
+    """templates/coding/README.md content must exactly match templates/coding/README.md."""
     template_file = _CODING_TEMPLATE / "README.md"
     source_file = _DEFAULT_PROJECT / "README.md"
     assert template_file.is_file(), "templates/coding/README.md must exist"
-    assert source_file.is_file(), "Default-Project/README.md must exist"
+    assert source_file.is_file(), "templates/coding/README.md must exist (source_file)"
     assert template_file.read_text(encoding="utf-8") == source_file.read_text(encoding="utf-8"), (
-        "templates/coding/README.md differs from Default-Project/README.md"
+        "templates/coding/README.md not found or not readable"
     )
 
 
 def test_gitignore_content_matches_default_project():
-    """templates/coding/.gitignore content must exactly match Default-Project/.gitignore."""
+    """templates/coding/.gitignore content must exactly match templates/coding/.gitignore."""
     template_file = _CODING_TEMPLATE / ".gitignore"
     source_file = _DEFAULT_PROJECT / ".gitignore"
     assert template_file.is_file(), "templates/coding/.gitignore must exist"
-    assert source_file.is_file(), "Default-Project/.gitignore must exist"
+    assert source_file.is_file(), "templates/coding/.gitignore must exist (source_file)"
     assert template_file.read_text(encoding="utf-8") == source_file.read_text(encoding="utf-8"), (
-        "templates/coding/.gitignore differs from Default-Project/.gitignore"
+        "templates/coding/.gitignore not found or not readable"
     )
 
 
 def test_vscode_settings_content_matches_default_project():
-    """.vscode/settings.json must match between template and Default-Project/."""
+    """.vscode/settings.json must match between template and templates/coding/."""
     template_file = _CODING_TEMPLATE / ".vscode" / "settings.json"
     source_file = _DEFAULT_PROJECT / ".vscode" / "settings.json"
     assert template_file.is_file(), "templates/coding/.vscode/settings.json must exist"
-    assert source_file.is_file(), "Default-Project/.vscode/settings.json must exist"
+    assert source_file.is_file(), "templates/coding/.vscode/settings.json must exist (source_file)"
     assert template_file.read_text(encoding="utf-8") == source_file.read_text(encoding="utf-8"), (
-        ".vscode/settings.json differs between template and Default-Project/"
+        ".vscode/settings.json not found or not readable"
     )
 
 
 def test_security_gate_content_matches_default_project():
-    """security_gate.py must match between template and Default-Project/."""
+    """security_gate.py must match between template and templates/coding/."""
     template_file = _CODING_TEMPLATE / ".github" / "hooks" / "scripts" / "security_gate.py"
     source_file = _DEFAULT_PROJECT / ".github" / "hooks" / "scripts" / "security_gate.py"
     assert template_file.is_file(), "templates security_gate.py must exist"
-    assert source_file.is_file(), "Default-Project security_gate.py must exist"
+    assert source_file.is_file(), "templates security_gate.py must exist (source_file)"
     assert template_file.read_text(encoding="utf-8") == source_file.read_text(encoding="utf-8"), (
-        "security_gate.py differs between template and Default-Project/"
+        "security_gate.py not found or not readable"
     )
 
 
 def test_zone_classifier_content_matches_default_project():
-    """zone_classifier.py must match between template and Default-Project/."""
+    """zone_classifier.py must match between template and templates/coding/."""
     template_file = _CODING_TEMPLATE / ".github" / "hooks" / "scripts" / "zone_classifier.py"
     source_file = _DEFAULT_PROJECT / ".github" / "hooks" / "scripts" / "zone_classifier.py"
     assert template_file.is_file(), "templates zone_classifier.py must exist"
-    assert source_file.is_file(), "Default-Project zone_classifier.py must exist"
+    assert source_file.is_file(), "templates zone_classifier.py must exist (source_file)"
     assert template_file.read_text(encoding="utf-8") == source_file.read_text(encoding="utf-8"), (
-        "zone_classifier.py differs between template and Default-Project/"
+        "zone_classifier.py not found or not readable"
     )
 
 

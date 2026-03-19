@@ -13,7 +13,8 @@ import pytest
 
 SCRIPTS_DIR = str(
     Path(__file__).parents[2]
-    / "Default-Project"
+    / "templates"
+    / "coding"
     / ".github"
     / "hooks"
     / "scripts"
@@ -206,10 +207,10 @@ def test_response_json_never_ask(sg):
 # ---------------------------------------------------------------------------
 
 def test_both_copies_identical():
-    """Default-Project and templates/coding must have identical security_gate.py."""
+    """templates/coding and templates/coding must have identical security_gate.py."""
     path_a = os.path.join(
         REPO_ROOT,
-        "Default-Project", ".github", "hooks", "scripts", "security_gate.py",
+        "templates", "coding", ".github", "hooks", "scripts", "security_gate.py",
     )
     path_b = os.path.join(
         REPO_ROOT,
@@ -220,6 +221,6 @@ def test_both_copies_identical():
     with open(path_b, "rb") as fb:
         b = fb.read()
     assert a == b, (
-        "security_gate.py in Default-Project/ and templates/coding/ are not identical. "
+        "security_gate.py in templates/coding/ and templates/coding/ are not identical. "
         "Run the sync step to bring them into alignment."
     )

@@ -20,7 +20,7 @@ from unittest.mock import patch
 _SCRIPTS_DIR = os.path.normpath(os.path.join(
     os.path.dirname(__file__),
     "..", "..",
-    "Default-Project", ".github", "hooks", "scripts",
+    "templates", "coding", ".github", "hooks", "scripts",
 ))
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
