@@ -16,6 +16,7 @@ from launcher.core.updater import check_for_update
 from launcher.core.downloader import download_update
 from launcher.core.applier import apply_update
 from launcher.core.project_creator import create_project, is_template_ready, list_templates
+from launcher.core.shim_config import read_python_path, write_python_path
 from launcher.core.vscode import find_vscode, open_in_vscode
 from launcher.gui.components import make_browse_row, make_label_entry_row
 from launcher.gui.validation import (
@@ -249,6 +250,20 @@ class App:
         )
         self.version_label.place(relx=1.0, rely=1.0, x=-20, y=-8, anchor="se")
 
+        # Settings gear button (GUI-018) -- top-right corner, opens settings dialog.
+        self.settings_button = ctk.CTkButton(
+            self._window,
+            text="⚙",
+            command=self._open_settings_dialog,
+            fg_color="transparent",
+            hover_color=COLOR_PRIMARY,
+            text_color=COLOR_SECONDARY,
+            width=32,
+            height=32,
+            border_width=0,
+        )
+        self.settings_button.place(relx=1.0, rely=0.0, x=-8, y=8, anchor="ne")
+
         # Disable the VS Code checkbox if VS Code is not detected on startup (GUI-006).
         if find_vscode() is None:
             self.open_in_vscode_checkbox.configure(state="disabled")
@@ -405,6 +420,158 @@ class App:
         )
         messagebox.showerror("Update Failed", message)
 
+    def _open_settings_dialog(self) -> None:
+        """Open the Settings dialog (GUI-018)."""
+        SettingsDialog(self._window)
+
     def run(self) -> None:
         """Start the application event loop."""
         self._window.mainloop()
+
+
+class SettingsDialog:
+    """Settings dialog for the launcher (GUI-018).
+
+    Opens a CTkToplevel window with a 'Relocate Python Runtime' section
+    that lets the user auto-detect or manually browse to the Python executable
+    and persists the path via shim_config.write_python_path().
+    """
+
+    def __init__(self, parent: ctk.CTk) -> None:
+        self._dialog = ctk.CTkToplevel(parent)
+        self._dialog.title("Settings")
+        self._dialog.geometry("480x280")
+        self._dialog.resizable(False, False)
+        self._dialog.configure(fg_color=COLOR_PRIMARY)
+        self._dialog.grab_set()
+        self._build_ui()
+
+    def _build_ui(self) -> None:
+        """Build the settings dialog widgets."""
+        # Section title
+        ctk.CTkLabel(
+            self._dialog,
+            text="Relocate Python Runtime",
+            text_color=COLOR_TEXT,
+            font=("", 14, "bold"),
+            anchor="w",
+        ).grid(row=0, column=0, columnspan=3, padx=20, pady=(16, 4), sticky="w")
+
+        # Current path read-out
+        ctk.CTkLabel(
+            self._dialog,
+            text="Current path:",
+            text_color=COLOR_TEXT,
+            anchor="w",
+        ).grid(row=1, column=0, padx=(20, 8), pady=4, sticky="w")
+
+        current = read_python_path()
+        current_text = str(current) if current is not None else "Not configured"
+        self._current_path_label = ctk.CTkLabel(
+            self._dialog,
+            text=current_text,
+            text_color=COLOR_SECONDARY,
+            anchor="w",
+            wraplength=300,
+        )
+        self._current_path_label.grid(row=1, column=1, columnspan=2, padx=(0, 20), pady=4, sticky="w")
+
+        # Auto-detect button
+        self._auto_detect_button = ctk.CTkButton(
+            self._dialog,
+            text="Auto-detect",
+            command=self._on_auto_detect,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
+            text_color=COLOR_TEXT,
+            height=36,
+        )
+        self._auto_detect_button.grid(row=2, column=0, padx=(20, 8), pady=(12, 4), sticky="ew")
+
+        # Browse button
+        self._browse_button = ctk.CTkButton(
+            self._dialog,
+            text="Browse...",
+            command=self._on_browse,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
+            text_color=COLOR_TEXT,
+            height=36,
+        )
+        self._browse_button.grid(row=2, column=1, padx=(0, 8), pady=(12, 4), sticky="ew")
+
+        # Close button
+        self._close_button = ctk.CTkButton(
+            self._dialog,
+            text="Close",
+            command=self._dialog.destroy,
+            fg_color="transparent",
+            hover_color=COLOR_PRIMARY,
+            text_color=COLOR_SECONDARY,
+            height=36,
+            border_width=1,
+            border_color=COLOR_SECONDARY,
+        )
+        self._close_button.grid(row=3, column=0, columnspan=3, padx=20, pady=(16, 12), sticky="ew")
+
+    def _on_auto_detect(self) -> None:
+        """Auto-detect the python-embed directory from the launcher's install location."""
+        python_exe = self._find_bundled_python()
+        if python_exe is None or not python_exe.exists():
+            messagebox.showerror(
+                "Auto-detect Failed",
+                "Could not find a bundled Python runtime at the expected location.\n"
+                "Please use 'Browse...' to locate python.exe manually.",
+                parent=self._dialog,
+            )
+            return
+        write_python_path(python_exe)
+        self._current_path_label.configure(text=str(python_exe))
+        messagebox.showinfo(
+            "Python Runtime Updated",
+            f"Python runtime path updated to:\n{python_exe}",
+            parent=self._dialog,
+        )
+
+    def _find_bundled_python(self) -> "Path | None":
+        """Return the expected bundled Python executable path.
+
+        Checks sys._MEIPASS first (PyInstaller bundle), then falls back to
+        the grandparent of sys.executable (development layout).
+        """
+        if hasattr(sys, "_MEIPASS"):
+            # Running from a PyInstaller bundle: MEIPASS is the _internal dir.
+            # The python-embed folder sits next to the launcher executable.
+            exe_dir = Path(sys.executable).parent
+        else:
+            # Development: sys.executable is .venv/Scripts/python.exe –
+            # go up two levels to the repo root, mirroring the install layout.
+            exe_dir = Path(sys.executable).parent.parent
+
+        if sys.platform == "win32":
+            return exe_dir / "python-embed" / "python.exe"
+        else:
+            return exe_dir / "python-embed" / "python3"
+
+    def _on_browse(self) -> None:
+        """Open a file browser to locate the Python executable."""
+        if sys.platform == "win32":
+            filetypes = [("Python executable", "python.exe"), ("All files", "*.*")]
+        else:
+            filetypes = [("Python executable", "python python3"), ("All files", "*")]
+
+        path_str = filedialog.askopenfilename(
+            title="Select Python Executable",
+            filetypes=filetypes,
+            parent=self._dialog,
+        )
+        if not path_str:
+            return
+        python_exe = Path(path_str)
+        write_python_path(python_exe)
+        self._current_path_label.configure(text=str(python_exe))
+        messagebox.showinfo(
+            "Python Runtime Updated",
+            f"Python runtime path updated to:\n{python_exe}",
+            parent=self._dialog,
+        )
