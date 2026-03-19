@@ -34,6 +34,9 @@ a = Analysis(
         (os.path.join(SPECPATH, 'templates'), 'templates'),
         (os.path.join(SPECPATH, 'TS-Logo.png'), '.'),
         (os.path.join(SPECPATH, 'TS-Logo.ico'), '.'),
+        # FIX-056: Bundle the ts-python shim so _find_bundled_shim() can locate it
+        # via sys._MEIPASS on both macOS and Linux.
+        (os.path.join(SPECPATH, 'src', 'installer', 'shims'), 'shims'),
     ] + _python_embed_bundle,
     # customtkinter uses dynamic plugin imports that static analysis misses.
     hiddenimports=['customtkinter'],

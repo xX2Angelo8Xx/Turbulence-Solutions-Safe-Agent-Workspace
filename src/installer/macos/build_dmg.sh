@@ -61,6 +61,12 @@ mkdir -p "${APP_BUNDLE}/Contents/Resources"
 # Copy all PyInstaller --onedir output into Contents/MacOS/
 cp -R "${DIST_DIR}/launcher/"* "${APP_BUNDLE}/Contents/MacOS/"
 
+# FIX-056: Bundle the ts-python shim inside the .app for first-launch deployment
+echo "==> Bundling ts-python shim..."
+mkdir -p "${APP_BUNDLE}/Contents/Resources/shims"
+cp "src/installer/shims/ts-python" "${APP_BUNDLE}/Contents/Resources/shims/ts-python"
+chmod +x "${APP_BUNDLE}/Contents/Resources/shims/ts-python"
+
 # INS-018: Copy the Python embeddable distribution into the app bundle if it
 # has been populated at build time.  On macOS the bundled PyInstaller Python
 # framework is the primary runtime; python-embed/ acts as a portable fallback

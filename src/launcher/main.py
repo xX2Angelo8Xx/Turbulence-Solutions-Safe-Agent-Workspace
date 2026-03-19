@@ -18,6 +18,7 @@ if _src_dir not in sys.path:
 
 from launcher.config import APP_NAME, VERSION  # noqa: E402
 from launcher.core.os_utils import get_platform  # noqa: E402
+from launcher.core.shim_config import ensure_shim_deployed  # noqa: E402
 
 
 def main() -> None:
@@ -28,6 +29,8 @@ def main() -> None:
     # check), we skip the blocking GUI launch so the subprocess exits cleanly.
     if os.environ.get("PYTEST_CURRENT_TEST"):
         return
+    # FIX-056: Deploy the ts-python shim on first launch (macOS/Linux only).
+    ensure_shim_deployed()
     from launcher.gui.app import App
     App().run()
 

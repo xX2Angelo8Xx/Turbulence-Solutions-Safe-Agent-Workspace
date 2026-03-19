@@ -108,3 +108,106 @@ def verify_ts_python() -> "tuple[bool, str]":
         return False, f"Python executable not found: {python_path}"
     except OSError as exc:
         return False, f"Failed to run Python runtime: {exc}"
+
+
+def ensure_shim_deployed() -> None:
+    """Deploy the ts-python shim on first launch (macOS/Linux only).
+
+    On Windows, the Inno Setup installer handles shim deployment.
+    On macOS/Linux, there is no installer post-install step, so the launcher
+    deploys the shim on first launch when python-path.txt does not exist yet.
+    """
+    if platform.system() == "Windows":
+        return  # Windows uses Inno Setup for deployment
+
+    config = get_python_path_config()
+    if config.exists() and config.read_text(encoding="utf-8").strip():
+        return  # Already configured — skip
+
+    shim_source = _find_bundled_shim()
+    if shim_source is None:
+        return  # Not a bundled build or shim not found
+
+    python_exe = _find_bundled_python_exe()
+    if python_exe is None:
+        return  # No bundled Python found
+
+    shim_dir = get_shim_dir()
+    shim_dir.mkdir(parents=True, exist_ok=True)
+
+    shim_dest = shim_dir / "ts-python"
+    shutil.copy2(str(shim_source), str(shim_dest))
+    os.chmod(str(shim_dest), 0o755)
+
+    write_python_path(python_exe)
+
+    _add_to_shell_profile(str(shim_dir))
+
+
+def _find_bundled_shim() -> "Path | None":
+    """Locate the ts-python shim bundled with the app."""
+    import sys
+    if hasattr(sys, "_MEIPASS"):
+        # PyInstaller _MEIPASS approach (datas entry in launcher.spec)
+        meipass = Path(sys._MEIPASS) / "shims" / "ts-python"
+        if meipass.exists():
+            return meipass
+        # macOS .app layout: Contents/MacOS/launcher → shim at Contents/Resources/shims/
+        exe_dir = Path(sys.executable).parent
+        resources = exe_dir.parent / "Resources" / "shims" / "ts-python"
+        if resources.exists():
+            return resources
+        # Linux AppImage layout: usr/bin/launcher → shim at usr/share/shims/
+        linux_shim = exe_dir / ".." / ".." / "usr" / "share" / "shims" / "ts-python"
+        resolved = linux_shim.resolve()
+        if resolved.exists():
+            return resolved
+    return None
+
+
+def _find_bundled_python_exe() -> "Path | None":
+    """Locate the bundled Python executable."""
+    import sys
+    if hasattr(sys, "_MEIPASS"):
+        exe_dir = Path(sys.executable).parent
+        # macOS: Python.framework bundled by PyInstaller
+        framework = (
+            exe_dir
+            / "_internal"
+            / "Python.framework"
+            / "Versions"
+            / "Current"
+            / "bin"
+            / "python3"
+        )
+        if framework.exists():
+            return framework
+        # macOS/Linux: python-embed directory next to executable
+        for name in ("python3", "python"):
+            candidate = exe_dir / "python-embed" / name
+            if candidate.exists():
+                return candidate
+    return None
+
+
+def _add_to_shell_profile(bin_dir: str) -> None:
+    """Append the shim bin directory to shell profile(s) if not already present."""
+    export_line = f'\nexport PATH="$PATH:{bin_dir}"\n'
+
+    home = Path.home()
+    if platform.system() == "Darwin":
+        profiles = [home / ".zshrc", home / ".bashrc"]
+    else:
+        profiles = [home / ".bashrc", home / ".zshrc"]
+
+    for profile in profiles:
+        if not profile.exists():
+            continue
+        content = profile.read_text(encoding="utf-8", errors="replace")
+        if bin_dir in content:
+            continue  # Already present
+        try:
+            with open(profile, "a", encoding="utf-8") as f:
+                f.write(export_line)
+        except OSError:
+            pass  # Best-effort — don't fail if profile is read-only
