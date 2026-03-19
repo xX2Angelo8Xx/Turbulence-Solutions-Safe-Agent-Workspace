@@ -161,9 +161,11 @@ def test_verify_ts_python_windows_uses_shim_dir_when_exists(tmp_path):
         ok, msg = sc.verify_ts_python()
 
     assert ok is True
-    # The call should have used the shim dir candidate, not PATH
+    # The call should have used the shim dir candidate via cmd.exe /c
     args_used = mock_run.call_args[0][0]
-    assert str(fake_cmd) == args_used[0]
+    assert args_used[0] == "cmd.exe"
+    assert args_used[1] == "/c"
+    assert args_used[2] == str(fake_cmd)
 
 
 # ---------------------------------------------------------------------------
@@ -188,7 +190,9 @@ def test_verify_ts_python_windows_fallback_to_path(tmp_path):
 
     assert ok is True
     args_used = mock_run.call_args[0][0]
-    assert args_used[0] == "C:\\Windows\\ts-python.cmd"
+    assert args_used[0] == "cmd.exe"
+    assert args_used[1] == "/c"
+    assert args_used[2] == "C:\\Windows\\ts-python.cmd"
 
 
 # ---------------------------------------------------------------------------
@@ -461,19 +465,21 @@ def test_verify_ts_python_windows_shim_dir_takes_precedence(tmp_path):
 
     assert ok is True
     args_used = mock_run.call_args[0][0]
-    assert args_used[0] == str(fake_cmd)
+    assert args_used[0] == "cmd.exe"
+    assert args_used[1] == "/c"
+    assert args_used[2] == str(fake_cmd)
 
 
 # ---------------------------------------------------------------------------
-# 18. Timeout message includes "5 seconds"
+# 18. Timeout message includes "30 seconds"
 # ---------------------------------------------------------------------------
 
-def test_verify_ts_python_timeout_message_mentions_5_seconds():
-    """Timeout failure message must mention the 5-second timeout value."""
+def test_verify_ts_python_timeout_message_mentions_30_seconds():
+    """Timeout failure message must mention the 30-second timeout value."""
     sc = _import_shim_config()
     with patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
-         patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="ts-python", timeout=5)):
+         patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="ts-python", timeout=30)):
         ok, msg = sc.verify_ts_python()
     assert ok is False
-    assert "5" in msg
+    assert "30" in msg

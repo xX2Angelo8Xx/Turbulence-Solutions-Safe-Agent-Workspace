@@ -63,15 +63,18 @@ def verify_ts_python() -> "tuple[bool, str]":
     """Verify the ts-python shim by actually executing it.
 
     Runs ``ts-python -c "import sys; print(sys.version)"`` via subprocess
-    with a 5-second timeout. Returns ``(True, version_string)`` on success
+    with a 30-second timeout. Returns ``(True, version_string)`` on success
     or ``(False, error_message)`` on failure.
 
     On Windows, prefers ``ts-python.cmd`` from the configured shim directory,
-    then falls back to a PATH lookup. On Unix/macOS, looks for ``ts-python``
-    on PATH. Never uses ``shell=True``.
+    then falls back to a PATH lookup. ``.cmd`` files are invoked via
+    ``cmd.exe /c`` to prevent hangs from stdin inheritance and to ensure
+    correct interpretation on Windows ARM under x64 emulation.
+    On Unix/macOS, looks for ``ts-python`` on PATH. Never uses ``shell=True``.
     """
     system = platform.system()
     shim_exe: "str | None" = None
+    use_cmd_wrapper = False
 
     if system == "Windows":
         # Prefer ts-python.cmd in the configured shim directory.
@@ -81,25 +84,35 @@ def verify_ts_python() -> "tuple[bool, str]":
         else:
             # Fall back to PATH lookup.
             shim_exe = shutil.which("ts-python.cmd") or shutil.which("ts-python")
+        # .cmd files must be invoked via cmd.exe /c to prevent hangs on
+        # Windows ARM (x64 emulation) and stdin inheritance issues.
+        if shim_exe is not None and shim_exe.lower().endswith(".cmd"):
+            use_cmd_wrapper = True
     else:
         shim_exe = shutil.which("ts-python")
 
     if shim_exe is None:
         return False, "ts-python shim not found on PATH or in shim directory."
 
+    if use_cmd_wrapper:
+        cmd_args = ["cmd.exe", "/c", shim_exe, "-c", "import sys; print(sys.version)"]
+    else:
+        cmd_args = [shim_exe, "-c", "import sys; print(sys.version)"]
+
     try:
         result = subprocess.run(
-            [shim_exe, "-c", "import sys; print(sys.version)"],
+            cmd_args,
             capture_output=True,
             text=True,
-            timeout=5,
+            timeout=30,
+            stdin=subprocess.DEVNULL,
         )
         if result.returncode == 0:
             return True, result.stdout.strip()
         stderr = result.stderr.strip()
         return False, f"ts-python exited with code {result.returncode}: {stderr}"
     except subprocess.TimeoutExpired:
-        return False, "ts-python shim timed out after 5 seconds."
+        return False, "ts-python shim timed out after 30 seconds."
     except FileNotFoundError:
         return False, f"ts-python executable not found: {shim_exe}"
     except OSError as exc:
