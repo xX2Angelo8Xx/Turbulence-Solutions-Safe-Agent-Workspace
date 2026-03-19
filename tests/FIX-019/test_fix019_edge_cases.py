@@ -23,8 +23,8 @@ SETUP_ISS = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
 BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 
-EXPECTED_VERSION = "2.0.1"
-PREVIOUS_VERSION = "1.0.3"
+EXPECTED_VERSION = "3.0.0"
+PREVIOUS_VERSION = "2.1.3"
 SKIP_VERSION_1 = "1.0.2"
 SKIP_VERSION_2 = "1.0.1"
 
@@ -104,7 +104,7 @@ class TestVersionOrdering:
             f"got {new_parts[0]}"
         )
         assert new_parts[1] == 0, "Minor version must be reset to 0 after major bump"
-        assert new_parts[2] == 1, "Patch version is 1 after FIX-030 patch bump"
+        assert new_parts[2] == 0, "Patch version must be 0 after major bump"
 
 
 # ---------------------------------------------------------------------------

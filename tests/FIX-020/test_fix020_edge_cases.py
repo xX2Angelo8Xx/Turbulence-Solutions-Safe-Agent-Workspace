@@ -13,14 +13,14 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXPECTED_VERSION = "2.0.1"
-EXPECTED_MAJOR = 2
+EXPECTED_VERSION = "3.0.0"
+EXPECTED_MAJOR = 3
 EXPECTED_MINOR = 0
-EXPECTED_PATCH = 1
+EXPECTED_PATCH = 0
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
 # Stale versions that must NOT appear anywhere in version-assignment lines
-STALE_VERSIONS = ["1.0.0", "1.0.1", "1.0.2", "1.0.3"]
+STALE_VERSIONS = ["1.0.0", "1.0.1", "1.0.2", "1.0.3", "2.0.1", "2.1.0", "2.1.3"]
 
 
 # ---------------------------------------------------------------------------

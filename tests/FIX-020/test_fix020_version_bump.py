@@ -10,7 +10,7 @@ from pathlib import Path
 # Resolve repo root relative to this test file (tests/FIX-020/ -> repo root)
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-EXPECTED_VERSION = "2.0.1"
+EXPECTED_VERSION = "3.0.0"
 OLD_VERSION = "1.0.3"
 
 

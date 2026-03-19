@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.parent
-EXPECTED_VERSION = "2.1.3"
+EXPECTED_VERSION = "3.0.0"
 
 
 def test_config_py_version() -> None:
