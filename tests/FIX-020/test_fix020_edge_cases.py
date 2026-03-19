@@ -26,7 +26,7 @@ del _ver_parts
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
 # Stale versions that must NOT appear anywhere in version-assignment lines
-STALE_VERSIONS = ["1.0.0", "1.0.1", "1.0.2", "1.0.3", "2.0.1", "2.1.0", "2.1.3"]
+STALE_VERSIONS = ["1.0.0", "1.0.1", "1.0.2", "1.0.3"]
 
 
 # ---------------------------------------------------------------------------

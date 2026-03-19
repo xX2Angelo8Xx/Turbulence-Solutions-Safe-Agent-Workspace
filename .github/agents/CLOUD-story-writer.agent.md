@@ -1,5 +1,5 @@
 ---
-name: story-writer
+name: cloud-story-writer
 description: "Use when creating or refining user stories from user input. Generates well-structured, acceptance-criteria-rich user stories aligned with the project vision. Requires human approval before writing to the CSV. Use for: user story creation, story refinement, acceptance criteria definition."
 ---
 
