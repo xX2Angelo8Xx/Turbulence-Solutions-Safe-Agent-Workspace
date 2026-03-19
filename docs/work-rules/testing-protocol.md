@@ -216,3 +216,34 @@ Test scripts are **permanent project artifacts**. They are not throw-away code.
 - Minimize one-time / disposable code. If temporary test scaffolding is needed during development, remove it before handoff — the committed test script must be clean and reusable.
 - The results produced by the final test script are what is archived in `docs/test-results/test-results.csv`. Future releases run the same scripts; if output changes, it is a regression.
 - When adding edge-case tests during Tester review, add them to the same `tests/<WP-ID>/` file — do not create separate throw-away scripts.
+
+---
+
+## Version Bump Tests — Single Source of Truth
+
+Version bump workpackages create tests that verify version strings in source files.
+These tests **must not** hardcode the current version as a constant. Instead, they must
+use a dynamic inline expression that reads from `src/launcher/config.py`:
+
+```python
+import re as _re
+EXPECTED_VERSION: str = _re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    _re.MULTILINE,
+).group(1)
+del _re
+```
+
+Or import from the shared utility (requires `REPO_ROOT` to be on `sys.path`):
+
+```python
+from tests.shared.version_utils import CURRENT_VERSION as EXPECTED_VERSION
+```
+
+`tests/shared/version_utils.py` reads the version dynamically from `src/launcher/config.py`,
+which is the single source of truth. This means:
+
+- Future version bumps only need to update the 5 source files (config.py, pyproject.toml, setup.iss, build_dmg.sh, build_appimage.sh).
+- No test files outside `tests/shared/` ever need updating for a version bump.
+- **Allowed to remain hardcoded:** historical version strings such as `OLD_VERSION`, `PREVIOUS_VERSION`, `SKIP_ONE_VERSION`, `STALE_VERSIONS` — these are correct fixed values that should never change.

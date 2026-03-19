@@ -23,7 +23,11 @@ SETUP_ISS = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
 BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 
-EXPECTED_VERSION = "3.0.0"
+EXPECTED_VERSION: str = re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    re.MULTILINE,
+).group(1)
 PREVIOUS_VERSION = "2.1.3"
 SKIP_VERSION_1 = "1.0.2"
 SKIP_VERSION_2 = "1.0.1"

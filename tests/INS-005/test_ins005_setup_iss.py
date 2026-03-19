@@ -8,6 +8,14 @@ import pytest
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 SETUP_ISS = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
 
+import re as _re
+CURRENT_VERSION: str = _re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    _re.MULTILINE,
+).group(1)
+del _re
+
 
 def read_iss() -> str:
     return SETUP_ISS.read_text(encoding="utf-8")
@@ -37,7 +45,7 @@ class TestSetupValues:
 
     def test_app_version(self):
         content = read_iss()
-        assert 'MyAppVersion "2.0.1"' in content
+        assert f'MyAppVersion "{CURRENT_VERSION}"' in content
 
     def test_app_publisher(self):
         content = read_iss()

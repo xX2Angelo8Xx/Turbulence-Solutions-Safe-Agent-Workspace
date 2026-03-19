@@ -13,6 +13,14 @@ import pytest
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 
+import re as _re
+CURRENT_VERSION: str = _re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    _re.MULTILINE,
+).group(1)
+del _re
+
 
 def read_script() -> str:
     return BUILD_DMG.read_text(encoding="utf-8")
@@ -95,7 +103,7 @@ class TestAppMetadata:
 
     def test_app_version(self):
         content = read_script()
-        assert "2.0.1" in content, "Script must embed version 2.0.1"
+        assert CURRENT_VERSION in content, f"Script must embed version {CURRENT_VERSION}"
 
     def test_publisher(self):
         content = read_script()

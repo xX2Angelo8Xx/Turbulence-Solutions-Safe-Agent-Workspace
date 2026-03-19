@@ -13,7 +13,13 @@ SETUP_ISS = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
 BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 
-TARGET_VERSION = "3.0.1"
+import re as _re
+TARGET_VERSION: str = _re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    _re.MULTILINE,
+).group(1)
+del _re
 OLD_VERSION = "2.1.3"
 
 

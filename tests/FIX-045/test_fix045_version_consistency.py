@@ -7,7 +7,11 @@ import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.parent
-EXPECTED_VERSION = "3.0.0"
+EXPECTED_VERSION: str = re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    re.MULTILINE,
+).group(1)
 
 
 def test_config_py_version() -> None:

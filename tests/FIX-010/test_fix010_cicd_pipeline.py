@@ -25,6 +25,14 @@ BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 PYPROJECT = REPO_ROOT / "pyproject.toml"
 
+import re as _re
+CURRENT_VERSION: str = _re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    _re.MULTILINE,
+).group(1)
+del _re
+
 
 @pytest.fixture(scope="module")
 def workflow():
@@ -193,24 +201,24 @@ def test_setup_iss_source_path_is_not_bare_dist():
 def test_setup_iss_version_is_1_0_0():
     """setup.iss MyAppVersion must be 2.0.0 (updated by FIX-020 version bump)."""
     content = SETUP_ISS.read_text(encoding="utf-8")
-    assert 'MyAppVersion "2.0.1"' in content, (
-        "setup.iss MyAppVersion must be 2.0.1 to match pyproject.toml. Got something else."
+    assert f'MyAppVersion "{CURRENT_VERSION}"' in content, (
+        f"setup.iss MyAppVersion must be {CURRENT_VERSION} to match pyproject.toml. Got something else."
     )
 
 
 def test_build_dmg_version_is_1_0_0():
     """build_dmg.sh APP_VERSION must be 2.0.0 (updated by FIX-020 version bump)."""
     content = BUILD_DMG.read_text(encoding="utf-8")
-    assert 'APP_VERSION="2.0.1"' in content, (
-        "build_dmg.sh APP_VERSION must be 2.0.1 to match pyproject.toml. Got something else."
+    assert f'APP_VERSION="{CURRENT_VERSION}"' in content, (
+        f"build_dmg.sh APP_VERSION must be {CURRENT_VERSION} to match pyproject.toml. Got something else."
     )
 
 
 def test_build_appimage_version_is_1_0_0():
     """build_appimage.sh APP_VERSION must be 2.0.0 (updated by FIX-020 version bump)."""
     content = BUILD_APPIMAGE.read_text(encoding="utf-8")
-    assert 'APP_VERSION="2.0.1"' in content, (
-        "build_appimage.sh APP_VERSION must be 2.0.1 to match pyproject.toml. Got something else."
+    assert f'APP_VERSION="{CURRENT_VERSION}"' in content, (
+        f"build_appimage.sh APP_VERSION must be {CURRENT_VERSION} to match pyproject.toml. Got something else."
     )
 
 

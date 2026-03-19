@@ -13,6 +13,14 @@ import pytest
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 
+import re as _re
+CURRENT_VERSION: str = _re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    _re.MULTILINE,
+).group(1)
+del _re
+
 
 def read_script() -> str:
     return BUILD_APPIMAGE.read_text(encoding="utf-8")
@@ -327,7 +335,7 @@ class TestSecurity:
 class TestMetadata:
     def test_app_version_embedded(self):
         content = read_script()
-        assert "2.0.1" in content, "Script must embed version 2.0.1"
+        assert CURRENT_VERSION in content, f"Script must embed version {CURRENT_VERSION}"
 
     def test_publisher_referenced(self):
         content = read_script()

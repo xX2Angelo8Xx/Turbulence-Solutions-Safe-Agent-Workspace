@@ -13,7 +13,11 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXPECTED_VERSION = "3.0.0"
+EXPECTED_VERSION: str = re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    re.MULTILINE,
+).group(1)
 EXPECTED_MAJOR = 3
 EXPECTED_MINOR = 0
 EXPECTED_PATCH = 0

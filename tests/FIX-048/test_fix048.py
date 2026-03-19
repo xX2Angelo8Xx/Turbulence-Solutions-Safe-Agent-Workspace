@@ -24,6 +24,14 @@ import pytest
 REPO_ROOT = Path(__file__).parents[2]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
+import re as _re
+_CURRENT_VERSION: str = _re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    _re.MULTILINE,
+).group(1)
+del _re
+
 
 def _import_shim_config():
     import launcher.core.shim_config as sc
@@ -263,53 +271,53 @@ def test_windows_fallback_to_path_cmd_wrapper(tmp_path):
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-# 11. Version bump — all 5 version locations contain "3.0.1"
+# 11. Version bump — all 5 version locations contain the current version
 # ---------------------------------------------------------------------------
 
 def test_version_config_py():
-    """src/launcher/config.py VERSION constant is 3.0.1."""
+    """src/launcher/config.py VERSION constant matches the current version."""
     config_py = REPO_ROOT / "src" / "launcher" / "config.py"
     assert config_py.exists(), "config.py not found"
     content = config_py.read_text(encoding="utf-8")
-    assert '3.0.1' in content, "config.py must contain version 3.0.1"
+    assert _CURRENT_VERSION in content, f"config.py must contain version {_CURRENT_VERSION}"
 
 
 def test_version_pyproject_toml():
-    """pyproject.toml version field is 3.0.1."""
+    """pyproject.toml version field matches the current version."""
     pyproject = REPO_ROOT / "pyproject.toml"
     assert pyproject.exists(), "pyproject.toml not found"
     content = pyproject.read_text(encoding="utf-8")
-    assert 'version = "3.0.1"' in content, "pyproject.toml must contain version 3.0.1"
+    assert f'version = "{_CURRENT_VERSION}"' in content, f"pyproject.toml must contain version {_CURRENT_VERSION}"
 
 
 def test_version_setup_iss():
-    """src/installer/windows/setup.iss MyAppVersion is 3.0.1."""
+    """src/installer/windows/setup.iss MyAppVersion matches the current version."""
     setup_iss = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
     assert setup_iss.exists(), "setup.iss not found"
     content = setup_iss.read_text(encoding="utf-8")
-    assert '3.0.1' in content, "setup.iss must contain version 3.0.1"
+    assert _CURRENT_VERSION in content, f"setup.iss must contain version {_CURRENT_VERSION}"
 
 
 def test_version_build_dmg_sh():
-    """src/installer/macos/build_dmg.sh APP_VERSION is 3.0.1."""
+    """src/installer/macos/build_dmg.sh APP_VERSION matches the current version."""
     build_dmg = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
     assert build_dmg.exists(), "build_dmg.sh not found"
     content = build_dmg.read_text(encoding="utf-8")
-    assert '3.0.1' in content, "build_dmg.sh must contain version 3.0.1"
+    assert _CURRENT_VERSION in content, f"build_dmg.sh must contain version {_CURRENT_VERSION}"
 
 
 def test_version_build_appimage_sh():
-    """src/installer/linux/build_appimage.sh APP_VERSION is 3.0.1."""
+    """src/installer/linux/build_appimage.sh APP_VERSION matches the current version."""
     build_appimage = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
     assert build_appimage.exists(), "build_appimage.sh not found"
     content = build_appimage.read_text(encoding="utf-8")
-    assert '3.0.1' in content, "build_appimage.sh must contain version 3.0.1"
+    assert _CURRENT_VERSION in content, f"build_appimage.sh must contain version {_CURRENT_VERSION}"
 
 
 def test_version_consistency_all_five_locations():
-    """All 5 version locations agree on 3.0.1 (no location left on old version)."""
+    """All 5 version locations agree on the current version (no location left on old version)."""
     import re
-    version_target = "3.0.1"
+    version_target = _CURRENT_VERSION
 
     # config.py: VERSION: str = "x.y.z"  (has type annotation)
     config_py = REPO_ROOT / "src" / "launcher" / "config.py"

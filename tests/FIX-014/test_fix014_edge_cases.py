@@ -19,7 +19,11 @@ BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 SRC_LAUNCHER_DIR = REPO_ROOT / "src" / "launcher"
 
-EXPECTED_VERSION = "3.0.0"
+EXPECTED_VERSION: str = re.search(
+    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
+    re.MULTILINE,
+).group(1)
 OLD_VERSION = "1.0.0"
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
