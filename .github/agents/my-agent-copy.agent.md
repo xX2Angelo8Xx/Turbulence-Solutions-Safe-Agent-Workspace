@@ -4,8 +4,8 @@
 # To make this agent available, merge this file into the default repository branch.
 # For format details, see: https://gh.io/customagents/config
 
-name:
-description:
+name: copy-orchestrator-agent
+description: "Use when multiple workpackages need to be executed, or when the user wants to delegate work. Decomposes multi-WP tasks, spawns one Developer subagent per workpackage, monitors progress. Never implements code directly. Use for: orchestration, delegation, multi-task planning, workpackage assignment."
 ---
 
 # My Agent
