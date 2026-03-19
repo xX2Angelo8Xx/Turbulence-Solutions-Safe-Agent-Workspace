@@ -19,6 +19,8 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=admin
+ArchitecturesInstallIn64BitMode=x64compatible
+ArchitecturesAllowed=x64compatible
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -28,12 +30,14 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\..\..\dist\launcher\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; INS-018: Bundle the Python embeddable distribution so the security gate can
+; INS-018 / FIX-055: Bundle the Python embeddable distribution so the security gate can
 ; run without requiring the user to have Python installed separately.
 ; The python-embed\ directory is populated at CI build time by downloading
 ; python-3.11.x-embed-amd64.zip from python.org and extracting it into
 ; src\installer\python-embed\ before running PyInstaller and iscc.
-Source: "..\python-embed\*"; DestDir: "{app}\python-embed"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: PythonEmbedExists
+; skipifsourcedoesntexist is a compile-time flag: dev builds compile without
+; python-embed present, while CI builds always extract the embedded files.
+Source: "..\python-embed\*"; DestDir: "{app}\python-embed"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
 ; INS-021: Deploy the ts-python Windows shim to the well-known user-local bin
 ; directory.  ignoreversion ensures reinstall/update overwrites the shim.
 Source: "..\..\installer\shims\ts-python.cmd"; DestDir: "{localappdata}\TurbulenceSolutions\bin"; Flags: ignoreversion
@@ -63,17 +67,6 @@ Type: filesandordirs; Name: "{app}\python-embed"
 Type: filesandordirs; Name: "{localappdata}\TurbulenceSolutions"
 
 [Code]
-// INS-018: Return True only when the python-embed source directory contains
-// python.exe, meaning the CI build step has already extracted the embeddable
-// package.  Without this guard iscc would fail when run in a plain developer
-// environment where the ~15 MB binary distribution has not been downloaded.
-function PythonEmbedExists(): Boolean;
-var
-  SrcDir: String;
-begin
-  SrcDir := ExpandConstant('{src}') + '\..\python-embed\python.exe';
-  Result := FileExists(SrcDir);
-end;
 
 // INS-021: Return True when PathToAdd is not already present in the current
 // user's PATH registry value.  The check is case-insensitive and uses semicolon
