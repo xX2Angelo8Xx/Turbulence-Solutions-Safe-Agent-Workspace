@@ -35,6 +35,5 @@ All detailed rules, workflows, and protocols are in **`docs/work-rules/index.md`
 
 ## For AI Agents
 
-1. Read `docs/work-rules/agent-workflow.md` for your onboarding checklist and execution protocol.
-2. Read `docs/workpackages/workpackages.csv` to see current project state.
-3. Read the rule file(s) relevant to your assigned task (find them via `docs/work-rules/index.md`).
+1. Read `docs/work-rules/agent-workflow.md` and `docs/workpackages/workpackages.csv` to understand current project state.
+2. Read the rule file(s) relevant to your assigned task (find them via `docs/work-rules/index.md`).

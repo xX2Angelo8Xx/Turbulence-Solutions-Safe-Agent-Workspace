@@ -128,4 +128,5 @@ When creating a new workpackage that references a User Story:
 
 1. **Update the User Story's `Linked WPs` column** in `user-stories.csv` to include the new WP ID in the same commit.
 2. This is mandatory — failing to do so creates cross-reference drift that must be caught and fixed during maintenance.
+3. **When a Developer creates or claims a WP that references a User Story**, the Developer MUST verify that the WP ID is listed in the parent User Story's `Linked WPs` column in `docs/user-stories/user-stories.csv`. If not present, add it before beginning implementation.
 3. When decomposing a WP into sub-WPs, update the parent User Story's `Linked WPs` to include all sub-WP IDs.

@@ -88,7 +88,6 @@ Templates (bundled inside Launcher)
 │   ├── FIX-040/                      # Tests for FIX-040 (Fix Windows update restart)
 │   ├── FIX-041/                      # Tests for FIX-041 (Fix stale version .dist-info)
 │   ├── FIX-042/                      # Tests for FIX-042 (NoAgentZone visible in explorer)
-│   ├── FIX-043/                      # Tests for FIX-043 (Fix INS-005 uninstall delete type)
 │   ├── FIX-031/                      # Tests for FIX-031
 │   ├── FIX-032/                      # Tests for FIX-032
 │   ├── FIX-033/                      # Tests for FIX-033

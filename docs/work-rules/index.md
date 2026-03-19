@@ -32,7 +32,7 @@ Central hub for all project rules, workflows, and protocols. Every rule in this 
 | `docs/bugs/bugs.csv` | Bug tracking — all identified defects |
 | `docs/test-results/test-results.csv` | Test execution records — all test runs |
 | `docs/maintenance/` | Maintenance audit logs (timestamped) |
-| `Default-Project/` | Template shipped to end users — **never modify for testing** |
+| `templates/coding/` | Template shipped to end users — **never modify for testing** |
 
 ---
 

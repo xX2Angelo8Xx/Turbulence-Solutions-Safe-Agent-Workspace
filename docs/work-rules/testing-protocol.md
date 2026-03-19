@@ -189,6 +189,8 @@ The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages
 - **Security WPs** require both protection tests and bypass-attempt tests — no exceptions.
 - **Every bug fix** requires a regression test proving the bug is fixed and cannot recur.
 - The testing protocol is the **floor**, not the ceiling. Always seek additional failure modes.
+- **Pytest output policy:** pytest output must NEVER be redirected to a `.txt` file in the repository root. All output must go to `docs/workpackages/<WP-ID>/` or be discarded. Agents that create temporary output files MUST delete them before WP handoff.
+- **test-report.md exit criterion:** The Tester Agent MUST create `test-report.md` in `docs/workpackages/<WP-ID>/` as a hard exit criterion before marking a WP as Done. A WP cannot be marked Done without a `test-report.md`.
 
 ---
 
