@@ -1,0 +1,15 @@
+#!/bin/sh
+CONFIG_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/TurbulenceSolutions"
+CONFIG="$CONFIG_DIR/python-path.txt"
+if [ ! -f "$CONFIG" ]; then
+    echo "ERROR: Python path configuration not found: $CONFIG" >&2
+    echo "Please reinstall the Agent Environment Launcher or use Settings > Relocate Python Runtime." >&2
+    exit 1
+fi
+PYTHON_PATH=$(cat "$CONFIG")
+if [ ! -x "$PYTHON_PATH" ]; then
+    echo "ERROR: Python executable not found or not executable: $PYTHON_PATH" >&2
+    echo "Please reinstall the Agent Environment Launcher or use Settings > Relocate Python Runtime." >&2
+    exit 1
+fi
+exec "$PYTHON_PATH" "$@"

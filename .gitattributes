@@ -1,3 +1,7 @@
 # Force shell scripts to use LF line endings on all platforms.
 # Bash on Linux will fail with 'command not found' if scripts contain CRLF.
 *.sh text eol=lf
+
+# ts-python shim files - enforce correct line endings per platform
+src/installer/shims/ts-python text eol=lf
+src/installer/shims/ts-python.cmd text eol=crlf
