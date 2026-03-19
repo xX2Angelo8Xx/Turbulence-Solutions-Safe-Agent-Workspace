@@ -134,10 +134,18 @@ def test_setup_iss_python_embed_dest_dir():
     ), "setup.iss must install python-embed to {app}\\python-embed"
 
 
-def test_setup_iss_python_embed_check_function():
+def test_setup_iss_python_embed_skipifsourcedoesntexist():
+    """FIX-055: python-embed [Files] entry must use skipifsourcedoesntexist flag.
+
+    The old runtime Check: PythonEmbedExists function has been replaced with the
+    compile-time skipifsourcedoesntexist Inno Setup flag.  This flag silently skips
+    the Files entry when the source directory does not exist at compile time, allowing
+    dev builds to compile without the python-embed directory present.
+    """
     text = SETUP_ISS.read_text(encoding="utf-8")
-    assert "PythonEmbedExists" in text, (
-        "setup.iss must define and use PythonEmbedExists check function"
+    assert "skipifsourcedoesntexist" in text, (
+        "setup.iss python-embed [Files] entry must use skipifsourcedoesntexist flag "
+        "(FIX-055 replaced PythonEmbedExists runtime check with this compile-time flag)"
     )
 
 
@@ -146,11 +154,22 @@ def test_setup_iss_has_code_section():
     assert "[Code]" in text, "setup.iss must have a [Code] section for PythonEmbedExists"
 
 
-def test_setup_iss_python_embed_exists_uses_file_exists():
+def test_setup_iss_python_embed_no_check_parameter():
+    """FIX-055: python-embed [Files] line must NOT use a Check: parameter.
+
+    The old PythonEmbedExists runtime function required a Check: clause on the
+    [Files] entry.  FIX-055 removes this in favour of the compile-time
+    skipifsourcedoesntexist flag, so no Check: parameter should appear on the
+    python-embed Files line.
+    """
     text = SETUP_ISS.read_text(encoding="utf-8")
-    assert "FileExists" in text, (
-        "PythonEmbedExists must use Inno Setup FileExists() to test for python.exe"
-    )
+    for line in text.splitlines():
+        if "python-embed" in line.lower() and "Source:" in line:
+            assert "Check:" not in line, (
+                "python-embed [Files] entry must not use Check: — "
+                "FIX-055 replaced PythonEmbedExists with skipifsourcedoesntexist"
+            )
+            break
 
 
 def test_setup_iss_uninstall_delete_python_embed():

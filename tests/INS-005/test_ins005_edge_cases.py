@@ -161,14 +161,25 @@ class TestPrivilegesAndArch:
             "PrivilegesRequired must be exactly 'admin' — writing to {autopf} requires elevation"
         )
 
-    def test_architecture_directives_not_present(self):
-        """ArchitecturesAllowed/ArchitecturesInstallMode removed — not supported by CI Inno Setup (BUG-041)."""
+    def test_architecture_directives_present(self):
+        """ArchitecturesAllowed and ArchitecturesInstallIn64BitMode must be present (FIX-055).
+
+        BUG-041 required removing these directives because the chocolatey Inno Setup at
+        that time used the obsolete ArchitecturesInstallMode key.  FIX-055 re-introduces
+        the correct directives (ArchitecturesAllowed=x64compatible and
+        ArchitecturesInstallIn64BitMode=x64compatible) because CI Inno Setup is now
+        up-to-date and the installer must restrict installation to 64-bit systems.
+        """
         content = read_iss()
-        assert "ArchitecturesAllowed" not in content, (
-            "ArchitecturesAllowed must not be present — not supported by chocolatey Inno Setup on CI (BUG-041)"
+        assert "ArchitecturesAllowed=x64compatible" in content, (
+            "ArchitecturesAllowed=x64compatible must be present — FIX-055 re-introduced it"
+        )
+        assert "ArchitecturesInstallIn64BitMode=x64compatible" in content, (
+            "ArchitecturesInstallIn64BitMode=x64compatible must be present — FIX-055 re-introduced it"
         )
         assert "ArchitecturesInstallMode" not in content, (
-            "ArchitecturesInstallMode must not be present — not supported by chocolatey Inno Setup on CI (BUG-041)"
+            "ArchitecturesInstallMode (obsolete key) must not appear — only the correct "
+            "ArchitecturesInstallIn64BitMode directive is allowed"
         )
 
 

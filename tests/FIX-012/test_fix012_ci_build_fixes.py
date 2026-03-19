@@ -96,12 +96,18 @@ class TestSetupIssArchDirectives:
             "not supported by CI Inno Setup version (chocolatey)"
         )
 
-    def test_architectures_allowed_absent(self):
-        """ArchitecturesAllowed must NOT be present in setup.iss (BUG-041)."""
+    def test_architectures_allowed_present(self):
+        """ArchitecturesAllowed=x64compatible must be present in setup.iss (FIX-055).
+
+        FIX-012 removed this directive because the chocolatey Inno Setup at the time
+        did not support it (BUG-041 / ArchitecturesInstallMode).  FIX-055 restores the
+        correct directive (ArchitecturesAllowed=x64compatible) because the CI Inno Setup
+        has been upgraded and now supports it.
+        """
         content = read_iss()
-        assert "ArchitecturesAllowed" not in content, (
-            "ArchitecturesAllowed must be removed from setup.iss — "
-            "not supported by CI Inno Setup version (chocolatey)"
+        assert "ArchitecturesAllowed=x64compatible" in content, (
+            "ArchitecturesAllowed=x64compatible must be present in setup.iss — "
+            "FIX-055 re-introduced it now that CI Inno Setup supports the directive"
         )
 
     def test_setup_section_present(self):

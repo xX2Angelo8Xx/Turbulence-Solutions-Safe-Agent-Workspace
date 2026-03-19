@@ -142,16 +142,18 @@ class TestSetupIssIntegrityAfterFix:
             "it suppresses the redundant 'Select Start Menu folder' wizard page."
         )
 
-    def test_architectures_allowed_absent_case_insensitive(self):
-        """ArchitecturesAllowed must be absent in any capitalisation variant.
+    def test_architectures_allowed_present_case_insensitive(self):
+        """ArchitecturesAllowed must be present (FIX-055 re-introduced it).
 
-        A developer re-introducing the directive with different casing
-        (e.g. ArchitecturesAllowed or architecturesallowed) would still break
-        the CI Inno Setup build.
+        FIX-012 removed it to guard against the old CI Inno Setup version (BUG-041).
+        FIX-055 restores ArchitecturesAllowed=x64compatible because the CI Inno Setup
+        has been upgraded and now supports this directive.  This check verifies the
+        directive exists in any capitalisation.
         """
         content = read_iss()
-        assert "architecturesallowed" not in content.lower(), (
-            "ArchitecturesAllowed (any casing) must not appear in setup.iss"
+        assert "architecturesallowed" in content.lower(), (
+            "ArchitecturesAllowed (any casing) must be present in setup.iss — "
+            "FIX-055 re-introduced it now that CI Inno Setup supports the directive"
         )
 
     def test_architectures_install_mode_absent_case_insensitive(self):

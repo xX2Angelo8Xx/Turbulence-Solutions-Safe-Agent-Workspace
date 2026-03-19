@@ -207,9 +207,22 @@ def test_uninstall_delete_type_files_and_dirs(iss_content: str):
 # INS-018 regression — PythonEmbedExists must still be present
 # ---------------------------------------------------------------------------
 
-def test_python_embed_exists_function_preserved(iss_content: str):
-    """INS-018 PythonEmbedExists function is still defined (no regression)."""
-    assert "function PythonEmbedExists" in iss_content
+def test_python_embed_exists_function_removed(iss_content: str):
+    """FIX-055: PythonEmbedExists runtime function must be absent from setup.iss.
+
+    INS-021 originally required this function to be present (INS-018 regression
+    guard).  FIX-055 deliberately removes it and replaces the runtime check with
+    the compile-time skipifsourcedoesntexist flag on the python-embed [Files] entry.
+    This test verifies the transition is complete and no stale reference remains.
+    """
+    assert "function PythonEmbedExists" not in iss_content, (
+        "PythonEmbedExists function must not be in setup.iss — "
+        "FIX-055 replaced it with skipifsourcedoesntexist on the [Files] entry"
+    )
+    assert "skipifsourcedoesntexist" in iss_content, (
+        "skipifsourcedoesntexist flag must be present — "
+        "it is the FIX-055 replacement for the removed PythonEmbedExists function"
+    )
 
 
 def test_python_embed_files_entry_present(iss_content: str):
