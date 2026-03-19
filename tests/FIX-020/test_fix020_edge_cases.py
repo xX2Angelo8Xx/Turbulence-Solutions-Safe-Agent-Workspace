@@ -18,9 +18,11 @@ EXPECTED_VERSION: str = re.search(
     (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
     re.MULTILINE,
 ).group(1)
-EXPECTED_MAJOR = 3
-EXPECTED_MINOR = 0
-EXPECTED_PATCH = 0
+_ver_parts = EXPECTED_VERSION.split(".")
+EXPECTED_MAJOR = int(_ver_parts[0])
+EXPECTED_MINOR = int(_ver_parts[1])
+EXPECTED_PATCH = int(_ver_parts[2])
+del _ver_parts
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
 # Stale versions that must NOT appear anywhere in version-assignment lines

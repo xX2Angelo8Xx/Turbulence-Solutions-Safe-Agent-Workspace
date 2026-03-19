@@ -161,7 +161,7 @@ class TestVersionUtilsErrorHandling:
         # We test the internal _read_current_version logic directly
         # by crafting bad text and verifying the regex fails to match
         bad_config_text = 'APP_NAME: str = "Test"\n'
-        pattern = r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"'
+        pattern = r"^VERSION\s*:\s*str\s*=\s*[\"']([^\"']+)[\"']"
         match = re.search(pattern, bad_config_text, re.MULTILINE)
         assert match is None, "Sanity: bad config text should not match VERSION pattern"
         # Now verify that version_utils raises RuntimeError when the match fails
@@ -175,7 +175,7 @@ class TestVersionUtilsErrorHandling:
     def test_version_utils_regex_pattern_is_correct(self):
         """The regex used in version_utils must match the actual config.py format."""
         config_text = CONFIG_PY.read_text(encoding="utf-8")
-        pattern = r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"'
+        pattern = r"^VERSION\s*:\s*str\s*=\s*[\"']([^\"']+)[\"']"
         match = re.search(pattern, config_text, re.MULTILINE)
         assert match is not None, "Pattern must match config.py VERSION declaration"
         version = match.group(1)
@@ -184,7 +184,7 @@ class TestVersionUtilsErrorHandling:
     def test_version_utils_does_not_match_comment(self):
         """The regex must not match a VERSION in a comment line."""
         fake_config_text = '# VERSION: str = "0.0.0"  # old\nVERSION: str = "3.0.1"\n'
-        pattern = r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"'
+        pattern = r"^VERSION\s*:\s*str\s*=\s*[\"']([^\"']+)[\"']"
         match = re.search(pattern, fake_config_text, re.MULTILINE)
         assert match is not None, "Pattern must still find the real VERSION line"
         # The commented line would not match ^ since comments in python don't start at col 0
@@ -284,22 +284,8 @@ class TestDynamicVersionSurvivesBump:
                 f"FIX-020 edge cases still hardcodes EXPECTED_VERSION = {bad_ver!r}"
             )
 
-    @pytest.mark.xfail(
-        reason=(
-            "BUG: FIX-020 test_fix020_edge_cases.py still hardcodes EXPECTED_MAJOR=3, "
-            "EXPECTED_MINOR=0, EXPECTED_PATCH=0 as fixed integer constants. "
-            "These should be derived dynamically from EXPECTED_VERSION.split('.'). "
-            "This was not addressed by FIX-049 and should be fixed in a follow-up WP."
-        ),
-        strict=True,
-    )
     def test_fix020_edge_cases_component_constants_are_dynamic(self):
-        """FIX-020 edge cases: EXPECTED_MAJOR/MINOR/PATCH must be derived from EXPECTED_VERSION.
-
-        Marked xfail(strict=True) so that this test FAILS (xfail) now — documenting the
-        known gap — but will turn into a PASS once the issue is fixed, at which point
-        strict=True will cause a test error forcing removal of the xfail marker.
-        """
+        """FIX-020 edge cases: EXPECTED_MAJOR/MINOR/PATCH must be derived from EXPECTED_VERSION."""
         self_check = REPO_ROOT / "tests/FIX-020/test_fix020_edge_cases.py"
         content = self_check.read_text(encoding="utf-8")
         # Hardcoded integer constants for version components

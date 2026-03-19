@@ -14,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 def _read_current_version() -> str:
     config_py = REPO_ROOT / "src" / "launcher" / "config.py"
     text = config_py.read_text(encoding="utf-8")
-    match = re.search(r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"', text, re.MULTILINE)
+    match = re.search(r"^VERSION\s*:\s*str\s*=\s*[\"']([^\"']+)[\"']", text, re.MULTILINE)
     if not match:
         raise RuntimeError(f"Could not find VERSION constant in {config_py}")
     return match.group(1)
