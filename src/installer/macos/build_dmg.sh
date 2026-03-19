@@ -61,6 +61,19 @@ mkdir -p "${APP_BUNDLE}/Contents/Resources"
 # Copy all PyInstaller --onedir output into Contents/MacOS/
 cp -R "${DIST_DIR}/launcher/"* "${APP_BUNDLE}/Contents/MacOS/"
 
+# INS-018: Copy the Python embeddable distribution into the app bundle if it
+# has been populated at build time.  On macOS the bundled PyInstaller Python
+# framework is the primary runtime; python-embed/ acts as a portable fallback
+# for the security gate shim (INS-019/INS-020).
+PYTHON_EMBED_SRC="src/installer/python-embed"
+if [ -f "${PYTHON_EMBED_SRC}/python.exe" ] || [ -f "${PYTHON_EMBED_SRC}/python3" ]; then
+    echo "==> Copying python-embed into app bundle Resources..."
+    mkdir -p "${APP_BUNDLE}/Contents/Resources/python-embed"
+    cp -R "${PYTHON_EMBED_SRC}/"* "${APP_BUNDLE}/Contents/Resources/python-embed/"
+else
+    echo "==> python-embed not populated — skipping (macOS uses PyInstaller framework)"
+fi
+
 # ---------------------------------------------------------------------------
 # Step 3: Write Info.plist
 # ---------------------------------------------------------------------------

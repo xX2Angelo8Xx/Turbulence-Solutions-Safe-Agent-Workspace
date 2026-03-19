@@ -71,6 +71,19 @@ mkdir -p "${APPDIR}/usr/share/icons/hicolor/256x256/apps"
 # Copy all PyInstaller --onedir output into AppDir/usr/bin/
 cp -R "${DIST_DIR}/launcher/"* "${APPDIR}/usr/bin/"
 
+# INS-018: Copy the Python embeddable distribution into the AppImage if it has
+# been populated at build time.  On Linux the bundled PyInstaller Python is the
+# primary runtime; python-embed/ acts as a portable fallback for the security
+# gate shim (INS-019/INS-020).
+PYTHON_EMBED_SRC="src/installer/python-embed"
+if [ -f "${PYTHON_EMBED_SRC}/python3" ] || [ -f "${PYTHON_EMBED_SRC}/python" ]; then
+    echo "==> Copying python-embed into AppDir..."
+    mkdir -p "${APPDIR}/usr/bin/python-embed"
+    cp -R "${PYTHON_EMBED_SRC}/"* "${APPDIR}/usr/bin/python-embed/"
+else
+    echo "==> python-embed not populated — skipping (Linux uses system/PyInstaller Python)"
+fi
+
 # ---------------------------------------------------------------------------
 # Step 3: Write .desktop file
 # ---------------------------------------------------------------------------

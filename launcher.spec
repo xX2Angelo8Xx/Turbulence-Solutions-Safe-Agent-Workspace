@@ -16,6 +16,16 @@ on any machine and on all three supported platforms (Windows, macOS, Linux).
 
 import os
 
+# INS-018: Include the Python embeddable distribution if it has been populated.
+# At build time the CI job downloads python-3.11.x-embed-amd64.zip and extracts
+# it into src/installer/python-embed/ before running PyInstaller.  When the
+# directory contains only the README placeholder (no .exe/.dll), this entry is
+# omitted so that a plain developer build still works without the ~15 MB bundle.
+_PYTHON_EMBED_DIR = os.path.join(SPECPATH, 'src', 'installer', 'python-embed')
+_python_embed_bundle = []
+if os.path.isfile(os.path.join(_PYTHON_EMBED_DIR, 'python.exe')):
+    _python_embed_bundle = [(_PYTHON_EMBED_DIR, 'python-embed')]
+
 a = Analysis(
     [os.path.join(SPECPATH, 'src', 'launcher', 'main.py')],
     pathex=[os.path.join(SPECPATH, 'src')],
@@ -24,7 +34,7 @@ a = Analysis(
         (os.path.join(SPECPATH, 'templates'), 'templates'),
         (os.path.join(SPECPATH, 'TS-Logo.png'), '.'),
         (os.path.join(SPECPATH, 'TS-Logo.ico'), '.'),
-    ],
+    ] + _python_embed_bundle,
     # customtkinter uses dynamic plugin imports that static analysis misses.
     hiddenimports=['customtkinter'],
     hookspath=[],

@@ -22,6 +22,18 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller launcher.spec
 
+      # INS-018: Download and extract the Python 3.11 embeddable distribution
+      # into src/installer/python-embed/ so it is bundled with the installer.
+      # This step must run BEFORE Inno Setup so `PythonEmbedExists()` returns True
+      # and the [Files] entry for python-embed is included in the output EXE.
+      # - name: Download Python embeddable distribution
+      #   run: |
+      #     $version = "3.11.9"
+      #     $url = "https://www.python.org/ftp/python/$version/python-$version-embed-amd64.zip"
+      #     Invoke-WebRequest -Uri $url -OutFile python-embed.zip
+      #     Expand-Archive -Path python-embed.zip -DestinationPath src/installer/python-embed/ -Force
+      #     Remove-Item python-embed.zip
+
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress
 

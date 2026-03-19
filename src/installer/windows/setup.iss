@@ -28,6 +28,12 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\..\..\dist\launcher\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; INS-018: Bundle the Python embeddable distribution so the security gate can
+; run without requiring the user to have Python installed separately.
+; The python-embed\ directory is populated at CI build time by downloading
+; python-3.11.x-embed-amd64.zip from python.org and extracting it into
+; src\installer\python-embed\ before running PyInstaller and iscc.
+Source: "..\python-embed\*"; DestDir: "{app}\python-embed"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: PythonEmbedExists
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -41,3 +47,18 @@ Filename: "{app}\{#MyAppExeName}"; Flags: nowait skipifnotsilent
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
+; INS-018: Remove the bundled Python embeddable directory on uninstall.
+Type: filesandordirs; Name: "{app}\python-embed"
+
+[Code]
+// INS-018: Return True only when the python-embed source directory contains
+// python.exe, meaning the CI build step has already extracted the embeddable
+// package.  Without this guard iscc would fail when run in a plain developer
+// environment where the ~15 MB binary distribution has not been downloaded.
+function PythonEmbedExists(): Boolean;
+var
+  SrcDir: String;
+begin
+  SrcDir := ExpandConstant('{src}') + '\..\python-embed\python.exe';
+  Result := FileExists(SrcDir);
+end;
