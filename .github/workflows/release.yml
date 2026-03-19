@@ -116,8 +116,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-tags: true
+
+      - name: Fetch tags (workflow_dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        run: git fetch --tags
 
       - name: Validate tag exists (workflow_dispatch only)
         if: github.event_name == 'workflow_dispatch'
