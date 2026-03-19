@@ -174,3 +174,95 @@ def test_main_py_imports_ensure_shim_deployed():
     content = MAIN_PY.read_text(encoding="utf-8")
     assert "ensure_shim_deployed" in content
     assert "shim_config" in content
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests (FIX-056 Review)
+# ---------------------------------------------------------------------------
+
+def test_add_to_shell_profile_skips_nonexistent_file(tmp_path):
+    """_add_to_shell_profile() must silently skip profiles that do not exist."""
+    from launcher.core.shim_config import _add_to_shell_profile
+
+    bin_dir = "/home/user/.local/share/TurbulenceSolutions/bin"
+    # tmp_path exists but contains no .zshrc or .bashrc
+    with patch("launcher.core.shim_config.platform.system", return_value="Darwin"):
+        with patch("launcher.core.shim_config.Path.home", return_value=tmp_path):
+            # Should not raise and should not create any file
+            _add_to_shell_profile(bin_dir)
+
+    assert not (tmp_path / ".zshrc").exists()
+    assert not (tmp_path / ".bashrc").exists()
+
+
+def test_add_to_shell_profile_readonly_file_does_not_raise(tmp_path):
+    """_add_to_shell_profile() must not raise when profile is read-only."""
+    import stat
+    from launcher.core.shim_config import _add_to_shell_profile
+
+    bin_dir = "/home/user/.local/share/TurbulenceSolutions/bin"
+    profile = tmp_path / ".zshrc"
+    profile.write_text("# existing\n", encoding="utf-8")
+    # Make read-only
+    profile.chmod(stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+
+    try:
+        with patch("launcher.core.shim_config.platform.system", return_value="Darwin"):
+            with patch("launcher.core.shim_config.Path.home", return_value=tmp_path):
+                # Should swallow the OSError and NOT raise
+                _add_to_shell_profile(bin_dir)
+    finally:
+        # Restore write permission so pytest cleanup can delete the temp dir
+        profile.chmod(stat.S_IRUSR | stat.S_IWUSR)
+
+
+def test_ensure_shim_deployed_returns_early_when_shim_not_found(tmp_path):
+    """ensure_shim_deployed() must return early when _find_bundled_shim() returns None."""
+    from launcher.core import shim_config
+
+    config_file = tmp_path / "python-path.txt"
+    # config does NOT exist so we proceed past the early-exit check
+
+    with patch("launcher.core.shim_config.platform.system", return_value="Darwin"):
+        with patch("launcher.core.shim_config.get_python_path_config", return_value=config_file):
+            with patch("launcher.core.shim_config._find_bundled_shim", return_value=None):
+                with patch("launcher.core.shim_config._find_bundled_python_exe") as mock_py:
+                    shim_config.ensure_shim_deployed()
+                    # _find_bundled_python_exe must NOT be called — returned early
+                    mock_py.assert_not_called()
+
+
+def test_ensure_shim_deployed_returns_early_when_python_not_found(tmp_path):
+    """ensure_shim_deployed() must return early when _find_bundled_python_exe() returns None."""
+    from launcher.core import shim_config
+
+    config_file = tmp_path / "python-path.txt"
+    fake_shim = tmp_path / "ts-python"
+    fake_shim.write_text("#!/bin/sh\n", encoding="utf-8")
+
+    with patch("launcher.core.shim_config.platform.system", return_value="Darwin"):
+        with patch("launcher.core.shim_config.get_python_path_config", return_value=config_file):
+            with patch("launcher.core.shim_config._find_bundled_shim", return_value=fake_shim):
+                with patch("launcher.core.shim_config._find_bundled_python_exe", return_value=None):
+                    with patch("launcher.core.shim_config.get_shim_dir") as mock_dir:
+                        shim_config.ensure_shim_deployed()
+                        # get_shim_dir (and mkdir/copy) must NOT be called — returned early
+                        mock_dir.assert_not_called()
+
+
+def test_find_bundled_shim_returns_none_without_meipass():
+    """_find_bundled_shim() must return None when sys._MEIPASS is not set."""
+    from launcher.core.shim_config import _find_bundled_shim
+    import sys
+
+    # Ensure _MEIPASS is absent for this test
+    had_meipass = hasattr(sys, "_MEIPASS")
+    original = getattr(sys, "_MEIPASS", None)
+    if had_meipass:
+        del sys._MEIPASS
+    try:
+        result = _find_bundled_shim()
+        assert result is None, f"Expected None without _MEIPASS, got {result}"
+    finally:
+        if had_meipass:
+            sys._MEIPASS = original
