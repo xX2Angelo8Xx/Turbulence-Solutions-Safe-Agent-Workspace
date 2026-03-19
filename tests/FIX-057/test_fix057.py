@@ -72,3 +72,58 @@ def test_shim_bundling_before_desktop_file():
     assert shim_idx < desktop_idx, (
         "Shim bundling must appear BEFORE the Step 3 .desktop file section"
     )
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests
+# ---------------------------------------------------------------------------
+
+
+def test_no_windows_shim_paths_in_build_script():
+    """build_appimage.sh must not reference Windows-specific shim paths.
+
+    Windows path patterns (.cmd/.bat extension, drive letters, backslash
+    file-path separators) must never appear in the Linux build script.
+    """
+    text = _script_text()
+    # .cmd or .bat shim extensions — exclusively Windows
+    assert "ts-python.cmd" not in text, (
+        "build_appimage.sh references ts-python.cmd — a Windows-only shim extension"
+    )
+    assert "ts-python.bat" not in text, (
+        "build_appimage.sh references ts-python.bat — a Windows-only shim extension"
+    )
+    # Windows drive letter path pattern (e.g. C:\ or C:/) — use negative lookbehind
+    # to avoid matching URL schemes like https:/ where a letter precedes the colon
+    assert not re.search(r'(?<![a-zA-Z0-9])[A-Za-z]:[/\\]', text), (
+        "build_appimage.sh contains a Windows drive letter path (e.g. C:\\)"
+    )
+    # %APPDATA% or %USERPROFILE% Windows environment variables
+    assert "%APPDATA%" not in text and "%USERPROFILE%" not in text, (
+        "build_appimage.sh references Windows environment variables"
+    )
+    # Backslash as path separator in installer paths (not shell escapes)
+    # Pattern: src\installer or shims\ (backslash in a file path context)
+    assert not re.search(r'src\\installer|shims\\', text), (
+        "build_appimage.sh uses backslash path separators in installer paths (Windows-style)"
+    )
+
+
+def test_mkdir_uses_p_flag():
+    """The mkdir for shims directory must use the -p flag (idempotent, no error if exists)."""
+    text = _script_text()
+    # Must match: mkdir -p ... usr/share/shims
+    pattern = r'mkdir\s+-p[^\n]*usr/share/shims'
+    assert re.search(pattern, text), (
+        "build_appimage.sh mkdir for usr/share/shims does not use the -p flag"
+    )
+
+
+def test_cp_uses_relative_path_from_repo_root():
+    """cp command must reference a relative path rooted at src/installer/shims/ts-python."""
+    text = _script_text()
+    # The cp source must be exactly: src/installer/shims/ts-python (not an absolute path)
+    pattern = r'cp\s+"?src/installer/shims/ts-python"?'
+    assert re.search(pattern, text), (
+        "build_appimage.sh cp does not use src/installer/shims/ts-python as the relative source path"
+    )
