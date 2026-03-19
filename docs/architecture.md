@@ -37,9 +37,19 @@ Templates (bundled inside Launcher)
 │   │   ├── core/                     # Business logic
 │   │   │   ├── github_auth.py        # GitHub token provider (env vars / gh CLI)
 │   │   │   ├── updater.py            # Version check via GitHub Releases API
-│   │   │   └── downloader.py         # Asset download from GitHub Releases
+│   │   │   ├── downloader.py         # Asset download from GitHub Releases
+│   │   │   ├── applier.py            # Update apply and restart logic
+│   │   │   ├── os_utils.py           # OS detection helpers
+│   │   │   ├── project_creator.py    # Project scaffolding logic
+│   │   │   ├── shim_config.py        # ts-python shim path configuration
+│   │   │   └── vscode.py             # VS Code launch helpers
 │   │   └── config.py                 # Constants
 │   └── installer/                    # Per-platform installer scripts
+│       ├── linux/                    # Linux AppImage build script
+│       ├── macos/                    # macOS DMG build script
+│       ├── windows/                  # Windows Inno Setup script
+│       ├── python-embed/             # Bundled Python embeddable distribution
+│       └── shims/                    # ts-python shim scripts (Windows .cmd / Unix sh)
 ├── templates/                        # Bundled project templates
 ├── tests/                            # Permanent test scripts (per workpackage)
 │   ├── conftest.py                   # pytest configuration — src/ path setup
@@ -79,8 +89,15 @@ Templates (bundled inside Launcher)
 │   ├── FIX-041/                      # Tests for FIX-041 (Fix stale version .dist-info)
 │   ├── FIX-042/                      # Tests for FIX-042 (NoAgentZone visible in explorer)
 │   ├── FIX-043/                      # Tests for FIX-043 (Fix INS-005 uninstall delete type)
+│   ├── FIX-031/                      # Tests for FIX-031
+│   ├── FIX-032/                      # Tests for FIX-032
+│   ├── FIX-033/                      # Tests for FIX-033
+│   ├── FIX-034/                      # Tests for FIX-034
+│   ├── FIX-035/                      # Tests for FIX-035
 │   ├── FIX-044/                      # Tests for FIX-044 (Fix PermissionError on read-only template)
 │   ├── FIX-045/                      # Tests for FIX-045 (Bump Version to 2.1.3)
+│   ├── FIX-046/                      # Tests for FIX-046 (Remove Default-Project)
+│   ├── FIX-047/                      # Tests for FIX-047 (Bump Version to 3.0.0)
 │   ├── GUI-001/                      # Tests for GUI-001 (Main Window Layout)
 │   ├── GUI-002/                      # Tests for GUI-002 (Project Type Selection)
 │   ├── GUI-003/                      # Tests for GUI-003 (Folder Name Input)
@@ -98,6 +115,7 @@ Templates (bundled inside Launcher)
 │   ├── GUI-015/                      # Tests for GUI-015 (Rename Root Folder to TS-SAE)
 │   ├── GUI-016/                      # Tests for GUI-016 (Rename Internal Project Folder)
 │   ├── GUI-017/                      # Tests for GUI-017 (UI Labels for New Naming)
+│   ├── GUI-018/                      # Tests for GUI-018
 │   ├── INS-001/                      # Tests for INS-001 (Project Scaffolding)
 │   ├── INS-002/                      # Tests for INS-002 (Python Packaging)
 │   ├── INS-003/                      # Tests for INS-003 (PyInstaller Config)
@@ -114,6 +132,10 @@ Templates (bundled inside Launcher)
 │   ├── INS-015/                      # Tests for INS-015 (CI macOS Build Jobs)
 │   ├── INS-016/                      # Tests for INS-016 (CI Linux Build Job)
 │   ├── INS-017/                      # Tests for INS-017 (CI Release Upload Job)
+│   ├── INS-018/                      # Tests for INS-018 (Bundle Python Embeddable Distribution)
+│   ├── INS-019/                      # Tests for INS-019 (Create ts-python shim and config system)
+│   ├── INS-020/                      # Tests for INS-020 (Update require-approval.json template for ts-python)
+│   ├── INS-021/                      # Tests for INS-021
 │   ├── SAF-001/                      # Tests for SAF-001 (Security Gate Core)
 │   ├── SAF-002/                      # Tests for SAF-002 (Zone Enforcement Logic)
 │   ├── SAF-003/                      # Tests for SAF-003 (Tool Parameter Validation)
@@ -143,7 +165,11 @@ Templates (bundled inside Launcher)
 │   ├── SAF-028/                      # Tests for SAF-028 (Run Code Block Scanning)
 │   ├── SAF-029/                      # Tests for SAF-029 (Fix dot-prefix path matching)
 │   ├── SAF-030/                      # Tests for SAF-030 (Recognise bare tilde as path-like)
-│   └── SAF-031/                      # Tests for SAF-031 (Fix python -m pip and startswith bypass)
+│   ├── SAF-031/                      # Tests for SAF-031 (Fix python -m pip and startswith bypass)
+│   ├── SAF-032/                      # Tests for SAF-032
+│   ├── SAF-033/                      # Tests for SAF-033
+│   ├── SAF-034/                      # Tests for SAF-034
+│   └── DOC-006/                      # Tests for DOC-006 (Document V3.0.0 security decisions)
 ├── docs/
 │   ├── architecture.md               # Project overview and structure (this file)
 │   ├── project-scope.md              # Project scope and vision
