@@ -60,48 +60,39 @@ def verify_shim() -> "tuple[bool, str]":
 
 
 def verify_ts_python() -> "tuple[bool, str]":
-    """Verify the ts-python shim by actually executing it.
+    """Verify the ts-python shim by testing the configured Python runtime.
 
-    Runs ``ts-python -c "import sys; print(sys.version)"`` via subprocess
-    with a 30-second timeout. Returns ``(True, version_string)`` on success
-    or ``(False, error_message)`` on failure.
+    Instead of invoking ts-python.cmd through cmd.exe /c (which has
+    fragile quoting/parsing with paths containing spaces or special
+    characters), this directly reads python-path.txt and calls the
+    Python executable.  The shim file existence is verified separately.
 
-    On Windows, prefers ``ts-python.cmd`` from the configured shim directory,
-    then falls back to a PATH lookup. ``.cmd`` files are invoked via
-    ``cmd.exe /c`` to prevent hangs from stdin inheritance and to ensure
-    correct interpretation on Windows ARM under x64 emulation.
-    On Unix/macOS, looks for ``ts-python`` on PATH. Never uses ``shell=True``.
+    Returns ``(True, version_string)`` on success or
+    ``(False, error_message)`` on failure.
     """
+    # Step 1: Verify python-path.txt is configured and points to a real file.
+    python_path = read_python_path()
+    if python_path is None:
+        return False, "Python path configuration not found."
+    if not python_path.exists():
+        return False, f"Python executable not found: {python_path}"
+
+    # Step 2: Verify the shim script exists at the expected location.
     system = platform.system()
-    shim_exe: "str | None" = None
-    use_cmd_wrapper = False
-
     if system == "Windows":
-        # Prefer ts-python.cmd in the configured shim directory.
-        candidate = get_shim_dir() / "ts-python.cmd"
-        if candidate.exists():
-            shim_exe = str(candidate)
-        else:
-            # Fall back to PATH lookup.
-            shim_exe = shutil.which("ts-python.cmd") or shutil.which("ts-python")
-        # .cmd files must be invoked via cmd.exe /c to prevent hangs on
-        # Windows ARM (x64 emulation) and stdin inheritance issues.
-        if shim_exe is not None and shim_exe.lower().endswith(".cmd"):
-            use_cmd_wrapper = True
+        shim_file = get_shim_dir() / "ts-python.cmd"
     else:
-        shim_exe = shutil.which("ts-python")
+        shim_file = get_shim_dir() / "ts-python"
+    if not shim_file.exists():
+        # Also check PATH as fallback.
+        found = shutil.which("ts-python.cmd") if system == "Windows" else shutil.which("ts-python")
+        if found is None:
+            return False, "ts-python shim not found on PATH or in shim directory."
 
-    if shim_exe is None:
-        return False, "ts-python shim not found on PATH or in shim directory."
-
-    if use_cmd_wrapper:
-        cmd_args = ["cmd.exe", "/c", shim_exe, "-c", "import sys; print(sys.version)"]
-    else:
-        cmd_args = [shim_exe, "-c", "import sys; print(sys.version)"]
-
+    # Step 3: Execute the Python runtime directly (bypass cmd.exe entirely).
     try:
         result = subprocess.run(
-            cmd_args,
+            [str(python_path), "-c", "import sys; print(sys.version)"],
             capture_output=True,
             text=True,
             timeout=30,
@@ -110,10 +101,10 @@ def verify_ts_python() -> "tuple[bool, str]":
         if result.returncode == 0:
             return True, result.stdout.strip()
         stderr = result.stderr.strip()
-        return False, f"ts-python exited with code {result.returncode}: {stderr}"
+        return False, f"Python exited with code {result.returncode}: {stderr}"
     except subprocess.TimeoutExpired:
-        return False, "ts-python shim timed out after 30 seconds."
+        return False, "Python runtime timed out after 30 seconds."
     except FileNotFoundError:
-        return False, f"ts-python executable not found: {shim_exe}"
+        return False, f"Python executable not found: {python_path}"
     except OSError as exc:
-        return False, f"Failed to run ts-python shim: {exc}"
+        return False, f"Failed to run Python runtime: {exc}"
