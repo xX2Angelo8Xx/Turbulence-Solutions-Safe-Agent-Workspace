@@ -46,6 +46,25 @@ Three root causes were addressed:
 - `test_windows_shim_dir_used_first` — Verifies .cmd shim in shim dir takes priority over PATH
 - `test_windows_fallback_to_path_cmd_wrapper` — Verifies fallback PATH .cmd also gets cmd.exe wrapper
 
-## Known Limitations
+## Iteration 2 — 2025-07-25
+
+### Tester Feedback Addressed
+- **SAF-034 test_verify_ts_python_windows_uses_shim_dir_when_exists**: Updated assertion from `args_used[0] == str(fake_cmd)` → `args_used[0] == "cmd.exe"` and `args_used[2] == str(fake_cmd)` to reflect cmd.exe /c wrapper.
+- **SAF-034 test_verify_ts_python_windows_fallback_to_path**: Same pattern — updated to check `args_used[0] == "cmd.exe"` and path at index 2.
+- **SAF-034 test_verify_ts_python_windows_shim_dir_takes_precedence**: Same update.
+- **SAF-034 test_verify_ts_python_timeout_message_mentions_5_seconds**: Renamed to `test_verify_ts_python_timeout_message_mentions_30_seconds`; updated assertion to `"30" in msg`.
+- **SAF-034 test_verify_ts_python_passes_timeout_5_to_subprocess** (in test_saf034_edge.py): Renamed to `test_verify_ts_python_passes_timeout_30_to_subprocess`; updated `== 5` → `== 30`.
+- **SAF-034 test_verify_ts_python_shim_path_with_spaces** (in test_saf034_edge.py): Updated to check `args[0] == "cmd.exe"` and `args[2] == str(fake_cmd)`.
+- **FIX-047 TARGET_VERSION**: Updated from `"3.0.0"` to `"3.0.1"` in test_fix047_version.py.
+
+### Additional Changes
+- `tests/SAF-034/test_saf034.py` — Updated 4 tests for new cmd.exe /c wrapper behavior and 30s timeout
+- `tests/SAF-034/test_saf034_edge.py` — Updated 2 tests for 30s timeout and cmd.exe wrapper with spaces
+- `tests/FIX-047/test_fix047_version.py` — Updated TARGET_VERSION to 3.0.1
+
+### Tests Added/Updated
+- All 12 previously-failing regression tests now pass
+- Full suite: 61 tests (21 FIX-048 + 29 SAF-034 + 11 FIX-047) — 61/61 pass
+
 - The cmd.exe /c wrapper applies to any shim path ending with `.cmd` (case-insensitive), which is the correct heuristic for Windows batch files.
 - The CI fix (uncommenting the download step) requires internet access during the CI build; this is the expected behavior in the release workflow.

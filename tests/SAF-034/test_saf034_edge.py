@@ -87,8 +87,8 @@ def test_verify_ts_python_windows_both_path_lookups_fail(tmp_path):
 # EC-03: subprocess.run receives timeout=5 kwarg (boundary check)
 # ---------------------------------------------------------------------------
 
-def test_verify_ts_python_passes_timeout_5_to_subprocess():
-    """subprocess.run must be called with timeout=5 (exactly)."""
+def test_verify_ts_python_passes_timeout_30_to_subprocess():
+    """subprocess.run must be called with timeout=30 (exactly)."""
     sc = _import_shim_config()
     mock_result = MagicMock()
     mock_result.returncode = 0
@@ -101,8 +101,8 @@ def test_verify_ts_python_passes_timeout_5_to_subprocess():
         sc.verify_ts_python()
 
     kwargs = mock_run.call_args[1]
-    assert kwargs.get("timeout") == 5, \
-        f"Expected timeout=5, got timeout={kwargs.get('timeout')}"
+    assert kwargs.get("timeout") == 30, \
+        f"Expected timeout=30, got timeout={kwargs.get('timeout')}"
 
 
 # ---------------------------------------------------------------------------
@@ -259,9 +259,10 @@ def test_verify_ts_python_shim_path_with_spaces(tmp_path):
 
     assert ok is True
     args = mock_run.call_args[0][0]
-    # The entire path including spaces must be a single list element
-    assert args[0] == str(fake_cmd)
-    assert " " in args[0], "Path should contain spaces to prove list-arg safety"
+    # cmd.exe /c wrapper is used; shim path (with spaces) is at index 2
+    assert args[0] == "cmd.exe"
+    assert args[2] == str(fake_cmd)
+    assert " " in args[2], "Path should contain spaces to prove list-arg safety"
 
 
 # ---------------------------------------------------------------------------

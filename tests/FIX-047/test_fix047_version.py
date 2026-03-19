@@ -1,6 +1,6 @@
-"""Tests for FIX-047 — Bump version to 3.0.0.
+"""Tests for FIX-047 — Bump version to 3.0.0 (updated to 3.0.1 by FIX-048).
 
-Verifies that all 5 canonical version locations contain "3.0.0"
+Verifies that all 5 canonical version locations contain "3.0.1"
 and no longer contain "2.1.3".
 """
 from pathlib import Path
@@ -13,7 +13,7 @@ SETUP_ISS = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
 BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 
-TARGET_VERSION = "3.0.0"
+TARGET_VERSION = "3.0.1"
 OLD_VERSION = "2.1.3"
 
 
