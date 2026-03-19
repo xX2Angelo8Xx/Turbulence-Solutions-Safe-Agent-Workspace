@@ -129,6 +129,51 @@ All 12 FIX-050 tests pass.
 
 ---
 
+## Iteration 2 — Regression Fix (2026-03-19)
+
+**Reason:** Tester returned WP with two regressions. See `test-report.md`.
+
+### Regression 1 — INS-019 (`test_windows_shim_python_path_is_quoted`)
+
+**Root cause:** FIX-050 changed `ts-python.cmd` to use `!PYTHON_PATH!`
+(delayed expansion) instead of `%PYTHON_PATH%`. The INS-019 test was still
+asserting `'"%PYTHON_PATH%"' in text`.
+
+**Fix:** Updated assertion in `tests/INS-019/test_ins019_edge_cases.py` to
+check for `'"!PYTHON_PATH!"'` instead.
+
+### Regression 2 — SAF-034 (13+ additional failures)
+
+**Root cause:** FIX-050's new `verify_ts_python()` calls `read_python_path()`
+as its first step. If not configured (no `python-path.txt`), it immediately
+returns `(False, "Python path configuration not found.")`. SAF-034 tests only
+mocked `shutil.which` and `subprocess.run`, not `read_python_path()`, so they
+hit the early exit before reaching subprocess.
+
+**Fix:** Added `patch("launcher.core.shim_config.read_python_path", ...)` to
+each of the 15 newly-failing SAF-034 tests, using a `MagicMock` path with
+`exists.return_value = True` (Unix/Mac tests) or a real tmp_path file (Windows
+`test_verify_ts_python_windows_returns_stripped_version`). For
+`test_verify_ts_python_subprocess_args_are_static` the assertion was also
+updated from `args[0] == "/usr/bin/ts-python"` to `args[0] == "/usr/local/bin/python3"`
+to reflect the new direct-python behavior.
+
+### Files changed (Iteration 2)
+
+| File | Change |
+|------|--------|
+| `tests/INS-019/test_ins019_edge_cases.py` | Updated assertion from `"%PYTHON_PATH%"` to `"!PYTHON_PATH!"` |
+| `tests/SAF-034/test_saf034.py` | Added `read_python_path` mock to 8 tests |
+| `tests/SAF-034/test_saf034_edge.py` | Added `read_python_path` mock to 7 tests; updated subprocess args assertion in EC-06 |
+
+### Test results after Iteration 2
+
+- `tests/INS-019/` — all pass
+- `tests/SAF-034/` — 4 pre-existing BUG-078 failures remain (Windows cmd.exe shim tests), 0 new failures
+- `tests/FIX-050/` — all 31 tests pass
+
+---
+
 ## Test Results
 
 See `docs/test-results/test-results.csv` entries TST-1868 through TST-1869.

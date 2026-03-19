@@ -53,7 +53,10 @@ def test_verify_ts_python_success_unix():
     mock_result.returncode = 0
     mock_result.stdout = "3.11.0 (default, ...)\n"
     mock_result.stderr = ""
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
          patch("subprocess.run", return_value=mock_result) as mock_run:
         ok, msg = sc.verify_ts_python()
@@ -86,7 +89,10 @@ def test_verify_ts_python_nonzero_exit():
     mock_result.returncode = 1
     mock_result.stdout = ""
     mock_result.stderr = "some error"
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
          patch("subprocess.run", return_value=mock_result):
         ok, msg = sc.verify_ts_python()
@@ -102,7 +108,10 @@ def test_verify_ts_python_nonzero_exit():
 def test_verify_ts_python_timeout():
     """Returns (False, ...) when subprocess times out."""
     sc = _import_shim_config()
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
          patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="ts-python", timeout=5)):
         ok, msg = sc.verify_ts_python()
@@ -132,7 +141,10 @@ def test_verify_ts_python_file_not_found():
 def test_verify_ts_python_os_error():
     """Returns (False, ...) on generic OSError."""
     sc = _import_shim_config()
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
          patch("subprocess.run", side_effect=OSError("permission denied")):
         ok, msg = sc.verify_ts_python()
@@ -214,7 +226,10 @@ def test_verify_ts_python_unix_uses_which():
             return "/opt/ts/bin/ts-python"
         return None
 
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", side_effect=_which), \
          patch("subprocess.run", return_value=mock_result):
         ok, msg = sc.verify_ts_python()
@@ -408,7 +423,10 @@ def test_verify_ts_python_never_uses_shell_true():
     mock_result.stdout = "3.11.0\n"
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
          patch("subprocess.run", return_value=mock_result) as mock_run:
         sc.verify_ts_python()
@@ -429,7 +447,10 @@ def test_verify_ts_python_uses_list_args():
     mock_result.stdout = "3.11.0\n"
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
          patch("subprocess.run", return_value=mock_result) as mock_run:
         sc.verify_ts_python()
@@ -477,7 +498,10 @@ def test_verify_ts_python_windows_shim_dir_takes_precedence(tmp_path):
 def test_verify_ts_python_timeout_message_mentions_30_seconds():
     """Timeout failure message must mention the 30-second timeout value."""
     sc = _import_shim_config()
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
          patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="ts-python", timeout=30)):
         ok, msg = sc.verify_ts_python()

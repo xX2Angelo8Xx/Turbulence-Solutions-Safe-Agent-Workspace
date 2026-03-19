@@ -92,7 +92,7 @@ def test_windows_shim_python_path_is_quoted():
     in the path without enabling command injection.
     """
     text = WINDOWS_SHIM.read_text(encoding="utf-8")
-    assert '"%PYTHON_PATH%"' in text, (
+    assert '"!PYTHON_PATH!"' in text, (
         "Windows shim must invoke Python path with double quotes "
         "to handle spaces and prevent injection"
     )

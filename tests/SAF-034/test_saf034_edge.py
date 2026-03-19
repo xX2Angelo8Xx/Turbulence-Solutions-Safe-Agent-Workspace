@@ -50,7 +50,10 @@ def test_verify_ts_python_macos_uses_which():
             return "/usr/local/bin/ts-python"
         return None
 
-    with patch("platform.system", return_value="Darwin"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Darwin"), \
          patch("shutil.which", side_effect=_which), \
          patch("subprocess.run", return_value=mock_result):
         ok, msg = sc.verify_ts_python()
@@ -95,7 +98,10 @@ def test_verify_ts_python_passes_timeout_30_to_subprocess():
     mock_result.stdout = "3.11.0\n"
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/bin/ts-python"), \
          patch("subprocess.run", return_value=mock_result) as mock_run:
         sc.verify_ts_python()
@@ -117,7 +123,10 @@ def test_verify_ts_python_empty_stdout_on_success():
     mock_result.stdout = ""
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/bin/ts-python"), \
          patch("subprocess.run", return_value=mock_result):
         ok, msg = sc.verify_ts_python()
@@ -171,21 +180,25 @@ def test_on_create_project_error_dialog_title(tmp_path):
 
 def test_verify_ts_python_subprocess_args_are_static():
     """The command list passed to subprocess.run must be exactly:
-    [shim_exe, '-c', 'import sys; print(sys.version)'].
-    No user input flows through the shim arguments."""
+    [python_exe, '-c', 'import sys; print(sys.version)'].
+    No user input flows through the subprocess arguments."""
     sc = _import_shim_config()
     mock_result = MagicMock()
     mock_result.returncode = 0
     mock_result.stdout = "3.11.0\n"
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    mock_py.__str__ = MagicMock(return_value="/usr/local/bin/python3")
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/bin/ts-python"), \
          patch("subprocess.run", return_value=mock_result) as mock_run:
         sc.verify_ts_python()
 
     args = mock_run.call_args[0][0]
-    assert args[0] == "/usr/bin/ts-python"
+    assert args[0] == "/usr/local/bin/python3"
     assert args[1] == "-c"
     assert args[2] == "import sys; print(sys.version)"
     assert len(args) == 3, "Extra args would indicate injection risk"
@@ -203,7 +216,10 @@ def test_verify_ts_python_nonzero_exit_empty_stderr():
     mock_result.stdout = ""
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/bin/ts-python"), \
          patch("subprocess.run", return_value=mock_result):
         ok, msg = sc.verify_ts_python()
@@ -225,7 +241,10 @@ def test_verify_ts_python_macos_full_success():
     mock_result.stdout = version_line + "\n"
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Darwin"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Darwin"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
          patch("subprocess.run", return_value=mock_result):
         ok, msg = sc.verify_ts_python()
@@ -274,13 +293,16 @@ def test_verify_ts_python_windows_returns_stripped_version(tmp_path):
     sc = _import_shim_config()
     fake_cmd = tmp_path / "ts-python.cmd"
     fake_cmd.write_text("@echo off\n")
+    fake_python = tmp_path / "python.exe"
+    fake_python.write_text("")
 
     mock_result = MagicMock()
     mock_result.returncode = 0
     mock_result.stdout = "  3.11.9 (tags/v3.11.9:8eb12b9, Jun  2 2024)  \n"
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Windows"), \
+    with patch("launcher.core.shim_config.read_python_path", return_value=fake_python), \
+         patch("platform.system", return_value="Windows"), \
          patch.object(sc, "get_shim_dir", return_value=tmp_path), \
          patch("subprocess.run", return_value=mock_result):
         ok, msg = sc.verify_ts_python()
