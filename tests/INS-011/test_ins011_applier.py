@@ -121,10 +121,11 @@ class TestWindowsApply:
             popen_calls.append({"args": args, "kwargs": kwargs})
 
         with patch("launcher.core.applier.subprocess.Popen", side_effect=fake_popen), \
+             patch("launcher.core.applier.os._exit") as mock_os_exit, \
              patch("launcher.core.applier.sys.exit") as mock_exit:
             _apply_windows(installer)
 
-        return popen_calls, mock_exit
+        return popen_calls, mock_os_exit
 
     def test_windows_popen_called_with_list_args(self, tmp_path):
         popen_calls, _ = self._run_windows_apply(tmp_path)
@@ -153,6 +154,7 @@ class TestWindowsApply:
             captured["args"] = args
 
         with patch("launcher.core.applier.subprocess.Popen", side_effect=fake_popen), \
+             patch("launcher.core.applier.os._exit"), \
              patch("launcher.core.applier.sys.exit"):
             _apply_windows(installer)
         assert captured["args"][0] == str(installer)
@@ -394,6 +396,7 @@ class TestNoShellTrue:
             captured_kwargs.update(kwargs)
 
         with patch("launcher.core.applier.subprocess.Popen", side_effect=fake_popen), \
+             patch("launcher.core.applier.os._exit"), \
              patch("launcher.core.applier.sys.exit"):
             _apply_windows(installer)
 

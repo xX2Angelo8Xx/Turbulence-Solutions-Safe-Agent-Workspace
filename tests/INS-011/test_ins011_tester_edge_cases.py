@@ -119,7 +119,8 @@ class TestPathEdgeCases:
             captured["args"] = args
 
         with patch("launcher.core.applier.subprocess.Popen", side_effect=fake_popen), \
-             patch("launcher.core.applier.sys.exit"):
+             patch("launcher.core.applier.sys.exit"), \
+             patch("launcher.core.applier.os._exit"):
             _apply_windows(installer)
 
         assert captured["args"][0] == str(installer), (
@@ -141,7 +142,8 @@ class TestPathEdgeCases:
             captured["args"] = args
 
         with patch("launcher.core.applier.subprocess.Popen", side_effect=fake_popen), \
-             patch("launcher.core.applier.sys.exit"):
+             patch("launcher.core.applier.sys.exit"), \
+             patch("launcher.core.applier.os._exit"):
             _apply_windows(installer)
 
         assert captured["args"][0] == str(installer)
