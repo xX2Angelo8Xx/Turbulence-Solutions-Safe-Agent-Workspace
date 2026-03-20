@@ -251,6 +251,49 @@ def _check_csv_structural(result: ValidationResult) -> None:
                 )
 
 
+VALID_BUG_STATUSES = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
+
+
+def _check_bug_status_enum(result: ValidationResult) -> None:
+    """Verify all bug statuses are from the allowed set."""
+    _, bug_rows = read_csv(BUG_CSV)
+    for bug in bug_rows:
+        bug_id = bug.get("ID", "<no ID>")
+        status = bug.get("Status", "").strip()
+        if status and status not in VALID_BUG_STATUSES:
+            result.warning(
+                f"{bug_id} has non-standard Status '{status}' — "
+                f"valid values: Open, In Progress, Fixed, Verified, Closed"
+            )
+
+
+def _check_bug_linkage(wp_id: str, result: ValidationResult) -> None:
+    """Warn if bugs referenced in dev-log/test-report lack Fixed In WP linkage."""
+    wp_folder = REPO_ROOT / "docs" / "workpackages" / wp_id
+    bug_refs: set[str] = set()
+    for filename in ("dev-log.md", "test-report.md"):
+        filepath = wp_folder / filename
+        if filepath.exists():
+            content = filepath.read_text(encoding="utf-8", errors="replace")
+            bug_refs.update(re.findall(r"BUG-\d{3}", content))
+
+    if not bug_refs:
+        return
+
+    _, bug_rows = read_csv(BUG_CSV)
+    bug_map = {b["ID"]: b for b in bug_rows}
+    for bug_id in sorted(bug_refs):
+        bug = bug_map.get(bug_id)
+        if not bug:
+            continue
+        fixed_wp = bug.get("Fixed In WP", "").strip()
+        if fixed_wp != wp_id and wp_id not in fixed_wp:
+            result.warning(
+                f"{bug_id} referenced in {wp_id} dev-log/test-report "
+                f"but Fixed In WP is empty or doesn't match"
+            )
+
+
 def validate_full(result: ValidationResult) -> None:
     """Run all validation checks."""
     # Duplicate ID checks
@@ -273,6 +316,9 @@ def validate_full(result: ValidationResult) -> None:
     # Status cascade checks
     _check_bug_cascade(result)
     _check_us_cascade(result)
+
+    # Bug status enum validation
+    _check_bug_status_enum(result)
 
     # Branch naming
     _check_branch_naming(result)
@@ -311,6 +357,9 @@ def validate_wp(wp_id: str, result: ValidationResult) -> None:
 
     # Branch naming
     _check_branch_naming(result)
+
+    # Bug linkage (warn about bugs referenced in docs but not linked)
+    _check_bug_linkage(wp_id, result)
 
 
 def main() -> int:
