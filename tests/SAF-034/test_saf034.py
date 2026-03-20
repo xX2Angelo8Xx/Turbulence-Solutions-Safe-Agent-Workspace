@@ -18,7 +18,7 @@ Covers:
 15. verify_ts_python() never uses shell=True (security rule)
 16. verify_ts_python() uses list args (not string) for subprocess.run
 17. Windows: ts-python.cmd in shim dir takes precedence over PATH entry
-18. Timeout message includes "5 seconds"
+18. Timeout message includes "30 seconds"
 """
 from __future__ import annotations
 
@@ -69,9 +69,10 @@ def test_verify_ts_python_success_unix():
 # ---------------------------------------------------------------------------
 
 def test_verify_ts_python_not_found_on_path():
-    """Returns (False, ...) when shutil.which finds nothing."""
+    """Returns (False, ...) when python-path.txt is not configured."""
     sc = _import_shim_config()
-    with patch("platform.system", return_value="Linux"), \
+    with patch("launcher.core.shim_config.read_python_path", return_value=None), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value=None):
         ok, msg = sc.verify_ts_python()
     assert ok is False
@@ -126,7 +127,10 @@ def test_verify_ts_python_timeout():
 def test_verify_ts_python_file_not_found():
     """Returns (False, ...) when the executable path doesn't exist at call time."""
     sc = _import_shim_config()
-    with patch("platform.system", return_value="Linux"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value="/usr/local/bin/ts-python"), \
          patch("subprocess.run", side_effect=FileNotFoundError("no such file")):
         ok, msg = sc.verify_ts_python()
@@ -157,7 +161,7 @@ def test_verify_ts_python_os_error():
 # ---------------------------------------------------------------------------
 
 def test_verify_ts_python_windows_uses_shim_dir_when_exists(tmp_path):
-    """On Windows, ts-python.cmd in shim dir is used when it exists."""
+    """On Windows, ts-python.cmd in shim dir is found during shim existence check."""
     sc = _import_shim_config()
     fake_cmd = tmp_path / "ts-python.cmd"
     fake_cmd.write_text("@echo off\n")
@@ -167,17 +171,19 @@ def test_verify_ts_python_windows_uses_shim_dir_when_exists(tmp_path):
     mock_result.stdout = "3.12.0\n"
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Windows"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Windows"), \
          patch.object(sc, "get_shim_dir", return_value=tmp_path), \
          patch("subprocess.run", return_value=mock_result) as mock_run:
         ok, msg = sc.verify_ts_python()
 
     assert ok is True
-    # The call should have used the shim dir candidate via cmd.exe /c
+    # FIX-050: verify_ts_python now invokes Python directly (no cmd.exe wrapper)
     args_used = mock_run.call_args[0][0]
-    assert args_used[0] == "cmd.exe"
-    assert args_used[1] == "/c"
-    assert args_used[2] == str(fake_cmd)
+    assert args_used[1] == "-c"
+    assert "sys.version" in args_used[2]
 
 
 # ---------------------------------------------------------------------------
@@ -194,17 +200,20 @@ def test_verify_ts_python_windows_fallback_to_path(tmp_path):
     mock_result.stdout = "3.11.5\n"
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Windows"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Windows"), \
          patch.object(sc, "get_shim_dir", return_value=tmp_path), \
          patch("shutil.which", return_value="C:\\Windows\\ts-python.cmd"), \
          patch("subprocess.run", return_value=mock_result) as mock_run:
         ok, msg = sc.verify_ts_python()
 
     assert ok is True
+    # FIX-050: verify_ts_python invokes Python directly, not the shim via cmd.exe
     args_used = mock_run.call_args[0][0]
-    assert args_used[0] == "cmd.exe"
-    assert args_used[1] == "/c"
-    assert args_used[2] == "C:\\Windows\\ts-python.cmd"
+    assert args_used[1] == "-c"
+    assert "sys.version" in args_used[2]
 
 
 # ---------------------------------------------------------------------------
@@ -243,9 +252,10 @@ def test_verify_ts_python_unix_uses_which():
 # ---------------------------------------------------------------------------
 
 def test_verify_ts_python_unix_not_on_path():
-    """On Unix, returns (False, ...) when ts-python is absent from PATH."""
+    """On Unix, returns (False, ...) when python-path.txt not configured."""
     sc = _import_shim_config()
-    with patch("platform.system", return_value="Linux"), \
+    with patch("launcher.core.shim_config.read_python_path", return_value=None), \
+         patch("platform.system", return_value="Linux"), \
          patch("shutil.which", return_value=None):
         ok, msg = sc.verify_ts_python()
     assert ok is False
@@ -467,7 +477,7 @@ def test_verify_ts_python_uses_list_args():
 # ---------------------------------------------------------------------------
 
 def test_verify_ts_python_windows_shim_dir_takes_precedence(tmp_path):
-    """On Windows, shim dir ts-python.cmd is used even if PATH also has it."""
+    """On Windows, shim dir ts-python.cmd is checked for existence even if PATH also has it."""
     sc = _import_shim_config()
     fake_cmd = tmp_path / "ts-python.cmd"
     fake_cmd.write_text("@echo off\n")
@@ -477,18 +487,21 @@ def test_verify_ts_python_windows_shim_dir_takes_precedence(tmp_path):
     mock_result.stdout = "3.12.0\n"
     mock_result.stderr = ""
 
-    # Ensure PATH also reports a different path — shim dir must win.
-    with patch("platform.system", return_value="Windows"), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    # Ensure PATH also reports a different path — shim dir must win for existence check.
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Windows"), \
          patch.object(sc, "get_shim_dir", return_value=tmp_path), \
          patch("shutil.which", return_value="C:\\different\\ts-python.cmd"), \
          patch("subprocess.run", return_value=mock_result) as mock_run:
         ok, _ = sc.verify_ts_python()
 
     assert ok is True
+    # FIX-050: Python is invoked directly, not via cmd.exe /c shim
     args_used = mock_run.call_args[0][0]
-    assert args_used[0] == "cmd.exe"
-    assert args_used[1] == "/c"
-    assert args_used[2] == str(fake_cmd)
+    assert args_used[1] == "-c"
+    assert "sys.version" in args_used[2]
 
 
 # ---------------------------------------------------------------------------

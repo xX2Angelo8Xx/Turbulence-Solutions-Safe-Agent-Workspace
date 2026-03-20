@@ -69,17 +69,14 @@ def test_verify_ts_python_macos_uses_which():
 # ---------------------------------------------------------------------------
 
 def test_verify_ts_python_windows_both_path_lookups_fail(tmp_path):
-    """On Windows, if shim dir has no .cmd and both shutil.which lookups return
-    None, verify_ts_python returns (False, 'not found ...')."""
+    """On Windows, if python-path.txt is not configured,
+    verify_ts_python returns (False, 'not found ...')."""
     sc = _import_shim_config()
-    # tmp_path has no ts-python.cmd
 
-    def _which(name, *a, **kw):
-        return None  # Both ts-python.cmd and ts-python absent from PATH
-
-    with patch("platform.system", return_value="Windows"), \
+    with patch("launcher.core.shim_config.read_python_path", return_value=None), \
+         patch("platform.system", return_value="Windows"), \
          patch.object(sc, "get_shim_dir", return_value=tmp_path), \
-         patch("shutil.which", side_effect=_which):
+         patch("shutil.which", return_value=None):
         ok, msg = sc.verify_ts_python()
 
     assert ok is False
@@ -258,30 +255,32 @@ def test_verify_ts_python_macos_full_success():
 # ---------------------------------------------------------------------------
 
 def test_verify_ts_python_shim_path_with_spaces(tmp_path):
-    """A shim path containing spaces must be passed as a list element,
+    """A python path containing spaces must be passed as a list element,
     NOT as a string split on spaces (which would break the call)."""
     sc = _import_shim_config()
     spaced_dir = tmp_path / "path with spaces"
     spaced_dir.mkdir()
     fake_cmd = spaced_dir / "ts-python.cmd"
     fake_cmd.write_text("@echo off\n")
+    fake_python = spaced_dir / "python.exe"
+    fake_python.write_text("")
 
     mock_result = MagicMock()
     mock_result.returncode = 0
     mock_result.stdout = "3.11.0\n"
     mock_result.stderr = ""
 
-    with patch("platform.system", return_value="Windows"), \
+    with patch("launcher.core.shim_config.read_python_path", return_value=fake_python), \
+         patch("platform.system", return_value="Windows"), \
          patch.object(sc, "get_shim_dir", return_value=spaced_dir), \
          patch("subprocess.run", return_value=mock_result) as mock_run:
         ok, _ = sc.verify_ts_python()
 
     assert ok is True
     args = mock_run.call_args[0][0]
-    # cmd.exe /c wrapper is used; shim path (with spaces) is at index 2
-    assert args[0] == "cmd.exe"
-    assert args[2] == str(fake_cmd)
-    assert " " in args[2], "Path should contain spaces to prove list-arg safety"
+    # FIX-050: Python is invoked directly; path with spaces is at index 0
+    assert args[0] == str(fake_python)
+    assert " " in args[0], "Path should contain spaces to prove list-arg safety"
 
 
 # ---------------------------------------------------------------------------
@@ -301,7 +300,9 @@ def test_verify_ts_python_windows_returns_stripped_version(tmp_path):
     mock_result.stdout = "  3.11.9 (tags/v3.11.9:8eb12b9, Jun  2 2024)  \n"
     mock_result.stderr = ""
 
-    with patch("launcher.core.shim_config.read_python_path", return_value=fake_python), \
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
          patch("platform.system", return_value="Windows"), \
          patch.object(sc, "get_shim_dir", return_value=tmp_path), \
          patch("subprocess.run", return_value=mock_result):

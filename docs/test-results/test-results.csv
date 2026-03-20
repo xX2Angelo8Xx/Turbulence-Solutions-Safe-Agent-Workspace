@@ -1810,3 +1810,4 @@
 "TST-1929","SAF-034: targeted suite","Unit","SAF-034","Fail","2026-03-20","Windows 11 + Python 3.11","25 passed in 0.53s",""
 "TST-1930","SAF-034: 25/29 tests pass (4 pre-existing failures)","Unit","SAF-034","Pass","2026-03-20","Windows 11 + Python 3.11","25 passed / 4 failed (pre-existing)","4 failures are pre-existing from FIX-056/057 verify_ts_python refactor (expect cmd.exe but get python.exe directly). SAF-034 fix verified: 25 core tests pass. Logged by FIX-060."
 "TST-1931","FIX-060: targeted suite","Unit","FIX-060","Pass","2026-03-20","Windows 11 + Python 3.11","4 passed in 0.15s",""
+"TST-1932","SAF-034 mock alignment for FIX-050","Regression","FIX-051","Pass","2026-03-20","Windows/pytest","29/29 passed","All SAF-034 tests pass after updating mocks to reflect FIX-050 verify_ts_python() rewrite. read_python_path() mocked in all relevant tests."
