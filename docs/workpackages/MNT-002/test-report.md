@@ -1,14 +1,14 @@
 # Test Report — MNT-002
 
 **Tester:** Tester Agent
-**Date:** 2026-03-20
-**Iteration:** 1
+**Date:** 2026-03-21
+**Iteration:** 2
 
 ## Summary
 
-MNT-002 delivers the three required files (validation-exceptions.json, action-tracker.json, maintenance-protocol.md with Step 0). All 20 developer-written tests pass. However, a Tester-added edge-case test reveals a **schema contract violation** in action-tracker.json: the `_schema` key documents `resolved_by` as "empty if Open", but 5 Open actions carry non-empty WP-ID values in that field. This is a data/schema inconsistency that must be resolved before the WP can be marked Done.
+MNT-002 Iteration 2 re-test after BUG-091 fix (Option B). All 31 tests pass — 20 developer tests and 11 tester edge-case tests. The BUG-091 fix is correct: `_schema.resolved_by` now explicitly states "may contain planned WP-ID while Open, must be non-empty when Done", and the updated `test_open_actions_resolved_by_schema_contract` test enforces this new contract. `validate_workspace.py --wp MNT-002` returns exit code 0 (clean).
 
-**Verdict: FAIL — Return to Developer**
+**Verdict: PASS**
 
 ---
 
@@ -20,7 +20,7 @@ MNT-002 delivers the three required files (validation-exceptions.json, action-tr
 | `docs/maintenance/action-tracker.json` | ⚠️ Created — schema violation (see below) |
 | `docs/work-rules/maintenance-protocol.md` | ✅ Step 0 added correctly |
 | `docs/workpackages/MNT-002/dev-log.md` | ✅ Exists, non-empty |
-| `tests/MNT-002/` | ✅ 3 test files, 20 developer tests |
+| `tests/MNT-002/` | ✅ 4 test files, 31 tests (20 developer + 11 tester edge-cases) |
 | `scripts/validate_workspace.py` | ⚠️ Not updated (deferred — see Observation 1) |
 
 ---
@@ -33,32 +33,34 @@ MNT-002 delivers the three required files (validation-exceptions.json, action-tr
 | TST-1969 | MNT-002 action-tracker.json schema | Unit | Pass | Developer run — 9/9 |
 | TST-1970 | MNT-002 maintenance-protocol.md action tracker step | Unit | Pass | Developer run — 5/5 |
 | TST-1971 | MNT-002 full developer test suite (Tester run) | Unit | Pass | 20/20 passed |
-| TST-1972 | MNT-002 Tester edge-case test suite | Unit | **Fail** | 30 passed, 1 failed — schema violation |
+| TST-1972 | MNT-002 Tester edge-case test suite | Unit | Fail | 30 passed, 1 failed — schema violation (BUG-091) |
+| TST-1973 | MNT-002 iteration 2 full suite after BUG-091 fix | Unit | Pass | Developer run — 31/31 passed |
+| TST-1974 | MNT-002 Tester re-run after BUG-091 fix (31 tests) | Unit | Pass | Tester run — 31/31 passed |
 
 ---
 
 ## Findings
 
-### FAIL: Schema Contract Violation — `resolved_by` for Open Actions (BUG-091)
+### PASS: BUG-091 Fix Verified — `resolved_by` Schema Contract Now Correct
 
 **Test:** `test_mnt002_edge_cases.py::test_open_actions_resolved_by_schema_contract`
 
-The `_schema` key in `action-tracker.json` documents the `resolved_by` field as:
-> "WP-ID or commit that resolved this, **empty if Open**"
+The `_schema.resolved_by` description was updated to:
+> "WP-ID or commit that resolved this; **may contain planned WP-ID while Open**, must be non-empty when Done"
 
-However, 5 actions with `status: "Open"` have non-empty `resolved_by` values:
+The 5 Open actions with WP-ID values in `resolved_by` now comply with the documented schema:
 
-| Action | Status | resolved_by |
-|--------|--------|-------------|
-| ACT-006 | Open | FIX-067 |
-| ACT-007 | Open | FIX-067 |
-| ACT-009 | Open | FIX-065 |
-| ACT-010 | Open | FIX-066 |
-| ACT-011 | Open | FIX-068 |
+| Action | Status | resolved_by | Verdict |
+|--------|--------|-------------|---------|
+| ACT-006 | Open | FIX-067 | ✅ Valid planned WP-ID |
+| ACT-007 | Open | FIX-067 | ✅ Valid planned WP-ID |
+| ACT-009 | Open | FIX-065 | ✅ Valid planned WP-ID |
+| ACT-010 | Open | FIX-066 | ✅ Valid planned WP-ID |
+| ACT-011 | Open | FIX-068 | ✅ Valid planned WP-ID |
 
-The developer's intent is clear (tracking which WP is planned to resolve each action), but the current implementation violates the documented schema. The schema description is the contract — if the data model needs to express "planned WP", that field must be in the schema too.
+All `resolved_by` values on Open actions match `^[A-Z]+-\d+$` (valid WP-ID format). Done actions all have non-empty `resolved_by`. The test enforces both halves of the contract.
 
-**Filed as:** BUG-091
+**BUG-091 closed.** Fix verified.
 
 ---
 
@@ -74,22 +76,20 @@ FIX-065 (CSV strict parsing) does not cover this feature based on its descriptio
 
 ## TODOs for Developer
 
-- [ ] **Fix schema violation (REQUIRED to PASS):** Resolve the inconsistency between the `_schema` description "empty if Open" and the 5 Open actions that have WP-IDs in `resolved_by`. Choose one of:
-  - **Option A:** Add a `planned_wp` field to the schema (e.g., `"planned_wp": "WP-ID planned to resolve this, empty if not yet assigned"`), clear `resolved_by` for all Open actions, move the planned WP-IDs to the new `planned_wp` field.
-  - **Option B:** Update the `_schema` description for `resolved_by` to: `"WP-ID or commit that resolved this; may also contain a planned WP-ID for Open actions"`. Rename the field semantics clearly in the description.
-- [ ] **Add a test for `resolved_by` consistency** (if choosing Option A): Verify Open actions have empty `resolved_by` and that Done actions have non-empty `resolved_by`.
-- [ ] **Update existing developer test** `test_actions_have_required_fields` to enforce the schema contract (currently only checks field existence and type, not the "empty if Open" rule).
+None — all issues resolved.
 
 ---
 
 ## Bugs Found
 
-- BUG-091: `action-tracker.json: Open actions have non-empty resolved_by (schema contract violation)` — logged in `docs/bugs/bugs.csv`
+- BUG-091: closed — fix verified (schema description now allows planned WP-IDs for Open actions)
 
 ---
 
 ## Verdict
 
-**FAIL — Return WP to In Progress**
+**PASS — Mark WP as Done**
 
-The core deliverables are correct (all three files exist with the right structure). One schema contract is violated: the `_schema` documentation says `resolved_by` is "empty if Open", but 5 Open actions have non-empty values. The fix is straightforward (2-option choice described above). All other checks pass.
+All three deliverables are correct and fully tested. BUG-091 fix is accurate: schema contract updated, test enforces new contract, all 31 tests pass, workspace validation clean.
+
+Deferred item (not blocking): `validate_workspace.py` integration with `validation-exceptions.json` is explicitly out of scope per user instruction — tracked under a separate WP.
