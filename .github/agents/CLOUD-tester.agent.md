@@ -48,7 +48,8 @@ Before marking any WP as `Done`, verify ALL of the following:
 - [ ] `docs/workpackages/<WP-ID>/dev-log.md` exists and is non-empty
 - [ ] `docs/workpackages/<WP-ID>/test-report.md` has been written by you
 - [ ] Test files exist in `tests/<WP-ID>/` with at least one test
-- [ ] All test runs are logged in `docs/test-results/test-results.csv`
+- [ ] All test results logged via `scripts/add_test_result.py` (mandatory — never edit test-results.csv directly)
+- [ ] `scripts/validate_workspace.py --wp <WP-ID>` returns clean (exit code 0)
 - [ ] `git add -A` has been run to stage all changes
 - [ ] `git commit` with message `<WP-ID>: Tester PASS`
 - [ ] `git push origin <branch-name>`

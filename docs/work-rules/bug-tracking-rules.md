@@ -55,3 +55,9 @@ Open → In Progress → Fixed → Verified → Closed
 - Bugs found during testing should be logged in `docs/bugs/bugs.csv` **and** noted in the WP's `test-report.md`.
 - All mandatory columns must be filled when logging a bug — incomplete entries will be rejected during maintenance checks.
 - A regression test must be written for every fixed bug to prevent recurrence.
+- **Use `scripts/add_bug.py`** for auto-ID assignment and field validation:
+  ```powershell
+  .venv\Scripts\python scripts/add_bug.py `
+      --title "..." --severity High --reported-by "Tester Agent" `
+      --description "..." --steps "..." --expected "..." --actual "..."
+  ```

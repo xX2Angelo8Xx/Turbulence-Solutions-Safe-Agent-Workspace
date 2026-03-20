@@ -16,8 +16,7 @@ Central hub for all project rules, workflows, and protocols. Every rule in this 
 | Log or fix a bug | [bug-tracking-rules.md](bug-tracking-rules.md) |
 | Write, run, or log tests | [testing-protocol.md](testing-protocol.md) |
 | Perform project maintenance | [maintenance-protocol.md](maintenance-protocol.md) |
-| Onboard as an AI agent | [agent-workflow.md](agent-workflow.md) |
-
+| Onboard as an AI agent | [agent-workflow.md](agent-workflow.md) || Use a helper script | [../scripts/README.md](../../scripts/README.md) |
 ---
 
 ## Key Project Files

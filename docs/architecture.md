@@ -50,6 +50,15 @@ Templates (bundled inside Launcher)
 │       ├── windows/                  # Windows Inno Setup script
 │       ├── python-embed/             # Bundled Python embeddable distribution
 │       └── shims/                    # ts-python shim scripts (Windows .cmd / Unix sh)
+├── scripts/                          # Agent helper scripts (CSV ops, validation, finalization)
+│   ├── csv_utils.py                  # Shared CSV module with file locking
+│   ├── add_test_result.py            # Append a test result to test-results.csv
+│   ├── add_bug.py                    # Append a bug to bugs.csv
+│   ├── add_workpackage.py            # Create a WP and auto-update parent US
+│   ├── validate_workspace.py         # Pre-handoff / pre-merge workspace checks
+│   ├── finalize_wp.py                # Post-Done: merge, branch cleanup, cascades
+│   ├── update_architecture.py        # Regenerate the Repository Structure tree
+│   └── README.md                     # Script reference guide
 ├── templates/                        # Bundled project templates
 ├── tests/                            # Permanent test scripts (per workpackage)
 │   ├── conftest.py                   # pytest configuration — src/ path setup
@@ -81,6 +90,11 @@ Templates (bundled inside Launcher)
 │   ├── FIX-028/                      # Tests for FIX-028 (macOS Ad-Hoc Code Signing)
 │   ├── FIX-029/                      # Tests for FIX-029 (CI Code Signing Verification)
 │   ├── FIX-030/                      # Tests for FIX-030 (Bump Version to 2.0.1)
+│   ├── FIX-031/                      # Tests for FIX-031
+│   ├── FIX-032/                      # Tests for FIX-032
+│   ├── FIX-033/                      # Tests for FIX-033
+│   ├── FIX-034/                      # Tests for FIX-034
+│   ├── FIX-035/                      # Tests for FIX-035
 │   ├── FIX-036/                      # Tests for FIX-036 (Bump Version to 2.1.0)
 │   ├── FIX-037/                      # Tests for FIX-037 (Remove .dist-info from macOS bundle)
 │   ├── FIX-038/                      # Tests for FIX-038 (Component-level macOS codesign)
@@ -88,11 +102,6 @@ Templates (bundled inside Launcher)
 │   ├── FIX-040/                      # Tests for FIX-040 (Fix Windows update restart)
 │   ├── FIX-041/                      # Tests for FIX-041 (Fix stale version .dist-info)
 │   ├── FIX-042/                      # Tests for FIX-042 (NoAgentZone visible in explorer)
-│   ├── FIX-031/                      # Tests for FIX-031
-│   ├── FIX-032/                      # Tests for FIX-032
-│   ├── FIX-033/                      # Tests for FIX-033
-│   ├── FIX-034/                      # Tests for FIX-034
-│   ├── FIX-035/                      # Tests for FIX-035
 │   ├── FIX-044/                      # Tests for FIX-044 (Fix PermissionError on read-only template)
 │   ├── FIX-045/                      # Tests for FIX-045 (Bump Version to 2.1.3)
 │   ├── FIX-046/                      # Tests for FIX-046 (Remove Default-Project)
@@ -100,6 +109,10 @@ Templates (bundled inside Launcher)
 │   ├── FIX-048/                      # Tests for FIX-048 (Fix ts-python shim timeout, v3.0.1)
 │   ├── FIX-049/                      # Tests for FIX-049 (Fix version test regression pattern)
 │   ├── FIX-050/                      # Tests for FIX-050 (Fix ts-python.cmd parsing, v3.0.2)
+│   ├── FIX-055/                      # Tests for FIX-055 (Fix ArchitecturesAllowed regression)
+│   ├── FIX-056/                      # Tests for FIX-056
+│   ├── FIX-057/                      # Tests for FIX-057
+│   ├── FIX-058/                      # Tests for FIX-058 (Bump Version to 3.0.3)
 │   ├── GUI-001/                      # Tests for GUI-001 (Main Window Layout)
 │   ├── GUI-002/                      # Tests for GUI-002 (Project Type Selection)
 │   ├── GUI-003/                      # Tests for GUI-003 (Folder Name Input)
@@ -164,6 +177,7 @@ Templates (bundled inside Launcher)
 │   ├── SAF-024/                      # Tests for SAF-024 (Generic Deny Messages)
 │   ├── SAF-025/                      # Tests for SAF-025 (Integrity Hashes Update)
 │   ├── SAF-026/                      # Tests for SAF-026 (Python Inline Code Scanning)
+│   ├── SAF-027/                      # Tests for SAF-027 (see SAF-026 — tests share fixtures)
 │   ├── SAF-028/                      # Tests for SAF-028 (Run Code Block Scanning)
 │   ├── SAF-029/                      # Tests for SAF-029 (Fix dot-prefix path matching)
 │   ├── SAF-030/                      # Tests for SAF-030 (Recognise bare tilde as path-like)

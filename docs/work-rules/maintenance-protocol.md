@@ -58,13 +58,19 @@ The following checks are executed in order. Each item produces a **Pass**, **War
 ### 9. Structural Integrity
 - Is `copilot-instructions.md` still under 40 lines with no detailed process rules?
 - Are all agent files in `.github/agents/` syntactically valid with required YAML frontmatter?
-- Is the `Default-Project/` template unmodified (no accidental test changes)?
+- Is the `templates/coding/` template unmodified (no accidental test changes)?
+- Are all scripts in `scripts/` syntactically valid and runnable?
 
 ### 10. Recurring Issue Tracking
 - Review findings from the previous maintenance log (if one exists in `docs/maintenance/`).
 - Check whether any previously proposed actions were NOT implemented.
 - Flag any issues that recur across multiple maintenance cycles — these indicate a rules gap, not just an execution failure.
 - For recurring issues: propose a specific rule change in the work-rules documentation, not just another cleanup action.
+
+### 11. Automated Validation
+- Run `scripts/validate_workspace.py --full` and include the output in the maintenance log.
+- Any violations reported by the script should appear in the relevant check's findings.
+- This check verifies that the helper scripts are being used and that their enforcement is working.
 
 ---
 

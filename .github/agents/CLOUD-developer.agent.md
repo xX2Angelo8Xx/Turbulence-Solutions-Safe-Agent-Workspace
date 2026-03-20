@@ -53,7 +53,8 @@ Before setting any WP to `Review` and handing off to Tester, verify ALL of the f
 - [ ] `docs/workpackages/<WP-ID>/dev-log.md` has been created and filled in
 - [ ] All test files exist in `tests/<WP-ID>/`
 - [ ] All tests pass: `.venv\Scripts\python -m pytest tests/ -v`
-- [ ] Test runs are logged in `docs/test-results/test-results.csv`
+- [ ] Test results logged via `scripts/add_test_result.py` (mandatory — never edit test-results.csv directly)
+- [ ] `scripts/validate_workspace.py --wp <WP-ID>` returns clean (exit code 0)
 - [ ] `git add -A` — all new and modified files are staged
 - [ ] `git status` — confirms no unstaged changes remain
 - [ ] `git diff --cached --stat` — confirms staged changes match your work

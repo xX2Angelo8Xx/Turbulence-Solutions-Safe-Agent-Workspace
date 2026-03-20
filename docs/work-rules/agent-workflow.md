@@ -25,7 +25,7 @@ Every agent follows this exact workflow when implementing a workpackage. No step
 | 2 | **Claim** | Set WP status to `In Progress`. Fill in `Assigned To`. |
 | 3 | **Prepare** | Create the WP folder: `docs/workpackages/<WP-ID>/`. Create `dev-log.md` inside it (see format below). |
 | 4 | **Implement** | Write code following `coding-standards.md` and `security-rules.md`. Stay within WP scope. |
-| 5 | **Test** | Create `tests/<WP-ID>/` folder if it doesn't exist. Write and run tests per `testing-protocol.md`. All tests must pass. Log results in `docs/test-results/test-results.csv`. |
+| 5 | **Test** | Create `tests/<WP-ID>/` folder if it doesn't exist. Write and run tests per `testing-protocol.md`. All tests must pass. Log results using `scripts/add_test_result.py` (mandatory — direct CSV editing is prohibited). |
 | 6 | **Document** | Update `dev-log.md` with implementation summary, decisions made, tests written, and known limitations. |
 | 7 | **Handoff** | Set WP status to `Review`. Commit per `commit-branch-rules.md`. Hand off to Tester Agent. |
 
@@ -64,7 +64,7 @@ Rules:
 | Step | Action | Details |
 |------|--------|---------|
 | 8 | **Review** | Read the WP row, `dev-log.md`, linked user story, and code changes. Verify requirements are met. |
-| 9 | **Test** | Run the full test suite. Add edge-case tests beyond the Developer's. Think beyond the protocol: attack vectors, boundaries, race conditions. Log all runs in `docs/test-results/test-results.csv`. |
+| 9 | **Test** | Run the full test suite. Add edge-case tests beyond the Developer's. Think beyond the protocol: attack vectors, boundaries, race conditions. Log all runs using `scripts/add_test_result.py` (mandatory — direct CSV editing is prohibited). |
 | 10 | **Verdict** | Write `test-report.md` in the WP folder (see `testing-protocol.md` for format). |
 
 **If PASS:** Set WP to `Done`. Push.  
@@ -85,16 +85,25 @@ If any of items 1–4 are missing, do NOT mark the WP as Done. Create the missin
 
 ### Post-Done Finalization (Orchestrator)
 
-After the Tester marks a WP as Done, the Orchestrator (or the Tester if no Orchestrator is active) performs these finalization steps:
+After the Tester marks a WP as Done, the Orchestrator (or the Tester if no Orchestrator is active) runs the finalization script:
 
-1. **Merge to main:** `git checkout main && git merge <branch-name> --no-edit && git push origin main`
-2. **Delete feature branch:** `git branch -d <branch-name>` (local) and `git push origin --delete <branch-name>` (remote)
-3. **Cascade US status:** Check `docs/user-stories/user-stories.csv` — if ALL linked WPs for the parent User Story are now Done, set the User Story status to `Done`.
-4. **Cascade Bug status:** Check `docs/bugs/bugs.csv` — if the WP is listed in any bug's `Fixed In WP` column and the bug is Open, update the bug status to `Closed`.
-5. **Architecture sync (mandatory):** Compare the actual directory layout against `docs/architecture.md`. If ANY discrepancy exists (new directories, renamed folders, removed items), update the document immediately. This step has been historically skipped — treat it as a blocking requirement before proceeding to the next WP.
-6. **Post-merge verification:** After merging and branch deletion, run `git branch -r --merged main` to confirm no stale merged branches remain. If any are found, delete them immediately.
+```powershell
+.venv\Scripts\python scripts/finalize_wp.py <WP-ID>
+```
 
-These steps are mandatory. Skipping them causes maintenance debt that accumulates across sessions.
+The script performs **all** finalization steps automatically:
+1. Validates the WP via `scripts/validate_workspace.py --wp <WP-ID>`
+2. Merges the feature branch to main and pushes
+3. Deletes the feature branch (local + remote)
+4. Cascades User Story status to `Done` if all linked WPs are Done
+5. Cascades Bug status to `Closed` for bugs fixed by this WP
+6. Syncs `docs/architecture.md` via `scripts/update_architecture.py`
+7. Commits cascade changes and pushes
+8. Verifies no stale merged branches remain
+
+Use `--dry-run` to preview without executing: `.venv\Scripts\python scripts/finalize_wp.py <WP-ID> --dry-run`
+
+**Do NOT perform these steps manually.** The script exists to prevent the finalization errors that have recurred across every maintenance cycle.
 
 ---
 
@@ -149,6 +158,29 @@ For subsequent iterations (after Tester feedback), append a new section:
 - **When uncertain:** Stop and ask — do not guess.
 - **Context discipline:** Read only what you need. Do not preemptively load all documentation.
 - **No self-review:** The agent who implements a WP must NOT be the one who reviews it.
+
+---
+
+## Mandatory Script Usage
+
+The following operations **MUST** be performed via helper scripts. Direct manual execution of these operations is prohibited — the scripts exist to prevent recurring errors detected across multiple maintenance cycles.
+
+| Operation | Script | Who Uses It |
+|-----------|--------|-------------|
+| Add test result row | `scripts/add_test_result.py` | Developer, Tester |
+| Create workpackage | `scripts/add_workpackage.py` | Orchestrator, Developer |
+| Log a bug | `scripts/add_bug.py` | Tester |
+| Pre-commit validation | `scripts/validate_workspace.py` | Developer, Tester |
+| Post-Done finalization | `scripts/finalize_wp.py` | Orchestrator |
+| Architecture sync | `scripts/update_architecture.py` | Called by finalize_wp.py |
+
+See `scripts/README.md` for full usage documentation.
+
+**Pre-handoff validation gate:** Before setting a WP to `Review` (Developer) or `Done` (Tester), run:
+```powershell
+.venv\Scripts\python scripts/validate_workspace.py --wp <WP-ID>
+```
+Abort and fix any errors before proceeding.
 
 ---
 

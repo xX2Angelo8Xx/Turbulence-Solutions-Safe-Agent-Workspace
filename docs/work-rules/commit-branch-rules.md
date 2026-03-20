@@ -49,7 +49,7 @@ Before every `git push`, complete the following steps in order:
 
 ## Post-Merge Cleanup
 
-After a workpackage reaches `Done` and is merged into `main`, the feature branch **MUST** be deleted immediately — do not defer cleanup:
+After a workpackage reaches `Done` and is merged into `main`, the feature branch **MUST** be deleted immediately. This is handled automatically by `scripts/finalize_wp.py` — do not perform these steps manually unless the script is unavailable:
 
 ```bash
 # Delete local branch
@@ -60,10 +60,6 @@ git push origin --delete <branch-name>
 ```
 
 Never allow stale merged branches to accumulate in the repository.
-
-## OneDrive Workspace Note
-
-This workspace is stored on OneDrive. Git directory deletions (e.g. branch log directories) may fail due to OneDrive file-sync locks. If git prompts a retry on directory cleanup, answer **`n`** — the branch reference itself is deleted even if the log directory cleanup fails. **Never use `--force` or destructive flags to work around OneDrive lock failures.**
 
 ## Explicit Git Sequence for Agents
 
@@ -88,14 +84,16 @@ git push origin <branch-name>
 
 ### After Done (Orchestrator or Tester)
 ```bash
+# Preferred: use the finalization script (handles merge + cleanup + cascades)
+.venv/Scripts/python scripts/finalize_wp.py <WP-ID>
+
+# Manual fallback (only if script is unavailable):
 git checkout main
 git merge <branch-name> --no-edit
 git push origin main
 git branch -d <branch-name>
 git push origin --delete <branch-name>
 ```
-
-**OneDrive Note:** If branch deletion prompts for retry on directory cleanup, answer `n`. The branch is already deleted.
 
 ## Rules
 

@@ -194,18 +194,26 @@ The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages
 
 ---
 
-## TST-ID Assignment
+## TST-ID Assignment — Mandatory Script Usage
 
-Every new test result row in `docs/test-results/test-results.csv` requires a unique, strictly sequential TST-ID. Follow these rules without exception:
+Agents **MUST** use `scripts/add_test_result.py` to add rows to `docs/test-results/test-results.csv`. **Direct CSV editing for test results is prohibited.** The script atomically assigns the next sequential TST-ID using file locking, preventing the duplicate-ID collisions that have recurred across four maintenance cycles.
 
-1. **Before assigning any new TST-ID**, query the CSV for the highest existing ID:
-   ```powershell
-   # PowerShell — get the last TST-ID
-   Import-Csv 'docs/test-results/test-results.csv' | Select-Object -ExpandProperty ID | Sort-Object | Select-Object -Last 1
-   ```
-2. New IDs **MUST** start from the highest existing ID + 1. Do not guess, do not estimate.
-3. **Never reuse or reassign TST-IDs.** Once an ID is issued it is permanent, even if the row is later removed.
-4. When multiple developers are logging results in the same session, each must re-query the CSV immediately before writing to avoid collisions.
+```powershell
+.venv\Scripts\python scripts/add_test_result.py `
+    --name "test_foo_bar" `
+    --type Unit `
+    --wp GUI-001 `
+    --status Pass `
+    --env "Windows 11 + Python 3.13" `
+    --result "5 passed / 0 failed" `
+    --notes "Optional notes"
+```
+
+Rules:
+1. **Never edit test-results.csv by hand.** Always use the script.
+2. **Never reuse or reassign TST-IDs.** Once an ID is issued it is permanent, even if the row is later removed.
+3. The script uses `locked_next_id_and_append()` which holds a file lock for the entire read-compute-write cycle — safe for parallel agent execution.
+4. See `scripts/README.md` for full usage reference.
 
 ---
 

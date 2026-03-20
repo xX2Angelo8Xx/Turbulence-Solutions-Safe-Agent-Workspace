@@ -124,8 +124,20 @@ When a workpackage is implemented by a human (not an AI agent):
 
 ## Cross-Reference Integrity
 
-When creating a new workpackage that references a User Story:
+When creating a new workpackage, **use `scripts/add_workpackage.py`** which automatically handles cross-reference updates:
 
+```powershell
+.venv\Scripts\python scripts/add_workpackage.py `
+    --category GUI --name "..." --description "..." --goal "..." --user-story US-007
+```
+
+The script:
+1. Assigns the next sequential ID within the category (e.g., `GUI-019`).
+2. Appends the row to `workpackages.csv` with duplicate-ID prevention.
+3. **Automatically updates the User Story's `Linked WPs` column** in `user-stories.csv`.
+4. Uses file locking for parallel agent safety.
+
+If manual CSV editing is unavoidable:
 1. **Update the User Story's `Linked WPs` column** in `user-stories.csv` to include the new WP ID in the same commit.
 2. This is mandatory — failing to do so creates cross-reference drift that must be caught and fixed during maintenance.
 3. **When a Developer creates or claims a WP that references a User Story**, the Developer MUST verify that the WP ID is listed in the parent User Story's `Linked WPs` column in `docs/user-stories/user-stories.csv`. If not present, add it before beginning implementation.

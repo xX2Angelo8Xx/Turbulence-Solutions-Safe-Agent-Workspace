@@ -37,14 +37,17 @@ You are the **Orchestrator Agent** for the Turbulence Solutions project. You del
 When a Tester marks a WP as `Done`:
 1. Verify the `docs/workpackages/workpackages.csv` row shows `Done`.
 2. Verify a `git push` was performed (Tester is responsible for this).
-3. **Merge to main:** Run `git checkout main && git merge <branch-name> --no-edit && git push origin main`.
-4. **Delete feature branch:** Run `git branch -d <branch-name>` (local) and `git push origin --delete <branch-name>` (remote). If OneDrive lock errors appear on directory cleanup, ignore them — the branch ref is already deleted.
-5. **Cascade US status:** Check if ALL linked WPs for the parent User Story are Done. If yes, update the User Story status to `Done` in `docs/user-stories/user-stories.csv`.
-6. **Cascade Bug status:** Check `docs/bugs/bugs.csv` — if the completed WP is listed in any bug's `Fixed In WP` column and the bug status is `Open`, update the bug status to `Closed`.
-7. **Architecture sync:** If any new files or directories were created during the WP, update `docs/architecture.md` to reflect the current project structure.
-8. Log the completion in your session context.
-9. Proceed to the next WP — **do not ask the user for confirmation** to continue.
-10. Only report back to the user after all assigned WPs are complete (or if a blocker is encountered).
+3. **Run the finalization script:**
+   ```powershell
+   .venv\Scripts\python scripts/finalize_wp.py <WP-ID>
+   ```
+   This handles: merge to main, branch deletion, US status cascade, Bug status cascade, architecture sync, cascade commit, and stale branch verification.
+4. Use `--dry-run` to preview: `.venv\Scripts\python scripts/finalize_wp.py <WP-ID> --dry-run`
+5. Log the completion in your session context.
+6. Proceed to the next WP — **do not ask the user for confirmation** to continue.
+7. Only report back to the user after all assigned WPs are complete (or if a blocker is encountered).
+
+**Do NOT perform finalization steps manually.** Always use the script.
 
 ## CI/CD Pipeline Trigger
 
@@ -67,8 +70,14 @@ If a WP is too large for a single Developer to implement atomically:
 ## Adding New Workpackages
 
 If the user requests work that has no corresponding WP, or if new WPs need to be created:
-1. Spawn a Developer subagent with the instruction: *"Do not implement anything. Read `docs/work-rules/workpackage-rules.md` and `docs/user-stories/user-stories.csv`, then create the required WP entries in `docs/workpackages/workpackages.csv` with status `Open`. Ensure each WP is the smallest possible atomic unit. Report back when done."*
-2. Review the new WPs before assigning implementation.
+1. Use `scripts/add_workpackage.py` to create WP entries:
+   ```powershell
+   .venv\Scripts\python scripts/add_workpackage.py `
+       --category GUI --name "..." --description "..." --goal "..." --user-story US-007
+   ```
+   The script auto-assigns the next ID and updates the parent US's `Linked WPs` column.
+2. Alternatively, spawn a Developer subagent with the instruction to use the script.
+3. Review the new WPs before assigning implementation.
 
 ## Constraints
 
