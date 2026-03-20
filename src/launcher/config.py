@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 APP_NAME: str = "Turbulence Solutions Launcher"
-VERSION: str = "3.0.3"
+VERSION: str = "3.1.0"
 COLOR_PRIMARY: str = "#0A1D4E"
 COLOR_SECONDARY: str = "#5BC5F2"
 COLOR_TEXT: str = "#FFFFFF"
