@@ -79,6 +79,7 @@ class FileLock:
 def read_csv(
     path: Path,
     expected_columns: Optional[list[str]] = None,
+    strict: bool = True,
 ) -> tuple[list[str], list[dict]]:
     """Read a CSV file and return (fieldnames, rows as dicts).
 
@@ -86,6 +87,9 @@ def read_csv(
         path: Path to the CSV file.
         expected_columns: If provided, raise ValueError when the CSV header
             is missing any of the listed columns.
+        strict: If True (default), raise ValueError when a row has more
+            columns than the header. If False, merge overflow columns into
+            the last field (legacy behavior).
     """
     try:
         text = path.read_text(encoding="utf-8-sig")
@@ -103,29 +107,87 @@ def read_csv(
             )
 
     rows = []
-    for row in reader:
-        # DictReader puts extra columns under None key — merge them back
+    for row_idx, row in enumerate(reader, start=1):
+        # DictReader puts extra columns under None key
         if None in row:
-            overflow = row.pop(None)
-            last_field = fieldnames[-1]
-            row[last_field] = row.get(last_field, "") + "," + ",".join(overflow)
+            if strict:
+                overflow = row[None]
+                row_id = row.get(fieldnames[0], "<unknown>") if fieldnames else "<unknown>"
+                raise ValueError(
+                    f"{path.name} row {row_idx} (ID={row_id}): "
+                    f"overflow columns detected — row has "
+                    f"{len(fieldnames) + len(overflow)} fields but header "
+                    f"has {len(fieldnames)}. Overflow values: {overflow}"
+                )
+            else:
+                overflow = row.pop(None)
+                last_field = fieldnames[-1]
+                row[last_field] = row.get(last_field, "") + "," + ",".join(overflow)
         rows.append(row)
     return fieldnames, rows
 
 
 def write_csv(path: Path, fieldnames: list[str], rows: list[dict]) -> None:
-    """Write rows to a CSV file using QUOTE_ALL for consistency.
+    """Write rows to a CSV file using QUOTE_ALL with atomic write-verify-rename.
 
     All CSVs in this project use csv.QUOTE_ALL to eliminate field-escaping
     edge cases. This is a project-wide standard — do not change.
+
+    Steps:
+        1. Sanitize all field values — reject bare \\r or \\n characters.
+        2. Write to a temporary file in the same directory.
+        3. Re-read the temp file with strict parsing and verify row count.
+        4. Atomic-rename temp file over target (os.replace).
+        5. On failure, delete temp file and raise ValueError.
     """
+    # Field-level sanitization: reject bare \r or \n (not \r\n which csv handles)
+    for row_idx, row in enumerate(rows):
+        row_id = row.get(fieldnames[0], "<unknown>") if fieldnames else "<unknown>"
+        for field_name, value in row.items():
+            if not isinstance(value, str):
+                continue
+            if "\r\n" in value:
+                # csv module handles \r\n inside quoted fields — skip those
+                cleaned = value.replace("\r\n", "")
+            else:
+                cleaned = value
+            if "\r" in cleaned or "\n" in cleaned:
+                raise ValueError(
+                    f"write_csv: row {row_idx} (ID={row_id}), "
+                    f"field '{field_name}' contains bare newline character. "
+                    f"Value: {value!r}"
+                )
+
     buf = StringIO()
     writer = csv.DictWriter(
         buf, fieldnames=fieldnames, quoting=csv.QUOTE_ALL, lineterminator="\n"
     )
     writer.writeheader()
     writer.writerows(rows)
-    path.write_text(buf.getvalue(), encoding="utf-8")
+    content = buf.getvalue()
+
+    # Write to temp file in same directory
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    try:
+        tmp_path.write_text(content, encoding="utf-8")
+
+        # Re-read and verify with strict parsing
+        verify_fields, verify_rows = read_csv(tmp_path, strict=True)
+        if len(verify_rows) != len(rows):
+            raise ValueError(
+                f"write_csv verification failed: wrote {len(rows)} rows "
+                f"but re-read {len(verify_rows)} rows"
+            )
+
+        # Atomic rename
+        os.replace(str(tmp_path), str(path))
+    except Exception:
+        # Clean up temp file on any failure
+        try:
+            tmp_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+        raise
 
 
 def next_id(
