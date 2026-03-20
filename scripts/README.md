@@ -10,12 +10,16 @@ All scripts are non-interactive, use file locking for parallel safety, and run v
 
 | Script | Purpose | Replaces |
 |--------|---------|----------|
-| `add_test_result.py` | Add test result row with auto TST-ID | Manual CSV editing for test results |
+| `run_tests.py` | **Mandatory.** Run pytest + auto-log results | Manual test execution + `add_test_result.py` |
+| `add_test_result.py` | Add test result row with auto TST-ID (fallback) | Manual CSV editing for test results |
 | `add_workpackage.py` | Create WP with auto ID + US cross-ref | Manual CSV editing + forgetting US Linked WPs update |
 | `add_bug.py` | Log bug with auto BUG-ID | Manual CSV editing for bugs |
-| `validate_workspace.py` | Pre-commit integrity checker | Manual checklist verification |
-| `finalize_wp.py` | Post-Done merge, cleanup, cascades | 10-step manual Post-Done Finalization |
+| `validate_workspace.py` | Pre-commit integrity checker (also runs as pre-commit hook) | Manual checklist verification |
+| `finalize_wp.py` | Post-Done merge, cleanup, cascades (idempotent) | 10-step manual Post-Done Finalization |
 | `update_architecture.py` | Regenerate architecture.md tree | Manual architecture.md updates |
+| `install_hooks.py` | Set up tracked pre-commit hooks | Manual `git config` commands |
+| `dedup_test_ids.py` | One-time TST-ID deduplication | Manual ID renumbering |
+| `archive_test_results.py` | Archive old TST entries for Done WPs | Manual CSV pruning |
 
 ---
 
@@ -23,7 +27,26 @@ All scripts are non-interactive, use file locking for parallel safety, and run v
 
 All commands assume you're in the repository root.
 
-### add_test_result.py
+### run_tests.py (Mandatory)
+
+```powershell
+# Run tests for a specific WP and auto-log the result
+.venv\Scripts\python scripts/run_tests.py `
+    --wp GUI-001 `
+    --type Unit `
+    --env "Windows 11 + Python 3.13"
+
+# Run full regression suite
+.venv\Scripts\python scripts/run_tests.py `
+    --wp GUI-001 `
+    --type Integration `
+    --env "Windows 11 + Python 3.13" `
+    --full-suite
+```
+
+**Mandatory for:** Developer (Step 5) and Tester (Step 2 & 5). This is the primary tool for running tests and logging results. It executes pytest, parses the output, and atomically logs the result to `test-results.csv`.
+
+### add_test_result.py (Fallback)
 
 ```powershell
 .venv\Scripts\python scripts/add_test_result.py `
@@ -36,7 +59,7 @@ All commands assume you're in the repository root.
     --notes "Optional notes"
 ```
 
-**Mandatory for:** Developer (Step 5) and Tester (Step 9). Direct CSV editing for test results is prohibited.
+Fallback for cases where `run_tests.py` cannot be used (e.g., manual testing, external tools). Direct CSV editing for test results is prohibited.
 
 ### add_workpackage.py
 
@@ -90,7 +113,9 @@ Checks: duplicate IDs across all CSVs, missing artifacts (dev-log, test-report, 
 
 **Mandatory for:** Orchestrator (after Tester PASS). Replaces the entire Post-Done Finalization section.
 
-Steps performed: validate → merge to main → delete branch → cascade US status → cascade bug status → sync architecture.md → commit cascades → verify no stale branches.
+Steps performed: verify remote origin → validate → merge to main → delete branch → cascade US status → cascade bug status → sync architecture.md → commit cascades → verify no stale branches.
+
+Finalization is **idempotent** — if interrupted, re-running the command resumes from the last completed step. Use `--reset` to restart from scratch.
 
 ### update_architecture.py
 
@@ -100,6 +125,52 @@ Steps performed: validate → merge to main → delete branch → cascade US sta
 ```
 
 Usually called automatically by `finalize_wp.py`. Can also be run standalone.
+
+### install_hooks.py
+
+```powershell
+.venv\Scripts\python scripts/install_hooks.py
+```
+
+Sets `git config core.hooksPath scripts/hooks` so Git uses the tracked pre-commit hook. Run once after cloning the repository.
+
+### dedup_test_ids.py
+
+```powershell
+# Preview changes
+.venv\Scripts\python scripts/dedup_test_ids.py --dry-run
+
+# Apply deduplication
+.venv\Scripts\python scripts/dedup_test_ids.py
+```
+
+One-time utility to renumber duplicate TST-IDs in `test-results.csv`.
+
+### archive_test_results.py
+
+```powershell
+# Preview archival
+.venv\Scripts\python scripts/archive_test_results.py --dry-run
+
+# Archive Done WP test results
+.venv\Scripts\python scripts/archive_test_results.py
+```
+
+Moves test result entries for Done WPs to `docs/test-results/archived-test-results.csv` to keep the active CSV small.
+
+---
+
+## Setup (After Clone)
+
+```powershell
+# 1. Create virtual environment
+python -m venv .venv
+
+# 2. Install hooks
+.venv\Scripts\python scripts/install_hooks.py
+```
+
+This ensures the pre-commit hook (which runs `validate_workspace.py --full`) is active.
 
 ---
 
@@ -114,8 +185,8 @@ All scripts use `FileLock` (atomic lock file creation) to prevent race condition
 Internal module used by all scripts. Key exports:
 
 - `FileLock(path)` — cross-platform file lock context manager
-- `read_csv(path)` → `(fieldnames, rows)` — read CSV into dicts
-- `write_csv(path, fieldnames, rows)` — write CSV preserving quoting style
+- `read_csv(path, expected_columns=None)` → `(fieldnames, rows)` — read CSV into dicts (with optional schema validation)
+- `write_csv(path, fieldnames, rows)` — write CSV with QUOTE_ALL (project standard)
 - `next_id(path, prefix)` — get next sequential ID (no lock)
 - `append_row(path, row)` — append with duplicate check (locked)
 - `update_cell(path, id_col, id_val, target_col, new_val)` — update one cell (locked)

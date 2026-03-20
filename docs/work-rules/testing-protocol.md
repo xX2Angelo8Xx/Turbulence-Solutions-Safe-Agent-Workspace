@@ -114,17 +114,23 @@ these firing during an automated test run can destabilise or crash the system.
 2. Write tests **alongside** implementation, not after.
 3. All new tests must pass before setting the WP to `Review`.
 4. All **existing** tests must still pass (no regressions).
-5. Log test runs in `docs/test-results/test-results.csv`.
+5. **Run tests via `scripts/run_tests.py`** (mandatory). This executes pytest and atomically logs the result. Direct `pytest` invocation is allowed for development iteration, but the final pre-handoff run **must** use this script:
+   ```powershell
+   .venv\Scripts\python scripts/run_tests.py --wp <WP-ID> --type Unit --env "Windows 11 + Python 3.13"
+   ```
 6. Document test approach and results in the WP's `dev-log.md`.
 7. **Never use interactive constructs** — no `input()`, no commands that await stdin, no `[y/n]` prompts.
 
 ### For Testers (during review)
 
 1. Read the Developer's `dev-log.md` in the WP folder.
-2. Run the full test suite — not just the new tests: `.venv\Scripts\python -m pytest tests/`
+2. Run the full test suite via `scripts/run_tests.py` (mandatory):
+   ```powershell
+   .venv\Scripts\python scripts/run_tests.py --wp <WP-ID> --type Regression --env "Windows 11 + Python 3.13" --full-suite
+   ```
 3. Add edge-case tests the Developer may have missed — place them in `tests/<WP-ID>/`.
 4. **Think beyond the protocol**: consider attack vectors, boundary conditions, race conditions, concurrency issues, invalid inputs, and platform-specific quirks.
-5. Log all test runs in `docs/test-results/test-results.csv`.
+5. Run `scripts/run_tests.py` again for the WP-specific suite after adding edge-case tests.
 6. Write findings in the WP's `test-report.md` (see format below).
 7. **Never run commands that require user input** — all test execution must be non-interactive.
 
@@ -196,7 +202,17 @@ The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages
 
 ## TST-ID Assignment — Mandatory Script Usage
 
-Agents **MUST** use `scripts/add_test_result.py` to add rows to `docs/test-results/test-results.csv`. **Direct CSV editing for test results is prohibited.** The script atomically assigns the next sequential TST-ID using file locking, preventing the duplicate-ID collisions that have recurred across four maintenance cycles.
+Agents **MUST** use `scripts/run_tests.py` to execute tests and log results. This script runs pytest, parses the output, and atomically logs the result to `docs/test-results/test-results.csv` — closing the "self-reported results" loophole. The script is **proof that tests were actually executed**.
+
+```powershell
+# Run WP-specific tests and log result
+.venv\Scripts\python scripts/run_tests.py --wp GUI-001 --type Unit --env "Windows 11 + Python 3.13"
+
+# Run full regression suite and log result
+.venv\Scripts\python scripts/run_tests.py --wp GUI-001 --type Regression --env "Windows 11 + Python 3.13" --full-suite
+```
+
+For cases where `run_tests.py` cannot be used (e.g., manual test verification), `scripts/add_test_result.py` may be used as a fallback:
 
 ```powershell
 .venv\Scripts\python scripts/add_test_result.py `

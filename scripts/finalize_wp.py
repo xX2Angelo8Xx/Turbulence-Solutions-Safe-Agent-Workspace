@@ -10,6 +10,7 @@ Usage:
 """
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -20,6 +21,11 @@ from csv_utils import REPO_ROOT, FileLock, read_csv, update_cell, write_csv
 WP_CSV = REPO_ROOT / "docs" / "workpackages" / "workpackages.csv"
 US_CSV = REPO_ROOT / "docs" / "user-stories" / "user-stories.csv"
 BUG_CSV = REPO_ROOT / "docs" / "bugs" / "bugs.csv"
+
+CANONICAL_ORIGIN = (
+    "https://github.com/xX2Angelo8Xx/"
+    "Turbulence-Solutions-Safe-Agent-Workspace.git"
+)
 
 
 def _run_git(args: list[str], dry_run: bool, check: bool = True) -> subprocess.CompletedProcess:
@@ -39,6 +45,60 @@ def _get_current_branch() -> str:
         capture_output=True, text=True, cwd=str(REPO_ROOT),
     )
     return result.stdout.strip()
+
+
+def _verify_remote_origin(dry_run: bool) -> None:
+    """Verify git remote origin matches the canonical URL.
+
+    Auto-corrects if mismatched. This is a non-negotiable safety check
+    from copilot-instructions.md and commit-branch-rules.md.
+    """
+    if dry_run:
+        print("  [DRY RUN] Verify remote origin URL")
+        return
+    result = subprocess.run(
+        ["git", "remote", "get-url", "origin"],
+        capture_output=True, text=True, cwd=str(REPO_ROOT),
+    )
+    current_url = result.stdout.strip()
+    if current_url != CANONICAL_ORIGIN:
+        print(f"  WARNING: Remote origin mismatch!")
+        print(f"    Current:  {current_url}")
+        print(f"    Expected: {CANONICAL_ORIGIN}")
+        subprocess.run(
+            ["git", "remote", "set-url", "origin", CANONICAL_ORIGIN],
+            capture_output=True, text=True, cwd=str(REPO_ROOT), check=True,
+        )
+        print(f"  Auto-corrected remote origin to canonical URL.")
+    else:
+        print(f"  Remote origin verified ✓")
+
+
+def _state_path(wp_id: str) -> Path:
+    """Return the path to the finalization state file for a WP."""
+    return REPO_ROOT / "docs" / "workpackages" / wp_id / ".finalization-state.json"
+
+
+def _load_state(wp_id: str) -> dict:
+    """Load finalization state, or return empty state if none exists."""
+    path = _state_path(wp_id)
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    return {}
+
+
+def _save_state(wp_id: str, state: dict) -> None:
+    """Persist finalization state to disk."""
+    path = _state_path(wp_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, indent=2), encoding="utf-8")
+
+
+def _clear_state(wp_id: str) -> None:
+    """Remove the finalization state file on successful completion."""
+    path = _state_path(wp_id)
+    if path.exists():
+        path.unlink()
 
 
 def _validate_wp(wp_id: str) -> None:
@@ -148,6 +208,13 @@ def _verify_no_stale_branches(dry_run: bool) -> None:
 def finalize(wp_id: str, dry_run: bool) -> int:
     mode = "[DRY RUN] " if dry_run else ""
     print(f"\n{mode}Finalizing {wp_id}...")
+    state = {} if dry_run else _load_state(wp_id)
+    if state:
+        print(f"  Resuming from previous state (completed: {[k for k, v in state.items() if v]})")
+
+    # Step 0: Verify remote origin URL
+    print(f"\n--- Step 0: Verify remote origin ---")
+    _verify_remote_origin(dry_run)
 
     # Step 1: Read WP row, confirm Done
     print(f"\n--- Step 1: Verify WP status ---")
@@ -173,62 +240,103 @@ def finalize(wp_id: str, dry_run: bool) -> int:
         print(f"  Current branch: {branch_name}")
 
     # Step 3: Validate workspace
-    print(f"\n--- Step 3: Validate workspace ---")
-    if not dry_run:
-        _validate_wp(wp_id)
-        print(f"  Validation passed ✓")
+    if not state.get("validated"):
+        print(f"\n--- Step 3: Validate workspace ---")
+        if not dry_run:
+            _validate_wp(wp_id)
+            print(f"  Validation passed ✓")
+            state["validated"] = True
+            _save_state(wp_id, state)
+        else:
+            print(f"  [DRY RUN] Run validate_workspace.py --wp {wp_id}")
     else:
-        print(f"  [DRY RUN] Run validate_workspace.py --wp {wp_id}")
+        print(f"\n--- Step 3: Validate workspace (already done) ---")
 
     # Steps 4-5: Merge to main
-    if branch_name:
+    if branch_name and not state.get("merged"):
         print(f"\n--- Step 4: Merge to main ---")
         _run_git(["checkout", "main"], dry_run)
         _run_git(["merge", branch_name, "--no-edit"], dry_run)
         _run_git(["push", "origin", "main"], dry_run)
         if not dry_run:
             print(f"  Merged {branch_name} into main and pushed ✓")
+            state["merged"] = True
+            _save_state(wp_id, state)
+    elif branch_name:
+        print(f"\n--- Step 4: Merge to main (already done) ---")
 
-        # Steps 6-7: Delete feature branch
+    # Steps 6-7: Delete feature branch
+    if branch_name and not state.get("branch_deleted"):
         print(f"\n--- Step 5: Delete feature branch ---")
         _run_git(["branch", "-d", branch_name], dry_run, check=False)
         _run_git(["push", "origin", "--delete", branch_name], dry_run, check=False)
         if not dry_run:
             print(f"  Deleted branch {branch_name} (local + remote) ✓")
+            state["branch_deleted"] = True
+            _save_state(wp_id, state)
+    elif branch_name:
+        print(f"\n--- Step 5: Delete feature branch (already done) ---")
 
     # Step 8: Cascade US status
-    print(f"\n--- Step 6: Cascade User Story status ---")
-    _cascade_us_status(wp_id, dry_run)
+    if not state.get("us_cascaded"):
+        print(f"\n--- Step 6: Cascade User Story status ---")
+        _cascade_us_status(wp_id, dry_run)
+        if not dry_run:
+            state["us_cascaded"] = True
+            _save_state(wp_id, state)
+    else:
+        print(f"\n--- Step 6: Cascade User Story status (already done) ---")
 
     # Step 9: Cascade Bug status
-    print(f"\n--- Step 7: Cascade Bug status ---")
-    _cascade_bug_status(wp_id, dry_run)
+    if not state.get("bug_cascaded"):
+        print(f"\n--- Step 7: Cascade Bug status ---")
+        _cascade_bug_status(wp_id, dry_run)
+        if not dry_run:
+            state["bug_cascaded"] = True
+            _save_state(wp_id, state)
+    else:
+        print(f"\n--- Step 7: Cascade Bug status (already done) ---")
 
     # Step 10: Architecture sync
-    print(f"\n--- Step 8: Architecture sync ---")
-    _sync_architecture(dry_run)
+    if not state.get("arch_synced"):
+        print(f"\n--- Step 8: Architecture sync ---")
+        _sync_architecture(dry_run)
+        if not dry_run:
+            state["arch_synced"] = True
+            _save_state(wp_id, state)
+    else:
+        print(f"\n--- Step 8: Architecture sync (already done) ---")
 
     # Step 11: Commit cascade changes
-    print(f"\n--- Step 9: Commit cascade changes ---")
-    if not dry_run:
-        # Check if there are changes to commit
-        status = subprocess.run(
-            ["git", "status", "--porcelain"],
-            capture_output=True, text=True, cwd=str(REPO_ROOT),
-        )
-        if status.stdout.strip():
-            _run_git(["add", "-A"], dry_run)
-            _run_git(["commit", "-m", f"{wp_id}: finalize (cascade + cleanup)"], dry_run)
-            _run_git(["push", "origin", "main"], dry_run)
-            print(f"  Committed and pushed cascade changes ✓")
+    if not state.get("cascade_committed"):
+        print(f"\n--- Step 9: Commit cascade changes ---")
+        if not dry_run:
+            # Check if there are changes to commit
+            status = subprocess.run(
+                ["git", "status", "--porcelain"],
+                capture_output=True, text=True, cwd=str(REPO_ROOT),
+            )
+            if status.stdout.strip():
+                _run_git(["add", "-A"], dry_run)
+                _run_git(["commit", "-m", f"{wp_id}: finalize (cascade + cleanup)"], dry_run)
+                _run_git(["push", "origin", "main"], dry_run)
+                print(f"  Committed and pushed cascade changes ✓")
+            else:
+                print(f"  No cascade changes to commit")
+            state["cascade_committed"] = True
+            _save_state(wp_id, state)
         else:
-            print(f"  No cascade changes to commit")
+            print(f"  [DRY RUN] git add -A && git commit && git push (if changes exist)")
     else:
-        print(f"  [DRY RUN] git add -A && git commit && git push (if changes exist)")
+        print(f"\n--- Step 9: Commit cascade changes (already done) ---")
 
     # Step 12: Verify no stale branches
     print(f"\n--- Step 10: Verify no stale branches ---")
     _verify_no_stale_branches(dry_run)
+
+    # Clean up state file on success
+    if not dry_run:
+        _clear_state(wp_id)
 
     print(f"\n{'='*60}")
     print(f"{mode}Finalization of {wp_id} complete.")
@@ -244,8 +352,15 @@ def main() -> int:
         "--dry-run", action="store_true",
         help="Show what would be done without executing"
     )
+    parser.add_argument(
+        "--reset", action="store_true",
+        help="Discard any saved finalization state and restart from scratch"
+    )
 
     args = parser.parse_args()
+    if args.reset:
+        _clear_state(args.wp_id)
+        print(f"Cleared finalization state for {args.wp_id}")
     return finalize(args.wp_id, args.dry_run)
 
 

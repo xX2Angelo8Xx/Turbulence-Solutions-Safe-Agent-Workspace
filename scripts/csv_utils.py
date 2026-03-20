@@ -8,6 +8,7 @@ non-interactive and safe for autonomous agent use.
 import csv
 import os
 import re
+import sys
 import time
 from io import StringIO
 from pathlib import Path
@@ -28,8 +29,11 @@ class FileLock:
         self.timeout = timeout
         self.poll = poll
 
+    _STALE_THRESHOLD = 300.0  # seconds (5 minutes)
+
     def __enter__(self):
         start = time.monotonic()
+        stale_cleaned = False
         while True:
             try:
                 fd = os.open(
@@ -39,6 +43,23 @@ class FileLock:
                 os.close(fd)
                 return self
             except FileExistsError:
+                # Stale lock detection: if lock file is older than threshold,
+                # assume the owner crashed and remove it automatically.
+                if not stale_cleaned and self.lock_path.exists():
+                    try:
+                        age = time.time() - self.lock_path.stat().st_mtime
+                        if age > self._STALE_THRESHOLD:
+                            self.lock_path.unlink()
+                            stale_cleaned = True
+                            print(
+                                f"WARNING: Stale lock file detected "
+                                f"({age:.0f}s old), removed automatically: "
+                                f"{self.lock_path}",
+                                file=sys.stderr,
+                            )
+                            continue  # retry immediately
+                    except OSError:
+                        pass  # another process may have removed it
                 elapsed = time.monotonic() - start
                 if elapsed > self.timeout:
                     raise TimeoutError(
@@ -55,14 +76,32 @@ class FileLock:
             pass
 
 
-def read_csv(path: Path) -> tuple[list[str], list[dict]]:
-    """Read a CSV file and return (fieldnames, rows as dicts)."""
+def read_csv(
+    path: Path,
+    expected_columns: Optional[list[str]] = None,
+) -> tuple[list[str], list[dict]]:
+    """Read a CSV file and return (fieldnames, rows as dicts).
+
+    Args:
+        path: Path to the CSV file.
+        expected_columns: If provided, raise ValueError when the CSV header
+            is missing any of the listed columns.
+    """
     try:
         text = path.read_text(encoding="utf-8-sig")
     except UnicodeDecodeError:
         text = path.read_text(encoding="cp1252")
     reader = csv.DictReader(StringIO(text))
     fieldnames = list(reader.fieldnames or [])
+
+    if expected_columns is not None:
+        missing = set(expected_columns) - set(fieldnames)
+        if missing:
+            raise ValueError(
+                f"{path.name}: missing expected columns: {sorted(missing)}. "
+                f"Found: {fieldnames}"
+            )
+
     rows = []
     for row in reader:
         # DictReader puts extra columns under None key — merge them back
@@ -75,17 +114,14 @@ def read_csv(path: Path) -> tuple[list[str], list[dict]]:
 
 
 def write_csv(path: Path, fieldnames: list[str], rows: list[dict]) -> None:
-    """Write rows to a CSV file, preserving the project's quoting style."""
-    try:
-        original = path.read_text(encoding="utf-8") if path.exists() else ""
-    except UnicodeDecodeError:
-        original = path.read_text(encoding="cp1252") if path.exists() else ""
-    use_quote_all = original.startswith('"')
+    """Write rows to a CSV file using QUOTE_ALL for consistency.
 
+    All CSVs in this project use csv.QUOTE_ALL to eliminate field-escaping
+    edge cases. This is a project-wide standard — do not change.
+    """
     buf = StringIO()
-    quoting = csv.QUOTE_ALL if use_quote_all else csv.QUOTE_MINIMAL
     writer = csv.DictWriter(
-        buf, fieldnames=fieldnames, quoting=quoting, lineterminator="\n"
+        buf, fieldnames=fieldnames, quoting=csv.QUOTE_ALL, lineterminator="\n"
     )
     writer.writeheader()
     writer.writerows(rows)

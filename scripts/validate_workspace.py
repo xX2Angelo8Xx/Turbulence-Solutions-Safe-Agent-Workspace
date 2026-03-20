@@ -79,7 +79,11 @@ def _check_duplicate_ids(path: Path, id_column: str, result: ValidationResult) -
 
 
 def _check_wp_artifacts(wp_id: str, status: str, comments: str, result: ValidationResult) -> None:
-    """Check that a Done WP has required artifacts."""
+    """Check that a Done WP has required artifacts.
+
+    For Done WPs, missing artifacts are ERRORS (not warnings) because the
+    WP should not have reached Done without them.
+    """
     if status != "Done":
         return
 
@@ -99,13 +103,21 @@ def _check_wp_artifacts(wp_id: str, status: str, comments: str, result: Validati
     test_dir = REPO_ROOT / "tests" / wp_id
 
     if not dev_log.exists():
-        result.warning(f"{wp_id}: missing docs/workpackages/{wp_id}/dev-log.md")
+        result.error(f"{wp_id}: missing docs/workpackages/{wp_id}/dev-log.md")
 
     if not is_exempt and not test_report.exists():
-        result.warning(f"{wp_id}: missing docs/workpackages/{wp_id}/test-report.md")
+        result.error(f"{wp_id}: missing docs/workpackages/{wp_id}/test-report.md")
 
     if not test_dir.exists():
-        result.warning(f"{wp_id}: missing tests/{wp_id}/ directory")
+        result.error(f"{wp_id}: missing tests/{wp_id}/ directory")
+    elif not any(test_dir.glob("test_*.py")):
+        result.error(f"{wp_id}: tests/{wp_id}/ exists but contains no test_*.py files")
+
+    # Check for leftover temporary files
+    for folder in (wp_folder, test_dir):
+        if folder.exists():
+            for tmp in folder.glob("tmp_*"):
+                result.error(f"{wp_id}: leftover temporary file: {tmp.relative_to(REPO_ROOT)}")
 
 
 def _check_bug_cascade(result: ValidationResult) -> None:
@@ -168,6 +180,39 @@ def _check_branch_naming(result: ValidationResult) -> None:
         )
 
 
+def _check_tst_coverage(result: ValidationResult) -> None:
+    """Check that every Done WP with code changes has passing test results."""
+    _, wp_rows = read_csv(WP_CSV)
+    _, tst_rows = read_csv(TST_CSV)
+
+    # Build set of WP IDs that have at least one passing TST entry
+    wp_with_pass = set()
+    for tst in tst_rows:
+        if tst.get("Status", "").strip() == "Pass":
+            wp_ref = tst.get("WP Reference", "").strip()
+            if wp_ref:
+                wp_with_pass.add(wp_ref)
+
+    for wp in wp_rows:
+        wp_id = wp["ID"]
+        status = wp.get("Status", "")
+        comments = wp.get("Comments", "")
+
+        if status != "Done":
+            continue
+        # Skip decomposed WPs
+        if "decomposed" in comments.lower():
+            continue
+        # Skip exempt prefixes
+        if any(wp_id.startswith(p) for p in EXEMPT_PREFIXES_TEST_REPORT):
+            continue
+
+        if wp_id not in wp_with_pass:
+            result.error(
+                f"{wp_id}: Done WP has no passing test entry in test-results.csv"
+            )
+
+
 def validate_full(result: ValidationResult) -> None:
     """Run all validation checks."""
     # Duplicate ID checks
@@ -183,6 +228,9 @@ def validate_full(result: ValidationResult) -> None:
             _check_wp_artifacts(
                 wp["ID"], wp["Status"], wp.get("Comments", ""), result
             )
+
+    # TST coverage cross-validation
+    _check_tst_coverage(result)
 
     # Status cascade checks
     _check_bug_cascade(result)

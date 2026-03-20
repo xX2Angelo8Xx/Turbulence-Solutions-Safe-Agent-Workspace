@@ -67,6 +67,14 @@ def main() -> int:
         help='Parent user story ID (e.g. US-007) or "Enabler"'
     )
     parser.add_argument("--comments", default="", help="Optional notes")
+    parser.add_argument(
+        "--depends-on", default="",
+        help="Comma-separated WP IDs this WP depends on (e.g. GUI-001,GUI-002)"
+    )
+    parser.add_argument(
+        "--blockers", default="",
+        help="Description of blockers preventing progress"
+    )
 
     args = parser.parse_args()
     category = args.category.upper()
@@ -91,6 +99,8 @@ def main() -> int:
         "Goal": args.goal,
         "Comments": args.comments,
         "User Story": args.user_story,
+        "Depends On": args.depends_on,
+        "Blockers": args.blockers,
     }
 
     assigned_id = locked_next_id_and_append(

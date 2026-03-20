@@ -37,6 +37,8 @@ New categories may be introduced as the project evolves. Prefix must be uppercas
 | Goal | Measurable completion criteria |
 | Comments | Progress notes, blockers, review feedback |
 | User Story | Parent user story ID (e.g., `US-001`) or `Enabler` for infrastructure tasks |
+| Depends On | Comma-separated WP IDs this WP depends on (e.g., `GUI-001, GUI-002`) |
+| Blockers | Description of blockers preventing progress |
 
 ## Status Lifecycle
 
@@ -97,6 +99,21 @@ Workpackages must be broken into the **smallest atomic units** that can be imple
 **Examples of correct splitting:**
 - Instead of "Implement the full GUI" → `GUI-001: Main window layout`, `GUI-002: Project type dropdown`, `GUI-003: Folder name input`
 - Instead of "Build safety gate" → `SAF-001: Core hook entry point`, `SAF-002: Zone enforcement logic`, `SAF-003: Tool parameter validation`
+
+---
+
+## Regression Found After Done
+
+A Done workpackage is **never reopened**. If a regression or defect is discovered after a WP reaches `Done`, follow this procedure:
+
+1. **Do not modify the Done WP's status.** It stays `Done`.
+2. **Create a new FIX-xxx workpackage** referencing the original WP in the `Comments` column (e.g., "Regression in GUI-005").
+3. The FIX WP **must** include a regression test that reproduces the issue.
+4. Link the FIX WP to the same User Story as the original WP.
+5. If the original WP's `Depends On` column is relevant, carry forward any dependencies.
+6. Follow the normal WP lifecycle: Open → In Progress → Review → Done.
+
+This preserves the audit trail and ensures every fix is independently tested and reviewed.
 
 If a Developer determines a WP is too large mid-implementation, they must stop, report to the Orchestrator, and request a split before continuing.
 

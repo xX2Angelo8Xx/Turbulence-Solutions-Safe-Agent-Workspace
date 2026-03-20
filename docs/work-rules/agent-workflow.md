@@ -27,7 +27,17 @@ Every agent follows this exact workflow when implementing a workpackage. No step
 | 4 | **Implement** | Write code following `coding-standards.md` and `security-rules.md`. Stay within WP scope. |
 | 5 | **Test** | Create `tests/<WP-ID>/` folder if it doesn't exist. Write and run tests per `testing-protocol.md`. All tests must pass. Log results using `scripts/add_test_result.py` (mandatory — direct CSV editing is prohibited). |
 | 6 | **Document** | Update `dev-log.md` with implementation summary, decisions made, tests written, and known limitations. |
-| 7 | **Handoff** | Set WP status to `Review`. Commit per `commit-branch-rules.md`. Hand off to Tester Agent. |
+| 7 | **Handoff** | Set WP status to `Review`. Commit per `commit-branch-rules.md`. Hand off to Tester Agent. Include the list of changed files (output of `git diff --cached --name-only`) in the handoff message. |
+
+### Developer Pre-Handoff Checklist
+
+Before setting a WP to `Review`, the Developer MUST verify:
+1. All tests pass (run via `scripts/run_tests.py`).
+2. `docs/workpackages/<WP-ID>/dev-log.md` is up to date.
+3. No `tmp_` files remain in `docs/workpackages/<WP-ID>/` or `tests/<WP-ID>/`.
+4. WP branch follows `<WP-ID>/<short-desc>` naming convention.
+5. Run `scripts/validate_workspace.py --wp <WP-ID>` — must return exit code 0.
+6. All changes are staged and committed.
 
 ### Git Operations for Handoff (Step 7)
 
@@ -70,6 +80,15 @@ Rules:
 **If PASS:** Set WP to `Done`. Push.  
 **If FAIL:** Set WP back to `In Progress`. Write specific TODOs in `test-report.md`. Developer reads `test-report.md` and repeats from Step 4.
 
+### Escalation Rule — Iteration Cap
+
+If the Developer↔Tester cycle **fails 3 times** on the same WP (i.e., the Tester returns the WP to `In Progress` three times), the Tester **must** escalate to the Orchestrator before another iteration. The Orchestrator reviews the WP and may:
+- Reassign to a different Developer
+- Split the WP into smaller sub-WPs
+- Cancel the WP and create a replacement with revised scope
+
+The iteration count is tracked in `dev-log.md` (each iteration adds a numbered section). Three `## Iteration N` sections = escalation required.
+
 ### Tester PASS Checklist
 
 Before marking a WP as Done, the Tester MUST verify:
@@ -77,11 +96,14 @@ Before marking a WP as Done, the Tester MUST verify:
 2. `docs/workpackages/<WP-ID>/test-report.md` has been written (by you, the Tester).
 3. All test files exist in `tests/<WP-ID>/`.
 4. All test runs are logged in `docs/test-results/test-results.csv`.
-5. Run `git add -A` to stage all new test files and CSV updates.
-6. Commit: `<WP-ID>: Tester PASS`
-7. Push: `git push origin <branch-name>`
+5. All bugs found during testing are logged in `docs/bugs/bugs.csv`.
+6. WP branch follows `<WP-ID>/<short-desc>` naming convention.
+7. No `tmp_` files remain in `docs/workpackages/<WP-ID>/` or `tests/<WP-ID>/`.
+8. Run `git add -A` to stage all new test files and CSV updates.
+9. Commit: `<WP-ID>: Tester PASS`
+10. Push: `git push origin <branch-name>`
 
-If any of items 1–4 are missing, do NOT mark the WP as Done. Create the missing artifact or return to Developer.
+If any of items 1–7 are missing, do NOT mark the WP as Done. Create the missing artifact or return to Developer.
 
 ### Post-Done Finalization (Orchestrator)
 
@@ -168,11 +190,15 @@ The following operations **MUST** be performed via helper scripts. Direct manual
 | Operation | Script | Who Uses It |
 |-----------|--------|-------------|
 | Add test result row | `scripts/add_test_result.py` | Developer, Tester |
+| Run tests and log result | `scripts/run_tests.py` | Developer, Tester |
 | Create workpackage | `scripts/add_workpackage.py` | Orchestrator, Developer |
 | Log a bug | `scripts/add_bug.py` | Tester |
 | Pre-commit validation | `scripts/validate_workspace.py` | Developer, Tester |
 | Post-Done finalization | `scripts/finalize_wp.py` | Orchestrator |
 | Architecture sync | `scripts/update_architecture.py` | Called by finalize_wp.py |
+| Deduplicate TST-IDs | `scripts/dedup_test_ids.py` | Maintenance |
+| Install Git hooks | `scripts/install_hooks.py` | Setup (once after clone) |
+| Archive old test results | `scripts/archive_test_results.py` | Maintenance |
 
 See `scripts/README.md` for full usage documentation.
 
