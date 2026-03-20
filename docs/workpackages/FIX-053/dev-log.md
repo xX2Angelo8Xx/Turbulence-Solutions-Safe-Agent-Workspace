@@ -47,3 +47,35 @@ No new test files. The fix corrects existing mocking in the pre-existing test
 
 All tests in `tests/INS-011/` pass after the fix (logged via
 `scripts/add_test_result.py`).
+
+---
+
+## Iteration 2 — 2026-03-20
+
+### Tester Findings
+
+Tester (BUG-087) found two more tests in `tests/INS-011/test_ins011_tester_edge_cases.py`
+that call `_apply_windows()` with only `sys.exit` patched:
+
+- `TestPathEdgeCases.test_windows_path_with_spaces`
+- `TestPathEdgeCases.test_windows_path_with_unicode`
+
+Without `os._exit` mocked, these tests could kill the pytest process on code paths
+that reach the real `os._exit(0)` call inside `_apply_windows`.
+
+### Fix
+
+Added `patch("launcher.core.applier.os._exit")` as a third patch in both test contexts,
+alongside the existing `subprocess.Popen` and `sys.exit` patches.
+
+**No production code was changed.**
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `tests/INS-011/test_ins011_tester_edge_cases.py` | Added `patch("launcher.core.applier.os._exit")` to `test_windows_path_with_spaces` and `test_windows_path_with_unicode` |
+
+### Test Results (Iteration 2)
+
+All 66 tests in `tests/INS-011/` pass (`66 passed in 0.82s`).
