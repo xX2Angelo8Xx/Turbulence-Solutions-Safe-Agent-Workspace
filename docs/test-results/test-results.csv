@@ -1837,3 +1837,4 @@
 "TST-1956","test_fix062_resource_relocation","Regression","FIX-062","Pass","2026-03-20","Windows/Python 3.11","13 passed, 0 failed","Step 3.2 resource relocation block verified; LF line endings OK; symlink path correct; step ordering 3.1->3.2->3.5 confirmed"
 "TST-1957","FIX-062: full regression suite","Regression","FIX-062","Fail","2026-03-20","Windows 11 + Python 3.11","14 errors in 1.99s",""
 "TST-1958","FIX-062: targeted suite","Regression","FIX-062","Pass","2026-03-20","Windows 11 + Python 3.11","22 passed in 0.20s",""
+"TST-1959","FIX-063 internal relocation tests","Regression","FIX-063","Pass","2026-03-20","Windows/.venv/pytest","16 passed, 0 failed","All 16 regression tests pass: Step 2.1 mv+symlink, Step 3.1 path update, Step 3.2 removal, Step 3.5 signing paths, verification paths, no CRLF"

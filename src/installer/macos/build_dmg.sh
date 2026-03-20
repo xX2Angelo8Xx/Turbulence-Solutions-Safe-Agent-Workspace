@@ -62,6 +62,19 @@ mkdir -p "${APP_BUNDLE}/Contents/Resources"
 # Copy all PyInstaller --onedir output into Contents/MacOS/
 cp -R "${DIST_DIR}/launcher/"* "${APP_BUNDLE}/Contents/MacOS/"
 
+# ---------------------------------------------------------------------------
+# Step 2.1: Relocate _internal/ to Contents/Resources/ (codesign fix)
+#
+# macOS codesign treats all files in Contents/MacOS/ as code subcomponents.
+# Moving _internal/ to Contents/Resources/ and symlinking ensures codesign
+# only sees the launcher executable in Contents/MacOS/.  codesign does NOT
+# traverse symlinks — they are recorded as-is in CodeResources.
+# ---------------------------------------------------------------------------
+echo "==> Relocating _internal/ to Contents/Resources/ (codesign fix)..."
+mv "${APP_BUNDLE}/Contents/MacOS/_internal" "${APP_BUNDLE}/Contents/Resources/_internal"
+ln -s "../Resources/_internal" "${APP_BUNDLE}/Contents/MacOS/_internal"
+echo "  _internal/ -> Contents/Resources/_internal (symlinked)"
+
 # FIX-056: Bundle the ts-python shim inside the .app for first-launch deployment
 echo "==> Bundling ts-python shim..."
 mkdir -p "${APP_BUNDLE}/Contents/Resources/shims"
@@ -121,24 +134,7 @@ PLIST
 # at runtime; macOS codesign cannot process them as bundle subcomponents)
 # ---------------------------------------------------------------------------
 echo "==> Removing .dist-info directories from bundle..."
-find "${APP_BUNDLE}/Contents/MacOS/_internal" -type d -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true
-
-# ---------------------------------------------------------------------------
-# Step 3.2: Relocate non-code resources from MacOS/_internal/ to Resources/
-#
-# macOS codesign treats all files in Contents/MacOS/ as code subcomponents.
-# Non-code data files (images, icons) must live in Contents/Resources/ to
-# avoid "code object is not signed at all" errors.  Symlinks in _internal/
-# preserve sys._MEIPASS-based lookups at runtime.
-# ---------------------------------------------------------------------------
-echo "==> Relocating non-code resources to Contents/Resources/..."
-for f in TS-Logo.png TS-Logo.ico; do
-    if [ -f "${APP_BUNDLE}/Contents/MacOS/_internal/${f}" ]; then
-        mv "${APP_BUNDLE}/Contents/MacOS/_internal/${f}" "${APP_BUNDLE}/Contents/Resources/${f}"
-        ln -s "../../Resources/${f}" "${APP_BUNDLE}/Contents/MacOS/_internal/${f}"
-        echo "  Moved ${f} -> Contents/Resources/${f} (symlinked)"
-    fi
-done
+find "${APP_BUNDLE}/Contents/Resources/_internal" -type d -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
 # Step 3.5: Ad-hoc code signing with entitlements (bottom-up then bundle)
@@ -164,18 +160,18 @@ fi
 
 # 1. Sign individual shared libraries (.dylib and .so) inside _internal/
 echo "  Signing .dylib files..."
-find "${APP_BUNDLE}/Contents/MacOS/_internal" -name "*.dylib" -exec \
+find "${APP_BUNDLE}/Contents/Resources/_internal" -name "*.dylib" -exec \
     codesign --force --options runtime --sign - {} \;
 echo "  Signing .so files..."
-find "${APP_BUNDLE}/Contents/MacOS/_internal" -name "*.so" -exec \
+find "${APP_BUNDLE}/Contents/Resources/_internal" -name "*.so" -exec \
     codesign --force --options runtime --sign - {} \;
 
 # 2. Sign embedded Python.framework (valid nested bundle)
-if [ -d "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" ]; then
+if [ -d "${APP_BUNDLE}/Contents/Resources/_internal/Python.framework" ]; then
     echo "  Signing Python.framework..."
     codesign --deep --force --options runtime \
         --entitlements "${ENTITLEMENTS}" \
-        --sign - "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework"
+        --sign - "${APP_BUNDLE}/Contents/Resources/_internal/Python.framework"
 fi
 
 # 3. Sign the main launcher executable inside the .app bundle.
@@ -199,8 +195,8 @@ codesign --force --options runtime \
 # Verify code signatures
 echo "Verifying code signatures..."
 codesign --verify --verbose "${APP_BUNDLE}/Contents/MacOS/launcher" && echo "  Main executable: OK"
-if [ -d "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" ]; then
-    codesign --verify --deep "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" && echo "  Python.framework: OK"
+if [ -d "${APP_BUNDLE}/Contents/Resources/_internal/Python.framework" ]; then
+    codesign --verify --deep "${APP_BUNDLE}/Contents/Resources/_internal/Python.framework" && echo "  Python.framework: OK"
 fi
 codesign --verify --verbose "${APP_BUNDLE}" && echo "  App bundle: OK"
 echo "Code signing verification passed"
