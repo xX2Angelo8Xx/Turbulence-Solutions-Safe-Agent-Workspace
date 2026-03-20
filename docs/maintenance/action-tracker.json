@@ -53,7 +53,7 @@
       "source_log": "2026-03-20b-maintenance.md",
       "description": "Add TST-ID uniqueness enforcement rule to testing-protocol.md",
       "priority": "Info",
-      "status": "Open",
+      "status": "Done",
       "resolved_by": "FIX-067"
     },
     {
@@ -61,7 +61,7 @@
       "source_log": "2026-03-20b-maintenance.md",
       "description": "Add bug-closure step to bug-tracking-rules.md",
       "priority": "Info",
-      "status": "Open",
+      "status": "Done",
       "resolved_by": "FIX-067"
     },
     {
@@ -77,7 +77,7 @@
       "source_log": "2026-03-20b-maintenance.md",
       "description": "Audit csv_utils.py write functions for RFC 4180 quoting enforcement",
       "priority": "Info",
-      "status": "Open",
+      "status": "Done",
       "resolved_by": "FIX-065"
     },
     {
@@ -85,7 +85,7 @@
       "source_log": "2026-03-20b-maintenance.md",
       "description": "Enhance finalize_wp.py bug cascade to scan dev-log/test-report",
       "priority": "Info",
-      "status": "Open",
+      "status": "Done",
       "resolved_by": "FIX-066"
     },
     {
@@ -93,7 +93,7 @@
       "source_log": "2026-03-20b-maintenance.md",
       "description": "Add finalization cleanup verification (branch deletion, state file cleanup)",
       "priority": "Info",
-      "status": "Open",
+      "status": "Done",
       "resolved_by": "FIX-068"
     }
   ]
