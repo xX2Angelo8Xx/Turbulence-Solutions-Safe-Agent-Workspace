@@ -1849,3 +1849,4 @@
 "TST-1968","MNT-002 validation-exceptions.json schema","Unit","MNT-002","Pass","2026-03-20","Windows 11 + Python 3.11","6/6 tests pass - JSON schema and content validated",""
 "TST-1969","MNT-002 action-tracker.json schema","Unit","MNT-002","Pass","2026-03-20","Windows 11 + Python 3.11","9/9 tests pass - JSON schema, actions, IDs, statuses, priorities validated",""
 "TST-1970","MNT-002 maintenance-protocol.md action tracker step","Unit","MNT-002","Pass","2026-03-20","Windows 11 + Python 3.11","5/5 tests pass - step 0 present, references action-tracker.json, ordered before step 1",""
+"TST-1971","FIX-067: Tester full suite (31 tests)","Regression","FIX-067","Pass","2026-03-21","Windows 11 + Python 3.11","31 passed in 0.27s (14 dev + 17 tester edge cases)","Tester Agent. All 3 rule file additions verified. No regressions introduced. validate_workspace --wp FIX-067 clean."
