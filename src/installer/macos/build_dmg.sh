@@ -21,6 +21,7 @@ PUBLISHER="Turbulence Solutions"
 SPEC_FILE="launcher.spec"
 DIST_DIR="dist"
 BUILD_DIR="build"
+ENTITLEMENTS="src/installer/macos/entitlements.plist"
 
 # ---------------------------------------------------------------------------
 # Architecture selection
@@ -123,40 +124,68 @@ echo "==> Removing .dist-info directories from bundle..."
 find "${APP_BUNDLE}/Contents/MacOS/_internal" -type d -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
-# Step 3.5: Ad-hoc code signing (bottom-up to avoid python3.11 dir issue)
+# Step 3.5: Ad-hoc code signing with entitlements (bottom-up then bundle)
+#
+# Signing strategy:
+#   1. Sign all .dylib and .so files individually (leaf components)
+#   2. Sign Python.framework (nested bundle)
+#   3. Sign the main launcher executable (with entitlements)
+#   4. Sign the entire .app bundle (top-level, with entitlements)
+#
+# --options runtime  enables the hardened runtime (required for notarization
+#                    readiness and improves Gatekeeper trust scoring)
+# --entitlements     grants permissions needed by the embedded Python runtime
+# --force            overwrites any existing PyInstaller ad-hoc signature
+# --sign -           ad-hoc identity (no Developer ID certificate)
 # ---------------------------------------------------------------------------
-echo "Step 3.5: Code signing (bottom-up)..."
+echo "Step 3.5: Code signing (bottom-up with entitlements)..."
 
-# Sign individual shared libraries (.dylib and .so) inside _internal/
-echo "  Signing .dylib files..."
-find "${APP_BUNDLE}/Contents/MacOS/_internal" -name "*.dylib" -exec codesign --force --sign - {} \;
-echo "  Signing .so files..."
-find "${APP_BUNDLE}/Contents/MacOS/_internal" -name "*.so" -exec codesign --force --sign - {} \;
-
-# Sign embedded Python.framework (valid nested bundle — use --deep)
-if [ -d "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" ]; then
-    echo "  Signing Python.framework..."
-    codesign --deep --force --sign - "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework"
+if [ ! -f "${ENTITLEMENTS}" ]; then
+    echo "ERROR: Entitlements file not found at ${ENTITLEMENTS}" >&2
+    exit 1
 fi
 
-# NOTE: The launcher is CFBundleExecutable declared in Info.plist.
-# Signing it via Contents/MacOS/launcher triggers macOS bundle validation,
-# which recurses into _internal/ and fails on non-code data files (e.g. PNGs).
-# PyInstaller already ad-hoc signs the binary during the build step
-# ("Re-signing the EXE"). The signature is preserved when the binary is
-# copied into the .app via `cp -R`, so no re-sign is needed here.
+# 1. Sign individual shared libraries (.dylib and .so) inside _internal/
+echo "  Signing .dylib files..."
+find "${APP_BUNDLE}/Contents/MacOS/_internal" -name "*.dylib" -exec \
+    codesign --force --options runtime --sign - {} \;
+echo "  Signing .so files..."
+find "${APP_BUNDLE}/Contents/MacOS/_internal" -name "*.so" -exec \
+    codesign --force --options runtime --sign - {} \;
 
-# Verify individual code signatures
-# NOTE: Bundle-level signing is intentionally skipped. PyInstaller bundles
-# place non-code files (images, .pyc, .zip) in Contents/MacOS/_internal/
-# which codesign cannot handle as bundle subcomponents. The individual
-# bottom-up signing above is sufficient for macOS Apple Silicon execution.
+# 2. Sign embedded Python.framework (valid nested bundle)
+if [ -d "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" ]; then
+    echo "  Signing Python.framework..."
+    codesign --deep --force --options runtime \
+        --entitlements "${ENTITLEMENTS}" \
+        --sign - "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework"
+fi
+
+# 3. Sign the main launcher executable inside the .app bundle.
+#    Previous versions skipped this to avoid bundle validation recursion, but
+#    combined with --no-strict and entitlements this is required for Gatekeeper
+#    to accept the app when quarantine attributes are present.
+echo "  Signing main executable..."
+codesign --force --options runtime \
+    --entitlements "${ENTITLEMENTS}" \
+    --sign - "${APP_BUNDLE}/Contents/MacOS/launcher"
+
+# 4. Sign the entire .app bundle (top-level).
+#    This creates a proper bundle signature with a CodeResources seal.
+#    Non-code files in _internal/ are included as resource rules rather than
+#    as nested code, which avoids the previous "bundle format unrecognized" error.
+echo "  Signing .app bundle..."
+codesign --force --options runtime \
+    --entitlements "${ENTITLEMENTS}" \
+    --sign - "${APP_BUNDLE}"
+
+# Verify code signatures
 echo "Verifying code signatures..."
-# Verify the pre-bundle binary (has PyInstaller ad-hoc signature; bundle copy inherits it)
-codesign --verify "${DIST_DIR}/launcher/launcher" && echo "  Main executable (pre-bundle): OK"
+codesign --verify --verbose "${APP_BUNDLE}/Contents/MacOS/launcher" && echo "  Main executable: OK"
 if [ -d "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" ]; then
     codesign --verify --deep "${APP_BUNDLE}/Contents/MacOS/_internal/Python.framework" && echo "  Python.framework: OK"
 fi
+codesign --verify --verbose "${APP_BUNDLE}" && echo "  App bundle: OK"
 echo "Code signing verification passed"
 
 # ---------------------------------------------------------------------------

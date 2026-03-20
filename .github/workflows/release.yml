@@ -72,9 +72,29 @@ jobs:
 
       - name: Verify Code Signing
         run: |
-          codesign --verify dist/launcher/launcher && echo "Main executable signature valid"
-          codesign --verify --deep dist/AgentEnvironmentLauncher.app/Contents/MacOS/_internal/Python.framework && echo "Python.framework signature valid"
+          echo "--- Verifying main executable ---"
+          codesign --verify --verbose dist/AgentEnvironmentLauncher.app/Contents/MacOS/launcher && echo "Main executable: OK"
+          echo "--- Verifying Python.framework ---"
+          codesign --verify --deep dist/AgentEnvironmentLauncher.app/Contents/MacOS/_internal/Python.framework && echo "Python.framework: OK"
+          echo "--- Verifying .app bundle ---"
+          codesign --verify --verbose dist/AgentEnvironmentLauncher.app && echo "App bundle: OK"
+          echo "--- Displaying signing details ---"
+          codesign --display --verbose=2 dist/AgentEnvironmentLauncher.app
           echo "Code signing verification passed"
+
+      - name: Quarantine Simulation (diagnostic)
+        run: |
+          # Simulate what happens when a user downloads via Safari/Chrome.
+          # The quarantine attribute triggers Gatekeeper assessment.
+          echo "--- Simulating download quarantine flag ---"
+          xattr -w com.apple.quarantine "0083;66a1b2c3;Safari;D1234567-89AB-CDEF-0123-456789ABCDEF" dist/AgentEnvironmentLauncher.app
+          echo "--- spctl assessment (ad-hoc will be rejected — this is expected without Developer ID) ---"
+          spctl --assess --type execute --verbose dist/AgentEnvironmentLauncher.app 2>&1 || true
+          echo "--- codesign still valid after quarantine ---"
+          codesign --verify --verbose dist/AgentEnvironmentLauncher.app && echo "Bundle signature intact after quarantine: OK"
+          echo "--- Removing quarantine for DMG packaging ---"
+          xattr -cr dist/AgentEnvironmentLauncher.app
+          echo "Quarantine simulation complete — ad-hoc apps require manual workaround (xattr -cr) on user machines"
 
       - name: Upload macOS ARM DMG
         uses: actions/upload-artifact@v4

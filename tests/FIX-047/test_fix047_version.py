@@ -1,7 +1,7 @@
-"""Tests for FIX-047 — Bump version to 3.0.0 (updated to 3.0.1 by FIX-048).
+"""Tests for FIX-047 — Version consistency across all 5 canonical locations.
 
-Verifies that all 5 canonical version locations contain "3.0.1"
-and no longer contain "2.1.3".
+Verifies that all 5 canonical version locations contain the current version
+(read dynamically from config.py) and that no previous version lingers.
 """
 from pathlib import Path
 
@@ -13,14 +13,18 @@ SETUP_ISS = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
 BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 
-import re as _re
-TARGET_VERSION: str = _re.search(
-    r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
-    (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8"),
-    _re.MULTILINE,
-).group(1)
-del _re
-OLD_VERSION = "2.1.3"
+# Use the shared version utility instead of hardcoding.
+import sys
+sys.path.insert(0, str(REPO_ROOT / "tests" / "shared"))
+from version_utils import CURRENT_VERSION as TARGET_VERSION
+
+import pytest
+
+# Compute a plausible previous version by decrementing the patch number.
+# This guards against stale leftover version strings from a prior release.
+_parts = TARGET_VERSION.split(".")
+_patch = int(_parts[-1]) - 1 if len(_parts) >= 3 and int(_parts[-1]) > 0 else 0
+OLD_VERSION = ".".join(_parts[:-1] + [str(_patch)]) if _patch >= 0 else None
 
 
 def _read(path: Path) -> str:
@@ -51,22 +55,28 @@ def test_build_appimage_sh_version():
 
 # ── Old version absent ───────────────────────────────────────────────────────
 
+@pytest.mark.skipif(OLD_VERSION is None or OLD_VERSION == TARGET_VERSION,
+                    reason="No meaningful old version to check")
 def test_no_old_version_config_py():
     assert OLD_VERSION not in _read(CONFIG_PY)
 
-
+@pytest.mark.skipif(OLD_VERSION is None or OLD_VERSION == TARGET_VERSION,
+                    reason="No meaningful old version to check")
 def test_no_old_version_pyproject():
     assert OLD_VERSION not in _read(PYPROJECT_TOML)
 
-
+@pytest.mark.skipif(OLD_VERSION is None or OLD_VERSION == TARGET_VERSION,
+                    reason="No meaningful old version to check")
 def test_no_old_version_setup_iss():
     assert OLD_VERSION not in _read(SETUP_ISS)
 
-
+@pytest.mark.skipif(OLD_VERSION is None or OLD_VERSION == TARGET_VERSION,
+                    reason="No meaningful old version to check")
 def test_no_old_version_build_dmg():
     assert OLD_VERSION not in _read(BUILD_DMG)
 
-
+@pytest.mark.skipif(OLD_VERSION is None or OLD_VERSION == TARGET_VERSION,
+                    reason="No meaningful old version to check")
 def test_no_old_version_build_appimage():
     assert OLD_VERSION not in _read(BUILD_APPIMAGE)
 

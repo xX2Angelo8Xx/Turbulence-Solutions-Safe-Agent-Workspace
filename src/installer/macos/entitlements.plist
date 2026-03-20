@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Allow the embedded Python.framework to allocate executable memory
+         (required for ctypes, _cffi_backend, and JIT-capable modules). -->
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+
+    <!-- Disable library validation so that ad-hoc signed .dylib/.so files
+         bundled by PyInstaller can be loaded without matching the main
+         executable's team identifier (we have no Developer ID). -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+
+    <!-- Allow DYLD environment variables to be set.  PyInstaller's bootloader
+         sets DYLD_LIBRARY_PATH at runtime to locate bundled libraries. -->
+    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+    <true/>
+</dict>
+</plist>

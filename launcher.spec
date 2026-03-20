@@ -15,6 +15,16 @@ on any machine and on all three supported platforms (Windows, macOS, Linux).
 """
 
 import os
+import sys
+
+# macOS entitlements for ad-hoc code signing (embedded Python.framework needs
+# unsigned-executable-memory and disabled library validation).  On non-macOS
+# platforms the entitlements file is ignored by PyInstaller.
+_ENTITLEMENTS = None
+if sys.platform == 'darwin':
+    _ent_path = os.path.join(SPECPATH, 'src', 'installer', 'macos', 'entitlements.plist')
+    if os.path.isfile(_ent_path):
+        _ENTITLEMENTS = _ent_path
 
 # INS-018: Include the Python embeddable distribution if it has been populated.
 # At build time the CI job downloads python-3.11.x-embed-amd64.zip and extracts
@@ -67,8 +77,10 @@ exe = EXE(
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
+    # Explicit ad-hoc signing on macOS ('-') ensures PyInstaller produces a
+    # properly signed Mach-O binary.  None would skip signing entirely.
+    codesign_identity='-' if sys.platform == 'darwin' else None,
+    entitlements_file=_ENTITLEMENTS,
 )
 
 coll = COLLECT(

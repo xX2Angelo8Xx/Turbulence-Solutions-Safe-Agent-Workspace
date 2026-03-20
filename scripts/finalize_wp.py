@@ -228,6 +228,20 @@ def finalize(wp_id: str, dry_run: bool) -> int:
         return 1
     print(f"  {wp_id} is Done ✓")
 
+    # Step 1b: Verify tests exist
+    comments = wp_row.get("Comments", "")
+    is_decomposed = "decomposed" in comments.lower()
+    is_exempt = any(wp_id.startswith(p) for p in ("MNT-",))
+    test_dir = REPO_ROOT / "tests" / wp_id
+    if not is_decomposed and not is_exempt:
+        if not test_dir.exists() or not any(test_dir.glob("test_*.py")):
+            print(f"Error: tests/{wp_id}/ is missing or has no test_*.py files")
+            print(f"  Every WP must have tests before finalization.")
+            return 1
+        print(f"  tests/{wp_id}/ exists with test files ✓")
+    else:
+        print(f"  Test directory check skipped (decomposed/exempt)")
+
     # Step 2: Detect feature branch
     print(f"\n--- Step 2: Detect branch ---")
     current_branch = _get_current_branch()
