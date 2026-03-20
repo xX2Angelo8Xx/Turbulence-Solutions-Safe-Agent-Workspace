@@ -11,6 +11,7 @@ Usage:
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -158,8 +159,11 @@ def _cascade_us_status(wp_id: str, dry_run: bool) -> None:
 
 
 def _cascade_bug_status(wp_id: str, dry_run: bool) -> None:
-    """Close any Open bugs whose Fixed In WP matches this WP."""
+    """Close bugs linked to this WP, and auto-close bugs referenced in dev-log/test-report."""
     _, bug_rows = read_csv(BUG_CSV)
+    already_closed: set[str] = set()
+
+    # Phase 1: existing logic — close bugs where Fixed In WP matches exactly
     for bug in bug_rows:
         fixed_wp = bug.get("Fixed In WP", "").strip()
         if fixed_wp == wp_id and bug.get("Status") == "Open":
@@ -168,6 +172,42 @@ def _cascade_bug_status(wp_id: str, dry_run: bool) -> None:
                 print(f"  [DRY RUN] Close {bug_id} (fixed by {wp_id})")
             else:
                 update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
+                print(f"  Closed {bug_id} (fixed by {wp_id})")
+            already_closed.add(bug_id)
+
+    # Phase 2: scan dev-log.md and test-report.md for BUG-NNN references
+    wp_folder = REPO_ROOT / "docs" / "workpackages" / wp_id
+    bug_refs: set[str] = set()
+    for filename in ("dev-log.md", "test-report.md"):
+        filepath = wp_folder / filename
+        if filepath.exists():
+            content = filepath.read_text(encoding="utf-8", errors="replace")
+            bug_refs.update(re.findall(r"BUG-\d{3}", content))
+
+    # Re-read bugs after Phase 1 updates (status may have changed)
+    if bug_refs:
+        _, bug_rows = read_csv(BUG_CSV)
+        bug_map = {b["ID"]: b for b in bug_rows}
+
+        for bug_id in sorted(bug_refs):
+            if bug_id in already_closed:
+                continue
+            bug = bug_map.get(bug_id)
+            if not bug:
+                continue
+            status = bug.get("Status", "").strip()
+            if status in ("Closed", "Verified"):
+                continue
+            if status not in ("Open", "In Progress"):
+                continue
+            if dry_run:
+                print(f"  [DRY RUN] Auto-closed {bug_id} (referenced in dev-log/test-report, fixed by {wp_id})")
+            else:
+                fixed_wp = bug.get("Fixed In WP", "").strip()
+                if not fixed_wp:
+                    update_cell(BUG_CSV, "ID", bug_id, "Fixed In WP", wp_id)
+                update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
+                print(f"  Auto-closed {bug_id} (referenced in dev-log/test-report, fixed by {wp_id})")
                 print(f"  Closed {bug_id} (fixed by {wp_id})")
 
 

@@ -1845,3 +1845,4 @@
 "TST-1964","FIX-062 regression suite (Iteration 2)","Regression","FIX-063","Pass","2026-03-20","Windows 11 + Python 3.11.9","22/22 pass","16 tests flipped from presence to absence assertions after FIX-063 removed Step 3.2; all 22 tests pass"
 "TST-1965","FIX-063 full suite (Iteration 2)","Regression","FIX-063","Pass","2026-03-20","Windows 11 + Python 3.11.9","28/28 pass","All 16 developer tests + 12 tester edge-case tests pass. No new regressions."
 "TST-1966","Full suite regression check (Iteration 2)","Regression","FIX-063","Pass","2026-03-20","Windows 11 + Python 3.11.9","88 pre-existing failures unchanged, 0 new regressions","4136+ tests pass; 88 pre-existing failures (FIX-028, FIX-031, FIX-009, FIX-015, FIX-016, FIX-019, SAF-022, SAF-025 etc) unchanged from baseline"
+"TST-1967","FIX-066 Bug lifecycle automation tests","Unit","FIX-066","Pass","2026-03-20","Windows/Python 3.11.9","16/16 passed","9 cascade, 5 linkage, 2 enum tests. All pass."
