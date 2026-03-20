@@ -124,6 +124,23 @@ echo "==> Removing .dist-info directories from bundle..."
 find "${APP_BUNDLE}/Contents/MacOS/_internal" -type d -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
+# Step 3.2: Relocate non-code resources from MacOS/_internal/ to Resources/
+#
+# macOS codesign treats all files in Contents/MacOS/ as code subcomponents.
+# Non-code data files (images, icons) must live in Contents/Resources/ to
+# avoid "code object is not signed at all" errors.  Symlinks in _internal/
+# preserve sys._MEIPASS-based lookups at runtime.
+# ---------------------------------------------------------------------------
+echo "==> Relocating non-code resources to Contents/Resources/..."
+for f in TS-Logo.png TS-Logo.ico; do
+    if [ -f "${APP_BUNDLE}/Contents/MacOS/_internal/${f}" ]; then
+        mv "${APP_BUNDLE}/Contents/MacOS/_internal/${f}" "${APP_BUNDLE}/Contents/Resources/${f}"
+        ln -s "../../Resources/${f}" "${APP_BUNDLE}/Contents/MacOS/_internal/${f}"
+        echo "  Moved ${f} -> Contents/Resources/${f} (symlinked)"
+    fi
+done
+
+# ---------------------------------------------------------------------------
 # Step 3.5: Ad-hoc code signing with entitlements (bottom-up then bundle)
 #
 # Signing strategy:
