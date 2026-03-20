@@ -84,3 +84,51 @@ All tests in `tests/FIX-063/test_fix063_internal_relocation.py`:
 ## Iteration 1
 
 Implementation complete. All 16 tests pass.
+
+---
+
+## Iteration 2 — Fixing FIX-062 Test Compatibility
+
+**Date:** 2026-03-20
+**Trigger:** Tester returned WP with 16 FIX-062 tests failing after FIX-063 removed Step 3.2.
+
+### Problem
+
+`tests/FIX-062/test_fix062_resource_relocation.py` contained 16 tests asserting that
+Step 3.2 (and related constructs) *exist* in `build_dmg.sh`.  FIX-063 removed Step 3.2
+entirely, causing these tests to fail.
+
+### Changes Made
+
+**File:** `tests/FIX-062/test_fix062_resource_relocation.py`
+
+All 16 affected tests were updated to reflect the new post-FIX-063 reality:
+
+| Original test | Action taken |
+|---|---|
+| `test_step_32_header_present` | Renamed → `test_step_32_header_absent`, assertion flipped |
+| `test_step_32_moves_png` | Renamed → `test_step_32_moves_png_absent`, assertions flipped |
+| `test_step_32_moves_ico` | Renamed → `test_step_32_moves_ico_absent`, assertion flipped |
+| `test_step_32_symlink_relative_path` | Renamed → `test_step21_symlink_relative_path`; verifies `../../` absent and `../Resources/_internal` present |
+| `test_step_32_symlink_points_to_png` | Renamed → `test_step_32_symlink_points_to_png_absent`, assertion flipped |
+| `test_step_32_loop_over_files` | Renamed → `test_step_32_loop_over_files_absent`, assertion flipped |
+| `test_step_32_guarded_by_file_check` | Renamed → `test_step_32_file_guard_absent`, assertion flipped |
+| `test_step_ordering_31_before_32_before_35` | Renamed → `test_step_ordering_31_before_35`; asserts Step 3.2 absent, Step 3.1 before Step 3.5 |
+| `_extract_step32_block` helper | Replaced with `_extract_step21_block` (extracts Step 2.1 region) |
+| `test_for_loop_has_done` | Renamed → `test_for_loop_absent`, asserts loop is gone |
+| `test_if_block_has_fi` | Renamed → `test_ts_logo_if_guard_absent`, asserts guard is gone |
+| `test_step_32_uses_app_bundle_variable` | Renamed → `test_step21_uses_app_bundle_variable`; uses new helper |
+| `test_echo_diagnostic_message_in_step_32` | Renamed → `test_echo_diagnostic_message_in_step21`; uses new helper |
+| `test_symlink_depth_exactly_two_levels` | Renamed → `test_symlink_depth_exactly_one_level`; verifies 1 `..` not 2 |
+| `test_loop_guard_prevents_abort_on_single_missing_file` | Renamed → `test_ts_logo_loop_and_guard_absent`, both absent |
+| `test_loop_handles_neither_file_present` | Renamed → `test_ts_logo_references_entirely_absent` |
+| `test_no_crlf_in_step32_block` | Renamed → `test_step32_absent_in_raw_bytes`; verifies b"Step 3.2" not in raw bytes |
+
+Module docstring also updated to reflect the new purpose of these tests.
+
+### Test Results
+
+- `tests/FIX-062/` — 22/22 PASS
+- `tests/FIX-063/` — 28/28 PASS
+- Combined: **50/50 PASS** (TST-1963)
+- Full suite: 4136 pass, 88 pre-existing failures (unchanged)

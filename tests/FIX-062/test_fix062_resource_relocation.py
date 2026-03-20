@@ -1,13 +1,12 @@
 """
 Tests for FIX-062 — Fix macOS codesign TS-Logo.png failure
 
-Regression tests that verify build_dmg.sh contains the correct Step 3.2
-resource-relocation block, including:
-  - Presence of the relocation step
-  - Correct mv and ln -s commands
-  - Correct relative symlink path (../../Resources/<filename>)
-  - Step ordering (3.2 appears after 3.1 and before 3.5)
-  - LF line endings (no CRLF introduced)
+Updated after FIX-063 superseded Step 3.2:
+  FIX-063 moves the entire _internal/ directory to Contents/Resources/ (Step 2.1).
+  Step 3.2 (per-file TS-Logo relocation loop) was therefore removed entirely.
+
+These tests now verify the ABSENCE of Step 3.2 and its associated constructs,
+and verify that the FIX-063 Step 2.1 block is correctly in place.
 """
 
 import os
@@ -36,27 +35,32 @@ def test_no_crlf_line_endings():
     assert b"\r\n" not in content, "build_dmg.sh contains CRLF line endings"
 
 
-def test_step_32_header_present():
-    """Step 3.2 header comment must be present in the script."""
+def test_step_32_header_absent():
+    """Step 3.2 header comment must NOT be present — superseded by FIX-063 Step 2.1."""
     content = _read_script()
-    assert "Step 3.2" in content, "Step 3.2 header comment not found in build_dmg.sh"
+    assert "Step 3.2" not in content, "Step 3.2 header comment still present in build_dmg.sh — should have been removed by FIX-063"
 
 
-def test_step_32_moves_png():
-    """Step 3.2 must move TS-Logo.png to Contents/Resources/."""
+def test_step_32_moves_png_absent():
+    """TS-Logo.png per-file mv must NOT be present — FIX-063 moves the whole _internal/ dir."""
     content = _read_script()
-    assert "TS-Logo.png" in content, "TS-Logo.png not mentioned in Step 3.2"
-    # The mv command uses the loop variable ${f}; it must move from _internal/ to Resources/
-    assert re.search(
+    assert "TS-Logo.png" not in content, (
+        "TS-Logo.png still referenced in build_dmg.sh — FIX-063 should have removed the "
+        "per-file relocation loop (Step 3.2)"
+    )
+    assert not re.search(
         r'mv\s+.*_internal.*\$\{f\}.*Contents/Resources',
         content
-    ), "mv ..._internal/${f} -> Contents/Resources/${f} pattern not found"
+    ), "FIX-062 per-file mv ..._internal/${f} pattern must not exist after FIX-063"
 
 
-def test_step_32_moves_ico():
-    """Step 3.2 must move TS-Logo.ico to Contents/Resources/."""
+def test_step_32_moves_ico_absent():
+    """TS-Logo.ico per-file mv must NOT be present — FIX-063 removes the per-file loop."""
     content = _read_script()
-    assert "TS-Logo.ico" in content, "TS-Logo.ico not mentioned in Step 3.2"
+    assert "TS-Logo.ico" not in content, (
+        "TS-Logo.ico still referenced in build_dmg.sh — FIX-063 should have removed the "
+        "per-file relocation loop (Step 3.2)"
+    )
 
 
 def test_step_32_symlink_command_present():
@@ -65,56 +69,72 @@ def test_step_32_symlink_command_present():
     assert "ln -s" in content, "ln -s symlink command not found in build_dmg.sh"
 
 
-def test_step_32_symlink_relative_path():
-    """Symlink target must use the correct relative path ../../Resources/<filename>."""
+def test_step21_symlink_relative_path():
+    """FIX-063 symlink target must use ../Resources/_internal (1 level up from MacOS/).
+
+    The old FIX-062 path ../../Resources/<file> (2 levels up from _internal/) must
+    not exist — FIX-063 symlinks the entire _internal/ directory from MacOS/ directly.
+    """
     content = _read_script()
-    assert re.search(
+    # Old FIX-062 path (../../) must be absent
+    assert not re.search(
         r'ln\s+-s\s+"?\.\.\/\.\.\/Resources\/',
         content
-    ), "Symlink does not use relative path ../../Resources/"
-
-
-def test_step_32_symlink_points_to_png():
-    """Symlink for TS-Logo.png must point to ../../Resources/TS-Logo.png."""
-    content = _read_script()
-    # The ln -s line must reference ../../Resources/${f} or ../../Resources/TS-Logo.png
+    ), "Old FIX-062 symlink path ../../Resources/ must not exist after FIX-063"
+    # New FIX-063 path (../Resources/_internal) must be present
     assert re.search(
-        r'ln\s+-s\s+"?\.\./\.\./Resources/.*"?\s+.*_internal/',
+        r'ln\s+-s\s+"?\.\.\/Resources/_internal',
         content
-    ), "ln -s for Resources/<filename> -> _internal/<filename> pattern not found"
+    ), "FIX-063 symlink target ../Resources/_internal not found in build_dmg.sh"
 
 
-def test_step_32_loop_over_files():
-    """Step 3.2 must use a loop covering both TS-Logo.png and TS-Logo.ico."""
+def test_step_32_symlink_points_to_png_absent():
+    """No symlink should point to a per-file TS-Logo path — removed by FIX-063."""
     content = _read_script()
-    # The loop variable 'f' should iterate over both files
+    assert not re.search(
+        r'ln\s+-s\s+"?\.\.\./\.\.\./Resources/.*"?\s+.*_internal/',
+        content
+    ), (
+        "FIX-062 per-file symlink pattern (../../Resources/<file> -> _internal/<file>) "
+        "must not exist after FIX-063"
+    )
+
+
+def test_step_32_loop_over_files_absent():
+    """The FIX-062 per-file loop must NOT exist — removed by FIX-063."""
+    content = _read_script()
     loop_match = re.search(
         r'for\s+f\s+in\s+TS-Logo\.png\s+TS-Logo\.ico',
         content
     )
-    assert loop_match, "Loop 'for f in TS-Logo.png TS-Logo.ico' not found in Step 3.2"
+    assert not loop_match, (
+        "Loop 'for f in TS-Logo.png TS-Logo.ico' still found in build_dmg.sh — "
+        "must be removed by FIX-063"
+    )
 
 
-def test_step_32_guarded_by_file_check():
-    """Each relocation must be guarded by [ -f ... ] to avoid errors on missing files."""
+def test_step_32_file_guard_absent():
+    """The FIX-062 per-file [ -f .../${f} ] guard must NOT exist — removed by FIX-063."""
     content = _read_script()
-    assert re.search(
+    assert not re.search(
         r'\[\s+-f\s+.*_internal.*\$\{f\}',
         content
-    ), "File-existence guard '[ -f .../${f} ]' not found in Step 3.2"
+    ), (
+        "FIX-062 file guard '[ -f .../${f}]' still present in build_dmg.sh — "
+        "must be removed by FIX-063"
+    )
 
 
-def test_step_ordering_31_before_32_before_35():
-    """Step 3.1 must appear before Step 3.2 which must appear before Step 3.5."""
+def test_step_ordering_31_before_35():
+    """Step 3.1 must appear before Step 3.5.  Step 3.2 must be absent (removed by FIX-063)."""
     content = _read_script()
     pos_31 = content.find("Step 3.1")
     pos_32 = content.find("Step 3.2")
     pos_35 = content.find("Step 3.5")
     assert pos_31 != -1, "Step 3.1 not found"
-    assert pos_32 != -1, "Step 3.2 not found"
+    assert pos_32 == -1, "Step 3.2 must not exist — it was removed by FIX-063"
     assert pos_35 != -1, "Step 3.5 not found"
-    assert pos_31 < pos_32, "Step 3.1 must appear before Step 3.2"
-    assert pos_32 < pos_35, "Step 3.2 must appear before Step 3.5"
+    assert pos_31 < pos_35, "Step 3.1 must appear before Step 3.5"
 
 
 def test_step_32_resources_dir_pre_exists():
@@ -143,54 +163,55 @@ def test_no_absolute_symlink_path():
 # Edge-case tests added by Tester Agent
 # ---------------------------------------------------------------------------
 
-def _extract_step32_block(content: str) -> str:
-    """Return the text slice between 'Step 3.2' and 'Step 3.5' headers."""
-    start = content.find("Step 3.2")
-    end = content.find("Step 3.5")
-    assert start != -1, "Step 3.2 marker not found"
-    assert end != -1, "Step 3.5 marker not found"
+def _extract_step21_block(content: str) -> str:
+    """Return the text slice for the Step 2.1 section (FIX-063 _internal/ relocation)."""
+    start = content.find("Step 2.1")
+    # FIX-056 block immediately follows Step 2.1 in the script
+    end = content.find("FIX-056")
+    assert start != -1, "Step 2.1 marker not found"
+    assert end != -1, "Section boundary after Step 2.1 (FIX-056 comment) not found"
     return content[start:end]
 
 
-def test_for_loop_has_done():
-    """The for loop in Step 3.2 must be closed with 'done' (syntax correctness)."""
-    block = _extract_step32_block(_read_script())
-    assert re.search(r'\bdone\b', block), \
-        "for loop in Step 3.2 is not closed with 'done' — script would fail with syntax error"
+def test_for_loop_absent():
+    """The FIX-062 TS-Logo for loop must no longer exist anywhere in the script."""
+    content = _read_script()
+    assert not re.search(r'for\s+f\s+in\s+TS-Logo', content), (
+        "FIX-062 for-loop over TS-Logo files still present — must be removed by FIX-063"
+    )
 
 
-def test_if_block_has_fi():
-    """The if block inside the Step 3.2 loop must be closed with 'fi'."""
-    block = _extract_step32_block(_read_script())
-    if_count = len(re.findall(r'\bif\b', block))
-    fi_count = len(re.findall(r'\bfi\b', block))
-    assert fi_count >= 1, "No 'fi' found to close the if block in Step 3.2"
-    assert if_count == fi_count, \
-        f"Unmatched if/fi in Step 3.2: {if_count} 'if' but {fi_count} 'fi'"
+def test_ts_logo_if_guard_absent():
+    """The FIX-062 if-guard for TS-Logo files must not exist in the script."""
+    content = _read_script()
+    # The guard checked for -f ...TS-Logo or the loop variable ${f}
+    assert not re.search(r'\[\s+-f.*TS-Logo', content), (
+        "FIX-062 '[ -f ...TS-Logo ]' guard still present — must be removed by FIX-063"
+    )
 
 
-def test_step_32_uses_app_bundle_variable():
-    """All path references in Step 3.2 must use ${APP_BUNDLE}, not hardcoded paths."""
-    block = _extract_step32_block(_read_script())
+def test_step21_uses_app_bundle_variable():
+    """All path references in Step 2.1 (FIX-063) must use ${APP_BUNDLE}, not hardcoded paths."""
+    block = _extract_step21_block(_read_script())
     assert "${APP_BUNDLE}" in block, \
-        "Step 3.2 mv/ln commands must use ${APP_BUNDLE}, not hardcoded paths"
+        "Step 2.1 mv/ln commands must use ${APP_BUNDLE}, not hardcoded paths"
 
 
-def test_echo_diagnostic_message_in_step_32():
-    """Step 3.2 must produce a diagnostic echo so CI logs show what was relocated."""
-    block = _extract_step32_block(_read_script())
+def test_echo_diagnostic_message_in_step21():
+    """Step 2.1 (FIX-063) must produce a diagnostic echo so CI logs show what was relocated."""
+    block = _extract_step21_block(_read_script())
     assert "echo" in block, \
-        "Step 3.2 should include at least one diagnostic echo message for CI traceability"
+        "Step 2.1 should include at least one diagnostic echo message for CI traceability"
 
 
-def test_symlink_depth_exactly_two_levels():
-    """The relative symlink must traverse exactly two directory levels up (../../).
+def test_symlink_depth_exactly_one_level():
+    """The FIX-063 _internal symlink must traverse exactly one directory level up (..).
 
-    From Contents/MacOS/_internal/:
-      .. -> Contents/MacOS/
-      ../.. -> Contents/
-    So ../../Resources/<file> correctly resolves to Contents/Resources/<file>.
-    A depth of 1 (../Resources/) or 3 (../../../Resources/) would be wrong.
+    The symlink is placed at Contents/MacOS/_internal and points to ../Resources/_internal.
+    From Contents/MacOS/:
+      .. -> Contents/
+    So ../Resources/_internal correctly resolves to Contents/Resources/_internal.
+    A depth of 2 (../../Resources/) would be wrong — that was FIX-062's per-file path.
     """
     content = _read_script()
     ln_lines = [line.strip() for line in content.splitlines() if "ln -s" in line]
@@ -201,48 +222,43 @@ def test_symlink_depth_exactly_two_levels():
             path = m.group(1)
             segments = path.split("/")
             dotdot_count = sum(1 for s in segments if s == "..")
-            assert dotdot_count == 2, (
-                f"Expected exactly 2 '..' segments in symlink path (needed for "
-                f"Contents/MacOS/_internal/ -> Contents/Resources/), "
+            assert dotdot_count == 1, (
+                f"Expected exactly 1 '..' segment in symlink path (FIX-063: "
+                f"Contents/MacOS/ -> Contents/Resources/_internal), "
                 f"got {dotdot_count}: {line}"
             )
 
 
-def test_loop_guard_prevents_abort_on_single_missing_file():
-    """The [ -f ... ] guard ensures the loop doesn't error when only one file is present.
+def test_ts_logo_loop_and_guard_absent():
+    """The FIX-062 TS-Logo loop and its [ -f ] guard must not exist — removed by FIX-063.
 
-    If TS-Logo.ico is absent but TS-Logo.png is present (or vice versa), the
-    script must continue without error. The guard must be inside the loop body,
-    not wrapping the entire loop.
+    FIX-063 moves the entire _internal/ directory so there is no need for a
+    per-file loop or a missing-file guard for TS-Logo.png / TS-Logo.ico.
     """
-    block = _extract_step32_block(_read_script())
-    # The for-loop line and the if-guard must both be present inside the block
-    loop_match = re.search(r'for\s+f\s+in\s+TS-Logo\.png\s+TS-Logo\.ico', block)
-    guard_match = re.search(r'\[\s+-f\s+.*\$\{f\}', block)
-    assert loop_match, "for f in TS-Logo.png TS-Logo.ico loop not found in Step 3.2"
-    assert guard_match, "[ -f ...${f} ] guard not found inside Step 3.2 loop"
-    # The guard must appear AFTER the for-loop line (i.e., inside the loop body)
-    assert block.find(guard_match.group(0)) > block.find(loop_match.group(0)), \
-        "[ -f ] guard must appear inside the for loop body, not before it"
+    content = _read_script()
+    loop_match = re.search(r'for\s+f\s+in\s+TS-Logo\.png\s+TS-Logo\.ico', content)
+    guard_match = re.search(r'\[\s+-f\s+.*\$\{f\}', content)
+    assert not loop_match, (
+        "FIX-062 'for f in TS-Logo.png TS-Logo.ico' loop must be absent after FIX-063"
+    )
+    assert not guard_match, (
+        "FIX-062 '[ -f ...${f}]' guard must be absent after FIX-063"
+    )
 
 
-def test_loop_handles_neither_file_present():
-    """When neither TS-Logo.png nor TS-Logo.ico exists the loop must not fail.
+def test_ts_logo_references_entirely_absent():
+    """No TS-Logo.png or TS-Logo.ico reference must remain anywhere in the script.
 
-    This is ensured by the [ -f ] guard combined with 'set -euo pipefail' at the
-    top of the script: if the guard always fires, mv/ln are never called on missing
-    files. Verify the script does NOT have a mandatory-exit clause for missing files
-    outside of the guard.
+    FIX-063 eliminates the need for per-file handling by relocating the whole
+    _internal/ directory.  Any lingering TS-Logo reference would indicate an
+    incomplete cleanup.
     """
-    block = _extract_step32_block(_read_script())
-    # There must be no unconditional 'exit 1' or '|| exit 1' outside an if block
-    lines_with_exit = [
-        ln.strip() for ln in block.splitlines()
-        if re.search(r'exit\s+1', ln) and "if" not in ln
-    ]
-    assert not lines_with_exit, (
-        f"Step 3.2 has unconditional exit statements that would abort "
-        f"when files are absent: {lines_with_exit}"
+    content = _read_script()
+    assert "TS-Logo.png" not in content, (
+        "TS-Logo.png reference still present in build_dmg.sh after FIX-063"
+    )
+    assert "TS-Logo.ico" not in content, (
+        "TS-Logo.ico reference still present in build_dmg.sh after FIX-063"
     )
 
 
@@ -257,15 +273,10 @@ def test_mv_target_is_resources_dir():
                 f"mv target '{target}' does not place file in Contents/Resources/"
 
 
-def test_no_crlf_in_step32_block():
-    """Step 3.2 lines must not contain carriage-return characters (CRLF check)."""
+def test_step32_absent_in_raw_bytes():
+    """Step 3.2 must not appear anywhere in the raw bytes of build_dmg.sh."""
     with open(BUILD_SCRIPT, "rb") as f:
         raw = f.read()
-    # Find the byte range for Step 3.2
-    step32_pos = raw.find(b"Step 3.2")
-    step35_pos = raw.find(b"Step 3.5")
-    assert step32_pos != -1
-    assert step35_pos != -1
-    step32_bytes = raw[step32_pos:step35_pos]
-    assert b"\r\n" not in step32_bytes, \
-        "Step 3.2 block contains CRLF line endings — must be LF only"
+    assert b"Step 3.2" not in raw, (
+        "Raw bytes of build_dmg.sh still contain 'Step 3.2' — must be removed by FIX-063"
+    )
