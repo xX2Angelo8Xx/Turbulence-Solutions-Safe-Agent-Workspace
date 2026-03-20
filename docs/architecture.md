@@ -33,8 +33,6 @@ Templates (bundled inside Launcher)
 │   │   └── tester.agent.md
 │   ├── instructions/
 │   │   └── copilot-instructions.md
-│   ├── prompts/
-│   │   └── plan-fixLegacyValidationErrors.prompt.md
 │   └── workflows/
 │       └── release.yml
 ├── docs/
@@ -51,7 +49,8 @@ Templates (bundled inside Launcher)
 │   │   ├── 2026-03-19-maintenance.md
 │   │   └── 2026-03-20-maintenance.md
 │   ├── plans/
-│   │   └── plan-fixLegacyValidationErrors.md
+│   │   ├── plan-fixLegacyValidationErrors.md
+│   │   └── plan-project-status-next-steps.md
 │   ├── Security Audits/
 │   │   ├── SECURITY_ADVANCED_ATTACK_ANALYSIS-V3.0.0-18-03.26.md
 │   │   ├── SECURITY_AUDIT_REPORT-16-03.26-Handwritten.md
@@ -257,7 +256,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-054/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-055/
@@ -276,6 +274,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-060/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-061/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -505,6 +506,7 @@ Templates (bundled inside Launcher)
 │   │   │   └── test-report.md
 │   │   └── workpackages.csv
 │   ├── architecture.md
+│   ├── macos-installation-guide.md
 │   └── project-scope.md
 ├── scripts/
 │   ├── hooks/
@@ -529,6 +531,7 @@ Templates (bundled inside Launcher)
 │   │   │   └── README.md
 │   │   ├── macos/
 │   │   │   ├── build_dmg.sh
+│   │   │   ├── entitlements.plist
 │   │   │   └── README.md
 │   │   ├── python-embed/
 │   │   │   └── README.md
@@ -635,6 +638,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-058/
 │   ├── FIX-059/
 │   ├── FIX-060/
+│   ├── FIX-061/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
