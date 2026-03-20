@@ -5,7 +5,7 @@
     "description": "what needs to be done",
     "priority": "Warning or Info",
     "status": "Open | Done | Rejected",
-    "resolved_by": "WP-ID or commit that resolved this, empty if Open"
+    "resolved_by": "WP-ID or commit that resolved this; may contain planned WP-ID while Open, must be non-empty when Done"
   },
   "actions": [
     {
