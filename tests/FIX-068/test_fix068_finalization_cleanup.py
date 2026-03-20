@@ -356,3 +356,122 @@ class TestCheckStaleBranches:
         assert len(result.warnings) == 2
         assert "FIX-001/branch-a" in result.warnings[0]
         assert "FIX-002/branch-b" in result.warnings[1]
+
+
+# ---------------------------------------------------------------------------
+# 5. Tester edge-case tests
+# ---------------------------------------------------------------------------
+
+class TestTesterEdgeCases:
+    """Additional edge-case and boundary tests added by the Tester."""
+
+    # --- _check_orphaned_state_files edge cases ---
+
+    def test_orphaned_state_file_unknown_wp_id_no_warn(self, tmp_path):
+        """State file for a WP not in workpackages.csv is silently ignored."""
+        import validate_workspace as vw
+
+        wp_dir = tmp_path / "docs" / "workpackages" / "FIX-999"
+        wp_dir.mkdir(parents=True)
+        (wp_dir / ".finalization-state.json").write_text("{}")
+
+        mock_rows = [{"ID": "FIX-001", "Status": "Done"}]  # FIX-999 not present
+
+        result = vw.ValidationResult()
+        with patch.object(vw, "read_csv", return_value=([], mock_rows)), \
+             patch.object(vw, "REPO_ROOT", tmp_path):
+            vw._check_orphaned_state_files(result)
+
+        assert len(result.warnings) == 0
+
+    def test_orphaned_state_file_review_status_no_warn(self, tmp_path):
+        """A WP in Review status with state file does NOT produce a warning."""
+        import validate_workspace as vw
+
+        wp_dir = tmp_path / "docs" / "workpackages" / "FIX-099"
+        wp_dir.mkdir(parents=True)
+        (wp_dir / ".finalization-state.json").write_text("{}")
+
+        mock_rows = [{"ID": "FIX-099", "Status": "Review"}]
+
+        result = vw.ValidationResult()
+        with patch.object(vw, "read_csv", return_value=([], mock_rows)), \
+             patch.object(vw, "REPO_ROOT", tmp_path):
+            vw._check_orphaned_state_files(result)
+
+        assert len(result.warnings) == 0
+
+    # --- _clear_state edge cases ---
+
+    def test_clear_state_already_missing_does_not_raise(self, tmp_path):
+        """_clear_state on a missing file does not raise FileNotFoundError."""
+        import finalize_wp
+
+        missing = tmp_path / ".finalization-state.json"
+        assert not missing.exists()
+
+        with patch.object(finalize_wp, "_state_path", return_value=missing):
+            finalize_wp._clear_state("FIX-099")  # must not raise
+
+    def test_clear_state_only_removes_state_file(self, tmp_path):
+        """_clear_state deletes only the state file, not other WP files."""
+        import finalize_wp
+
+        wp_dir = tmp_path / "docs" / "workpackages" / "FIX-099"
+        wp_dir.mkdir(parents=True)
+        state_file = wp_dir / ".finalization-state.json"
+        state_file.write_text('{"step": 3}')
+        other_file = wp_dir / "dev-log.md"
+        other_file.write_text("# log")
+
+        with patch.object(finalize_wp, "_state_path", return_value=state_file):
+            finalize_wp._clear_state("FIX-099")
+
+        assert not state_file.exists()
+        assert other_file.exists()
+
+    # --- _check_stale_branches edge cases ---
+
+    @patch("validate_workspace.subprocess.run")
+    def test_empty_stdout_produces_no_warnings(self, mock_subproc):
+        """Empty stdout (no branches at all) produces no warnings."""
+        import validate_workspace as vw
+
+        mock_subproc.return_value = subprocess.CompletedProcess(
+            [], 0, stdout="", stderr=""
+        )
+
+        result = vw.ValidationResult()
+        vw._check_stale_branches(result)
+
+        assert len(result.warnings) == 0
+
+    @patch("validate_workspace.subprocess.run")
+    def test_whitespace_only_stdout_produces_no_warnings(self, mock_subproc):
+        """Whitespace-only stdout is handled without producing warnings."""
+        import validate_workspace as vw
+
+        mock_subproc.return_value = subprocess.CompletedProcess(
+            [], 0, stdout="   \n   \n", stderr=""
+        )
+
+        result = vw.ValidationResult()
+        vw._check_stale_branches(result)
+
+        assert len(result.warnings) == 0
+
+    @patch("validate_workspace.subprocess.run")
+    def test_origin_head_arrow_format_filtered(self, mock_subproc):
+        """'origin/HEAD -> origin/main' pointer lines are not flagged as stale."""
+        import validate_workspace as vw
+
+        mock_subproc.return_value = subprocess.CompletedProcess(
+            [], 0,
+            stdout="  origin/HEAD -> origin/main\n  origin/main\n",
+            stderr=""
+        )
+
+        result = vw.ValidationResult()
+        vw._check_stale_branches(result)
+
+        assert len(result.warnings) == 0
