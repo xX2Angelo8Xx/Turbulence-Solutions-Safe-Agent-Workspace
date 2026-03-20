@@ -24,5 +24,8 @@ All sub-workpackages have their own dev-log.md, test-report.md, and test directo
 ## Files Changed
 - None (decomposed WP — see sub-WPs for changes)
 
+## Test Report Exemption
+test-report.md is not applicable for INS-008 — this workpackage was decomposed into sub-workpackages INS-013 through INS-017 before implementation. All testing is covered by the sub-WPs.
+
 ## Known Limitations
 - None

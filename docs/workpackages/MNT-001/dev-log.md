@@ -28,6 +28,9 @@ Full maintenance sweep addressing all findings from the 2026-03-19 maintenance l
 ### WP Folder Integrity (Check 5)
 - Created retroactive test-report.md for: FIX-012, FIX-041, FIX-042, FIX-046, SAF-032, SAF-033
 
+## Test Report Exemption
+test-report.md is not applicable for MNT-001 — this is a maintenance workpackage with no code changes requiring independent test verification.
+
 ### Bug Tracking (Check 8)
 - Created 4 new fix WPs: FIX-051, FIX-052, FIX-053, FIX-054
 
