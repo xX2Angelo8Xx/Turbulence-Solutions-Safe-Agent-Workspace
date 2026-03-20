@@ -47,7 +47,9 @@ Templates (bundled inside Launcher)
 │   │   ├── 2026-03-13-maintenance.md
 │   │   ├── 2026-03-14-maintenance.md
 │   │   ├── 2026-03-19-maintenance.md
-│   │   └── 2026-03-20-maintenance.md
+│   │   ├── 2026-03-20-maintenance.md
+│   │   ├── 2026-03-20b-maintenance.md
+│   │   └── action-tracker.json
 │   ├── plans/
 │   │   ├── plan-fixLegacyValidationErrors.md
 │   │   └── plan-project-status-next-steps.md
@@ -284,6 +286,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-063/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-067/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -408,6 +413,8 @@ Templates (bundled inside Launcher)
 │   │   │   └── test-report.md
 │   │   ├── MNT-001/
 │   │   │   └── dev-log.md
+│   │   ├── MNT-002/
+│   │   │   └── dev-log.md
 │   │   ├── SAF-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -511,6 +518,7 @@ Templates (bundled inside Launcher)
 │   │   ├── SAF-034/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── validation-exceptions.json
 │   │   └── workpackages.csv
 │   ├── architecture.md
 │   ├── macos-installation-guide.md
@@ -519,6 +527,8 @@ Templates (bundled inside Launcher)
 │   ├── hooks/
 │   │   └── pre-commit
 │   ├── __init__.py
+│   ├── _repair_csvs.py
+│   ├── _verify.py
 │   ├── add_bug.py
 │   ├── add_test_result.py
 │   ├── add_workpackage.py
@@ -648,6 +658,10 @@ Templates (bundled inside Launcher)
 │   ├── FIX-061/
 │   ├── FIX-062/
 │   ├── FIX-063/
+│   ├── FIX-065/
+│   ├── FIX-066/
+│   ├── FIX-067/
+│   ├── FIX-068/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
@@ -687,6 +701,7 @@ Templates (bundled inside Launcher)
 │   ├── INS-020/
 │   ├── INS-021/
 │   ├── MNT-001/
+│   ├── MNT-002/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
