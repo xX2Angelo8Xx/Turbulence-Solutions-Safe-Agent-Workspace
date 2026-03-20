@@ -1849,3 +1849,4 @@
 "TST-1968","MNT-002 validation-exceptions.json schema","Unit","MNT-002","Pass","2026-03-20","Windows 11 + Python 3.11","6/6 tests pass - JSON schema and content validated",""
 "TST-1969","MNT-002 action-tracker.json schema","Unit","MNT-002","Pass","2026-03-20","Windows 11 + Python 3.11","9/9 tests pass - JSON schema, actions, IDs, statuses, priorities validated",""
 "TST-1970","MNT-002 maintenance-protocol.md action tracker step","Unit","MNT-002","Pass","2026-03-20","Windows 11 + Python 3.11","5/5 tests pass - step 0 present, references action-tracker.json, ordered before step 1",""
+"TST-1971","test_fix065_csv_strict","Unit","FIX-065","Pass","2026-03-20","Windows 11 + Python 3.11.9","17 passed / 0 failed","All 5 test classes pass: strict read, non-strict read, atomic write, sanitization, structural validation"

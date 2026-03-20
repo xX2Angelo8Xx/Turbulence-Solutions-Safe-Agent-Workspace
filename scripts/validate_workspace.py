@@ -213,6 +213,44 @@ def _check_tst_coverage(result: ValidationResult) -> None:
             )
 
 
+def _check_csv_structural(result: ValidationResult) -> None:
+    """Verify all 4 CSVs parse cleanly in strict mode with valid enum values."""
+    # Enum definitions for status fields
+    VALID_WP_STATUS = {"Open", "In Progress", "Review", "Done"}
+    VALID_BUG_STATUS = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
+    VALID_TST_STATUS = {"Pass", "Fail", "Blocked", "Skipped"}
+    VALID_US_STATUS = {"Open", "In Progress", "Done", "Closed"}
+
+    csv_configs = [
+        (WP_CSV, "Status", VALID_WP_STATUS, "WP"),
+        (BUG_CSV, "Status", VALID_BUG_STATUS, "Bug"),
+        (TST_CSV, "Status", VALID_TST_STATUS, "Test"),
+        (US_CSV, "Status", VALID_US_STATUS, "US"),
+    ]
+
+    for csv_path, status_col, valid_values, label in csv_configs:
+        if not csv_path.exists():
+            result.error(f"{label} CSV not found: {csv_path.name}")
+            continue
+
+        # Strict parse check
+        try:
+            _, rows = read_csv(csv_path, strict=True)
+        except ValueError as e:
+            result.error(f"{label} CSV structural error: {e}")
+            continue
+
+        # Enum validation (warnings — pre-existing data may have non-standard values)
+        for row in rows:
+            row_id = row.get("ID", "<no ID>")
+            status = row.get(status_col, "").strip()
+            if status and status not in valid_values:
+                result.warning(
+                    f"{row_id}: invalid {label} Status '{status}' — "
+                    f"expected one of {sorted(valid_values)}"
+                )
+
+
 def validate_full(result: ValidationResult) -> None:
     """Run all validation checks."""
     # Duplicate ID checks
@@ -238,6 +276,9 @@ def validate_full(result: ValidationResult) -> None:
 
     # Branch naming
     _check_branch_naming(result)
+
+    # CSV structural integrity
+    _check_csv_structural(result)
 
 
 def validate_wp(wp_id: str, result: ValidationResult) -> None:
