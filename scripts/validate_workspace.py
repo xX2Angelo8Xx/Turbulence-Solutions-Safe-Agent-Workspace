@@ -188,7 +188,7 @@ def _check_tst_coverage(result: ValidationResult) -> None:
     # Build set of WP IDs that have at least one passing TST entry
     wp_with_pass = set()
     for tst in tst_rows:
-        if tst.get("Status", "").strip() == "Pass":
+        if tst.get("Status", "").strip().lower() == "pass":
             wp_ref = tst.get("WP Reference", "").strip()
             if wp_ref:
                 wp_with_pass.add(wp_ref)
