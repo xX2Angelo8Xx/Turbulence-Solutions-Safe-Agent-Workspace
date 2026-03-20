@@ -1819,3 +1819,4 @@
 "TST-1938","test_fix047_version_suite","Regression","FIX-052","Pass","2026-03-20","Windows 11 + Python 3.11.9","11 passed / 0 failed","FIX-047 full suite verified: all 11 tests use dynamic CURRENT_VERSION, no hardcoded version strings"
 "TST-1939","test_fix052_regression_guard","Regression","FIX-052","Pass","2026-03-20","Windows 11 + Python 3.11.9","3 passed / 0 failed","Developer regression guard: no hardcoded 3.0.0, imports version_utils, FIX-047 suite passes"
 "TST-1940","test_fix052_edge_cases","Unit","FIX-052","Pass","2026-03-20","Windows 11 + Python 3.11.9","4 passed / 0 failed","Tester edge cases: no any X.Y.Z literal in FIX-047 test, version_utils not hardcoded, CURRENT_VERSION is valid SemVer, matches config.py"
+"TST-1941","INS-011 os._exit mock fix - full suite","Regression","FIX-053","Pass","2026-03-20","Windows 11 + Python 3.11.9","All 66 INS-011 tests pass. pytest no longer killed by os._exit at ~49%.",""
