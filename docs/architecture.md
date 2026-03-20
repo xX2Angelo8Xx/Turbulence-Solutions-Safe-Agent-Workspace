@@ -20,203 +20,679 @@ Templates (bundled inside Launcher)
 
 ```
 ├── .github/
-│   ├── agents/                       # Custom agent definitions
-│   │   ├── orchestrator.agent.md     # Multi-WP delegation agent
-│   │   ├── developer.agent.md        # Single-WP implementation agent
-│   │   ├── tester.agent.md           # Review and testing agent
-│   │   ├── maintenance.agent.md      # Project health audit agent
-│   │   └── story-writer.agent.md     # User story creation agent
+│   ├── agents/
+│   │   ├── CLOUD-developer.agent.md
+│   │   ├── CLOUD-maintenance.agent.md
+│   │   ├── CLOUD-orchestrator.agent.md
+│   │   ├── CLOUD-story-writer.agent.md
+│   │   ├── CLOUD-tester.agent.md
+│   │   ├── developer.agent.md
+│   │   ├── maintenance.agent.md
+│   │   ├── orchestrator.agent.md
+│   │   ├── story-writer.agent.md
+│   │   └── tester.agent.md
 │   ├── instructions/
-│   │   └── copilot-instructions.md   # Landing page — auto-loaded for all agents
+│   │   └── copilot-instructions.md
+│   ├── prompts/
+│   │   └── plan-fixLegacyValidationErrors.prompt.md
 │   └── workflows/
-│       └── release.yml               # CI/CD: build + release on version tag push
-├── src/                              # Launcher source
-│   ├── launcher/
-│   │   ├── main.py                   # Entry point
-│   │   ├── gui/                      # UI components
-│   │   ├── core/                     # Business logic
-│   │   │   ├── github_auth.py        # GitHub token provider (env vars / gh CLI)
-│   │   │   ├── updater.py            # Version check via GitHub Releases API
-│   │   │   ├── downloader.py         # Asset download from GitHub Releases
-│   │   │   ├── applier.py            # Update apply and restart logic
-│   │   │   ├── os_utils.py           # OS detection helpers
-│   │   │   ├── project_creator.py    # Project scaffolding logic
-│   │   │   ├── shim_config.py        # ts-python shim path configuration
-│   │   │   └── vscode.py             # VS Code launch helpers
-│   │   └── config.py                 # Constants
-│   └── installer/                    # Per-platform installer scripts
-│       ├── linux/                    # Linux AppImage build script
-│       ├── macos/                    # macOS DMG build script
-│       ├── windows/                  # Windows Inno Setup script
-│       ├── python-embed/             # Bundled Python embeddable distribution
-│       └── shims/                    # ts-python shim scripts (Windows .cmd / Unix sh)
-├── scripts/                          # Agent helper scripts (CSV ops, validation, finalization)
-│   ├── csv_utils.py                  # Shared CSV module with file locking
-│   ├── add_test_result.py            # Append a test result to test-results.csv
-│   ├── add_bug.py                    # Append a bug to bugs.csv
-│   ├── add_workpackage.py            # Create a WP and auto-update parent US
-│   ├── validate_workspace.py         # Pre-handoff / pre-merge workspace checks
-│   ├── finalize_wp.py                # Post-Done: merge, branch cleanup, cascades
-│   ├── update_architecture.py        # Regenerate the Repository Structure tree
-│   └── README.md                     # Script reference guide
-├── templates/                        # Bundled project templates
-├── tests/                            # Permanent test scripts (per workpackage)
-│   ├── conftest.py                   # pytest configuration — src/ path setup
-│   ├── __init__.py
-│   ├── DOC-001/                      # Tests for DOC-001 (Placeholder System)
-│   ├── DOC-002/                      # Tests for DOC-002 (README Placeholders)
-│   ├── DOC-003/                      # Tests for DOC-003 (copilot-instructions Placeholders)
-│   ├── DOC-004/                      # Tests for DOC-004 (Project Folder README Placeholders)
-│   ├── DOC-005/                      # Tests for DOC-005 (Known SAE Limitations in copilot-instructions)
-│   ├── FIX-006/                      # Tests for FIX-006 (Test Safety Infrastructure)
-│   ├── FIX-007/                      # Tests for FIX-007 (Standardize GUI Test Mock Pattern)
-│   ├── FIX-008/                      # Tests for FIX-008 (Conftest Multi-Layer VS Code Guard)
-│   ├── FIX-009/                      # Tests for FIX-009 (TST-ID Deduplication)
-│   ├── FIX-010/                      # Tests for FIX-010 (Fix CI/CD Release Pipeline)
-│   ├── FIX-011/                      # Tests for FIX-011 (Fix CI Spec File and Drop Intel Mac)
-│   ├── FIX-012/                      # Tests for FIX-012 (Fix macOS/Windows CI directives)
-│   ├── FIX-013/                      # Tests for FIX-013 (Fix PyInstaller Template Path)
-│   ├── FIX-014/                      # Tests for FIX-014 (Bump Version to 1.0.1)
-│   ├── FIX-015/                      # Tests for FIX-015 (Fix TS Logo Aspect Ratio)
-│   ├── FIX-016/                      # Tests for FIX-016 (Fix App Icon for Windows)
-│   ├── FIX-017/                      # Tests for FIX-017 (Bump Version to 1.0.2)
-│   ├── FIX-018/                      # Tests for FIX-018 (GitHub Auth for Private Repo)
-│   ├── FIX-019/                      # Tests for FIX-019 (Bump Version to 1.0.3)
-│   ├── FIX-020/                      # Tests for FIX-020 (Bump Version to 2.0.0)
-│   ├── FIX-021/                      # Tests for FIX-021 (Search Tools Blocking Fix)
-│   ├── FIX-022/                      # Tests for FIX-022 (Python/pip/venv Terminal Fixes)
-│   ├── FIX-023/                      # Tests for FIX-023 (.venv Directory in Project Folder)
-│   ├── FIX-026/                      # Tests for FIX-026 (get_errors Project Folder Fallback)
-│   ├── FIX-028/                      # Tests for FIX-028 (macOS Ad-Hoc Code Signing)
-│   ├── FIX-029/                      # Tests for FIX-029 (CI Code Signing Verification)
-│   ├── FIX-030/                      # Tests for FIX-030 (Bump Version to 2.0.1)
-│   ├── FIX-031/                      # Tests for FIX-031
-│   ├── FIX-032/                      # Tests for FIX-032
-│   ├── FIX-033/                      # Tests for FIX-033
-│   ├── FIX-034/                      # Tests for FIX-034
-│   ├── FIX-035/                      # Tests for FIX-035
-│   ├── FIX-036/                      # Tests for FIX-036 (Bump Version to 2.1.0)
-│   ├── FIX-037/                      # Tests for FIX-037 (Remove .dist-info from macOS bundle)
-│   ├── FIX-038/                      # Tests for FIX-038 (Component-level macOS codesign)
-│   ├── FIX-039/                      # Tests for FIX-039 (Skip launcher re-sign inside .app)
-│   ├── FIX-040/                      # Tests for FIX-040 (Fix Windows update restart)
-│   ├── FIX-041/                      # Tests for FIX-041 (Fix stale version .dist-info)
-│   ├── FIX-042/                      # Tests for FIX-042 (NoAgentZone visible in explorer)
-│   ├── FIX-044/                      # Tests for FIX-044 (Fix PermissionError on read-only template)
-│   ├── FIX-045/                      # Tests for FIX-045 (Bump Version to 2.1.3)
-│   ├── FIX-046/                      # Tests for FIX-046 (Remove Default-Project)
-│   ├── FIX-047/                      # Tests for FIX-047 (Bump Version to 3.0.0)
-│   ├── FIX-048/                      # Tests for FIX-048 (Fix ts-python shim timeout, v3.0.1)
-│   ├── FIX-049/                      # Tests for FIX-049 (Fix version test regression pattern)
-│   ├── FIX-050/                      # Tests for FIX-050 (Fix ts-python.cmd parsing, v3.0.2)
-│   ├── FIX-055/                      # Tests for FIX-055 (Fix ArchitecturesAllowed regression)
-│   ├── FIX-056/                      # Tests for FIX-056
-│   ├── FIX-057/                      # Tests for FIX-057
-│   ├── FIX-058/                      # Tests for FIX-058 (Bump Version to 3.0.3)
-│   ├── GUI-001/                      # Tests for GUI-001 (Main Window Layout)
-│   ├── GUI-002/                      # Tests for GUI-002 (Project Type Selection)
-│   ├── GUI-003/                      # Tests for GUI-003 (Folder Name Input)
-│   ├── GUI-004/                      # Tests for GUI-004 (Location Browser)
-│   ├── GUI-005/                      # Tests for GUI-005 (Project Creation Logic)
-│   ├── GUI-006/                      # Tests for GUI-006 (VS Code Auto-Open)
-│   ├── GUI-007/                      # Tests for GUI-007 (Input Validation & Error UX)
-│   ├── GUI-008/                      # Tests for GUI-008 (Version Display)
-│   ├── GUI-009/                      # Tests for GUI-009 (Update Notification Banner)
-│   ├── GUI-010/                      # Tests for GUI-010 (Check for Updates Button)
-│   ├── GUI-011/                      # Tests for GUI-011 (Apply Company Color Theme)
-│   ├── GUI-012/                      # Tests for GUI-012 (UI Spacing and Visual Hierarchy)
-│   ├── GUI-013/                      # Tests for GUI-013 (Add TS-Logo to App GUI and Icon)
-│   ├── GUI-014/                      # Tests for GUI-014 (Grey Out Unfinished Templates)
-│   ├── GUI-015/                      # Tests for GUI-015 (Rename Root Folder to TS-SAE)
-│   ├── GUI-016/                      # Tests for GUI-016 (Rename Internal Project Folder)
-│   ├── GUI-017/                      # Tests for GUI-017 (UI Labels for New Naming)
-│   ├── GUI-018/                      # Tests for GUI-018
-│   ├── INS-001/                      # Tests for INS-001 (Project Scaffolding)
-│   ├── INS-002/                      # Tests for INS-002 (Python Packaging)
-│   ├── INS-003/                      # Tests for INS-003 (PyInstaller Config)
-│   ├── INS-004/                      # Tests for INS-004 (Template Bundling)
-│   ├── INS-005/                      # Tests for INS-005 (Windows Installer)
-│   ├── INS-006/                      # Tests for INS-006 (macOS Installer)
-│   ├── INS-007/                      # Tests for INS-007 (Linux Installer)
-│   ├── INS-009/                      # Tests for INS-009 (GitHub Releases Version Check)
-│   ├── INS-010/                      # Tests for INS-010 (Update Download)
-│   ├── INS-011/                      # Tests for INS-011 (Update Apply and Restart)
-│   ├── INS-012/                      # Tests for INS-012 (.gitignore Configuration)
-│   ├── INS-013/                      # Tests for INS-013 (CI Workflow Skeleton)
-│   ├── INS-014/                      # Tests for INS-014 (CI Windows Build Job)
-│   ├── INS-015/                      # Tests for INS-015 (CI macOS Build Jobs)
-│   ├── INS-016/                      # Tests for INS-016 (CI Linux Build Job)
-│   ├── INS-017/                      # Tests for INS-017 (CI Release Upload Job)
-│   ├── INS-018/                      # Tests for INS-018 (Bundle Python Embeddable Distribution)
-│   ├── INS-019/                      # Tests for INS-019 (Create ts-python shim and config system)
-│   ├── INS-020/                      # Tests for INS-020 (Update require-approval.json template for ts-python)
-│   ├── INS-021/                      # Tests for INS-021
-│   ├── SAF-001/                      # Tests for SAF-001 (Security Gate Core)
-│   ├── SAF-002/                      # Tests for SAF-002 (Zone Enforcement Logic)
-│   ├── SAF-003/                      # Tests for SAF-003 (Tool Parameter Validation)
-│   ├── SAF-004/                      # Tests for SAF-004 (Terminal Sanitization — Design)
-│   ├── SAF-005/                      # Tests for SAF-005 (Terminal Command Sanitization)
-│   ├── SAF-006/                      # Tests for SAF-006 (Recursive Enumeration Protection)
-│   ├── SAF-007/                      # Tests for SAF-007 (Write Restriction Outside Project)
-│   ├── SAF-008/                      # Tests for SAF-008 (Hook File Integrity)
-│   ├── SAF-009/                      # Tests for SAF-009 (Cross-Platform Test Suite)
-│   ├── SAF-010/                      # Tests for SAF-010 (Hook Integration Config)
-│   ├── SAF-011/                      # Tests for SAF-011 (Hash Update Script)
-│   ├── SAF-012/                      # Tests for SAF-012 (Deny-by-Default Zone Classifier)
-│   ├── SAF-013/                      # Tests for SAF-013 (Security Gate 2-Tier Model)
-│   ├── SAF-014/                      # Tests for SAF-014 (Terminal Allowlist — Read Commands)
-│   ├── SAF-015/                      # Tests for SAF-015 (Terminal Allowlist — Write Commands)
-│   ├── SAF-016/                      # Tests for SAF-016 (Terminal Allowlist — Delete Commands)
-│   ├── SAF-017/                      # Tests for SAF-017 (Python and pip Commands)
-│   ├── SAF-018/                      # Tests for SAF-018 (multi_replace_string_in_file)
-│   ├── SAF-019/                      # Tests for SAF-019 (VS Code Auto-Approve Settings)
-│   ├── SAF-020/                      # Tests for SAF-020 (Terminal Wildcard Detection)
-│   ├── SAF-021/                      # Tests for SAF-021 (Wildcard Bypass Regression Tests)
-│   ├── SAF-022/                      # Tests for SAF-022 (NoAgentZone VS Code Exclude)
-│   ├── SAF-023/                      # Tests for SAF-023 (get_errors Restricted Zone Block)
-│   ├── SAF-024/                      # Tests for SAF-024 (Generic Deny Messages)
-│   ├── SAF-025/                      # Tests for SAF-025 (Integrity Hashes Update)
-│   ├── SAF-026/                      # Tests for SAF-026 (Python Inline Code Scanning)
-│   ├── SAF-027/                      # Tests for SAF-027 (see SAF-026 — tests share fixtures)
-│   ├── SAF-028/                      # Tests for SAF-028 (Run Code Block Scanning)
-│   ├── SAF-029/                      # Tests for SAF-029 (Fix dot-prefix path matching)
-│   ├── SAF-030/                      # Tests for SAF-030 (Recognise bare tilde as path-like)
-│   ├── SAF-031/                      # Tests for SAF-031 (Fix python -m pip and startswith bypass)
-│   ├── SAF-032/                      # Tests for SAF-032
-│   ├── SAF-033/                      # Tests for SAF-033
-│   ├── SAF-034/                      # Tests for SAF-034
-│   └── DOC-006/                      # Tests for DOC-006 (Document V3.0.0 security decisions)
+│       └── release.yml
 ├── docs/
-│   ├── architecture.md               # Project overview and structure (this file)
-│   ├── project-scope.md              # Project scope and vision
-│   ├── work-rules/                   # All project rules and workflows
-│   │   ├── index.md                  # Central hub — "if you need to…" lookup
-│   │   ├── workpackage-rules.md      # WP lifecycle, CSV format, status rules
-│   │   ├── user-story-rules.md       # US lifecycle, acceptance criteria
-│   │   ├── commit-branch-rules.md    # Branch naming, commit format
-│   │   ├── coding-standards.md       # Scope discipline, code quality
-│   │   ├── security-rules.md         # Security non-negotiables
-│   │   ├── bug-tracking-rules.md     # Bug logging, severity, CSV format
-│   │   ├── testing-protocol.md       # Test standards, categories, workflow
-│   │   ├── maintenance-protocol.md   # Maintenance checklist, log format
-│   │   └── agent-workflow.md         # Agent onboarding, WP execution protocol
-│   ├── workpackages/
-│   │   ├── workpackages.csv          # Task tracking (single source of truth)
-│   │   └── <WP-ID>/                  # Per-WP folders (created during development)
-│   │       ├── dev-log.md            #   Developer's implementation log
-│   │       └── test-report.md        #   Tester's findings and results
-│   ├── user-stories/
-│   │   └── user-stories.csv          # User stories (parent of workpackages)
 │   ├── bugs/
-│   │   └── bugs.csv                  # Bug tracking
+│   │   ├── User-Bug-Reports/
+│   │   │   ├── 2026-03-20-workspace-review.md
+│   │   │   └── BUG_REPORT-MacOS-2.0.0.md
+│   │   └── bugs.csv
+│   ├── maintenance/
+│   │   ├── .gitkeep
+│   │   ├── 2026-03-11-maintenance.md
+│   │   ├── 2026-03-13-maintenance.md
+│   │   ├── 2026-03-14-maintenance.md
+│   │   ├── 2026-03-19-maintenance.md
+│   │   └── 2026-03-20-maintenance.md
+│   ├── Security Audits/
+│   │   ├── SECURITY_ADVANCED_ATTACK_ANALYSIS-V3.0.0-18-03.26.md
+│   │   ├── SECURITY_AUDIT_REPORT-16-03.26-Handwritten.md
+│   │   ├── SECURITY_AUDIT_REPORT-16-03.26.md
+│   │   ├── SECURITY_AUDIT_REPORT-V2.0.0-17.03.26.md
+│   │   ├── SECURITY_AUDIT_VERIFICATION_REPORT-V2.1.2-18-03.26.md
+│   │   └── SECURITY_VERIFICATION_REPORT-17-03.26.md
 │   ├── test-results/
-│   │   └── test-results.csv          # Test execution records
-│   └── maintenance/                  # Maintenance audit logs (timestamped)
-├── TS-Logo.png                       # Company logo (used in GUI header and non-Windows icon)
-├── TS-Logo.ico                       # Company logo in ICO format (Windows app icon)
-├── .gitignore                        # Excludes .venv/, __pycache__/, build artifacts, etc.
-├── .venv/                            # Workspace-local virtual environment (gitignored)
-└── pyproject.toml                    # Python packaging configuration
+│   │   └── test-results.csv
+│   ├── user-stories/
+│   │   └── user-stories.csv
+│   ├── work-rules/
+│   │   ├── agent-workflow.md
+│   │   ├── bug-tracking-rules.md
+│   │   ├── coding-standards.md
+│   │   ├── commit-branch-rules.md
+│   │   ├── index.md
+│   │   ├── maintenance-protocol.md
+│   │   ├── recovery.md
+│   │   ├── security-rules.md
+│   │   ├── testing-protocol.md
+│   │   ├── user-story-rules.md
+│   │   └── workpackage-rules.md
+│   ├── workpackages/
+│   │   ├── DOC-001/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-002/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-003/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-004/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-005/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-006/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-001/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-002/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-003/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-004/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-005/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-006/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-007/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-008/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-009/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-010/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-011/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-012/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-013/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-014/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-015/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-016/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-017/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-018/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-019/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-020/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-021/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-022/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-023/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-024/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-025/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-026/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-027/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-028/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-029/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-030/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-031/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-032/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-033/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-034/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-035/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-036/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-037/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-038/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-039/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-040/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-041/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-042/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-043/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-044/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-045/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-046/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-047/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-048/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-049/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-050/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-055/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-056/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-057/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-058/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-059/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-060/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-001/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-002/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-003/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-004/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-005/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-006/
+│   │   │   ├── dev-log.md
+│   │   │   ├── gui006_result.txt
+│   │   │   ├── gui006_run.txt
+│   │   │   ├── gui006_run2.txt
+│   │   │   └── test-report.md
+│   │   ├── GUI-007/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-008/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-009/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-010/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-011/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-012/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-013/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-014/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-015/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-016/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-017/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── GUI-018/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-001/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-002/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-003/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-004/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-005/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-006/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-007/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-008/
+│   │   │   └── dev-log.md
+│   │   ├── INS-009/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-010/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-011/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-012/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-013/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-014/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-015/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-016/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-017/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-018/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-019/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-020/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-021/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-001/
+│   │   │   └── dev-log.md
+│   │   ├── SAF-001/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-002/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-003/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-004/
+│   │   │   ├── dev-log.md
+│   │   │   ├── terminal-sanitization-design.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-005/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-006/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-007/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-008/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-009/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-010/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-011/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-012/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-013/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-014/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-015/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-016/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-017/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-018/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-019/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-020/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-021/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-022/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-023/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-024/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-025/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-026/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-027/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-028/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-029/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-030/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-031/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-032/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-033/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-034/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   └── workpackages.csv
+│   ├── architecture.md
+│   └── project-scope.md
+├── scripts/
+│   ├── hooks/
+│   │   └── pre-commit
+│   ├── __init__.py
+│   ├── add_bug.py
+│   ├── add_test_result.py
+│   ├── add_workpackage.py
+│   ├── archive_test_results.py
+│   ├── csv_utils.py
+│   ├── dedup_test_ids.py
+│   ├── finalize_wp.py
+│   ├── install_hooks.py
+│   ├── README.md
+│   ├── run_tests.py
+│   ├── update_architecture.py
+│   └── validate_workspace.py
+├── src/
+│   ├── installer/
+│   │   ├── linux/
+│   │   │   ├── build_appimage.sh
+│   │   │   └── README.md
+│   │   ├── macos/
+│   │   │   ├── build_dmg.sh
+│   │   │   └── README.md
+│   │   ├── python-embed/
+│   │   │   └── README.md
+│   │   ├── shims/
+│   │   │   ├── README.md
+│   │   │   ├── ts-python
+│   │   │   └── ts-python.cmd
+│   │   └── windows/
+│   │       ├── README.md
+│   │       └── setup.iss
+│   └── launcher/
+│       ├── core/
+│       │   ├── __init__.py
+│       │   ├── applier.py
+│       │   ├── downloader.py
+│       │   ├── github_auth.py
+│       │   ├── os_utils.py
+│       │   ├── project_creator.py
+│       │   ├── shim_config.py
+│       │   ├── updater.py
+│       │   └── vscode.py
+│       ├── gui/
+│       │   ├── __init__.py
+│       │   ├── app.py
+│       │   ├── components.py
+│       │   └── validation.py
+│       ├── __init__.py
+│       ├── config.py
+│       └── main.py
+├── templates/
+│   ├── coding/
+│   │   ├── .github/
+│   │   ├── .vscode/
+│   │   ├── NoAgentZone/
+│   │   ├── Project/
+│   │   ├── .gitignore
+│   │   └── README.md
+│   └── creative-marketing/
+│       └── README.md
+├── tests/
+│   ├── DOC-001/
+│   ├── DOC-002/
+│   ├── DOC-003/
+│   ├── DOC-004/
+│   ├── DOC-005/
+│   ├── DOC-006/
+│   ├── FIX-001/
+│   ├── FIX-002/
+│   ├── FIX-003/
+│   ├── FIX-004/
+│   ├── FIX-005/
+│   ├── FIX-006/
+│   ├── FIX-007/
+│   ├── FIX-008/
+│   ├── FIX-009/
+│   ├── FIX-010/
+│   ├── FIX-011/
+│   ├── FIX-012/
+│   ├── FIX-013/
+│   ├── FIX-014/
+│   ├── FIX-015/
+│   ├── FIX-016/
+│   ├── FIX-017/
+│   ├── FIX-018/
+│   ├── FIX-019/
+│   ├── FIX-020/
+│   ├── FIX-021/
+│   ├── FIX-022/
+│   ├── FIX-023/
+│   ├── FIX-024/
+│   ├── FIX-025/
+│   ├── FIX-026/
+│   ├── FIX-027/
+│   ├── FIX-028/
+│   ├── FIX-029/
+│   ├── FIX-030/
+│   ├── FIX-031/
+│   ├── FIX-032/
+│   ├── FIX-033/
+│   ├── FIX-034/
+│   ├── FIX-035/
+│   ├── FIX-036/
+│   ├── FIX-037/
+│   ├── FIX-038/
+│   ├── FIX-039/
+│   ├── FIX-040/
+│   ├── FIX-041/
+│   ├── FIX-042/
+│   ├── FIX-043/
+│   ├── FIX-044/
+│   ├── FIX-045/
+│   ├── FIX-046/
+│   ├── FIX-047/
+│   ├── FIX-048/
+│   ├── FIX-049/
+│   ├── FIX-050/
+│   ├── FIX-055/
+│   ├── FIX-056/
+│   ├── FIX-057/
+│   ├── FIX-058/
+│   ├── FIX-059/
+│   ├── FIX-060/
+│   ├── GUI-001/
+│   ├── GUI-002/
+│   ├── GUI-003/
+│   ├── GUI-004/
+│   ├── GUI-005/
+│   ├── GUI-006/
+│   ├── GUI-007/
+│   ├── GUI-008/
+│   ├── GUI-009/
+│   ├── GUI-010/
+│   ├── GUI-011/
+│   ├── GUI-012/
+│   ├── GUI-013/
+│   ├── GUI-014/
+│   ├── GUI-015/
+│   ├── GUI-016/
+│   ├── GUI-017/
+│   ├── GUI-018/
+│   ├── INS-001/
+│   ├── INS-002/
+│   ├── INS-003/
+│   ├── INS-004/
+│   ├── INS-005/
+│   ├── INS-006/
+│   ├── INS-007/
+│   ├── INS-009/
+│   ├── INS-010/
+│   ├── INS-011/
+│   ├── INS-012/
+│   ├── INS-013/
+│   ├── INS-014/
+│   ├── INS-015/
+│   ├── INS-016/
+│   ├── INS-017/
+│   ├── INS-018/
+│   ├── INS-019/
+│   ├── INS-020/
+│   ├── INS-021/
+│   ├── MNT-001/
+│   ├── SAF-001/
+│   ├── SAF-002/
+│   ├── SAF-003/
+│   ├── SAF-004/
+│   ├── SAF-005/
+│   ├── SAF-006/
+│   ├── SAF-007/
+│   ├── SAF-008/
+│   ├── SAF-009/
+│   ├── SAF-010/
+│   ├── SAF-011/
+│   ├── SAF-012/
+│   ├── SAF-013/
+│   ├── SAF-014/
+│   ├── SAF-015/
+│   ├── SAF-016/
+│   ├── SAF-017/
+│   ├── SAF-018/
+│   ├── SAF-019/
+│   ├── SAF-020/
+│   ├── SAF-021/
+│   ├── SAF-022/
+│   ├── SAF-023/
+│   ├── SAF-024/
+│   ├── SAF-025/
+│   ├── SAF-026/
+│   ├── SAF-027/
+│   ├── SAF-028/
+│   ├── SAF-029/
+│   ├── SAF-030/
+│   ├── SAF-031/
+│   ├── SAF-032/
+│   ├── SAF-033/
+│   ├── SAF-034/
+│   ├── shared/
+│   ├── __init__.py
+│   └── conftest.py
+├── launcher.spec
+├── pyproject.toml
+├── TS-Logo.ico
+└── TS-Logo.png
 ```
 
 ## Task Tracking
