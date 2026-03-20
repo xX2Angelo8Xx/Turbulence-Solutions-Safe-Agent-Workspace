@@ -1855,3 +1855,6 @@
 "TST-1974","FIX-065 tester edge cases: newline boundary + read/write edge cases + structural additional","Unit","FIX-065","Pass","2026-03-21","Windows 11 + Python 3.11.9","16 passed / 0 failed","Tester additions: \r\n boundary, mixed CRLF+LF, header-only, UTF-8 BOM, empty rows, unicode roundtrip, os.replace failure cleanup, missing CSV, overflow isolation, TST/US enum warnings"
 "TST-1975","FIX-066 Bug lifecycle automation tests","Unit","FIX-066","Pass","2026-03-20","Windows/Python 3.11.9","16/16 passed","9 cascade, 5 linkage, 2 enum tests. All pass."
 "TST-1976","FIX-066: targeted suite","Regression","FIX-066","Pass","2026-03-20","Windows 11 + Python 3.11","27 passed in 0.51s",""
+"TST-1977","FIX-068: targeted suite","Unit","FIX-068","Pass","2026-03-20","Windows 11 + Python 3.11","19 passed in 0.24s",""
+"TST-1978","FIX-068 WP test suite (developer + tester edge cases)","Regression","FIX-068","Pass","2026-03-21","Windows 11 + Python 3.11.9","26 passed in 0.25s","19 developer tests + 7 tester edge-case tests (TestTesterEdgeCases). All pass."
+"TST-1979","FIX-068 full regression suite","Regression","FIX-068","Pass","2026-03-21","Windows 11 + Python 3.11.9","83 failed, 4384 passed, 34 skipped","83 pre-existing failures (SAF-022, SAF-025 etc) — 0 new regressions introduced by FIX-068"
