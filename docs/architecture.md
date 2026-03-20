@@ -50,6 +50,8 @@ Templates (bundled inside Launcher)
 │   │   ├── 2026-03-14-maintenance.md
 │   │   ├── 2026-03-19-maintenance.md
 │   │   └── 2026-03-20-maintenance.md
+│   ├── plans/
+│   │   └── plan-fixLegacyValidationErrors.md
 │   ├── Security Audits/
 │   │   ├── SECURITY_ADVANCED_ATTACK_ANALYSIS-V3.0.0-18-03.26.md
 │   │   ├── SECURITY_AUDIT_REPORT-16-03.26-Handwritten.md
@@ -240,6 +242,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-050/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-051/
+│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-055/
@@ -607,6 +613,10 @@ Templates (bundled inside Launcher)
 │   ├── FIX-048/
 │   ├── FIX-049/
 │   ├── FIX-050/
+│   ├── FIX-051/
+│   ├── FIX-052/
+│   ├── FIX-053/
+│   ├── FIX-054/
 │   ├── FIX-055/
 │   ├── FIX-056/
 │   ├── FIX-057/
