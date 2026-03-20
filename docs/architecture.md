@@ -288,6 +288,10 @@ Templates (bundled inside Launcher)
 │   │   ├── FIX-063/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── FIX-065/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── FIX-067/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
