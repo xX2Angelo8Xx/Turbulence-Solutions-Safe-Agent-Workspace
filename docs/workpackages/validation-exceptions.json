@@ -1,0 +1,11 @@
+{
+  "_schema": "Map of WP-ID to exception configuration. Used by validate_workspace.py to suppress known-OK validation warnings.",
+  "INS-008": {
+    "skip_checks": ["test-report", "test-folder"],
+    "reason": "Decomposed WP — tested via sub-WPs INS-013 through INS-017"
+  },
+  "MNT-001": {
+    "skip_checks": ["test-report", "test-folder"],
+    "reason": "Maintenance WP — no code changes requiring independent test verification"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "_schema": {
+    "action_id": "ACT-NNN sequential ID",
+    "source_log": "filename of maintenance log that proposed this action",
+    "description": "what needs to be done",
+    "priority": "Warning or Info",
+    "status": "Open | Done | Rejected",
+    "resolved_by": "WP-ID or commit that resolved this, empty if Open"
+  },
+  "actions": [
+    {
+      "action_id": "ACT-001",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Repair 3 malformed rows in workpackages.csv (FIX-036/037, FIX-040, FIX-047)",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "Phase A maintenance commit 2026-03-20"
+    },
+    {
+      "action_id": "ACT-002",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Fix 2 corrupted Linked WPs fields in user-stories.csv (US-024, US-026)",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "Phase A maintenance commit 2026-03-20"
+    },
+    {
+      "action_id": "ACT-003",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Close BUG-088/089/090 and fix BUG-084 status",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "Phase A maintenance commit 2026-03-20"
+    },
+    {
+      "action_id": "ACT-004",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Stage and commit FIX-063/.finalization-state.json deletion",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "Phase A maintenance commit 2026-03-20"
+    },
+    {
+      "action_id": "ACT-005",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Add test-report N/A notes to INS-008 and MNT-001 dev-logs",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "Phase A maintenance commit 2026-03-20"
+    },
+    {
+      "action_id": "ACT-006",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Add TST-ID uniqueness enforcement rule to testing-protocol.md",
+      "priority": "Info",
+      "status": "Open",
+      "resolved_by": "FIX-067"
+    },
+    {
+      "action_id": "ACT-007",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Add bug-closure step to bug-tracking-rules.md",
+      "priority": "Info",
+      "status": "Open",
+      "resolved_by": "FIX-067"
+    },
+    {
+      "action_id": "ACT-008",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Create WP for BUG-086 (FIX-050 version test hardcodes)",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "FIX-064 created"
+    },
+    {
+      "action_id": "ACT-009",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Audit csv_utils.py write functions for RFC 4180 quoting enforcement",
+      "priority": "Info",
+      "status": "Open",
+      "resolved_by": "FIX-065"
+    },
+    {
+      "action_id": "ACT-010",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Enhance finalize_wp.py bug cascade to scan dev-log/test-report",
+      "priority": "Info",
+      "status": "Open",
+      "resolved_by": "FIX-066"
+    },
+    {
+      "action_id": "ACT-011",
+      "source_log": "2026-03-20b-maintenance.md",
+      "description": "Add finalization cleanup verification (branch deletion, state file cleanup)",
+      "priority": "Info",
+      "status": "Open",
+      "resolved_by": "FIX-068"
+    }
+  ]
+}
