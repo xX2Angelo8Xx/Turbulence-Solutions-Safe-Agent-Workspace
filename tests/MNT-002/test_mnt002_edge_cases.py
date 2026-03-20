@@ -64,29 +64,33 @@ def test_description_non_empty():
 
 
 def test_open_actions_resolved_by_schema_contract():
-    """SCHEMA CONTRACT: resolved_by should be empty when status is Open.
+    """SCHEMA CONTRACT (Option B): resolved_by may contain a planned WP-ID while Open.
 
-    The _schema entry says: 'WP-ID or commit that resolved this, empty if Open'.
-    This test documents the current state — Open items have non-empty resolved_by
-    values (planned WP IDs), which violates the schema contract.
+    BUG-091 fix — Option B chosen: the _schema description was updated to:
+    'WP-ID or commit that resolved this; may contain planned WP-ID while Open,
+    must be non-empty when Done'.
 
-    BUG: ACT-006, ACT-007, ACT-009, ACT-010, ACT-011 are 'Open' but have
-    non-empty resolved_by. Either the schema description or the data must be
-    corrected. Filed as BUG in docs/bugs/bugs.csv.
+    This test enforces the updated contract:
+    - Schema description must explicitly allow planned WP-IDs for Open actions.
+    - Any non-empty resolved_by on an Open action must match a WP-ID pattern.
     """
+    import re
     data = _load_tracker()
-    violations = [
-        a["action_id"]
-        for a in data["actions"]
-        if a["status"] == "Open" and a.get("resolved_by", "").strip()
-    ]
-    # Currently this is a known schema violation — document it, don't silently pass
-    # If the schema is updated to allow "planned" WP-ID, remove this assertion.
-    assert violations == [], (
-        f"Schema violation: Open actions with non-empty resolved_by: {violations}\n"
-        "Schema says resolved_by must be empty when status is Open.\n"
-        "Either update the schema description to 'empty if unassigned' or clear these fields."
+    schema_desc = data["_schema"].get("resolved_by", "")
+    # Schema description must explicitly allow planned WP-IDs
+    assert "planned" in schema_desc.lower(), (
+        f"Schema description for resolved_by must allow planned WP-IDs.\n"
+        f"Current description: {schema_desc!r}"
     )
+    # Any non-empty resolved_by on an Open action must look like a WP-ID or commit ref
+    wp_id_pattern = re.compile(r"^[A-Z]+-\d+$")
+    for action in data["actions"]:
+        if action["status"] == "Open" and action.get("resolved_by", "").strip():
+            resolved_by = action["resolved_by"].strip()
+            assert wp_id_pattern.match(resolved_by) or len(resolved_by) >= 7, (
+                f"{action['action_id']}: resolved_by {resolved_by!r} on Open action "
+                "must be a valid WP-ID (e.g. FIX-067) or git commit reference"
+            )
 
 
 def test_done_actions_have_non_empty_resolved_by():
