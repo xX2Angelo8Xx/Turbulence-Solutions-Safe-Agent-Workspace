@@ -326,3 +326,61 @@ def test_conftest_autouse_mock_blocks_real_shim_execution():
     result = app_module.verify_ts_python()
     assert result == (True, "3.11.0 (mocked)"), \
         "conftest autouse fixture should have intercepted verify_ts_python"
+
+
+# ---------------------------------------------------------------------------
+# EC-12: python_path is configured but executable doesn't exist on disk
+# ---------------------------------------------------------------------------
+
+def test_verify_ts_python_python_path_exists_false():
+    """When read_python_path() returns a Path but exists() is False,
+    verify_ts_python returns (False, 'Python executable not found: ...')."""
+    sc = _import_shim_config()
+    mock_py = MagicMock()
+    mock_py.exists.return_value = False
+    mock_py.__str__ = MagicMock(return_value="/configured/but/missing/python3")
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"):
+        ok, msg = sc.verify_ts_python()
+    assert ok is False
+    assert "not found" in msg.lower()
+
+
+# ---------------------------------------------------------------------------
+# EC-13: Shim missing from shim dir AND not on PATH (Unix)
+# ---------------------------------------------------------------------------
+
+def test_verify_ts_python_unix_shim_missing_everywhere(tmp_path):
+    """On Unix, if the shim file is absent from shim dir AND shutil.which
+    returns None, verify_ts_python returns (False, 'ts-python shim not found ...')."""
+    sc = _import_shim_config()
+    # tmp_path has no ts-python file
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Linux"), \
+         patch.object(sc, "get_shim_dir", return_value=tmp_path), \
+         patch("shutil.which", return_value=None):
+        ok, msg = sc.verify_ts_python()
+    assert ok is False
+    assert "not found" in msg.lower()
+
+
+# ---------------------------------------------------------------------------
+# EC-14: Shim missing from shim dir AND not on PATH (Windows)
+# ---------------------------------------------------------------------------
+
+def test_verify_ts_python_windows_shim_missing_everywhere(tmp_path):
+    """On Windows, if ts-python.cmd is absent from shim dir AND shutil.which
+    returns None, verify_ts_python returns (False, 'ts-python shim not found ...')."""
+    sc = _import_shim_config()
+    # tmp_path has no ts-python.cmd
+    mock_py = MagicMock()
+    mock_py.exists.return_value = True
+    with patch("launcher.core.shim_config.read_python_path", return_value=mock_py), \
+         patch("platform.system", return_value="Windows"), \
+         patch.object(sc, "get_shim_dir", return_value=tmp_path), \
+         patch("shutil.which", return_value=None):
+        ok, msg = sc.verify_ts_python()
+    assert ok is False
+    assert "not found" in msg.lower()
