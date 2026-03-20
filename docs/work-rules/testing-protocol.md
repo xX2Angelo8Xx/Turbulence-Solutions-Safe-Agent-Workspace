@@ -159,6 +159,14 @@ All test runs are logged in `docs/test-results/test-results.csv`.
 | Result | Brief outcome description |
 | Notes | Additional context, failure details |
 
+## TST-ID Uniqueness
+
+Test result IDs (`TST-NNN`) must be globally unique. To prevent duplicates:
+
+- **Never manually add rows** to `docs/test-results/test-results.csv`. Manual edits risk ID collisions and corrupt the sequential numbering.
+- **Always use `scripts/add_test_result.py` or `scripts/run_tests.py`** for test result logging. These scripts use atomic ID assignment via `locked_next_id_and_append()` to prevent duplicate IDs even under concurrent execution.
+- If duplicate TST-IDs are suspected, run `scripts/dedup_test_ids.py --dry-run` to check for collisions without modifying the file. Remove the `--dry-run` flag to apply fixes.
+
 ## Test Report Format
 
 The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages/<WP-ID>/test-report.md`):

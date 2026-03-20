@@ -38,6 +38,7 @@ Before setting a WP to `Review`, the Developer MUST verify:
 4. WP branch follows `<WP-ID>/<short-desc>` naming convention.
 5. Run `scripts/validate_workspace.py --wp <WP-ID>` — must return exit code 0.
 6. All changes are staged and committed.
+7. All bugs referenced in `dev-log.md` have `Fixed In WP` populated with this WP-ID.
 
 ### Git Operations for Handoff (Step 7)
 

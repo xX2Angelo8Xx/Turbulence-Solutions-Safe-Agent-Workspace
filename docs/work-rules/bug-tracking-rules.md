@@ -61,3 +61,16 @@ Open → In Progress → Fixed → Verified → Closed
       --title "..." --severity High --reported-by "Tester Agent" `
       --description "..." --steps "..." --expected "..." --actual "..."
   ```
+
+## Bug Closure at Finalization
+
+When a workpackage is finalized (status set to `Done`), all bugs referenced in its `dev-log.md` or `test-report.md` must have:
+
+- **`Fixed In WP`** populated with the WP-ID
+- **`Status`** set to `Closed`
+
+The finalization script (`scripts/finalize_wp.py`) automatically scans for bug references (BUG-NNN patterns) in the WP's `dev-log.md` and `test-report.md` and cascades closures — setting `Fixed In WP` and updating `Status` to `Closed` for each referenced bug.
+
+Developers must verify bug linkage before handoff to the Tester:
+- Confirm every bug mentioned in `dev-log.md` has its `Fixed In WP` field populated with the current WP-ID.
+- If a bug was reported during testing and fixed in the same WP, ensure both `dev-log.md` and `test-report.md` reference the bug ID consistently.

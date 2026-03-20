@@ -13,6 +13,9 @@ Structured integrity audit for periodic project health checks. The Maintenance A
 
 The following checks are executed in order. Each item produces a **Pass**, **Warning**, or **Fail** result.
 
+### 0. Action Tracker Review
+- Read `docs/maintenance/action-tracker.json`. Review all `Open` actions from previous cycles. Verify if any have been resolved by completed WPs. Update status accordingly. Note unresolved actions in the maintenance log.
+
 ### 1. Git Hygiene
 - Are there workpackages marked `Done` that have **not** been committed or pushed?
 - Do all active branches follow the naming convention `<WP-ID>/<short-description>`?
