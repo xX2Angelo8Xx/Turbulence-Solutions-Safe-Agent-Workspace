@@ -97,8 +97,10 @@ def _save_state(wp_id: str, state: dict) -> None:
 def _clear_state(wp_id: str) -> None:
     """Remove the finalization state file on successful completion."""
     path = _state_path(wp_id)
-    if path.exists():
+    try:
         path.unlink()
+    except FileNotFoundError:
+        pass
 
 
 def _validate_wp(wp_id: str) -> None:
@@ -283,9 +285,52 @@ def finalize(wp_id: str, dry_run: bool) -> int:
     if branch_name and not state.get("branch_deleted"):
         print(f"\n--- Step 5: Delete feature branch ---")
         _run_git(["branch", "-d", branch_name], dry_run, check=False)
+        if not dry_run:
+            # Verify local branch deletion
+            check_local = subprocess.run(
+                ["git", "branch", "--list", branch_name],
+                capture_output=True, text=True, cwd=str(REPO_ROOT),
+            )
+            if check_local.stdout.strip():
+                print(f"  Local branch still exists, retrying deletion...")
+                _run_git(["branch", "-D", branch_name], dry_run, check=False)
+                check_local2 = subprocess.run(
+                    ["git", "branch", "--list", branch_name],
+                    capture_output=True, text=True, cwd=str(REPO_ROOT),
+                )
+                if check_local2.stdout.strip():
+                    print(f"  Warning: local branch {branch_name} could not be deleted")
+                else:
+                    print(f"  Local branch deleted on retry ✓")
+            else:
+                print(f"  Local branch deletion verified ✓")
+        else:
+            print(f"  [DRY RUN] Would verify local branch deletion")
+
         _run_git(["push", "origin", "--delete", branch_name], dry_run, check=False)
         if not dry_run:
-            print(f"  Deleted branch {branch_name} (local + remote) ✓")
+            # Verify remote branch deletion
+            check_remote = subprocess.run(
+                ["git", "branch", "-r", "--list", f"origin/{branch_name}"],
+                capture_output=True, text=True, cwd=str(REPO_ROOT),
+            )
+            if check_remote.stdout.strip():
+                print(f"  Remote branch still exists, retrying deletion...")
+                _run_git(["push", "origin", "--delete", branch_name], dry_run, check=False)
+                check_remote2 = subprocess.run(
+                    ["git", "branch", "-r", "--list", f"origin/{branch_name}"],
+                    capture_output=True, text=True, cwd=str(REPO_ROOT),
+                )
+                if check_remote2.stdout.strip():
+                    print(f"  Warning: remote branch origin/{branch_name} could not be deleted")
+                else:
+                    print(f"  Remote branch deleted on retry ✓")
+            else:
+                print(f"  Remote branch deletion verified ✓")
+        else:
+            print(f"  [DRY RUN] Would verify remote branch deletion")
+
+        if not dry_run:
             state["branch_deleted"] = True
             _save_state(wp_id, state)
     elif branch_name:
@@ -351,6 +396,9 @@ def finalize(wp_id: str, dry_run: bool) -> int:
     # Clean up state file on success
     if not dry_run:
         _clear_state(wp_id)
+        print(f"  Cleaned up .finalization-state.json")
+    else:
+        print(f"  [DRY RUN] Would clean up .finalization-state.json")
 
     print(f"\n{'='*60}")
     print(f"{mode}Finalization of {wp_id} complete.")

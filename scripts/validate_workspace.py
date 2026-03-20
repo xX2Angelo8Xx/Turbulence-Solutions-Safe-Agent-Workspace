@@ -213,6 +213,43 @@ def _check_tst_coverage(result: ValidationResult) -> None:
             )
 
 
+def _check_orphaned_state_files(result: ValidationResult) -> None:
+    """Check for orphaned .finalization-state.json files in WP folders."""
+    _, wp_rows = read_csv(WP_CSV)
+    wp_status = {r["ID"]: r["Status"] for r in wp_rows}
+
+    wp_base = REPO_ROOT / "docs" / "workpackages"
+    for state_file in wp_base.glob("*/.finalization-state.json"):
+        wp_id = state_file.parent.name
+        status = wp_status.get(wp_id, "")
+        if status == "Done":
+            result.warning(
+                f"{wp_id} is Done but has orphaned .finalization-state.json"
+            )
+
+
+def _check_stale_branches(result: ValidationResult) -> None:
+    """Check for remote branches already merged into main."""
+    try:
+        proc = subprocess.run(
+            ["git", "branch", "-r", "--merged", "main"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+    except FileNotFoundError:
+        return
+    if proc.returncode != 0:
+        return
+    for line in proc.stdout.strip().splitlines():
+        branch = line.strip()
+        if not branch:
+            continue
+        if "origin/main" in branch or "origin/HEAD" in branch:
+            continue
+        result.warning(
+            f"Stale merged branch: {branch} — should be deleted after finalization"
+        )
+
+
 def validate_full(result: ValidationResult) -> None:
     """Run all validation checks."""
     # Duplicate ID checks
@@ -238,6 +275,12 @@ def validate_full(result: ValidationResult) -> None:
 
     # Branch naming
     _check_branch_naming(result)
+
+    # Orphaned finalization state files
+    _check_orphaned_state_files(result)
+
+    # Stale merged branches
+    _check_stale_branches(result)
 
 
 def validate_wp(wp_id: str, result: ValidationResult) -> None:
