@@ -39,6 +39,7 @@ Templates (bundled inside Launcher)
 │   ├── bugs/
 │   │   ├── User-Bug-Reports/
 │   │   │   ├── 2026-03-20-workspace-review.md
+│   │   │   ├── AgentExperienceReport_v3.1.2.md
 │   │   │   └── BUG_REPORT-MacOS-2.0.0.md
 │   │   └── bugs.csv
 │   ├── maintenance/
@@ -52,7 +53,8 @@ Templates (bundled inside Launcher)
 │   │   └── action-tracker.json
 │   ├── plans/
 │   │   ├── plan-fixLegacyValidationErrors.md
-│   │   └── plan-project-status-next-steps.md
+│   │   ├── plan-project-status-next-steps.md
+│   │   └── vscode-session-id-methoden.md
 │   ├── Security Audits/
 │   │   ├── SECURITY_ADVANCED_ATTACK_ANALYSIS-V3.0.0-18-03.26.md
 │   │   ├── SECURITY_AUDIT_REPORT-16-03.26-Handwritten.md
@@ -93,6 +95,18 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-006/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-007/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-008/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-009/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-010/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-001/
@@ -530,6 +544,16 @@ Templates (bundled inside Launcher)
 │   │   ├── SAF-034/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── SAF-035/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-036/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-037/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
 │   │   └── workpackages.csv
 │   ├── architecture.md
@@ -607,6 +631,10 @@ Templates (bundled inside Launcher)
 │   ├── DOC-004/
 │   ├── DOC-005/
 │   ├── DOC-006/
+│   ├── DOC-007/
+│   ├── DOC-008/
+│   ├── DOC-009/
+│   ├── DOC-010/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
@@ -750,6 +778,9 @@ Templates (bundled inside Launcher)
 │   ├── SAF-032/
 │   ├── SAF-033/
 │   ├── SAF-034/
+│   ├── SAF-035/
+│   ├── SAF-036/
+│   ├── SAF-037/
 │   ├── shared/
 │   ├── __init__.py
 │   └── conftest.py
