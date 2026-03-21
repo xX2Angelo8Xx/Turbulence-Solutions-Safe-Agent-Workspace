@@ -62,3 +62,31 @@ None. This is a documentation-only change to a template file.
 ## AC Verification
 
 - AC 8 of US-033: "copilot-instructions.md contains a first-action directive pointing agents to AGENT-RULES.md" — **SATISFIED**
+
+---
+
+## Iteration 1 — Tester Regression Fixes
+
+**Date:** 2026-03-21  
+**Tester Report:** `docs/workpackages/DOC-008/test-report.md`
+
+### Problem
+The DOC-008 directive added a second `{{PROJECT_NAME}}` occurrence at the top of the template file. This caused 3 DOC-003 edge-case tests (in `tests/DOC-003/test_doc003_edge_cases.py`) to fail:
+1. `test_placeholder_count_exactly_one_in_default_project` — asserted `count == 1`, now 2
+2. `test_placeholder_count_exactly_one_in_templates_coding` — same
+3. `test_placeholder_is_in_workspace_rules_section` — checked index of first occurrence; first occurrence is now at line 2 (before Workspace Rules)
+
+### Fix Applied
+Updated `tests/DOC-003/test_doc003_edge_cases.py`:
+1. Changed count assertions from `== 1` to `>= 1` (multiple occurrences are legitimate)
+2. Rewrote `test_placeholder_is_in_workspace_rules_section` to extract the Workspace Rules section body (from `## Workspace Rules` to the next `##` heading) and assert `{{PROJECT_NAME}}` appears within that body, rather than relying on the index of the first file-wide occurrence.
+
+### Files Changed
+| File | Change |
+|------|--------|
+| `tests/DOC-003/test_doc003_edge_cases.py` | Relaxed 2 count assertions; rewrote 1 section test |
+
+### Test Results
+- 29 tests passed, 0 failed (DOC-003 + DOC-008)
+- Test run logged as TST-2007
+- BUG-093 resolved by this fix
