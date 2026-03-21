@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import datetime
 import hashlib
 import json
 import os
@@ -8,6 +9,8 @@ import posixpath
 import re
 import shlex
 import sys
+import tempfile
+import uuid
 from pathlib import Path
 from typing import Optional
 
@@ -68,14 +71,14 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # Known-good SHA256 of templates/coding/.vscode/settings.json.
 # Updated by running .github/hooks/scripts/update_hashes.py after any
 # intentional admin change to settings.json.
-_KNOWN_GOOD_SETTINGS_HASH: str = "623c80d355b2a69390d8c95e896b1ecbd33a3dc73d8f2a73b30eac5dfec47b6b"
+_KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c022439a6d3597bc2248447"
 
 # Known-good SHA256 of security_gate.py in canonical form.
 # Canonical form: the file content with the value portion of this constant
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "259cac8e11a276e0814e7110cb844426469b7418bc402c975c68d2a163104ef1"
+_KNOWN_GOOD_GATE_HASH: str = "05e1be2ef73d387d2f27aabab528db3be1dd110c6983b120ab2a0521a79c6254"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -85,6 +88,19 @@ _INTEGRITY_WARNING: str = (
 )
 
 _DENY_REASON = "Access denied. This action has been blocked by the workspace security policy."
+
+
+# ---------------------------------------------------------------------------
+# SAF-035: Session denial counter constants
+# ---------------------------------------------------------------------------
+
+# Default maximum denials before a session is locked.  SAF-036 will make this
+# configurable via a workspace config file; until then it is hard-coded here.
+_DENY_THRESHOLD: int = 20
+
+# File names (relative to the scripts directory)
+_STATE_FILE_NAME: str = ".hook_state.json"
+_OTEL_JSONL_NAME: str = "copilot-otel.jsonl"
 
 
 # ---------------------------------------------------------------------------
@@ -763,6 +779,168 @@ _GIT_DENIED_COMBOS: list[tuple[str, str]] = [
     ("gc", "--force"),
 ]
 
+
+
+# ---------------------------------------------------------------------------
+# SAF-035: Session denial counter helpers
+# ---------------------------------------------------------------------------
+
+def _utc_now_iso() -> str:
+    """Return current UTC time in ISO 8601 format."""
+    return datetime.datetime.utcnow().isoformat() + "Z"
+
+
+def _read_otel_session_id(scripts_dir: str) -> "Optional[str]":
+    """Extract session ID from the OTel JSONL export file (last non-empty line).
+
+    Looks for ``session.id`` in resource attributes first; falls back to
+    ``gen_ai.conversation.id`` in the first span's attributes.
+    Returns None when the file does not exist, is empty, or cannot be parsed.
+    """
+    otel_path = os.path.join(scripts_dir, _OTEL_JSONL_NAME)
+    try:
+        if not os.path.isfile(otel_path):
+            return None
+
+        # Read the last non-empty line (tail approach — most recent span)
+        last_line: "Optional[str]" = None
+        with open(otel_path, "r", encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                stripped = line.strip()
+                if stripped:
+                    last_line = stripped
+
+        if not last_line:
+            return None
+
+        span = json.loads(last_line)
+        if not isinstance(span, dict):
+            return None
+
+        resource_spans = span.get("resourceSpans")
+        if not isinstance(resource_spans, list) or not resource_spans:
+            return None
+
+        first_rs = resource_spans[0]
+        if not isinstance(first_rs, dict):
+            return None
+
+        # Attempt 1: session.id from resource attributes
+        resource = first_rs.get("resource", {})
+        if isinstance(resource, dict):
+            for attr in resource.get("attributes", []):
+                if (
+                    isinstance(attr, dict)
+                    and attr.get("key") == "session.id"
+                ):
+                    value = attr.get("value", {})
+                    if isinstance(value, dict):
+                        sid = value.get("stringValue", "")
+                        if isinstance(sid, str) and sid:
+                            return sid
+
+        # Attempt 2: gen_ai.conversation.id from the first span's attributes
+        scope_spans = first_rs.get("scopeSpans")
+        if isinstance(scope_spans, list) and scope_spans:
+            spans = scope_spans[0].get("spans") if isinstance(scope_spans[0], dict) else None
+            if isinstance(spans, list) and spans:
+                first_span = spans[0]
+                if isinstance(first_span, dict):
+                    for attr in first_span.get("attributes", []):
+                        if (
+                            isinstance(attr, dict)
+                            and attr.get("key") == "gen_ai.conversation.id"
+                        ):
+                            value = attr.get("value", {})
+                            if isinstance(value, dict):
+                                sid = value.get("stringValue", "")
+                                if isinstance(sid, str) and sid:
+                                    return sid
+
+        return None
+    except (OSError, json.JSONDecodeError, IndexError, KeyError,
+            AttributeError, TypeError, ValueError):
+        return None
+
+
+def _load_state(state_path: str) -> dict:
+    """Load hook state from JSON file.  Returns empty dict on any error."""
+    try:
+        if not os.path.isfile(state_path):
+            return {}
+        with open(state_path, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+        if not isinstance(data, dict):
+            return {}
+        return data
+    except (OSError, json.JSONDecodeError, ValueError):
+        return {}
+
+
+def _save_state(state_path: str, state: dict) -> None:
+    """Save hook state using an atomic write (temp file → rename)."""
+    dir_path = os.path.dirname(state_path)
+    try:
+        fd, tmp_path = tempfile.mkstemp(
+            dir=dir_path, suffix=".tmp", prefix=".hook_state_"
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                json.dump(state, fh, indent=2)
+            os.replace(tmp_path, state_path)
+        except Exception:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
+    except Exception:
+        # Best-effort — counter is non-blocking; silently skip on write failure
+        pass
+
+
+def _get_session_id(scripts_dir: str, state: dict) -> "tuple[str, dict]":
+    """Resolve the active session ID.
+
+    Returns the session ID from the OTel JSONL file when available.
+    Falls back to a persisted UUID4 stored in the state dict; creates one
+    if none exists yet.  The (possibly modified) state dict is returned as
+    the second element so the caller can persist it.
+    """
+    otel_sid = _read_otel_session_id(scripts_dir)
+    if otel_sid:
+        return otel_sid, state
+
+    # Fallback: reuse or create a UUID4-based session ID
+    fallback_id = state.get("_fallback_session_id")
+    if not isinstance(fallback_id, str) or not fallback_id:
+        fallback_id = str(uuid.uuid4())
+        state["_fallback_session_id"] = fallback_id
+        state["_fallback_created"] = _utc_now_iso()
+
+    return fallback_id, state
+
+
+def _increment_deny_counter(
+    state: dict, session_id: str, threshold: int
+) -> "tuple[int, bool]":
+    """Increment the deny counter for *session_id*.
+
+    Returns ``(new_deny_count, now_locked)`` where *now_locked* is True if
+    this increment reaches or exceeds *threshold*.
+    """
+    if session_id not in state or not isinstance(state[session_id], dict):
+        state[session_id] = {"deny_count": 0, "locked": False, "timestamp": ""}
+
+    entry = state[session_id]
+    entry["deny_count"] = entry.get("deny_count", 0) + 1
+    entry["timestamp"] = _utc_now_iso()
+
+    now_locked = entry["deny_count"] >= threshold
+    if now_locked:
+        entry["locked"] = True
+
+    return entry["deny_count"], now_locked
 
 
 # ---------------------------------------------------------------------------
@@ -2157,12 +2335,38 @@ def main() -> None:
             print(build_response("deny", _DENY_REASON), flush=True)
             sys.exit(0)
 
+        # SAF-035: Session denial counter — check lock status before deciding
+        scripts_dir = os.path.dirname(os.path.abspath(__file__))
+        state_path = os.path.join(scripts_dir, _STATE_FILE_NAME)
+        state = _load_state(state_path)
+        session_id, state = _get_session_id(scripts_dir, state)
+        session_data = state.get(session_id, {})
+        if isinstance(session_data, dict) and session_data.get("locked", False):
+            _lockout_msg = (
+                f"Session locked — {_DENY_THRESHOLD} denied actions reached. "
+                "Start a new chat session to continue working."
+            )
+            print(build_response("deny", _lockout_msg), flush=True)
+            sys.exit(0)
+
         decision = decide(data, ws_root)
 
         if decision == "allow":
             print(build_response("allow"), flush=True)
         else:
-            print(build_response("deny", _DENY_REASON), flush=True)
+            # SAF-035: Increment deny counter and build progressive deny message
+            deny_count, now_locked = _increment_deny_counter(
+                state, session_id, _DENY_THRESHOLD
+            )
+            _save_state(state_path, state)
+            if now_locked:
+                deny_reason = (
+                    f"Session locked — {_DENY_THRESHOLD} denied actions reached. "
+                    "Start a new chat session to continue working."
+                )
+            else:
+                deny_reason = f"Block {deny_count} of {_DENY_THRESHOLD}. {_DENY_REASON}"
+            print(build_response("deny", deny_reason), flush=True)
 
     except Exception:
         print(build_response("deny", _DENY_REASON), flush=True)
