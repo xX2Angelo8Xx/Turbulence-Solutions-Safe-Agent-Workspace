@@ -84,8 +84,12 @@ def test_zone_classifier_importable_with_restricted_sys_path():
     zone_classifier_path = SCRIPTS_DIR / "zone_classifier.py"
     assert zone_classifier_path.exists(), "zone_classifier.py must exist in scripts dir"
 
-    # Save and clear sys.path to simulate the embedded Python restriction
+    # Save original state — zone_classifier may already be in sys.modules from
+    # test collection (SAF-001 imports security_gate which imports zone_classifier).
+    # We MUST restore it so that SAF-001/conftest.py _patch_detect_project_folder
+    # fixture can still find it when SAF-001 tests run after this one.
     original_path = sys.path.copy()
+    _saved_zc = sys.modules.get("zone_classifier")  # None or existing module object
 
     # Remove scripts dir from sys.path to reproduce the original error
     restricted = [p for p in sys.path if str(SCRIPTS_DIR) not in p and str(SCRIPTS_DIR).replace("\\", "/") not in p]
@@ -123,8 +127,13 @@ def test_zone_classifier_importable_with_restricted_sys_path():
     finally:
         # Restore sys.path
         sys.path = original_path
-        # Re-import zone_classifier if it was available before
-        if "zone_classifier" in sys.modules:
+        # Restore zone_classifier in sys.modules to its original state.
+        # Without this, the SAF-001/conftest.py fixture (_patch_detect_project_folder)
+        # receives sys.modules.get("zone_classifier") == None, skips patching, and
+        # all SAF-001 zone tests fail because detect_project_folder is unpatched.
+        if _saved_zc is not None:
+            sys.modules["zone_classifier"] = _saved_zc
+        elif "zone_classifier" in sys.modules:
             del sys.modules["zone_classifier"]
 
 
@@ -161,3 +170,146 @@ def test_script_dir_resolved_correctly_relative():
         )
     finally:
         os.chdir(original_cwd)
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests
+# ---------------------------------------------------------------------------
+
+
+def test_path_with_spaces_resolves_correctly(tmp_path):
+    """Path(__file__).resolve().parent must work when the path contains spaces.
+
+    The fix uses str(Path(__file__).resolve().parent) which is then passed to
+    sys.path.insert(). On all platforms pathlib handles spaces natively — this
+    test verifies that assumption using a real temporary directory.
+    """
+    # Create a directory with spaces in the name to simulate a real install path
+    # such as "C:/Program Files/Agent Environment Launcher/.../scripts/"
+    spaced_dir = tmp_path / "path with spaces" / "hooks" / "scripts"
+    spaced_dir.mkdir(parents=True)
+    simulated_file = spaced_dir / "security_gate.py"
+    simulated_file.write_text("# placeholder", encoding="utf-8")
+
+    # Replicate what the fix does
+    resolved_parent = simulated_file.resolve().parent
+    path_str = str(resolved_parent)
+
+    assert resolved_parent == spaced_dir.resolve(), (
+        "Path resolution returned a different directory than expected"
+    )
+    # str() must preserve the spaces so sys.path.insert() receives the correct string
+    assert " " in path_str, (
+        "Space characters were lost during path resolution/stringification"
+    )
+
+
+def test_sys_path_insert_idempotent_import():
+    """Repeated sys.path.insert(0, SCRIPTS_DIR) calls must not break zone_classifier import.
+
+    The embedded Python shim is single-shot (one invocation per hook call), but
+    this test confirms that if the insert were called multiple times (e.g. from
+    test scaffolding or reimport scenarios) zone_classifier remains importable.
+    """
+    original_path = sys.path.copy()
+    saved_zc = sys.modules.get("zone_classifier")
+    try:
+        # Insert the same path multiple times — simulating repeated invocations
+        for _ in range(5):
+            sys.path.insert(0, str(SCRIPTS_DIR))
+
+        count = sys.path.count(str(SCRIPTS_DIR))
+        assert count >= 5, "Expected at least 5 copies of SCRIPTS_DIR in sys.path"
+
+        # Despite duplicates, zone_classifier must remain importable
+        sys.modules.pop("zone_classifier", None)
+        import zone_classifier as zc_test  # noqa: F401
+        assert zc_test is not None, "zone_classifier import failed despite duplicates in sys.path"
+    finally:
+        sys.path = original_path
+        sys.modules.pop("zone_classifier", None)
+        if saved_zc is not None:
+            sys.modules["zone_classifier"] = saved_zc
+
+
+def test_security_gate_decide_functional_after_fix():
+    """After the sys.path fix, security_gate.decide() must return a valid decision.
+
+    This end-to-end test reimports both modules from a restricted sys.path (as
+    the embedded Python shim does), verifying that zone_classifier is found and
+    that the security gate can process a real tool call without crashing.
+    """
+    original_path = sys.path.copy()
+    saved_sg = sys.modules.get("security_gate")
+    saved_zc = sys.modules.get("zone_classifier")
+    try:
+        # Simulate restricted embedded-Python sys.path
+        restricted = [
+            p for p in sys.path
+            if str(SCRIPTS_DIR) not in p
+            and str(SCRIPTS_DIR).replace("\\", "/") not in p
+        ]
+        sys.path = restricted
+        # Apply the fix — identical to the line added by FIX-069
+        sys.path.insert(0, str(SCRIPTS_DIR))
+
+        # Force fresh imports to exercise the actual fix code path
+        sys.modules.pop("security_gate", None)
+        sys.modules.pop("zone_classifier", None)
+        import security_gate as sg_fresh  # noqa: F401
+
+        # TodoRead is in _ALWAYS_ALLOW_TOOLS — no path or zone check involved.
+        # This confirms the full import chain (security_gate → zone_classifier) works
+        # and that decide() returns "allow" without crashing.
+        payload = {"tool_name": "TodoRead"}
+        result = sg_fresh.decide(payload, "/workspace")
+        assert result == "allow", (
+            f"decide() returned {result!r} for TodoRead; expected 'allow'. "
+            "zone_classifier may not have been loaded correctly."
+        )
+    finally:
+        sys.path = original_path
+        # Restore module state to prevent contamination of SAF-001/002 tests
+        sys.modules.pop("security_gate", None)
+        sys.modules.pop("zone_classifier", None)
+        if saved_zc is not None:
+            sys.modules["zone_classifier"] = saved_zc
+        if saved_sg is not None:
+            sys.modules["security_gate"] = saved_sg
+
+
+def test_gate_hash_valid_after_fix():
+    """_KNOWN_GOOD_GATE_HASH embedded in security_gate.py must match the current file.
+
+    FIX-069 modified security_gate.py and updated the hash via update_hashes.py.
+    This test independently recomputes the canonical hash and compares it with
+    the stored constant.  A mismatch means verify_file_integrity() would deny
+    ALL tool calls, making the entire security gate non-functional at runtime.
+    """
+    import hashlib
+    import re as _re
+
+    with open(SECURITY_GATE, "rb") as fh:
+        content = fh.read()
+
+    # Canonical form: replace the 64-char stored hash with 64 zeros (same as
+    # _compute_gate_canonical_hash in security_gate.py)
+    canonical = _re.sub(
+        rb'(?<=_KNOWN_GOOD_GATE_HASH: str = ")[0-9a-fA-F]{64}',
+        b"0" * 64,
+        content,
+    )
+    computed_hash = hashlib.sha256(canonical).hexdigest()
+
+    # Extract the stored constant from source
+    source = content.decode("utf-8", errors="replace")
+    match = _re.search(r'_KNOWN_GOOD_GATE_HASH: str = "([0-9a-fA-F]{64})"', source)
+    assert match, "_KNOWN_GOOD_GATE_HASH constant not found in security_gate.py"
+    stored_hash = match.group(1)
+
+    assert computed_hash == stored_hash, (
+        f"FIX-069: _KNOWN_GOOD_GATE_HASH is stale after the fix was applied.\n"
+        f"  Stored  : {stored_hash}\n"
+        f"  Computed: {computed_hash}\n"
+        "Run update_hashes.py to regenerate the hash constant."
+    )
