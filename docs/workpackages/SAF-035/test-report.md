@@ -1,102 +1,149 @@
-# Test Report — SAF-035
+# Test Report — SAF-035: Implement Session-Scoped Denial Counter
 
-**Tester:** Tester Agent  
-**Date:** 2026-03-21  
-**Verdict:** FAIL
+**Tester:** Tester Agent
+**Date:** 2026-03-21
+**Iteration:** 2 (re-test after BUG-094 / BUG-095 fixes)
+**Verdict:** PASS
 
 ---
 
 ## Summary
 
-SAF-035 implements a session-scoped denial counter in `security_gate.py`. The counter logic itself is well-implemented: it increments correctly, locks at threshold, persists atomically, handles corrupt/missing state, and isolates sessions independently. All 56 WP-specific tests pass.
+SAF-035 adds a session-scoped denial counter to `security_gate.py`. On each deny
+decision the counter increments, displays "Block N of M" in the deny reason, and
+locks the session (denying ALL tool calls) once the threshold M=20 is reached.
+Session identity is derived from OTel JSONL or a fallback UUID.
 
-However, the WP introduces **critical regressions in 7 SAF-024 tests** and creates a **template directory pollution problem**. These must be fixed before the WP can pass.
+All acceptance criteria verified. BUG-094 and BUG-095 confirmed fixed. No regressions
+introduced. Template directory remains clean.
+
+---
+
+## Iteration 2 Focus
+
+The Developer addressed two bugs from Iteration 1:
+
+- **BUG-094** — SAF-024 regressions: 7 SAF-024 tests asserted `reason == _GENERIC_MESSAGE`
+  and broke because SAF-035 prepends "Block N of M." to deny messages. Fix: changed
+  assertions to `_GENERIC_MESSAGE in reason`.
+- **BUG-095** — Template directory pollution: tests calling `main()` wrote `.hook_state.json`
+  to `templates/coding/.github/hooks/scripts/`. Fix: added a global autouse conftest
+  fixture `_prevent_hook_state_writes` that mocks `_load_state`, `_save_state`, and
+  `_get_session_id`, with cleanup in teardown. SAF-035-local conftest overrides the
+  fixture for its own unit tests.
 
 ---
 
 ## Test Results
 
-| Run | Scope | Result | Details |
-|-----|-------|--------|---------|
-| TST-2018 | SAF-035 targeted (56 tests) | **PASS** | All developer + tester edge-case tests pass |
-| TST-2019 | SAF-035 targeted (dup) | **PASS** | 56 passed in 0.90s |
-| TST-2020 | SAF-024 regression check | **FAIL** | 7 tests fail due to counter prefix in deny message |
-| TST-2021 | Template pollution check | **FAIL** | .hook_state.json created in templates/ dir |
-| TST-2017 | Full regression suite | **FAIL** | 83 failures total (7 caused by SAF-035, rest pre-existing) |
+| Suite | Tests | Result |
+|-------|-------|--------|
+| SAF-035 (developer + tester edge cases) | 56 | **56 passed** |
+| SAF-024 (generic deny messages) | 20 | **20 passed** |
+| Full regression suite (excl. yaml import errors) | 4482 passed, 76 failed, 2 skipped | Same 76 failures as main |
+| Full regression suite (with yaml imports) | 14 collection errors | Pre-existing (yaml not installed) |
+
+### Pre-existing failures (76) — verified identical on main
+
+All 76 failures are present on the `main` branch with the exact same count (76 failed,
+4426 passed). The SAF-035 branch adds 56 net new passing tests (4482 − 4426 = 56).
+Zero new failures introduced by SAF-035.
+
+Affected WPs: FIX-009, FIX-019, FIX-028, FIX-031, FIX-036, FIX-037, FIX-038,
+FIX-039, FIX-049, FIX-050, INS-004, INS-019, SAF-010, SAF-022, SAF-025.
 
 ---
 
-## Bugs Filed
+## Bugs Filed (Iteration 1) — Now Fixed
 
 | Bug ID | Severity | Title |
 |--------|----------|-------|
-| BUG-094 | High | SAF-035 counter causes SAF-024 test regressions |
-| BUG-095 | High | Counter writes .hook_state.json to template directory during tests |
-
----
-
-## Detailed Findings
-
-### Issue 1 (Critical): SAF-024 Test Regressions — BUG-094
-
-**Root cause:** SAF-035 modifies `main()` to prepend "Block N of M" to deny messages and return "Session locked" after threshold. SAF-024 tests call `main()` without mocking the counter functions, so the deny reason no longer matches the exact generic message.
-
-**7 failing tests:**
-1. `tests/SAF-024/test_saf024_edge_cases.py::test_main_write_tool_deny_is_generic`
-2. `tests/SAF-024/test_saf024_edge_cases.py::test_main_multi_replace_deny_is_generic`
-3. `tests/SAF-024/test_saf024_edge_cases.py::test_main_get_errors_deny_is_generic`
-4. `tests/SAF-024/test_saf024_edge_cases.py::test_main_grep_search_deny_is_generic`
-5. `tests/SAF-024/test_saf024_edge_cases.py::test_main_semantic_search_deny_is_generic`
-6. `tests/SAF-024/test_saf024_edge_cases.py::test_main_unknown_tool_deny_is_generic`
-7. `tests/SAF-024/test_saf024_generic_deny_messages.py::test_main_stdout_generic_on_deny`
-
-**Fix required:** Update SAF-024 tests that call `main()` to either:
-- Mock `_load_state`, `_save_state`, `_get_session_id` so the counter doesn't run, OR
-- Change assertions from `reason == _GENERIC_MESSAGE` to verify `_GENERIC_MESSAGE in reason` (since the counter message still contains the generic text as a suffix), OR
-- Add a conftest-level fixture that automatically mocks the counter for all test modules that import security_gate and call `main()`
-
-### Issue 2 (Critical): Template Directory Pollution — BUG-095
-
-**Root cause:** When any test calls `sg.main()`, the counter computes `scripts_dir = os.path.dirname(os.path.abspath(__file__))` which resolves to the actual `templates/coding/.github/hooks/scripts/` directory. The counter then writes `.hook_state.json` there.
-
-**Consequences:**
-- `templates/coding/` is the shipping template — it must never be modified by tests
-- State accumulates across test runs: after 20 `main()` calls with deny outcomes, the session locks permanently
-- SAF-024 tests become non-deterministic depending on execution order and history
-- Confirmed: `.hook_state.json` existed with `deny_count: 20, locked: true` in the template directory
-
-**Fix required:** Any test calling `main()` must mock `_load_state`, `_save_state`, and `_get_session_id` (or use a temporary directory). Consider adding this as an autouse conftest fixture alongside the existing safety-net mocks (conftest.py Layer 1–3).
-
-**Cleanup required:** Delete `templates/coding/.github/hooks/scripts/.hook_state.json` from the repo.
+| BUG-094 | High | SAF-035 counter causes SAF-024 test regressions | **Fixed** |
+| BUG-095 | High | Counter writes .hook_state.json to template directory during tests | **Fixed** |
 
 ---
 
 ## Verification Checklist
 
-| # | Requirement | Status | Notes |
-|---|------------|--------|-------|
-| 1 | Counter increments on each DENY | PASS | Tests 1, EC-07 |
-| 2 | Block N of M in deny reason | PASS | Tests 2, EC-13 |
-| 3 | Session locked at M=20 | PASS | Test 3 |
-| 4 | Locked session denies ALL tools | PASS | Test 4 |
-| 5 | Independent session counters | PASS | Test 5 |
-| 6 | New session starts at 0 | PASS | Test 6 |
-| 7 | Returning to locked session stays locked | PASS | EC-12 |
-| 8 | OTel JSONL session.id extraction | PASS | Test 7 |
-| 9 | Fallback to gen_ai.conversation.id | PASS | Test 7 |
-| 10 | Fallback to UUID4 when JSONL missing | PASS | Test 8 |
-| 11 | .hook_state.json persistence | PASS | Test 9 |
-| 12 | Corrupt/empty state handled gracefully | PASS | Test 10 |
-| 13 | Atomic writes (temp + os.replace) | PASS | Test 11, code review |
-| 14 | 3 OTel settings in settings.json | PASS | Verified in file |
-| 15 | .gitignore entries added | PASS | copilot-otel.jsonl and .hook_state.json present |
-| 16 | Hashes updated | PASS | Hash constants updated in security_gate.py |
-| 17 | Malformed JSON in JSONL | PASS | EC-01 |
-| 18 | State file with unexpected keys | PASS | EC-04 |
-| 19 | Session ID with special chars/null | PASS | EC-08, EC-09, EC-10 |
-| 20 | Very large deny_count | PASS | EC-07 |
-| — | No regression in SAF-024 tests | **FAIL** | 7 tests broken by counter prefix |
-| — | No template dir pollution | **FAIL** | .hook_state.json created in templates/ |
+| # | Check | Result |
+|---|-------|--------|
+| 1 | All 56 SAF-035 tests pass | PASS |
+| 2 | All 20 SAF-024 tests pass (previously 7 failed) | PASS |
+| 3 | No `.hook_state.json` in `templates/coding/.github/hooks/scripts/` after test run | PASS |
+| 4 | Full regression suite: zero new failures vs main | PASS (76 = 76) |
+| 5 | BUG-094 marked "Fixed" in bugs.csv | PASS |
+| 6 | BUG-095 marked "Fixed" in bugs.csv | PASS |
+| 7 | Counter increments on each deny | PASS |
+| 8 | Session locks at threshold M | PASS |
+| 9 | Session isolation (independent counters) | PASS |
+| 10 | OTel JSONL extraction (session.id + gen_ai.conversation.id) | PASS |
+| 11 | UUID fallback when JSONL missing | PASS |
+| 12 | "Block N of M" in deny reason | PASS |
+| 13 | Locked session denies ALL tools (including always-allow) | PASS |
+| 14 | Corrupt/empty state file handled gracefully | PASS |
+| 15 | Atomic write (tempfile + os.replace) | PASS |
+| 16 | `.gitignore` excludes `.hook_state.json` and `copilot-otel.jsonl` | PASS |
+| 17 | OTel settings added to `.vscode/settings.json` | PASS |
+
+---
+
+## Code Review Observations
+
+### Implementation Quality
+- **Atomic writes**: `_save_state` uses `tempfile.mkstemp` + `os.replace` — correct for
+  preventing partial-write corruption.
+- **Defensive parsing**: `_load_state` handles corrupt JSON, non-dict JSON, missing files,
+  and permissions errors. Returns empty dict on any failure.
+- **OTel parsing**: `_read_otel_session_id` uses type checks at every level of the nested
+  structure, catching all possible malformed data shapes.
+- **Lock check placement**: Session lock is checked in `main()` before `decide()`, ensuring
+  locked sessions are denied immediately without executing gate logic.
+- **_DENY_REASON unchanged**: The generic policy message constant is preserved, and
+  "Block N of M" is prepended as a prefix — SAF-024 compliance maintained.
+
+### Security Analysis
+- **Path traversal in session IDs**: Session IDs are dictionary keys only — never used to
+  construct file paths. Verified by EC-08/EC-09/EC-10 edge-case tests.
+- **No information leakage**: Deny messages contain only "Block N of M" + generic policy
+  text. Zone names never appear in deny responses. Verified by EC-13/EC-14 tests.
+- **State file location**: Fixed in `.github/hooks/scripts/` — within the same directory
+  structure already controlled by the security gate.
+
+### Conftest Fixture Architecture
+The `_prevent_hook_state_writes` fixture in `tests/conftest.py` is well-designed:
+1. Mocks `_load_state` → returns `{}`
+2. Mocks `_save_state` → no-op
+3. Mocks `_get_session_id` → returns `("test-fixture-session", {})`
+4. Teardown: removes `.hook_state.json` if created by subprocess tests
+5. SAF-035 conftest: no-op override so unit tests can call real functions
+
+### Edge Cases Covered (Tester Tests)
+- Malformed/trailing-whitespace JSONL handling (EC-01, EC-02, EC-03)
+- State file with unexpected keys (EC-04)
+- Zero and negative threshold (EC-05, EC-06)
+- Very large deny_count 10,000+ (EC-07)
+- Session IDs with path traversal, null bytes, special JSON characters (EC-08–EC-10)
+- Locked flag consistency (EC-11)
+- Locked session persistence across invocations (EC-12)
+- Block-N-of-M content and zone-leak prevention (EC-13)
+- SAF-024 regression guard (EC-14)
+
+---
+
+## Test Log References
+
+| TST ID | Description | Result |
+|--------|-------------|--------|
+| TST-2022 | SAF-035 Iteration 2: regression + pollution fix | Pass |
+| TST-2024 | SAF-035: targeted suite (56 tests) | Pass |
+
+---
+
+## Verdict: PASS
+
+All acceptance criteria verified. BUG-094 and BUG-095 confirmed fixed. No regressions
+introduced. Template directory remains clean. Counter logic is correct and tested
+comprehensively with 56 tests covering all 11 ACs plus 14 additional edge cases.
 
 ---
 
