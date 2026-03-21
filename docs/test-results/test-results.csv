@@ -1880,3 +1880,4 @@
 "TST-1999","test_report_contains_implementation_notes","Unit","DOC-010","Pass","2026-03-21","Windows 11 + Python 3.11.9","Report contains .hook_state.json, deny_count, locked implementation notes",""
 "TST-2000","DOC-010: full regression suite","Regression","DOC-010","Fail","2026-03-21","Windows 11 + Python 3.11.9","14 errors in 2.05s",""
 "TST-2001","DOC-010: targeted suite","Unit","DOC-010","Pass","2026-03-21","Windows 11 + Python 3.11.9","42 passed in 0.31s",""
+"TST-2002","DOC-007: targeted suite","Unit","DOC-007","Pass","2026-03-21","Windows 11 + Python 3.11.9","35 passed in 0.23s",""
