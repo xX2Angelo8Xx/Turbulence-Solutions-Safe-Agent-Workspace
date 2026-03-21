@@ -12,9 +12,11 @@ from pathlib import Path
 from typing import Optional
 
 # SAF-002: zone classification is delegated to the dedicated module.
-# zone_classifier.py lives in the same scripts directory; it is on
-# sys.path both when the script runs directly (Python adds the script's
-# own directory) and in tests (the test fixture inserts the scripts dir).
+# FIX-069: The Python embeddable distribution (ts-python shim) ships with a
+# ._pth file that restricts sys.path and does NOT add the script directory.
+# Insert the script directory explicitly so zone_classifier is always importable
+# regardless of whether security_gate.py is invoked via standard or embedded Python.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import zone_classifier
 
 # ---------------------------------------------------------------------------
@@ -73,7 +75,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "623c80d355b2a69390d8c95e896b1ecbd33a3dc73d8f2a
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "aaebdea9c49da9b2d6f3ae1f313bb72ef0827f25181916eded3ae360d20bcadd"
+_KNOWN_GOOD_GATE_HASH: str = "259cac8e11a276e0814e7110cb844426469b7418bc402c975c68d2a163104ef1"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
