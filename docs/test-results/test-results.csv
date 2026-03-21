@@ -1904,3 +1904,8 @@
 "TST-2023","SAF-035: full regression suite","Regression","SAF-035","Fail","2026-03-21","Windows 11 + Python 3.11","14 errors in 2.04s",""
 "TST-2024","SAF-035: targeted suite","Unit","SAF-035","Pass","2026-03-21","Windows 11 + Python 3.11","56 passed in 0.79s",""
 "TST-2025","SAF-036-counter-config-tests","Unit","SAF-036","Pass","2026-03-21","Windows-11-Python-3.11","16-passed-0-failed","config-loading-tests"
+"TST-2026","SAF-036: full regression suite","Regression","SAF-036","Fail","2026-03-21","Windows 11 + Python 3.11","15 errors in 3.48s",""
+"TST-2027","SAF-036: full regression suite","Regression","SAF-036","Fail","2026-03-21","Windows 11 + Python 3.11","15 errors in 2.11s",""
+"TST-2028","SAF-036: targeted suite","Unit","SAF-036","Pass","2026-03-21","Windows 11 + Python 3.11","30 passed in 0.30s",""
+"TST-2029","SAF-036: SAF-035 regression check (56 passed)","Regression","SAF-036","Pass","2026-03-21","Windows 11 + Python 3.11","56 passed, 0 failed","No regressions in SAF-035 denial counter tests or SAF-024 generic deny message tests (20 passed)"
+"TST-2030","SAF-036: SAF-024 regression check (20 passed)","Regression","SAF-036","Pass","2026-03-21","Windows 11 + Python 3.11","20 passed, 0 failed","No regressions in SAF-024 generic deny message tests"
