@@ -124,3 +124,37 @@ def test_all_versions_consistent() -> None:
     assert unique.pop() == CURRENT_VERSION, (
         f"All sources agree on '{unique}' but CURRENT_VERSION is '{CURRENT_VERSION}'"
     )
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests (added during review)
+# ---------------------------------------------------------------------------
+
+STALE_VERSION = "3.1.1"
+_VERSION_FILES = [
+    REPO_ROOT / "src" / "launcher" / "config.py",
+    REPO_ROOT / "pyproject.toml",
+    REPO_ROOT / "src" / "installer" / "windows" / "setup.iss",
+    REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh",
+    REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh",
+]
+
+
+def test_current_version_is_3_1_2() -> None:
+    """CURRENT_VERSION (read from config.py) must equal the expected release version 3.1.2."""
+    assert CURRENT_VERSION == "3.1.2", (
+        f"Expected CURRENT_VERSION == '3.1.2', got '{CURRENT_VERSION}'"
+    )
+
+
+def test_no_stale_3_1_1_in_version_files() -> None:
+    """None of the 5 canonical version files may still contain the old version 3.1.1."""
+    stale_found: dict[str, list[int]] = {}
+    for path in _VERSION_FILES:
+        assert path.exists(), f"Version file not found: {path}"
+        for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            if STALE_VERSION in line:
+                stale_found.setdefault(str(path.relative_to(REPO_ROOT)), []).append(lineno)
+    assert not stale_found, (
+        f"Stale version '{STALE_VERSION}' still found in: {stale_found}"
+    )
