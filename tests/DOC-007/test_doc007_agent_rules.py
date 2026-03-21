@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests for DOC-007: AGENT-RULES.md template.
 
 Verifies that templates/coding/Project/AGENT-RULES.md exists and contains
@@ -55,7 +55,7 @@ def test_placeholder_workspace_name():
 
 
 # ---------------------------------------------------------------------------
-# Section 1 — Allowed Zone
+# Section 1 â€” Allowed Zone
 # ---------------------------------------------------------------------------
 
 def test_has_allowed_zone_section():
@@ -80,7 +80,7 @@ def test_allowed_zone_references_project_name():
 
 
 # ---------------------------------------------------------------------------
-# Section 2 — Denied Zones
+# Section 2 â€” Denied Zones
 # ---------------------------------------------------------------------------
 
 def test_has_denied_zones_section():
@@ -106,7 +106,7 @@ def test_denied_zone_noagentzone():
 
 
 # ---------------------------------------------------------------------------
-# Section 3 — Tool Permission Matrix
+# Section 3 â€” Tool Permission Matrix
 # ---------------------------------------------------------------------------
 
 def test_has_tool_permission_matrix():
@@ -144,7 +144,7 @@ def test_matrix_has_allowed_or_denied_or_zone_checked():
 
 
 # ---------------------------------------------------------------------------
-# Section 4 — Terminal Rules
+# Section 4 â€” Terminal Rules
 # ---------------------------------------------------------------------------
 
 def test_has_terminal_rules_section():
@@ -173,7 +173,7 @@ def test_terminal_rules_has_blocked_examples():
 
 
 # ---------------------------------------------------------------------------
-# Section 5 — Git Rules
+# Section 5 â€” Git Rules
 # ---------------------------------------------------------------------------
 
 def test_has_git_rules_section():
@@ -198,7 +198,7 @@ def test_git_rules_blocked_operations():
 
 
 # ---------------------------------------------------------------------------
-# Section 6 — Session-Scoped Denial Counter
+# Section 6 â€” Session-Scoped Denial Counter
 # ---------------------------------------------------------------------------
 
 def test_has_denial_counter_section():
@@ -223,7 +223,7 @@ def test_denial_counter_mentions_new_chat_resets():
 
 
 # ---------------------------------------------------------------------------
-# Section 7 — Known Workarounds
+# Section 7 â€” Known Workarounds
 # ---------------------------------------------------------------------------
 
 def test_has_workarounds_section():
@@ -249,4 +249,102 @@ def test_workarounds_mentions_set_content():
     content = _content()
     assert "Set-Content" in content, (
         "Known Workarounds should mention Set-Content as Out-File alternative"
+    )
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests
+# ---------------------------------------------------------------------------
+
+def test_no_hardcoded_project_name_uppercase():
+    """Template must not contain standalone 'Project' (capital P) outside {{...}} placeholders."""
+    content = _content()
+    stripped = re.sub(r"\{\{[^}]+\}\}", "", content)
+    matches = re.findall(r"\bProject\b", stripped)
+    assert not matches, (
+        f"Found hardcoded 'Project' (capital P) reference(s) not using a placeholder: "
+        f"{matches[:5]}. Use {{{{PROJECT_NAME}}}} instead."
+    )
+
+
+def test_valid_markdown_h1_title():
+    """File must start with a top-level H1 heading."""
+    content = _content()
+    lines = content.splitlines()
+    first_nonempty = next((ln for ln in lines if ln.strip()), "")
+    assert first_nonempty.startswith("# "), (
+        f"File must begin with an H1 heading. First non-empty line: {first_nonempty!r}"
+    )
+
+
+def test_all_seven_numbered_sections_present():
+    """Sections 1 through 7 must each exist with their numbered heading."""
+    content = _content()
+    for i in range(1, 8):
+        assert re.search(rf"##\s+{i}\.", content), (
+            f"Numbered section {i} not found - expected a heading like ## {i}. title"
+        )
+
+
+def test_matrix_covers_create_directory_explicitly():
+    """create_directory must be explicitly named in the tool permission matrix."""
+    content = _content()
+    matrix_match = re.search(
+        r"##[^\n]*tool.{0,20}permission.{0,20}matrix(.*?)(?=^##|\Z)",
+        content, re.IGNORECASE | re.MULTILINE | re.DOTALL
+    )
+    assert matrix_match, "Could not locate Tool Permission Matrix section"
+    section = matrix_match.group(1)
+    assert "create_directory" in section, (
+        "create_directory must be explicitly listed in the Tool Permission Matrix"
+    )
+
+
+def test_matrix_write_tools_are_zone_checked():
+    """Write tools in the matrix must use Zone-checked permission label."""
+    content = _content()
+    matrix_match = re.search(
+        r"##[^\n]*tool.{0,20}permission.{0,20}matrix(.*?)(?=^##|\Z)",
+        content, re.IGNORECASE | re.MULTILINE | re.DOTALL
+    )
+    assert matrix_match, "Could not locate Tool Permission Matrix section"
+    section = matrix_match.group(1)
+    assert "Zone-checked" in section, (
+        "Tool permission matrix must contain Zone-checked label for write tools"
+    )
+
+
+def test_matrix_covers_terminal_category():
+    """Terminal must appear as a category in the tool permission matrix."""
+    content = _content()
+    matrix_match = re.search(
+        r"##[^\n]*tool.{0,20}permission.{0,20}matrix(.*?)(?=^##|\Z)",
+        content, re.IGNORECASE | re.MULTILINE | re.DOTALL
+    )
+    assert matrix_match, "Could not locate Tool Permission Matrix section"
+    section = matrix_match.group(1)
+    assert re.search(r"\bTerminal\b", section), (
+        "Terminal must appear as a category or row in the Tool Permission Matrix"
+    )
+
+
+def test_denied_zones_presented_as_table():
+    """Denied zones must be presented in a markdown table format."""
+    content = _content()
+    denied_match = re.search(
+        r"##[^\n]*denied.{0,20}zone(.*?)(?=^##|\Z)",
+        content, re.IGNORECASE | re.MULTILINE | re.DOTALL
+    )
+    assert denied_match, "Could not locate Denied Zones section body"
+    section = denied_match.group(1)
+    assert "|" in section, "Denied Zones must be presented as a markdown table"
+    for path in (".github/", ".vscode/", "NoAgentZone/"):
+        assert path in section, f"Denied path {path} not found in the Denied Zones table"
+
+
+def test_markdown_no_unclosed_code_fence():
+    """Every opening code fence must have a matching closing fence."""
+    content = _content()
+    fences = re.findall(r"^```", content, re.MULTILINE)
+    assert len(fences) % 2 == 0, (
+        f"Odd number of triple-backtick code fences ({len(fences)}) - not all closed."
     )
