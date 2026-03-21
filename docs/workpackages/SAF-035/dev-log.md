@@ -66,3 +66,42 @@ and locks the session at the configured threshold (default 20).
 - In fallback mode (no OTel), session boundaries cannot be detected. All denies in the
   current VS Code instance accumulate under the same UUID until manually reset.
 - SAF-036 will add threshold configurability; SAF-037 will add a reset script.
+
+---
+
+## Iteration 2 — 2026-03-21
+
+### Tester Feedback Addressed
+
+- **BUG-094** (SAF-024 regressions): SAF-035's counter prefixes deny messages with
+  "Block N of M." which broke 7 SAF-024 tests that asserted exact equality
+  (`reason == _GENERIC_MESSAGE`). Fixed by changing assertions to containment checks
+  (`_GENERIC_MESSAGE in reason`) since the counter message always includes the
+  generic text as a suffix.
+
+- **BUG-095** (Template directory pollution): Tests calling `main()` wrote
+  `.hook_state.json` to the shipping template directory. Fixed by:
+  1. Deleting the existing `.hook_state.json` from `templates/coding/.github/hooks/scripts/`
+  2. Adding a global autouse fixture in `tests/conftest.py` that mocks `_load_state`,
+     `_save_state`, and `_get_session_id` to prevent in-process writes
+  3. Adding cleanup in the fixture teardown to remove `.hook_state.json` created by
+     subprocess tests (e.g. SAF-001 integration tests that run security_gate.py directly)
+  4. Adding a SAF-035-specific conftest override so SAF-035 unit tests retain access
+     to the real functions
+
+### Additional Changes
+
+- `tests/conftest.py` — Added `_prevent_hook_state_writes` autouse fixture with
+  mock + teardown cleanup for `.hook_state.json`
+- `tests/SAF-035/conftest.py` — Created: no-op override of global fixture so SAF-035
+  tests can directly call `_load_state`, `_save_state`, etc.
+- `tests/SAF-024/test_saf024_edge_cases.py` — Changed 5 assertions from `==` to `in`
+  for deny reason checks
+- `tests/SAF-024/test_saf024_generic_deny_messages.py` — Changed 1 assertion from
+  `==` to `in` for deny reason check
+
+### Tests Added/Updated
+
+- Global conftest fixture `_prevent_hook_state_writes` — prevents template pollution
+- `tests/SAF-035/conftest.py` — override to preserve SAF-035 test isolation
+- Updated 6 SAF-024 assertions to use containment checks

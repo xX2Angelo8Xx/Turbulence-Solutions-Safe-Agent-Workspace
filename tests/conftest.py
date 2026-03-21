@@ -127,3 +127,42 @@ def _subprocess_popen_sentinel():
 
     with patch("subprocess.Popen", side_effect=_guarded_popen):
         yield
+
+
+_SG_SCRIPTS_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "templates", "coding",
+                 ".github", "hooks", "scripts")
+)
+_HOOK_STATE_PATH = os.path.join(_SG_SCRIPTS_DIR, ".hook_state.json")
+
+
+@pytest.fixture(autouse=True)
+def _prevent_hook_state_writes():
+    """Prevent security_gate from writing .hook_state.json to the template directory.
+
+    SAF-035 adds a session denial counter that persists state to disk.
+    Without this fixture, any test calling security_gate.main() would write
+    .hook_state.json into templates/coding/.github/hooks/scripts/, polluting
+    the shipping template and making tests non-deterministic.
+
+    In-process calls are intercepted by mocking _load_state, _save_state, and
+    _get_session_id.  Subprocess calls (e.g. SAF-001 integration tests) cannot
+    be intercepted, so we also delete .hook_state.json after each test as a
+    safety net.
+    """
+    if _SG_SCRIPTS_DIR not in sys.path:
+        sys.path.insert(0, _SG_SCRIPTS_DIR)
+    try:
+        import security_gate
+        with patch.object(security_gate, "_load_state", return_value={}), \
+             patch.object(security_gate, "_save_state", return_value=None), \
+             patch.object(security_gate, "_get_session_id", return_value=("test-fixture-session", {})):
+            yield
+    except (ImportError, ModuleNotFoundError):
+        yield
+    # Cleanup: remove .hook_state.json if created by a subprocess call
+    try:
+        if os.path.isfile(_HOOK_STATE_PATH):
+            os.unlink(_HOOK_STATE_PATH)
+    except OSError:
+        pass

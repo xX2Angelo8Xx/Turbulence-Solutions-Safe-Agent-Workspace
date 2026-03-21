@@ -94,9 +94,9 @@ def test_main_write_tool_deny_is_generic(monkeypatch, capsys):
         "filePath": f"{WS}/.vscode/settings.json",
     }
     reason = _get_stdout_reason(monkeypatch, capsys, payload)
-    assert reason == _GENERIC_MESSAGE, (
-        f"write-tool deny reason is not the generic message.\n"
-        f"  Expected: {_GENERIC_MESSAGE!r}\n"
+    assert _GENERIC_MESSAGE in reason, (
+        f"write-tool deny reason does not contain the generic message.\n"
+        f"  Expected to contain: {_GENERIC_MESSAGE!r}\n"
         f"  Actual:   {reason!r}"
     )
     _assert_no_zones(reason, "write tool: ")
@@ -115,8 +115,8 @@ def test_main_multi_replace_deny_is_generic(monkeypatch, capsys):
         ],
     }
     reason = _get_stdout_reason(monkeypatch, capsys, payload)
-    assert reason == _GENERIC_MESSAGE, (
-        f"multi_replace deny reason is not the generic message.\n"
+    assert _GENERIC_MESSAGE in reason, (
+        f"multi_replace deny reason does not contain the generic message.\n"
         f"  Actual: {reason!r}"
     )
     _assert_no_zones(reason, "multi_replace: ")
@@ -133,8 +133,8 @@ def test_main_get_errors_deny_is_generic(monkeypatch, capsys):
         "filePaths": [f"{WS}/.vscode/settings.json"],
     }
     reason = _get_stdout_reason(monkeypatch, capsys, payload)
-    assert reason == _GENERIC_MESSAGE, (
-        f"get_errors deny reason is not the generic message.\n"
+    assert _GENERIC_MESSAGE in reason, (
+        f"get_errors deny reason does not contain the generic message.\n"
         f"  Actual: {reason!r}"
     )
     _assert_no_zones(reason, "get_errors: ")
@@ -153,8 +153,8 @@ def test_main_grep_search_deny_is_generic(monkeypatch, capsys):
         "filePath": WS,
     }
     reason = _get_stdout_reason(monkeypatch, capsys, payload)
-    assert reason == _GENERIC_MESSAGE, (
-        f"grep_search deny reason is not the generic message.\n"
+    assert _GENERIC_MESSAGE in reason, (
+        f"grep_search deny reason does not contain the generic message.\n"
         f"  Actual: {reason!r}"
     )
     _assert_no_zones(reason, "grep_search: ")
@@ -270,8 +270,8 @@ def test_main_unknown_tool_deny_is_generic(monkeypatch, capsys):
         "filePath": f"{WS}/.github/secret_key",
     }
     reason = _get_stdout_reason(monkeypatch, capsys, payload)
-    assert reason == _GENERIC_MESSAGE, (
-        f"unknown-tool deny reason is not the generic message.\n"
+    assert _GENERIC_MESSAGE in reason, (
+        f"unknown-tool deny reason does not contain the generic message.\n"
         f"  Actual: {reason!r}"
     )
     _assert_no_zones(reason, "unknown tool: ")

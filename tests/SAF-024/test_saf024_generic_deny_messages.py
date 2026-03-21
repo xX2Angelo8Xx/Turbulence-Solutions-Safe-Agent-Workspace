@@ -143,9 +143,9 @@ def test_main_stdout_generic_on_deny(monkeypatch, capsys):
     captured = capsys.readouterr()
     data = json.loads(captured.out)
     reason = data["hookSpecificOutput"].get("permissionDecisionReason", "")
-    assert reason == _GENERIC_MESSAGE, (
-        f"main() deny reason does not match generic message.\n"
-        f"  Expected: {_GENERIC_MESSAGE!r}\n"
+    assert _GENERIC_MESSAGE in reason, (
+        f"main() deny reason does not contain the generic message.\n"
+        f"  Expected to contain: {_GENERIC_MESSAGE!r}\n"
         f"  Actual:   {reason!r}"
     )
 
