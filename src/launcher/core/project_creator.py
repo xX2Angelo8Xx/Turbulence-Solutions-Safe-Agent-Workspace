@@ -63,7 +63,13 @@ def replace_template_placeholders(project_dir: Path, project_name: str) -> None:
       {{PROJECT_NAME}}    → project_name
       {{WORKSPACE_NAME}}  → TS-SAE-{project_name}
 
-    Only .md files are processed. Non-.md files and binary files are skipped.
+    All .md files in the project tree are processed via rglob, including
+    (but not limited to):
+      - <project_name>/AGENT-RULES.md
+      - <project_name>/README.md
+      - .github/instructions/copilot-instructions.md
+
+    Non-.md files and binary files are skipped.
     The function is idempotent: if no placeholder is found the file is not written.
     """
     workspace_name = f"TS-SAE-{project_name}"
