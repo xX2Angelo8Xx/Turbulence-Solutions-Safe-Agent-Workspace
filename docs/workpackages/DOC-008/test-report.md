@@ -2,101 +2,116 @@
 
 **Tester:** Tester Agent
 **Date:** 2026-03-21
-**Iteration:** 1
+**Iteration:** 2 (second review cycle)
 
 ## Summary
 
+**Iteration 2 — All Issues Resolved. PASS.**
+
 DOC-008 adds a `> [!IMPORTANT]` read-first directive to the top of
-`templates/coding/.github/instructions/copilot-instructions.md`. The implementation
-itself is correct — the directive is at the right location, uses the right syntax,
-references the right file, and uses the `{{PROJECT_NAME}}` placeholder correctly.
+`templates/coding/.github/instructions/copilot-instructions.md`. The implementation is
+correct — directive is at the very top of the file (line 1), uses exact `> [!IMPORTANT]`
+syntax, references `{{PROJECT_NAME}}/AGENT-RULES.md`, and all original content is preserved.
 
-**However, the change introduces 3 regressions in the DOC-003 test suite** that must
-be resolved before the WP can be approved.
+The 3 DOC-003 regressions identified in Iteration 1 (BUG-093) have been fixed. The
+Developer updated `tests/DOC-003/test_doc003_edge_cases.py` to relax the placeholder count
+assertions from `== 1` to `>= 1`, and rewrote `test_placeholder_is_in_workspace_rules_section`
+to check section body content rather than the file-wide first occurrence. All 23 targeted
+tests pass. Full suite shows zero new failures versus `main`.
 
-The directive adds a second `{{PROJECT_NAME}}` occurrence at the top of the file.
-Existing DOC-003 edge-case tests assert that the placeholder appears exactly once
-and that its first occurrence is inside the `## Workspace Rules` section. Both
-assumptions are now violated.
+---
 
-## Tests Executed
+## Iteration 1 (Tester FAIL — returned to Developer)
+
+Iteration 1 found 3 regressions in `tests/DOC-003/test_doc003_edge_cases.py` caused by the
+directive introducing a second `{{PROJECT_NAME}}` placeholder. Bug filed as BUG-093.
+The Developer fixed all 3 tests and re-submitted.
+
+---
+
+## Tests Executed — Iteration 2
+
+### DOC-008 Developer Tests (5 tests)
 
 | Test | Type | Result | Notes |
 |------|------|--------|-------|
-| test_read_first_directive_present | Unit | PASS | Directive present and contains AGENT-RULES.md |
-| test_directive_mentions_agent_rules | Unit | PASS | Exact filename AGENT-RULES.md referenced |
+| test_read_first_directive_present | Unit | PASS | Directive present; AGENT-RULES.md referenced |
+| test_directive_mentions_agent_rules | Unit | PASS | Exact filename AGENT-RULES.md present |
 | test_directive_uses_project_name_placeholder | Unit | PASS | {{PROJECT_NAME}}/AGENT-RULES.md on same line |
-| test_directive_is_near_top | Unit | PASS | Within first 10 lines |
-| test_existing_content_preserved | Unit | PASS | All 7 original sections present |
-| test_directive_in_first_5_lines (tester) | Regression | PASS | Directive is in lines 1–2 |
-| test_directive_is_very_first_content (tester) | Regression | PASS | First character is '>' |
-| test_no_unexpected_placeholders (tester) | Regression | PASS | Only {{PROJECT_NAME}} used |
-| test_no_single_brace_placeholder_leak (tester) | Regression | PASS | No single-brace variants found |
-| test_important_callout_syntax (tester) | Regression | PASS | Exact '> [!IMPORTANT]' present |
-| test_directive_body_is_blockquote (tester) | Regression | PASS | Body line starts with '>' |
-| test_agent_rules_path_format (tester) | Regression | PASS | Forward-slash path separator used |
-| **test_placeholder_count_exactly_one_in_default_project (DOC-003)** | Regression | **FAIL** | Count is 2, expected 1 — DOC-008 introduced second occurrence |
-| **test_placeholder_count_exactly_one_in_templates_coding (DOC-003)** | Regression | **FAIL** | Count is 2, expected 1 |
-| **test_placeholder_is_in_workspace_rules_section (DOC-003)** | Regression | **FAIL** | First occurrence (idx 75) precedes Workspace Rules (idx 231) |
+| test_directive_is_near_top | Unit | PASS | Within first 10 lines (actually line 2) |
+| test_existing_content_preserved | Unit | PASS | All 7 original sections intact |
 
-## Regression Analysis
+### DOC-008 Tester Edge-Case Tests (7 tests)
 
-The DOC-008 directive:
+| Test | Type | Result | Notes |
+|------|------|--------|-------|
+| test_directive_in_first_5_lines | Regression | PASS | Directive in lines 1–2 |
+| test_directive_is_very_first_content | Regression | PASS | First char is '>' (blockquote) |
+| test_no_unexpected_placeholders | Regression | PASS | Only {{PROJECT_NAME}} placeholder present |
+| test_no_single_brace_placeholder_leak | Regression | PASS | No malformed {PROJECT_NAME} found |
+| test_important_callout_syntax | Regression | PASS | Exact '> [!IMPORTANT]' line present |
+| test_directive_body_is_blockquote | Regression | PASS | Body line starts with '>' |
+| test_agent_rules_path_format | Regression | PASS | Forward-slash path separator used |
 
-```markdown
-> [!IMPORTANT]
-> **First Action — Read Rule Book:** Before any work, read `{{PROJECT_NAME}}/AGENT-RULES.md` for your complete permissions and rules.
-```
+### DOC-003 Regression Tests — BUG-093 Fix Verification (11 tests)
 
-Introduced a second `{{PROJECT_NAME}}` placeholder. DOC-003 asserts:
+| Test | Type | Result | Notes |
+|------|------|--------|-------|
+| test_placeholder_count_exactly_one_in_default_project | Regression | PASS | Assertion relaxed to >= 1; count is 2 (valid) |
+| test_placeholder_count_exactly_one_in_templates_coding | Regression | PASS | Same relaxation; both occurrences legitimate |
+| test_placeholder_is_in_workspace_rules_section | Regression | PASS | Now checks section body content (not first-file occurrence) |
+| test_noagentzone_reference_unchanged_in_default_project | Regression | PASS | |
+| test_github_reference_unchanged_in_default_project | Regression | PASS | |
+| test_vscode_reference_unchanged_in_default_project | Regression | PASS | |
+| test_replacement_with_hyphenated_project_name | Regression | PASS | |
+| test_replacement_with_underscored_project_name | Regression | PASS | |
+| test_replacement_with_numeric_suffix_project_name | Regression | PASS | |
+| test_default_project_file_has_no_bom | Regression | PASS | |
+| test_templates_coding_file_has_no_bom | Regression | PASS | |
 
-1. **Exactly 1** occurrence of `{{PROJECT_NAME}}` in the file — now **2** → FAIL
-2. **First occurrence** of `{{PROJECT_NAME}}` is inside `## Workspace Rules` — now **at line 2** (before the heading) → FAIL
+**Targeted suite total: 23 passed / 0 failed** (TST-2009)
 
-These tests **pass on `main`** and are broken only by the DOC-008 change.
+### Full Suite
 
-The DOC-003 assertions were always too strict (the template can legitimately have multiple
-placeholder  occurrences), but **existing tests must not be broken** — the Developer must
-update or relax those assertions as part of this WP.
+- **4409 passed, 76 failed, 2 skipped** (TST-2008)
+- All 76 failures confirmed pre-existing on `main` branch (verified by stashing DOC-008 changes)
+- Failing test suites: FIX-028/031/037/038/039 (codesign scripts), FIX-036/049/050 (version), FIX-009 (TST-ID format), INS-004 (pyc), INS-019 (shims), SAF-010/022/025 — none related to DOC-008
+- **Zero new regressions introduced by DOC-008**
+
+### Workspace Validation
+
+`scripts/validate_workspace.py --wp DOC-008` → **All checks passed** (exit code 0)
+
+---
+
+## AC Verification — US-033 AC 8
+
+The workpackage success criterion states: "copilot-instructions.md contains a first-action
+directive pointing agents to AGENT-RULES.md."
+
+Verification:
+- ✅ Directive is the very first content in the file (line 1–2)
+- ✅ Uses `> [!IMPORTANT]` GFM callout syntax
+- ✅ Contains `{{PROJECT_NAME}}/AGENT-RULES.md` path reference
+- ✅ Directive text instructs agents to read the file "Before any work"
+- ✅ All original template content preserved unchanged
+
+**AC 8 of US-033: SATISFIED**
+
+---
 
 ## Bugs Found
 
-- BUG-093: DOC-008 breaks DOC-003 placeholder count tests (regression) — logged in `docs/bugs/bugs.csv`
+No new bugs found in this iteration. BUG-093 (filed in Iteration 1) is marked Fixed in
+`docs/bugs/bugs.csv`.
 
 ## TODOs for Developer
 
-- [ ] **Fix or update the 3 failing DOC-003 edge-case tests** so the full suite passes.
-  The tests are in `tests/DOC-003/test_doc003_edge_cases.py`:
-  1. `test_placeholder_count_exactly_one_in_default_project` — change assertion from
-     `count == 1` to `count >= 1` (or update to `count == 2` if the new count is intentional and stable).
-  2. `test_placeholder_count_exactly_one_in_templates_coding` — same fix as above.
-  3. `test_placeholder_is_in_workspace_rules_section` — the test must be updated to
-     check that `{{PROJECT_NAME}}` appears somewhere in (or before) the Workspace Rules section,
-     or restructured to search for the specific placeholder occurrence in the Workspace Rules section
-     rather than using the index of the first occurrence.
-
-  **Preferred approach:** Change the count assertions to `count >= 2` (or `>= 1` to be
-  future-proof), and fix the Workspace Rules test to assert the **Workspace Rules section
-  contains** `{{PROJECT_NAME}}` (e.g., check the substring between `## Workspace Rules` and
-  the next `##` heading).
-
-- [ ] **Ensure all DOC-003 tests pass** after updating them:
-  ```
-  .venv\Scripts\python -m pytest tests/DOC-003/ -v
-  ```
-  All 17 tests must pass.
-
-- [ ] **Re-run the full test suite** (excluding pre-existing yaml import failures) and
-  confirm no new failures beyond those pre-existing on `main`.
-
-- [ ] **Note:** The developer's own 5 tests (tests/DOC-008/test_doc008_read_first_directive.py)
-  all pass and cover the requirements correctly. No changes needed to those.
+None.
 
 ## Verdict
 
-**FAIL — Return to Developer.**
+**PASS — Mark WP as Done.**
 
-All 12 DOC-008-specific tests pass (5 developer + 7 Tester edge-case). The implementation
-in `copilot-instructions.md` is correct. However, 3 DOC-003 regression tests fail due to
-the second `{{PROJECT_NAME}}` introduced by this WP. These were passing on `main` and must
-be green before the WP can be marked Done.
+All 23 DOC-008 + DOC-003 targeted tests pass. The 3 BUG-093 regressions are resolved.
+No new regressions vs. `main`. Workspace validation clean. AC 8 of US-033 satisfied.
