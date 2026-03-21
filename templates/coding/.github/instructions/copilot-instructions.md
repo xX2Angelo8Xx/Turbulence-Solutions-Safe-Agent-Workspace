@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> **First Action — Read Rule Book:** Before any work, read `{{PROJECT_NAME}}/AGENT-RULES.md` for your complete permissions and rules.
+
 # Turbulence Solutions – Copilot Instructions
 
 ## Company
