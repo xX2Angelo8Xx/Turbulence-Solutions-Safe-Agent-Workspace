@@ -463,8 +463,8 @@ class TestDenyReasonConstantUnchanged(unittest.TestCase):
         """The Block-N-of-M deny message must contain _DENY_REASON as a substring,
         so the policy message is always visible to the user."""
         state: dict = {}
-        count, _ = sg._increment_deny_counter(state, "regression-check", sg._DENY_THRESHOLD)
-        deny_reason = f"Block {count} of {sg._DENY_THRESHOLD}. {sg._DENY_REASON}"
+        count, _ = sg._increment_deny_counter(state, "regression-check", sg._DENY_THRESHOLD_DEFAULT)
+        deny_reason = f"Block {count} of {sg._DENY_THRESHOLD_DEFAULT}. {sg._DENY_REASON}"
         self.assertIn(sg._DENY_REASON, deny_reason)
         self.assertNotIn(".github", deny_reason.lower())
 

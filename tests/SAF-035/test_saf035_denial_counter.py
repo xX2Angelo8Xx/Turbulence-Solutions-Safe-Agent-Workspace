@@ -113,7 +113,7 @@ class TestCounterIncrements(unittest.TestCase):
                 state = sg._load_state(state_path)
                 # Ensure session exists with correct prior count
                 count, locked = sg._increment_deny_counter(
-                    state, session_id, sg._DENY_THRESHOLD
+                    state, session_id, sg._DENY_THRESHOLD_DEFAULT
                 )
                 sg._save_state(state_path, state)
                 self.assertEqual(count, expected_count)
@@ -134,7 +134,7 @@ class TestBlockNofMMessage(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             state_path = os.path.join(tmpdir, ".hook_state.json")
             session_id = "test-block-msg"
-            threshold = sg._DENY_THRESHOLD
+            threshold = sg._DENY_THRESHOLD_DEFAULT
 
             for n in range(1, 4):
                 state = sg._load_state(state_path)
@@ -275,7 +275,7 @@ class TestIndependentSessionCounters(unittest.TestCase):
             state_path = os.path.join(tmpdir, ".hook_state.json")
             session_a = "session-alpha"
             session_b = "session-beta"
-            threshold = sg._DENY_THRESHOLD
+            threshold = sg._DENY_THRESHOLD_DEFAULT
 
             # Add 5 denials to session A
             for _ in range(5):
@@ -309,7 +309,7 @@ class TestNewSessionStartsAtZero(unittest.TestCase):
             # Should not exist before first interaction
             self.assertNotIn(session_id, state)
 
-            count, locked = sg._increment_deny_counter(state, session_id, sg._DENY_THRESHOLD)
+            count, locked = sg._increment_deny_counter(state, session_id, sg._DENY_THRESHOLD_DEFAULT)
             self.assertEqual(count, 1)  # first deny → count becomes 1
             self.assertFalse(locked)
 
@@ -317,7 +317,7 @@ class TestNewSessionStartsAtZero(unittest.TestCase):
         """A new session should not be marked as locked."""
         state: dict = {}
         session_id = "new-session-no-lock"
-        count, locked = sg._increment_deny_counter(state, session_id, sg._DENY_THRESHOLD)
+        count, locked = sg._increment_deny_counter(state, session_id, sg._DENY_THRESHOLD_DEFAULT)
         self.assertFalse(locked)
 
 
@@ -457,7 +457,7 @@ class TestStatePersistence(unittest.TestCase):
 
             for expected in range(1, 6):
                 state = sg._load_state(state_path)
-                count, _ = sg._increment_deny_counter(state, session_id, sg._DENY_THRESHOLD)
+                count, _ = sg._increment_deny_counter(state, session_id, sg._DENY_THRESHOLD_DEFAULT)
                 sg._save_state(state_path, state)
                 self.assertEqual(count, expected)
 
@@ -515,7 +515,7 @@ class TestCorruptStateFile(unittest.TestCase):
 
             state = sg._load_state(state_path)  # returns {}
             session_id = "after-corrupt"
-            count, locked = sg._increment_deny_counter(state, session_id, sg._DENY_THRESHOLD)
+            count, locked = sg._increment_deny_counter(state, session_id, sg._DENY_THRESHOLD_DEFAULT)
             self.assertEqual(count, 1)
             self.assertFalse(locked)
 
@@ -536,7 +536,7 @@ class TestConcurrentAccess(unittest.TestCase):
                 try:
                     for _ in range(5):
                         state = sg._load_state(state_path)
-                        sg._increment_deny_counter(state, f"{session_id}-{thread_id}", sg._DENY_THRESHOLD)
+                        sg._increment_deny_counter(state, f"{session_id}-{thread_id}", sg._DENY_THRESHOLD_DEFAULT)
                         sg._save_state(state_path, state)
                         time.sleep(0.001)
                 except Exception as exc:
@@ -639,7 +639,7 @@ class TestMainIntegration(unittest.TestCase):
 
     def test_lockout_at_threshold_via_main(self) -> None:
         """After M denials the lockout message must be used."""
-        threshold = sg._DENY_THRESHOLD
+        threshold = sg._DENY_THRESHOLD_DEFAULT
         with tempfile.TemporaryDirectory() as tmpdir:
             state_path = os.path.join(tmpdir, ".hook_state.json")
             payload = json.dumps({

@@ -154,9 +154,14 @@ def _prevent_hook_state_writes():
         sys.path.insert(0, _SG_SCRIPTS_DIR)
     try:
         import security_gate
+        _default_counter_cfg = {
+            "counter_enabled": True,
+            "lockout_threshold": 20,
+        }
         with patch.object(security_gate, "_load_state", return_value={}), \
              patch.object(security_gate, "_save_state", return_value=None), \
-             patch.object(security_gate, "_get_session_id", return_value=("test-fixture-session", {})):
+             patch.object(security_gate, "_get_session_id", return_value=("test-fixture-session", {})), \
+             patch.object(security_gate, "_load_counter_config", return_value=dict(_default_counter_cfg)):
             yield
     except (ImportError, ModuleNotFoundError):
         yield

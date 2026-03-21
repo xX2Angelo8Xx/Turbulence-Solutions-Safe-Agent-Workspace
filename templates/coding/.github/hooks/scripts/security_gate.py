@@ -78,7 +78,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "05e1be2ef73d387d2f27aabab528db3be1dd110c6983b120ab2a0521a79c6254"
+_KNOWN_GOOD_GATE_HASH: str = "53e06243cbc78224e7c7aaae72c15b32536d17538e2e7f8504f80ad58ffa6793"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -94,13 +94,16 @@ _DENY_REASON = "Access denied. This action has been blocked by the workspace sec
 # SAF-035: Session denial counter constants
 # ---------------------------------------------------------------------------
 
-# Default maximum denials before a session is locked.  SAF-036 will make this
-# configurable via a workspace config file; until then it is hard-coded here.
-_DENY_THRESHOLD: int = 20
+# Default maximum denials before a session is locked.
+_DENY_THRESHOLD_DEFAULT: int = 20
+
+# Default: counter is active unless config disables it.
+_COUNTER_ENABLED_DEFAULT: bool = True
 
 # File names (relative to the scripts directory)
 _STATE_FILE_NAME: str = ".hook_state.json"
 _OTEL_JSONL_NAME: str = "copilot-otel.jsonl"
+_COUNTER_CONFIG_NAME: str = "counter_config.json"
 
 
 # ---------------------------------------------------------------------------
@@ -875,6 +878,35 @@ def _load_state(state_path: str) -> dict:
         return data
     except (OSError, json.JSONDecodeError, ValueError):
         return {}
+
+
+def _load_counter_config(scripts_dir: str) -> dict:
+    """Load counter configuration from counter_config.json.
+
+    Returns a dict with keys 'counter_enabled' (bool) and 'lockout_threshold' (int).
+    Falls back to defaults on any error (missing file, corrupt JSON, invalid types).
+    """
+    defaults = {
+        "counter_enabled": _COUNTER_ENABLED_DEFAULT,
+        "lockout_threshold": _DENY_THRESHOLD_DEFAULT,
+    }
+    config_path = os.path.join(scripts_dir, _COUNTER_CONFIG_NAME)
+    try:
+        if not os.path.isfile(config_path):
+            return dict(defaults)
+        with open(config_path, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+        if not isinstance(data, dict):
+            return dict(defaults)
+        enabled = data.get("counter_enabled", _COUNTER_ENABLED_DEFAULT)
+        threshold = data.get("lockout_threshold", _DENY_THRESHOLD_DEFAULT)
+        if not isinstance(enabled, bool):
+            enabled = _COUNTER_ENABLED_DEFAULT
+        if not isinstance(threshold, int) or isinstance(threshold, bool) or threshold < 1:
+            threshold = _DENY_THRESHOLD_DEFAULT
+        return {"counter_enabled": enabled, "lockout_threshold": threshold}
+    except (OSError, json.JSONDecodeError, ValueError, TypeError):
+        return dict(defaults)
 
 
 def _save_state(state_path: str, state: dict) -> None:
@@ -2337,35 +2369,44 @@ def main() -> None:
 
         # SAF-035: Session denial counter — check lock status before deciding
         scripts_dir = os.path.dirname(os.path.abspath(__file__))
-        state_path = os.path.join(scripts_dir, _STATE_FILE_NAME)
-        state = _load_state(state_path)
-        session_id, state = _get_session_id(scripts_dir, state)
-        session_data = state.get(session_id, {})
-        if isinstance(session_data, dict) and session_data.get("locked", False):
-            _lockout_msg = (
-                f"Session locked — {_DENY_THRESHOLD} denied actions reached. "
-                "Start a new chat session to continue working."
-            )
-            print(build_response("deny", _lockout_msg), flush=True)
-            sys.exit(0)
+        # SAF-036: Load counter configuration
+        counter_cfg = _load_counter_config(scripts_dir)
+        counter_enabled = counter_cfg["counter_enabled"]
+        threshold = counter_cfg["lockout_threshold"]
+
+        if counter_enabled:
+            state_path = os.path.join(scripts_dir, _STATE_FILE_NAME)
+            state = _load_state(state_path)
+            session_id, state = _get_session_id(scripts_dir, state)
+            session_data = state.get(session_id, {})
+            if isinstance(session_data, dict) and session_data.get("locked", False):
+                _lockout_msg = (
+                    f"Session locked — {threshold} denied actions reached. "
+                    "Start a new chat session to continue working."
+                )
+                print(build_response("deny", _lockout_msg), flush=True)
+                sys.exit(0)
 
         decision = decide(data, ws_root)
 
         if decision == "allow":
             print(build_response("allow"), flush=True)
         else:
-            # SAF-035: Increment deny counter and build progressive deny message
-            deny_count, now_locked = _increment_deny_counter(
-                state, session_id, _DENY_THRESHOLD
-            )
-            _save_state(state_path, state)
-            if now_locked:
-                deny_reason = (
-                    f"Session locked — {_DENY_THRESHOLD} denied actions reached. "
-                    "Start a new chat session to continue working."
+            if counter_enabled:
+                # SAF-035: Increment deny counter and build progressive deny message
+                deny_count, now_locked = _increment_deny_counter(
+                    state, session_id, threshold
                 )
+                _save_state(state_path, state)
+                if now_locked:
+                    deny_reason = (
+                        f"Session locked — {threshold} denied actions reached. "
+                        "Start a new chat session to continue working."
+                    )
+                else:
+                    deny_reason = f"Block {deny_count} of {threshold}. {_DENY_REASON}"
             else:
-                deny_reason = f"Block {deny_count} of {_DENY_THRESHOLD}. {_DENY_REASON}"
+                deny_reason = _DENY_REASON
             print(build_response("deny", deny_reason), flush=True)
 
     except Exception:
