@@ -1882,3 +1882,6 @@
 "TST-2001","DOC-010: targeted suite","Unit","DOC-010","Pass","2026-03-21","Windows 11 + Python 3.11.9","42 passed in 0.31s",""
 "TST-2002","DOC-007: targeted suite","Unit","DOC-007","Pass","2026-03-21","Windows 11 + Python 3.11.9","35 passed in 0.23s",""
 "TST-2003","test_doc008_read_first_directive","Unit","DOC-008","Pass","2026-03-21","Windows 11 + Python 3.11","5/5 tests passed","Verifies read-first directive presence, AGENT-RULES.md reference, {{PROJECT_NAME}} placeholder, top placement, and existing content preservation"
+"TST-2004","DOC-008 Full Suite + Tester Edge-Cases (Fail)","Regression","DOC-008","Fail","2026-03-21","Windows 11 + Python 3.11","12/12 DOC-008 tests pass; 3 DOC-003 regressions fail","DOC-008 adds second {{PROJECT_NAME}} breaking DOC-003 count/section tests"
+"TST-2005","DOC-008 Tester Edge-Case Tests","Regression","DOC-008","Pass","2026-03-21","Windows 11 + Python 3.11","7/7 edge-case tests pass","Edge cases: first 5 lines, no unexpected placeholders, GFM callout syntax, path format — all pass"
+"TST-2006","DOC-003 Regression: placeholder count (DOC-008)","Regression","DOC-008","Fail","2026-03-21","Windows 11 + Python 3.11","FAIL: count is 2, expected 1; first occurrence not in Workspace Rules","DOC-008 introduces second {{PROJECT_NAME}} violating DOC-003 exactly-one and section assertions"
