@@ -439,6 +439,10 @@ Templates (bundled inside Launcher)
 │   │   ├── INS-021/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── INS-022/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── MNT-001/
 │   │   │   └── dev-log.md
 │   │   ├── MNT-002/
@@ -570,7 +574,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-042/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
@@ -624,6 +627,7 @@ Templates (bundled inside Launcher)
 │       │   ├── project_creator.py
 │       │   ├── shim_config.py
 │       │   ├── updater.py
+│       │   ├── user_settings.py
 │       │   └── vscode.py
 │       ├── gui/
 │       │   ├── __init__.py
@@ -762,6 +766,7 @@ Templates (bundled inside Launcher)
 │   ├── INS-019/
 │   ├── INS-020/
 │   ├── INS-021/
+│   ├── INS-022/
 │   ├── MNT-001/
 │   ├── MNT-002/
 │   ├── SAF-001/
