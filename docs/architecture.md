@@ -50,6 +50,7 @@ Templates (bundled inside Launcher)
 │   │   ├── 2026-03-19-maintenance.md
 │   │   ├── 2026-03-20-maintenance.md
 │   │   ├── 2026-03-20b-maintenance.md
+│   │   ├── 2026-03-24-maintenance.md
 │   │   └── action-tracker.json
 │   ├── plans/
 │   │   ├── plan-fixLegacyValidationErrors.md
@@ -298,6 +299,10 @@ Templates (bundled inside Launcher)
 │   │   ├── FIX-063/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── FIX-064/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── FIX-065/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -314,7 +319,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-070/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-001/
@@ -551,7 +555,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-037/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
@@ -698,6 +701,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-061/
 │   ├── FIX-062/
 │   ├── FIX-063/
+│   ├── FIX-064/
 │   ├── FIX-065/
 │   ├── FIX-066/
 │   ├── FIX-067/
@@ -781,6 +785,8 @@ Templates (bundled inside Launcher)
 │   ├── SAF-035/
 │   ├── SAF-036/
 │   ├── SAF-037/
+│   ├── SAF-040/
+│   ├── SAF-042/
 │   ├── shared/
 │   ├── __init__.py
 │   └── conftest.py
