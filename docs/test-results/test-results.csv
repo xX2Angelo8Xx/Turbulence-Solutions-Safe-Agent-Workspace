@@ -1970,3 +1970,5 @@
 "TST-2089","GUI-020 developer tests (28 passed)","Unit","GUI-020","Pass","2026-03-25","Windows 11 + Python 3.11","28 passed, 0 failed","write_counter_config unit tests, create_project integration tests, app counter config passing tests"
 "TST-2090","GUI-020 tester edge-case tests (17 passed)","Unit","GUI-020","Pass","2026-03-25","Windows 11 + Python 3.11","17 passed, 0 failed","boundary thresholds (1 and 999999), JSON type correctness (bool/int), template without hooks dir, app fallback for zero/negative threshold"
 "TST-2091","GUI-022 include-readmes-checkbox unit tests","Unit","GUI-022","Pass","2026-03-25","Windows 11 + Python 3.11","12 passed, 0 failed","checkbox existence, default value, settings restore, toggle persistence, create_project wiring, stub param"
+"TST-2092","GUI-022: targeted suite","Unit","GUI-022","Pass","2026-03-25","Windows 11 + Python 3.11","20 passed in 0.41s",""
+"TST-2093","GUI-022: full regression suite","Regression","GUI-022","Fail","2026-03-25","Windows 11 + Python 3.11","14 errors in 2.58s",""
