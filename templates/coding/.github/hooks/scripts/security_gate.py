@@ -83,7 +83,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "5b9104699f4ad00c0ab5635388547399053af0bbd855906a2465817791a1bbdf"
+_KNOWN_GOOD_GATE_HASH: str = "fa9a42e2d02f755f89b3d0a938952550bdca34a40b01bd5bfe12aeb468b35107"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -629,6 +629,28 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         path_args_restricted=True,
         allow_arbitrary_paths=False,
         notes="PowerShell Move-Item",
+    ),
+    # SAF-041: shell utility commands completing ACs 2-4 of US-036
+    "touch": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Create/update files inside project folder; path args zone-checked",
+    ),
+    "chmod": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Non-Windows permission change; target path zone-checked",
+    ),
+    "ln": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Symbolic/hard links; both source and target path args zone-checked",
     ),
     # Category K — Recursive directory listing (SAF-006)
     "tree": CommandRule(
@@ -1357,6 +1379,8 @@ _PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
     "set-content", "sc", "add-content", "ac", "out-file",
     # FIX-032: Copy/move cmdlets — both source and dest zone-checked
     "copy-item", "cp", "copy", "mv", "move", "move-item",
+    # SAF-041: shell utility commands — path args zone-checked
+    "touch", "chmod", "ln",
 })
 
 # SAF-029: PowerShell delete cmdlets that receive project-folder fallback for
