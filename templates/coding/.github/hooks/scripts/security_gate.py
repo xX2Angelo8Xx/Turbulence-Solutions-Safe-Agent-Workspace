@@ -13,6 +13,7 @@ import tempfile
 import uuid
 from pathlib import Path
 from typing import Optional
+from urllib.parse import unquote
 
 # SAF-002: zone classification is delegated to the dedicated module.
 # FIX-069: The Python embeddable distribution (ts-python shim) ships with a
@@ -80,7 +81,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "e2699fa682039a816271c55354ea4bff69bd31fa4488ec7ce4b33c4641eacd35"
+_KNOWN_GOOD_GATE_HASH: str = "3fe22204544f4490589cf28deba2650ce290d1feab4e70fa3ba90a2648d512ed"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2199,7 +2200,7 @@ def _extract_lsp_file_path(data: dict) -> Optional[str]:
     if isinstance(uri, str) and uri:
         # Handle file:///C:/path (Windows) and file:///path (Unix)
         if uri.lower().startswith("file:///"):
-            path = uri[8:]  # strip "file:///"
+            path = unquote(uri[8:])  # strip "file:///" and decode percent-encoding
             # Windows drive letter: C:/path
             if len(path) >= 2 and path[1] == ":":
                 return path
@@ -2210,7 +2211,7 @@ def _extract_lsp_file_path(data: dict) -> Optional[str]:
             remainder = uri[7:]
             slash = remainder.find("/")
             if slash != -1:
-                return remainder[slash:]
+                return unquote(remainder[slash:])  # decode percent-encoding
         # Non-file URI scheme — not a file-system path; fail closed
         return None
 

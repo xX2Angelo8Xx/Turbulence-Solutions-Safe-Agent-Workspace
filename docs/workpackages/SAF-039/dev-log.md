@@ -43,3 +43,30 @@ Coverage:
 - `docs/workpackages/SAF-039/dev-log.md` (this file)
 - `tests/SAF-039/test_saf039_lsp_tools.py`
 - `docs/test-results/test-results.csv` (via add_test_result.py)
+
+---
+
+## Iteration 2 — BUG-097 Fix (2026-03-24)
+
+### Bug Fixed
+**BUG-097**: `_extract_lsp_file_path()` returned the raw URI path without decoding percent-encoded characters. A URI like `file:///workspace/project/%2E%2E/.github/config` extracted to `/workspace/project/%2E%2E/.github/config`. Since `posixpath.normpath` does not interpret `%2E%2E` (only literal `..`), `zone_classifier` allowed the path, but VS Code decodes `%2E` → `.` per RFC 3986 so the actual operation targeted `.github/config`.
+
+### Fix Applied
+Added `from urllib.parse import unquote` import to `security_gate.py`.
+
+In `_extract_lsp_file_path()`, applied `unquote()` on the extracted URI path before returning:
+- `file:///` branch: `path = unquote(uri[8:])`
+- `file://hostname/` branch: `return unquote(remainder[slash:])`
+
+`unquote()` is NOT applied to `filePath` values — those are direct filesystem paths, not URI-encoded strings.
+
+After modifying `security_gate.py`, re-ran `update_hashes.py` to re-embed SHA256 hashes (`_KNOWN_GOOD_GATE_HASH` updated to `3fe22204544f4490589cf28deba2650ce290d1feab4e70fa3ba90a2648d512ed`).
+
+### Test Results (Iteration 2)
+- **65 developer tests** (`test_saf039_lsp_tools.py`) — all pass ✓
+- **27 tester edge-case tests** (`test_saf039_tester_edge_cases.py`) — all 27 pass ✓ (previously 7 failed in `TestPercentEncodedTraversalBypass`)
+- **Total: 92 passed, 0 failed** — TST-2041
+
+### Additional Files Changed in Iteration 2
+- `templates/coding/.github/hooks/scripts/security_gate.py` (unquote import + URI path decoding)
+- `docs/test-results/test-results.csv` (TST-2041 via add_test_result.py)
