@@ -2,7 +2,47 @@
 
 **Tester:** Tester Agent
 **Date:** 2026-03-24
-**Iteration:** 1
+**Iteration:** 2 (updated — PASS)
+
+---
+
+## Iteration 2 Summary
+
+SAF-039 — Allow LSP tools scoped to project folder — **PASS**.
+
+BUG-097 has been fixed. `_extract_lsp_file_path()` now applies `urllib.parse.unquote()` to both URI code paths (`file:///` branch and `file://hostname/` branch), correctly decoding percent-encoded sequences such as `%2E%2E` → `..` before `zone_classifier.classify()` evaluates the path. The `_KNOWN_GOOD_GATE_HASH` was updated (`3fe22204544f4490589cf28deba2650ce290d1feab4e70fa3ba90a2648d512ed`) to reflect the modified `security_gate.py`.
+
+All 92 tests pass: 65 developer tests + 27 tester edge-case tests (including all 7 `TestPercentEncodedTraversalBypass` tests that previously failed). No new regressions were introduced — the full test suite yields the same 76 pre-existing failures on the SAF-039 branch as on the parent commit.
+
+### Iteration 2 Test Results
+
+| Test Run | Tests | Result | TST-ID |
+|----------|-------|--------|--------|
+| SAF-039 full suite (dev + tester) | 92 | PASS (92/92) | TST-2042 |
+
+### Fix Verification
+
+- `from urllib.parse import unquote` present at line 16 ✓
+- `file:///` branch: `path = unquote(uri[8:])` at line 2203 ✓
+- `file://hostname/` branch: `return unquote(remainder[slash:])` at line 2214 ✓
+- `filePath` branch: no `unquote()` applied (correct — direct FS path, not URI-encoded) ✓
+- `_KNOWN_GOOD_GATE_HASH` updated to `3fe22204544f4490589cf28deba2650ce290d1feab4e70fa3ba90a2648d512ed` ✓
+
+### Full Suite Regression Analysis
+
+- **Before SAF-039 (parent commit a5edaab):** 76 failed, 4554 passed, 2 skipped, 1 xfailed
+- **SAF-039 branch:** 76 failed, 4646 passed, 2 skipped, 1 xfailed
+- **New tests added:** +92 (all pass)
+- **New failures introduced:** 0
+- Pre-existing failures are unrelated to LSP tools (FIX-028/031/038 codesign CI, FIX-050 version consistency, SAF-022 exclude settings, SAF-025 pycache, SAF-010 hook config, INS-019 shims)
+
+## Verdict
+
+**PASS** — No security vulnerabilities, no regressions, BUG-097 fix confirmed.
+
+---
+
+## Iteration 1 (original report — FAIL)
 
 ## Summary
 
