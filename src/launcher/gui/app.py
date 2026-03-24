@@ -197,6 +197,37 @@ class App:
             row=7, column=0, columnspan=3, padx=20, pady=(20, 24), sticky="ew"
         )
 
+        # Blocking attempts counter section (GUI-019) -- toggle switch + threshold entry.
+        # CTkSwitch is used so this does not affect the Open in VS Code CTkCheckBox count.
+        self.counter_enabled_var = ctk.BooleanVar(value=True)
+        self.counter_enabled_checkbox = ctk.CTkSwitch(
+            self._window,
+            text="Enable blocking attempts counter",
+            variable=self.counter_enabled_var,
+            command=self._on_counter_enabled_toggle,
+            text_color=COLOR_TEXT,
+            progress_color=COLOR_SECONDARY,
+            button_color="#4AA8D4",
+        )
+        self.counter_enabled_checkbox.grid(
+            row=8, column=0, columnspan=2, padx=20, pady=(10, 2), sticky="w"
+        )
+        ctk.CTkLabel(
+            self._window,
+            text="Block threshold:",
+            anchor="w",
+            text_color=COLOR_TEXT,
+        ).grid(row=9, column=0, padx=(20, 8), pady=(0, 4), sticky="w")
+        self.counter_threshold_var = ctk.StringVar(value="20")
+        self.counter_threshold_entry = ctk.CTkEntry(
+            self._window,
+            textvariable=self.counter_threshold_var,
+            width=80,
+        )
+        self.counter_threshold_entry.grid(
+            row=9, column=1, padx=(0, 8), pady=(0, 4), sticky="w"
+        )
+
         # Check for Updates button (GUI-010) -- secondary text-link style button.
         self.check_updates_button = ctk.CTkButton(
             self._window,
@@ -209,7 +240,7 @@ class App:
             border_width=0,
         )
         self.check_updates_button.grid(
-            row=8, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="e"
+            row=10, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="e"
         )
 
         # Update notification banner (GUI-009) -- hidden until an update is detected.
@@ -221,7 +252,7 @@ class App:
             height=28,
         )
         self.update_banner.grid(
-            row=9, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+            row=11, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
         )
         self.update_banner.grid_remove()
 
@@ -236,7 +267,7 @@ class App:
             height=32,
         )
         self.download_install_button.grid(
-            row=10, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+            row=12, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
         )
         self.download_install_button.grid_remove()
 
@@ -268,6 +299,27 @@ class App:
         if find_vscode() is None:
             self.open_in_vscode_checkbox.configure(state="disabled")
             self.open_in_vscode_var.set(False)
+
+    def _on_counter_enabled_toggle(self) -> None:
+        """Grey out the threshold entry when the counter is disabled (GUI-019)."""
+        if self.counter_enabled_var.get():
+            self.counter_threshold_entry.configure(state="normal")
+        else:
+            self.counter_threshold_entry.configure(state="disabled")
+
+    def get_counter_threshold(self) -> int:
+        """Return the validated blocking threshold as an integer.
+
+        Raises ValueError when the current entry value is not a positive integer.
+        """
+        raw = self.counter_threshold_var.get().strip()
+        try:
+            value = int(raw)
+        except (ValueError, TypeError) as exc:
+            raise ValueError(f"Threshold must be a positive integer, got: {raw!r}") from exc
+        if value <= 0:
+            raise ValueError(f"Threshold must be greater than zero, got: {value}")
+        return value
 
     def _browse_destination(self) -> None:
         """Open a native folder browser and populate the destination entry."""
