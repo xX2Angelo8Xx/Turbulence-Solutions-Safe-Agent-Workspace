@@ -43,6 +43,8 @@ _EXEMPT_TOOLS: frozenset = frozenset({
     "semantic_search", "file_search", "Glob", "agent", "Agent",
     "runSubagent", "search_subagent",
     "get_errors",  # SAF-023: handled early in decide(); listed here to pass unknown-tool guard
+    # SAF-039: VS Code LSP tools — handled early in decide(); zone-checked to project folder
+    "vscode_listCodeUsages", "vscode_renameSymbol",
     # FIX-035: VS Code/Copilot deferred development tools — safe to allow;
     # handled early in decide() before the path-check block.
     "install_python_packages", "configure_python_environment", "fetch_webpage",
@@ -78,7 +80,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "53e06243cbc78224e7c7aaae72c15b32536d17538e2e7f8504f80ad58ffa6793"
+_KNOWN_GOOD_GATE_HASH: str = "e2699fa682039a816271c55354ea4bff69bd31fa4488ec7ce4b33c4641eacd35"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2169,6 +2171,113 @@ def validate_get_errors(data: dict, ws_root: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# SAF-039: vscode_listCodeUsages / vscode_renameSymbol — path extraction helper
+# ---------------------------------------------------------------------------
+
+def _extract_lsp_file_path(data: dict) -> Optional[str]:
+    """Extract the target file path from a VS Code LSP tool payload.
+
+    Tries ``filePath`` first (workspace-relative), then ``uri`` (with
+    ``file://`` scheme stripped).  Looks in ``tool_input`` before falling
+    back to the top-level data dict.  Returns None when no path is present.
+    """
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        tool_input = {}
+
+    # 1. Try filePath in tool_input, then top-level
+    raw = tool_input.get("filePath")
+    if not isinstance(raw, str) or not raw:
+        raw = data.get("filePath")
+    if isinstance(raw, str) and raw:
+        return raw
+
+    # 2. Try uri — strip file:// scheme if present
+    uri = tool_input.get("uri")
+    if not isinstance(uri, str) or not uri:
+        uri = data.get("uri")
+    if isinstance(uri, str) and uri:
+        # Handle file:///C:/path (Windows) and file:///path (Unix)
+        if uri.lower().startswith("file:///"):
+            path = uri[8:]  # strip "file:///"
+            # Windows drive letter: C:/path
+            if len(path) >= 2 and path[1] == ":":
+                return path
+            # Unix absolute path: /path
+            return "/" + path
+        elif uri.lower().startswith("file://"):
+            # file://hostname/path — strip scheme and hostname
+            remainder = uri[7:]
+            slash = remainder.find("/")
+            if slash != -1:
+                return remainder[slash:]
+        # Non-file URI scheme — not a file-system path; fail closed
+        return None
+
+    return None
+
+
+# ---------------------------------------------------------------------------
+# SAF-039: vscode_listCodeUsages — zone-restricted to project folder
+# ---------------------------------------------------------------------------
+
+def validate_vscode_list_code_usages(data: dict, ws_root: str) -> str:
+    """SAF-039: Validate vscode_listCodeUsages tool calls.
+
+    Extracts the target file path from ``filePath`` or ``uri`` in the
+    payload.  Allows the call only when the path resolves inside the project
+    folder.  Fails closed — returns "deny" when no path is present.
+    """
+    raw_path = _extract_lsp_file_path(data)
+    if not isinstance(raw_path, str) or not raw_path:
+        # No path found — fail closed
+        return "deny"
+
+    # Null bytes have no legitimate use in file paths — deny immediately
+    if "\x00" in raw_path:
+        return "deny"
+
+    zone = zone_classifier.classify(raw_path, ws_root)
+    if zone == "allow":
+        # Block .git internals even when inside project folder
+        if zone_classifier.is_git_internals(raw_path):
+            return "deny"
+        return "allow"
+    return "deny"
+
+
+# ---------------------------------------------------------------------------
+# SAF-039: vscode_renameSymbol — write-like; zone-restricted + .git/ blocked
+# ---------------------------------------------------------------------------
+
+def validate_vscode_rename_symbol(data: dict, ws_root: str) -> str:
+    """SAF-039: Validate vscode_renameSymbol tool calls.
+
+    vscode_renameSymbol modifies source files in-place, so it is treated as
+    a write-like operation.  Extracts the target file path from ``filePath``
+    or ``uri`` in the payload.  Allows the call only when the path resolves
+    inside the project folder.  Explicitly blocks ``.git/`` internals.
+    Fails closed — returns "deny" when no path is present.
+    """
+    raw_path = _extract_lsp_file_path(data)
+    if not isinstance(raw_path, str) or not raw_path:
+        # No path found — fail closed
+        return "deny"
+
+    # Null bytes have no legitimate use in file paths — deny immediately
+    if "\x00" in raw_path:
+        return "deny"
+
+    zone = zone_classifier.classify(raw_path, ws_root)
+    if zone == "allow":
+        # Write-like: always block .git internals (SAF-032 extension)
+        if zone_classifier.is_git_internals(raw_path):
+            return "deny"
+        return "allow"
+    return "deny"
+
+
+# ---------------------------------------------------------------------------
 # SAF-006: Recursive enumeration protection
 # ---------------------------------------------------------------------------
 
@@ -2287,6 +2396,14 @@ def decide(data: dict, ws_root: str) -> str:
     # field is inspected rather than a single filePath.
     if tool_name == "get_errors":
         return validate_get_errors(data, ws_root)
+
+    # SAF-039: vscode_listCodeUsages — filePath/uri must be inside project folder.
+    if tool_name == "vscode_listCodeUsages":
+        return validate_vscode_list_code_usages(data, ws_root)
+
+    # SAF-039: vscode_renameSymbol — write-like; filePath/uri must be inside project folder.
+    if tool_name == "vscode_renameSymbol":
+        return validate_vscode_rename_symbol(data, ws_root)
 
     # FIX-021: file_search has no filePath — VS Code files.exclude hides zones
     if tool_name == "file_search":
