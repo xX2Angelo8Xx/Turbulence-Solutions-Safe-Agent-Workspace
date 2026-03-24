@@ -159,13 +159,15 @@ class TestCounterDefaults:
             "Counter switch command must be app._on_counter_enabled_toggle"
         )
 
-    def test_ctk_checkbox_still_called_once(self) -> None:
-        """CTkCheckBox must still be called exactly once (Open in VS Code) after adding counter switch."""
+    def test_ctk_checkbox_called_at_least_twice(self) -> None:
+        """CTkCheckBox must be called at least twice: Open in VS Code and Include README files."""
         _CTK_MOCK.reset_mock()
         from launcher.gui.app import App
         App()
-        # CTkSwitch is used for counter — CTkCheckBox count must remain 1.
-        _CTK_MOCK.CTkCheckBox.assert_called_once()
+        # CTkSwitch is used for counter — CTkCheckBox is used for both VS Code and README checkboxes.
+        assert _CTK_MOCK.CTkCheckBox.call_count >= 2, (
+            f"Expected at least 2 CTkCheckBox calls, got {_CTK_MOCK.CTkCheckBox.call_count}"
+        )
 
 
 # ---------------------------------------------------------------------------

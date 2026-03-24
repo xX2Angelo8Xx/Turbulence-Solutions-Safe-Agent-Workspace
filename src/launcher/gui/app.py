@@ -20,6 +20,7 @@ from launcher.core.downloader import download_update
 from launcher.core.applier import apply_update
 from launcher.core.project_creator import create_project, is_template_ready, list_templates
 from launcher.core.shim_config import read_python_path, verify_ts_python, write_python_path
+from launcher.core.user_settings import get_setting, set_setting
 from launcher.core.vscode import find_vscode, open_in_vscode
 from launcher.gui.components import make_browse_row, make_label_entry_row
 from launcher.gui.validation import (
@@ -29,7 +30,7 @@ from launcher.gui.validation import (
 )
 
 _WINDOW_WIDTH: int = 580
-_WINDOW_HEIGHT: int = 590
+_WINDOW_HEIGHT: int = 630
 
 # Path within a workspace root where the hook state file lives.
 _HOOK_STATE_RELATIVE: str = ".github/hooks/scripts/.hook_state.json"
@@ -231,6 +232,22 @@ class App:
             row=6, column=0, columnspan=2, padx=20, pady=10, sticky="w"
         )
 
+        # Include README files checkbox (GUI-022)
+        initial_include_readmes = get_setting("include_readmes", True)
+        self.include_readmes_var = ctk.BooleanVar(value=bool(initial_include_readmes))
+        self.include_readmes_checkbox = ctk.CTkCheckBox(
+            self._window,
+            text="Include README files",
+            variable=self.include_readmes_var,
+            command=self._on_include_readmes_toggle,
+            text_color=COLOR_TEXT,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
+        )
+        self.include_readmes_checkbox.grid(
+            row=7, column=0, columnspan=2, padx=20, pady=(0, 6), sticky="w"
+        )
+
         # Create Project button
         self.create_button = ctk.CTkButton(
             self._window,
@@ -242,7 +259,7 @@ class App:
             height=40,
         )
         self.create_button.grid(
-            row=7, column=0, columnspan=3, padx=20, pady=(20, 24), sticky="ew"
+            row=8, column=0, columnspan=3, padx=20, pady=(20, 24), sticky="ew"
         )
 
         # Blocking attempts counter section (GUI-019) -- toggle switch + threshold entry.
@@ -258,14 +275,14 @@ class App:
             button_color="#4AA8D4",
         )
         self.counter_enabled_checkbox.grid(
-            row=8, column=0, columnspan=2, padx=20, pady=(10, 2), sticky="w"
+            row=9, column=0, columnspan=2, padx=20, pady=(10, 2), sticky="w"
         )
         ctk.CTkLabel(
             self._window,
             text="Block threshold:",
             anchor="w",
             text_color=COLOR_TEXT,
-        ).grid(row=9, column=0, padx=(20, 8), pady=(0, 4), sticky="w")
+        ).grid(row=10, column=0, padx=(20, 8), pady=(0, 4), sticky="w")
         self.counter_threshold_var = ctk.StringVar(value="20")
         self.counter_threshold_entry = ctk.CTkEntry(
             self._window,
@@ -273,7 +290,7 @@ class App:
             width=80,
         )
         self.counter_threshold_entry.grid(
-            row=9, column=1, padx=(0, 8), pady=(0, 4), sticky="w"
+            row=10, column=1, padx=(0, 8), pady=(0, 4), sticky="w"
         )
 
         # Check for Updates button (GUI-010) -- secondary text-link style button.
@@ -288,7 +305,7 @@ class App:
             border_width=0,
         )
         self.check_updates_button.grid(
-            row=10, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="e"
+            row=11, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="e"
         )
 
         # Update notification banner (GUI-009) -- hidden until an update is detected.
@@ -300,7 +317,7 @@ class App:
             height=28,
         )
         self.update_banner.grid(
-            row=11, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+            row=12, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
         )
         self.update_banner.grid_remove()
 
@@ -315,7 +332,7 @@ class App:
             height=32,
         )
         self.download_install_button.grid(
-            row=12, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+            row=13, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
         )
         self.download_install_button.grid_remove()
 
@@ -347,6 +364,10 @@ class App:
         if find_vscode() is None:
             self.open_in_vscode_checkbox.configure(state="disabled")
             self.open_in_vscode_var.set(False)
+
+    def _on_include_readmes_toggle(self) -> None:
+        """Persist the Include README files checkbox state (GUI-022)."""
+        set_setting("include_readmes", self.include_readmes_var.get())
 
     def _on_counter_enabled_toggle(self) -> None:
         """Grey out the threshold entry when the counter is disabled (GUI-019)."""
@@ -441,6 +462,9 @@ class App:
         except ValueError:
             counter_threshold = 20
 
+        # Read include_readmes from GUI checkbox (GUI-022).
+        include_readmes = self.include_readmes_var.get()
+
         try:
             created_path = create_project(
                 template_path,
@@ -448,6 +472,7 @@ class App:
                 folder_name,
                 counter_enabled=counter_enabled,
                 counter_threshold=counter_threshold,
+                include_readmes=include_readmes,
             )
         except Exception as exc:
             messagebox.showerror("Project Creation Failed", str(exc))

@@ -33,6 +33,7 @@ def create_project(
     folder_name: str,
     counter_enabled: bool = _DEFAULT_COUNTER_ENABLED,
     counter_threshold: int = _DEFAULT_COUNTER_THRESHOLD,
+    include_readmes: bool = True,
 ) -> Path:
     """Copy *template_path* into *destination* / *folder_name*.
 

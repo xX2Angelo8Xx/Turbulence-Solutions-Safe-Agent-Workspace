@@ -373,6 +373,9 @@ def test_on_create_project_proceeds_when_shim_ok(tmp_path):
     instance.counter_enabled_var.get.return_value = True
     instance.counter_threshold_var = MagicMock()
     instance.counter_threshold_var.get.return_value = "20"
+    # GUI-022: _on_create_project reads include_readmes from this attribute.
+    instance.include_readmes_var = MagicMock()
+    instance.include_readmes_var.get.return_value = True
 
     with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
          patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
