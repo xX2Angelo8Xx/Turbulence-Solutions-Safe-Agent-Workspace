@@ -83,7 +83,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "5cd1d17b4b47f4ab15ea07cdff2ac6c5e902b7eeb4e4b93dffe9cc99e0b5d5ab"
+_KNOWN_GOOD_GATE_HASH: str = "5b9104699f4ad00c0ab5635388547399053af0bbd855906a2465817791a1bbdf"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -391,6 +391,56 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         path_args_restricted=True,
         allow_arbitrary_paths=False,
         notes="",
+    ),
+    # SAF-040: additional read-only commands completing AC 1 of US-036
+    "diff": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Unix diff; path args zone-checked",
+    ),
+    "fc": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Windows file compare; path args zone-checked",
+    ),
+    "comp": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Windows binary compare; path args zone-checked",
+    ),
+    "sort": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Sort input/file; path args zone-checked",
+    ),
+    "uniq": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Filter duplicate lines; path args zone-checked",
+    ),
+    "awk": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Awk text processing; file path args zone-checked",
+    ),
+    "sed": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="Sed stream editor (read mode); file path args zone-checked",
     ),
     "ls": CommandRule(
         denied_flags=frozenset(),
