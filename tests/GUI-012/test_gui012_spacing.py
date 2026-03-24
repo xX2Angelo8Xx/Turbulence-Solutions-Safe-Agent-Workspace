@@ -37,7 +37,7 @@ class TestWindowHeight:
     def test_window_height_is_440(self):
         app = _fresh_app()
         geometry_call = app._window.geometry.call_args[0][0]
-        assert "590" in geometry_call
+        assert "630" in geometry_call
 
 
 # ---------------------------------------------------------------------------
@@ -67,9 +67,9 @@ class TestMainWidgetPadding:
         _CTK_MOCK.reset_mock()
         App()
         create_btn_mock = _CTK_MOCK.CTkButton.return_value
-        # Use call_args_list to find the Create Project button grid call (row=7).
+        # Use call_args_list to find the Create Project button grid call (row=8).
         create_grid_call = next(
-            c for c in create_btn_mock.grid.call_args_list if c.kwargs.get("row") == 7
+            c for c in create_btn_mock.grid.call_args_list if c.kwargs.get("row") == 8
         )
         pady = create_grid_call.kwargs.get("pady", 0)
         if isinstance(pady, tuple):
@@ -92,7 +92,7 @@ class TestMainWidgetPadding:
         _CTK_MOCK.reset_mock()
         App()
         checkbox_instance = _CTK_MOCK.CTkCheckBox.return_value
-        grid_call = checkbox_instance.grid.call_args
+        grid_call = checkbox_instance.grid.call_args_list[0]
         pady = grid_call.kwargs.get("pady", 0)
         if isinstance(pady, tuple):
             assert any(v >= 10 for v in pady)
@@ -116,9 +116,9 @@ class TestCreateButtonLayout:
         _CTK_MOCK.reset_mock()
         App()
         create_btn_mock = _CTK_MOCK.CTkButton.return_value
-        # Use call_args_list to find the Create Project button grid call (row=7).
+        # Use call_args_list to find the Create Project button grid call (row=8).
         create_grid_call = next(
-            c for c in create_btn_mock.grid.call_args_list if c.kwargs.get("row") == 7
+            c for c in create_btn_mock.grid.call_args_list if c.kwargs.get("row") == 8
         )
         assert "ew" in str(create_grid_call.kwargs.get("sticky", ""))
 

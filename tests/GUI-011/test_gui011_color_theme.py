@@ -145,15 +145,15 @@ class TestCheckboxColors:
         from launcher.config import COLOR_TEXT
         app = _fresh_app()
         calls = _CTK_MOCK.CTkCheckBox.call_args_list
-        assert len(calls) == 1
-        assert calls[0].kwargs.get("text_color") == COLOR_TEXT
+        assert len(calls) == 2
+        assert all(c.kwargs.get("text_color") == COLOR_TEXT for c in calls)
 
     def test_checkbox_fg_color(self):
         from launcher.config import COLOR_SECONDARY
         app = _fresh_app()
         calls = _CTK_MOCK.CTkCheckBox.call_args_list
-        assert len(calls) == 1
-        assert calls[0].kwargs.get("fg_color") == COLOR_SECONDARY
+        assert len(calls) == 2
+        assert all(c.kwargs.get("fg_color") == COLOR_SECONDARY for c in calls)
 
 
 # ---------------------------------------------------------------------------

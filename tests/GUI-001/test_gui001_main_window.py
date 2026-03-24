@@ -129,17 +129,17 @@ class TestRequiredWidgets:
         assert any("Create Project" in str(c) for c in _CTK_MOCK.CTkButton.call_args_list)
 
     def test_open_in_vscode_checkbox_created(self):
-        """CTkCheckBox must be created exactly once."""
+        """CTkCheckBox must be created at least twice (Open in VS Code + Include README files)."""
         _CTK_MOCK.reset_mock()
         App()
-        _CTK_MOCK.CTkCheckBox.assert_called_once()
+        assert _CTK_MOCK.CTkCheckBox.call_count >= 2
 
     def test_open_in_vscode_checkbox_text(self):
         """CTkCheckBox must carry the label 'Open in VS Code'."""
         _CTK_MOCK.reset_mock()
         App()
-        checkbox_call = _CTK_MOCK.CTkCheckBox.call_args
-        assert "Open in VS Code" in str(checkbox_call)
+        calls = _CTK_MOCK.CTkCheckBox.call_args_list
+        assert any("Open in VS Code" in str(c) for c in calls)
 
     def test_project_name_entry_is_accessible_as_attribute(self):
         app = _fresh_app()

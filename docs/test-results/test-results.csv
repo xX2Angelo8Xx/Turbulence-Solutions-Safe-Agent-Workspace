@@ -1972,3 +1972,4 @@
 "TST-2091","GUI-022 include-readmes-checkbox unit tests","Unit","GUI-022","Pass","2026-03-25","Windows 11 + Python 3.11","12 passed, 0 failed","checkbox existence, default value, settings restore, toggle persistence, create_project wiring, stub param"
 "TST-2092","GUI-022: targeted suite","Unit","GUI-022","Pass","2026-03-25","Windows 11 + Python 3.11","20 passed in 0.41s",""
 "TST-2093","GUI-022: full regression suite","Regression","GUI-022","Fail","2026-03-25","Windows 11 + Python 3.11","14 errors in 2.58s",""
+"TST-2094","GUI-022 iteration-2 regression fixes","Regression","GUI-022","Pass","2026-03-25","Windows 11 + Python 3.11","99 passed, 0 failed","Fixed 8 regressions in GUI-001, GUI-011, GUI-012; all 99 tests pass"
