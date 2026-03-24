@@ -83,7 +83,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "fa9a42e2d02f755f89b3d0a938952550bdca34a40b01bd5bfe12aeb468b35107"
+_KNOWN_GOOD_GATE_HASH: str = "91f80137f977fa3a0d682f9fcbfa94b6f3d4e3983c4af19e794e5622c212463a"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -296,13 +296,13 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         denied_flags=frozenset({"--force", "-f"}),
         allowed_subcommands=frozenset({
             "status", "log", "diff", "branch", "add", "commit",
-            "fetch", "pull", "push", "checkout", "stash", "tag",
-            "show", "remote", "config", "init", "clone", "merge",
+            "fetch", "pull", "push", "checkout", "switch", "stash", "tag",
+            "show", "remote", "blame", "config", "init", "clone", "merge",
             "rebase", "describe", "shortlog", "rev-parse", "ls-files",
         }),
         path_args_restricted=True,
         allow_arbitrary_paths=False,
-        notes="push --force denied; filter-branch/gc --force denied",
+        notes="push --force denied; filter-branch/gc --force/reset --hard/clean -f denied",
     ),
     # Category F — Node / NPM Ecosystem
     "npm": CommandRule(

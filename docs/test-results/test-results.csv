@@ -1936,3 +1936,4 @@
 "TST-2055","SAF-041 developer shell utility tests","Unit","SAF-041","Pass","2026-03-24","Windows 11 + Python 3.11","23 passed, 0 failed","touch/chmod/ln allowed in project, denied outside/restricted zones, ln cross-zone denied"
 "TST-2056","SAF-041 tester edge-case tests","Security","SAF-041","Pass","2026-03-24","Windows 11 + Python 3.11","17 passed, 0 failed","ln path traversal, ln -s/-sf/--symbolic flags, touch dotfiles, chmod symbolic modes, chmod outside project"
 "TST-2057","SAF-041 full suite regression check","Unit","SAF-041","Pass","2026-03-24","Windows 11 + Python 3.11","4884 passed (71 pre-existing failures unchanged), no regressions","Full test suite excluding yaml-dependent CI workflow tests (14 pre-existing collection errors)"
+"TST-2058","SAF-042 git allowlist tests","Unit","SAF-042","Pass","2026-03-24","Windows 11 + Python 3.11","45 passed, 0 failed","git switch, blame added; 17 allowed ops + 5 destructive blocks + edge cases verified"
