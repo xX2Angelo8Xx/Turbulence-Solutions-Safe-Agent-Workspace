@@ -1966,3 +1966,4 @@
 "TST-2085","SAF-045: SAF regression suite (SAF-040 through SAF-045)","Regression","SAF-045","Pass","2026-03-24","Windows 11 + Python 3.11","337 passed, 0 failed, 2 xfailed","No regressions introduced by SAF-045 in SAF-040 through SAF-045 test suite"
 "TST-2086","SAF-045: tester re-verification (54 tests)","Security","SAF-045","Pass","2026-03-24","Windows 11 + Python 3.11","54 passed, 0 failed","Tester re-verification: 33 developer tests + 21 tester edge cases — all pass"
 "TST-2087","SAF-045: SAF-040 to SAF-045 regression re-run","Regression","SAF-045","Pass","2026-03-24","Windows 11 + Python 3.11","358 passed, 0 failed, 2 xfailed","No regressions in SAF-040 through SAF-045; 2 xfailed are expected pre-existing"
+"TST-2088","GUI-020 counter config write tests","Unit","GUI-020","Pass","2026-03-24","Windows 11 + Python 3.11","28 passed, 0 failed","write_counter_config unit tests, create_project integration, app counter config forwarding"

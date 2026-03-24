@@ -217,7 +217,11 @@ class TestOnCreateProjectSuccess:
              patch("launcher.gui.app.create_project", return_value=tmp_path / "my-project") as mock_create, \
              patch("launcher.gui.app.messagebox"):
             app._on_create_project()
-        mock_create.assert_called_once_with(expected_template, Path(str(tmp_path)), "my-project")
+        # GUI-020: create_project now receives counter_enabled and counter_threshold kwargs.
+        args, kwargs = mock_create.call_args
+        assert args == (expected_template, Path(str(tmp_path)), "my-project")
+        assert "counter_enabled" in kwargs
+        assert "counter_threshold" in kwargs
 
     def test_success_shows_info_dialog(self, tmp_path):
         app = _make_app(project_name="my-project", template_display="Coding", destination=str(tmp_path))
@@ -287,7 +291,11 @@ class TestOnCreateProjectSuccess:
              patch("launcher.gui.app.create_project", return_value=tmp_path / "proj") as mock_create, \
              patch("launcher.gui.app.messagebox"):
             app._on_create_project()
-        mock_create.assert_called_once_with(expected_template, Path(str(tmp_path)), "proj")
+        # GUI-020: create_project now receives counter_enabled and counter_threshold kwargs.
+        args, kwargs = mock_create.call_args
+        assert args == (expected_template, Path(str(tmp_path)), "proj")
+        assert "counter_enabled" in kwargs
+        assert "counter_threshold" in kwargs
 
 
 # ---------------------------------------------------------------------------

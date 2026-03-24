@@ -433,8 +433,22 @@ class App:
                 f"Details: {shim_msg}",
             )
             return
+
+        # Read counter config from GUI controls (GUI-020).
+        counter_enabled = self.counter_enabled_var.get()
         try:
-            created_path = create_project(template_path, Path(destination_str), folder_name)
+            counter_threshold = self.get_counter_threshold()
+        except ValueError:
+            counter_threshold = 20
+
+        try:
+            created_path = create_project(
+                template_path,
+                Path(destination_str),
+                folder_name,
+                counter_enabled=counter_enabled,
+                counter_threshold=counter_threshold,
+            )
         except Exception as exc:
             messagebox.showerror("Project Creation Failed", str(exc))
             return

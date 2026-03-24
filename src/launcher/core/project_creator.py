@@ -5,12 +5,34 @@ Full implementation is provided in GUI-005.
 
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
+_COUNTER_CONFIG_PATH = Path(".github") / "hooks" / "scripts" / "counter_config.json"
+_DEFAULT_COUNTER_ENABLED = True
+_DEFAULT_COUNTER_THRESHOLD = 20
+
+
+def write_counter_config(
+    project_dir: Path, counter_enabled: bool, counter_threshold: int
+) -> None:
+    """Write counter_config.json into the workspace's .github/hooks/scripts/ directory."""
+    config_path = project_dir / _COUNTER_CONFIG_PATH
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_data = {
+        "counter_enabled": counter_enabled,
+        "lockout_threshold": counter_threshold,
+    }
+    config_path.write_text(json.dumps(config_data, indent=4), encoding="utf-8")
+
 
 def create_project(
-    template_path: Path, destination: Path, folder_name: str
+    template_path: Path,
+    destination: Path,
+    folder_name: str,
+    counter_enabled: bool = _DEFAULT_COUNTER_ENABLED,
+    counter_threshold: int = _DEFAULT_COUNTER_THRESHOLD,
 ) -> Path:
     """Copy *template_path* into *destination* / *folder_name*.
 
@@ -42,6 +64,9 @@ def create_project(
         )
 
     shutil.copytree(str(template_path), str(target))
+
+    # Write counter config from GUI settings into the new workspace (GUI-020).
+    write_counter_config(target, counter_enabled, counter_threshold)
 
     # Rename the internal "Project/" subfolder to match the user's project name.
     # This gives the working folder a meaningful name (e.g. "MatlabDemo/").
