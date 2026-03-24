@@ -43,6 +43,8 @@ _EXEMPT_TOOLS: frozenset = frozenset({
     "semantic_search", "file_search", "Glob", "agent", "Agent",
     "runSubagent", "search_subagent",
     "get_errors",  # SAF-023: handled early in decide(); listed here to pass unknown-tool guard
+    # SAF-038: memory and create_directory — handled early in decide(); zone-checked to project folder
+    "memory", "create_directory",
     # FIX-035: VS Code/Copilot deferred development tools — safe to allow;
     # handled early in decide() before the path-check block.
     "install_python_packages", "configure_python_environment", "fetch_webpage",
@@ -78,7 +80,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "53e06243cbc78224e7c7aaae72c15b32536d17538e2e7f8504f80ad58ffa6793"
+_KNOWN_GOOD_GATE_HASH: str = "d28370793bbbd11feaa9a0de9ec4ecb7931b0406693e6f518854865dec381c67"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2169,6 +2171,71 @@ def validate_get_errors(data: dict, ws_root: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# SAF-038: memory tool — path must be inside the project folder
+# ---------------------------------------------------------------------------
+
+def validate_memory(data: dict, ws_root: str) -> str:
+    """SAF-038: Validate memory tool calls.
+
+    Extracts the target file path from the payload (``filePath`` in
+    ``tool_input``, then ``filePath`` or ``path`` at the top level).
+    Allows the call only when the path resolves inside the project folder.
+    Fails closed — returns "deny" when no path is present.
+    """
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        tool_input = {}
+
+    # Prefer nested tool_input key (VS Code hook format)
+    raw_path = tool_input.get("filePath")
+    if not isinstance(raw_path, str) or not raw_path:
+        raw_path = data.get("filePath")
+    if not isinstance(raw_path, str) or not raw_path:
+        raw_path = data.get("path")
+    if not isinstance(raw_path, str) or not raw_path:
+        # No path found — fail closed
+        return "deny"
+
+    zone = zone_classifier.classify(raw_path, ws_root)
+    if zone == "allow":
+        if zone_classifier.is_git_internals(raw_path):
+            return "deny"
+        return "allow"
+    return "deny"
+
+
+# ---------------------------------------------------------------------------
+# SAF-038: create_directory tool — dirPath must be inside the project folder
+# ---------------------------------------------------------------------------
+
+def validate_create_directory(data: dict, ws_root: str) -> str:
+    """SAF-038: Validate create_directory tool calls.
+
+    Extracts ``dirPath`` from the payload (``tool_input`` first, then
+    top-level data).  Allows the call only when the path resolves inside
+    the project folder.  Fails closed — returns "deny" when dirPath is absent.
+    """
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        tool_input = {}
+
+    # Prefer nested tool_input key (VS Code hook format)
+    raw_path = tool_input.get("dirPath")
+    if not isinstance(raw_path, str) or not raw_path:
+        raw_path = data.get("dirPath")
+    if not isinstance(raw_path, str) or not raw_path:
+        # No dirPath found — fail closed
+        return "deny"
+
+    zone = zone_classifier.classify(raw_path, ws_root)
+    if zone == "allow":
+        if zone_classifier.is_git_internals(raw_path):
+            return "deny"
+        return "allow"
+    return "deny"
+
+
+# ---------------------------------------------------------------------------
 # SAF-006: Recursive enumeration protection
 # ---------------------------------------------------------------------------
 
@@ -2287,6 +2354,17 @@ def decide(data: dict, ws_root: str) -> str:
     # field is inspected rather than a single filePath.
     if tool_name == "get_errors":
         return validate_get_errors(data, ws_root)
+
+    # SAF-038: memory tool — filePath must be inside the project folder.
+    # Handled before the _EXEMPT_TOOLS fallback to ensure explicit path extraction.
+    if tool_name == "memory":
+        return validate_memory(data, ws_root)
+
+    # SAF-038: create_directory tool — dirPath must be inside the project folder.
+    # Handled before the _EXEMPT_TOOLS fallback because dirPath is not in
+    # _PATH_FIELDS and would not be found by the generic extract_path() helper.
+    if tool_name == "create_directory":
+        return validate_create_directory(data, ws_root)
 
     # FIX-021: file_search has no filePath — VS Code files.exclude hides zones
     if tool_name == "file_search":
