@@ -83,7 +83,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "91f80137f977fa3a0d682f9fcbfa94b6f3d4e3983c4af19e794e5622c212463a"
+_KNOWN_GOOD_GATE_HASH: str = "fbea406feb27fc8273f5e7e52cec52d11b2007658ad5aedf6086764ca5684a65"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2125,6 +2125,80 @@ def validate_semantic_search(data: dict, ws_root: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# SAF-043: file_search — scope validation to project folder
+# ---------------------------------------------------------------------------
+
+def validate_file_search(data: dict, ws_root: str) -> str:
+    """SAF-043: Validate ``file_search`` tool calls.
+
+    Inspects the ``query`` parameter for unsafe path scope:
+
+    - Deny if the query contains deny-zone directory names (``.github``,
+      ``.vscode``, ``NoAgentZone``), checked case-insensitively.
+    - Deny if the query contains path traversal sequences (``..``).
+    - Deny if the query contains a wildcard that could expand to a deny zone
+      (reuses ``_wildcard_prefix_matches_deny_zone``).
+    - Deny if the non-wildcard path prefix of the query is an absolute path
+      that resolves outside the project folder.
+    - Allow otherwise — VS Code ``search.exclude`` settings prevent deny-zone
+      files from appearing in ``file_search`` results.
+
+    Supports both the VS Code hook nested format (parameters inside
+    ``tool_input``) and the flat test format (parameters at the top level).
+    """
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        tool_input = {}
+
+    # Prefer nested tool_input key (VS Code hook format); fall back to top-level.
+    query = tool_input.get("query")
+    if not isinstance(query, str) or not query:
+        query = data.get("query")
+
+    if not isinstance(query, str):
+        # No query present — allow; VS Code search.exclude scopes results.
+        return "allow"
+
+    query_lower = query.lower()
+
+    # Deny references to deny-zone directory names (case-insensitive).
+    for zone_name in (".github", ".vscode", "noagentzone"):
+        if zone_name in query_lower:
+            return "deny"
+
+    # Deny path traversal sequences.
+    if ".." in query:
+        return "deny"
+
+    # Zone-check the non-wildcard path prefix when the query is (or starts with)
+    # an absolute path.  Relative globs (e.g. **/*.py, src/**) are scoped by
+    # VS Code to the workspace folder and are left to search.exclude filtering.
+    norm_query = zone_classifier.normalize_path(query)
+
+    # Extract the path prefix: everything before the first wildcard character.
+    if "*" in norm_query or "?" in norm_query:
+        wc_pos = len(norm_query)
+        for ch in ("*", "?"):
+            pos = norm_query.find(ch)
+            if pos != -1:
+                wc_pos = min(wc_pos, pos)
+        path_prefix = norm_query[:wc_pos].rstrip("/")
+    else:
+        path_prefix = norm_query
+
+    # Only zone-check if the prefix is an absolute path (drive letter or leading /).
+    if path_prefix and (
+        (len(path_prefix) >= 2 and path_prefix[1] == ":")  # Windows: C:/...
+        or path_prefix.startswith("/")                      # Unix/POSIX
+    ):
+        if zone_classifier.classify(path_prefix, ws_root) == "deny":
+            return "deny"
+
+    # Allow — VS Code search.exclude settings prevent deny-zone files from appearing.
+    return "allow"
+
+
+# ---------------------------------------------------------------------------
 # SAF-007: Write restriction — file write tools outside Project/ are denied
 # ---------------------------------------------------------------------------
 
@@ -2558,20 +2632,9 @@ def decide(data: dict, ws_root: str) -> str:
     if tool_name == "vscode_renameSymbol":
         return validate_vscode_rename_symbol(data, ws_root)
 
-    # FIX-021: file_search has no filePath — VS Code files.exclude hides zones
+    # SAF-043: file_search — scope query to project folder.
     if tool_name == "file_search":
-        tool_input = data.get("tool_input") or {}
-        if not isinstance(tool_input, dict):
-            tool_input = {}
-        query = tool_input.get("query") or data.get("query") or ""
-        if isinstance(query, str):
-            query_lower = query.lower()
-            for zone_name in (".github", ".vscode", "noagentzone"):
-                if zone_name in query_lower:
-                    return "deny"
-            if ".." in query:
-                return "deny"
-        return "allow"
+        return validate_file_search(data, ws_root)
 
     # FIX-035: Deferred development tools — safe to allow unconditionally.
     # These VS Code/Copilot tools carry no file-system path argument and do not
