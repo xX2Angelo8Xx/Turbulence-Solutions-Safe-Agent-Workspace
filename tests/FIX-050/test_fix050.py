@@ -16,6 +16,7 @@ Covers:
 """
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -304,35 +305,38 @@ def test_verify_path_with_spaces_and_parens(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# Version: 3.0.2
+# Version: dynamic (sourced from CURRENT_VERSION)
 # ---------------------------------------------------------------------------
 
 def test_config_py_version():
-    """src/launcher/config.py must declare version 3.0.2."""
-    assert CURRENT_VERSION == "3.0.2", (
-        f"Expected 3.0.2 but config.py has {CURRENT_VERSION!r}."
+    """src/launcher/config.py must declare the current version."""
+    content = (REPO_ROOT / "src" / "launcher" / "config.py").read_text(encoding="utf-8")
+    match = re.search(r'^VERSION\s*:\s*str\s*=\s*["\']([^"\']+)["\']', content, re.MULTILINE)
+    assert match, "VERSION constant not found in config.py"
+    assert match.group(1) == CURRENT_VERSION, (
+        f"Expected {CURRENT_VERSION!r} but config.py has {match.group(1)!r}."
     )
 
 
 def test_pyproject_toml_version():
-    """pyproject.toml version must be 3.0.2."""
+    """pyproject.toml version must match current version."""
     content = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert 'version = "3.0.2"' in content
+    assert f'version = "{CURRENT_VERSION}"' in content
 
 
 def test_setup_iss_version():
-    """setup.iss MyAppVersion must be 3.0.2."""
+    """setup.iss MyAppVersion must match current version."""
     content = (REPO_ROOT / "src" / "installer" / "windows" / "setup.iss").read_text(encoding="utf-8")
-    assert '#define MyAppVersion "3.0.2"' in content
+    assert f'#define MyAppVersion "{CURRENT_VERSION}"' in content
 
 
 def test_build_dmg_sh_version():
-    """build_dmg.sh APP_VERSION must be 3.0.2."""
+    """build_dmg.sh APP_VERSION must match current version."""
     content = (REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh").read_text(encoding="utf-8")
-    assert 'APP_VERSION="3.0.2"' in content
+    assert f'APP_VERSION="{CURRENT_VERSION}"' in content
 
 
 def test_build_appimage_sh_version():
-    """build_appimage.sh APP_VERSION must be 3.0.2."""
+    """build_appimage.sh APP_VERSION must match current version."""
     content = (REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh").read_text(encoding="utf-8")
-    assert 'APP_VERSION="3.0.2"' in content
+    assert f'APP_VERSION="{CURRENT_VERSION}"' in content
