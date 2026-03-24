@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import json
+import os
 import sys
+import tempfile
 import threading
 import time
 import tkinter.filedialog as filedialog
@@ -27,6 +30,51 @@ from launcher.gui.validation import (
 
 _WINDOW_WIDTH: int = 580
 _WINDOW_HEIGHT: int = 590
+
+# Path within a workspace root where the hook state file lives.
+_HOOK_STATE_RELATIVE: str = ".github/hooks/scripts/.hook_state.json"
+
+
+def _reset_hook_state(state_path: Path) -> tuple[int, str]:
+    """Reset all session counters in the hook state file.
+
+    Mirrors the logic in reset_hook_counter.py (SAF-037).
+    Returns (num_sessions_reset, message).
+    """
+    if not state_path.is_file():
+        return 0, "No state file found. Nothing to reset."
+    try:
+        raw = state_path.read_text(encoding="utf-8")
+        state = json.loads(raw)
+        if not isinstance(state, dict):
+            raise ValueError("root is not a JSON object")
+    except (json.JSONDecodeError, ValueError):
+        _atomic_write_hook_state(state_path, {})
+        return 0, "Warning: corrupt state file replaced with empty state."
+    session_keys = [k for k, v in state.items() if isinstance(v, dict) and "deny_count" in v]
+    count = len(session_keys)
+    for k in session_keys:
+        del state[k]
+    _atomic_write_hook_state(state_path, state)
+    return count, f"Reset {count} session(s)."
+
+
+def _atomic_write_hook_state(path: Path, data: dict) -> None:
+    """Write *data* as JSON via temp-file + os.replace for atomicity."""
+    dir_path = str(path.parent)
+    fd, tmp_path = tempfile.mkstemp(
+        dir=dir_path, suffix=".tmp", prefix=".hook_state_"
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, indent=2)
+        os.replace(tmp_path, str(path))
+    except Exception:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
 
 
 def _format_template_name(raw: str) -> str:
@@ -576,6 +624,50 @@ class SettingsDialog:
         )
         self._close_button.grid(row=3, column=0, columnspan=3, padx=20, pady=(16, 12), sticky="ew")
 
+        # Reset Agent Blocks section (GUI-021) -- clear workspace hook state.
+        ctk.CTkLabel(
+            self._dialog,
+            text="Reset Agent Blocks",
+            text_color=COLOR_TEXT,
+            font=("", 14, "bold"),
+            anchor="w",
+        ).grid(row=4, column=0, columnspan=3, padx=20, pady=(12, 4), sticky="w")
+
+        ctk.CTkLabel(
+            self._dialog,
+            text="Workspace:",
+            text_color=COLOR_TEXT,
+            anchor="w",
+        ).grid(row=5, column=0, padx=(20, 8), pady=4, sticky="w")
+        self.workspace_entry = ctk.CTkEntry(
+            self._dialog,
+            placeholder_text="Select workspace folder to reset",
+        )
+        self.workspace_entry.grid(row=5, column=1, padx=(0, 4), pady=4, sticky="ew")
+        self.browse_workspace_button = ctk.CTkButton(
+            self._dialog,
+            text="Browse",
+            command=self._browse_workspace,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
+            text_color=COLOR_TEXT,
+            width=70,
+            height=28,
+        )
+        self.browse_workspace_button.grid(row=5, column=2, padx=(0, 20), pady=4, sticky="w")
+        self.reset_agent_blocks_button = ctk.CTkButton(
+            self._dialog,
+            text="Reset Agent Blocks",
+            command=self._on_reset_agent_blocks,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
+            text_color=COLOR_TEXT,
+            height=36,
+        )
+        self.reset_agent_blocks_button.grid(
+            row=6, column=0, columnspan=3, padx=20, pady=(4, 12), sticky="ew"
+        )
+
     def _on_auto_detect(self) -> None:
         """Auto-detect the python-embed directory from the launcher's install location."""
         python_exe = self._find_bundled_python()
@@ -636,4 +728,47 @@ class SettingsDialog:
             "Python Runtime Updated",
             f"Python runtime path updated to:\n{python_exe}",
             parent=self._dialog,
+        )
+
+    def _browse_workspace(self) -> None:
+        """Open a folder browser and populate the workspace entry (GUI-021)."""
+        folder = filedialog.askdirectory(title="Select Workspace Folder to Reset")
+        if folder:
+            self.workspace_entry.delete(0, "end")
+            self.workspace_entry.insert(0, folder)
+
+    def _on_reset_agent_blocks(self) -> None:
+        """Handle Reset Agent Blocks button click (GUI-021).
+
+        Locates the workspace's .hook_state.json and resets all session counters.
+        """
+        workspace_str = self.workspace_entry.get().strip()
+        if not workspace_str:
+            messagebox.showerror(
+                "No Workspace Selected",
+                "Please select a workspace folder before resetting.",
+            )
+            return
+
+        workspace_path = Path(workspace_str)
+        if not workspace_path.is_dir():
+            messagebox.showerror(
+                "Invalid Workspace",
+                f"The selected path is not a valid directory:\n{workspace_str}",
+            )
+            return
+
+        state_path = workspace_path / _HOOK_STATE_RELATIVE
+        try:
+            _count, _msg = _reset_hook_state(state_path)
+        except OSError as exc:
+            messagebox.showerror(
+                "Reset Failed",
+                f"Could not reset the state file:\n{exc}",
+            )
+            return
+
+        messagebox.showinfo(
+            "Reset Complete",
+            "All session counters have been reset.",
         )
