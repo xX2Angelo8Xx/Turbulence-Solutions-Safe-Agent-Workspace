@@ -218,7 +218,7 @@ def _check_csv_structural(result: ValidationResult) -> None:
     # Enum definitions for status fields
     VALID_WP_STATUS = {"Open", "In Progress", "Review", "Done"}
     VALID_BUG_STATUS = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
-    VALID_TST_STATUS = {"Pass", "Fail", "Blocked", "Skipped"}
+    VALID_TST_STATUS = {"Pass", "Fail", "Blocked", "Skipped", "XFail"}
     VALID_US_STATUS = {"Open", "In Progress", "Done", "Closed"}
 
     csv_configs = [

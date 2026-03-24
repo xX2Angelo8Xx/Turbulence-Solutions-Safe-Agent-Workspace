@@ -100,11 +100,12 @@ Before marking a WP as Done, the Tester MUST verify:
 5. All bugs found during testing are logged in `docs/bugs/bugs.csv`.
 6. WP branch follows `<WP-ID>/<short-desc>` naming convention.
 7. No `tmp_` files remain in `docs/workpackages/<WP-ID>/` or `tests/<WP-ID>/`.
-8. Run `git add -A` to stage all new test files and CSV updates.
-9. Commit: `<WP-ID>: Tester PASS`
-10. Push: `git push origin <branch-name>`
+8. Scan `docs/bugs/bugs.csv` for any bug with `Fixed In WP` matching this WP-ID and Status=`Fixed`. Set those bugs to `Closed`.
+9. Run `git add -A` to stage all new test files and CSV updates.
+10. Commit: `<WP-ID>: Tester PASS`
+11. Push: `git push origin <branch-name>`
 
-If any of items 1–7 are missing, do NOT mark the WP as Done. Create the missing artifact or return to Developer.
+If any of items 1–8 are missing, do NOT mark the WP as Done. Create the missing artifact or return to Developer.
 
 ### Post-Done Finalization (Orchestrator)
 
@@ -127,6 +128,8 @@ The script performs **all** finalization steps automatically:
 Use `--dry-run` to preview without executing: `.venv\Scripts\python scripts/finalize_wp.py <WP-ID> --dry-run`
 
 **Do NOT perform these steps manually.** The script exists to prevent the finalization errors that have recurred across every maintenance cycle.
+
+**Post-finalization sanity check:** After running `finalize_wp.py`, verify that `docs/workpackages/<WP-ID>/.finalization-state.json` does NOT exist. If it persists, delete it manually and commit.
 
 ---
 
