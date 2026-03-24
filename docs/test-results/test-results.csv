@@ -1974,3 +1974,4 @@
 "TST-2093","GUI-022: full regression suite","Regression","GUI-022","Fail","2026-03-25","Windows 11 + Python 3.11","14 errors in 2.58s",""
 "TST-2094","GUI-022 iteration-2 regression fixes","Regression","GUI-022","Pass","2026-03-25","Windows 11 + Python 3.11","99 passed, 0 failed","Fixed 8 regressions in GUI-001, GUI-011, GUI-012; all 99 tests pass"
 "TST-2095","GUI-022 Iteration-2 full re-test (99 passed)","Regression","GUI-022","Pass","2026-03-25","Windows 11 + Python 3.11","99 passed, 0 failed","All 8 regressions from Iteration 1 fixed. GUI-001/011/012/022 suites all green. 70 pre-existing failures on main confirmed unrelated."
+"TST-2096","INS-023 skip README files unit tests","Unit","INS-023","Pass","2026-03-25","Windows 11 + Python 3.11","8 passed, 0 failed","include_readmes=True preserves, False removes, AGENT-RULES/copilot-instructions preserved, missing README no error, default True, case-sensitive match"

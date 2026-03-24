@@ -6,6 +6,7 @@ Full implementation is provided in GUI-005.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -78,6 +79,16 @@ def create_project(
 
     # Replace placeholder tokens in all .md files within the new project tree.
     replace_template_placeholders(target, folder_name)
+
+    # Remove README.md files when not requested (INS-023).
+    if not include_readmes:
+        for dirpath, _dirnames, filenames in os.walk(target):
+            for filename in filenames:
+                if filename == "README.md":
+                    try:
+                        os.unlink(os.path.join(dirpath, filename))
+                    except FileNotFoundError:
+                        pass
 
     return target
 
