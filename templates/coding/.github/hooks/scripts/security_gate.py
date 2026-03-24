@@ -30,7 +30,8 @@ import zone_classifier
 _ALWAYS_ALLOW_TOOLS: frozenset = frozenset({
     "vscode_ask_questions", "ask_questions",
     "TodoWrite", "TodoRead", "todo_write", "manage_todo_list",
-    "runSubagent", "search_subagent", "Agent", "agent",
+    # SAF-044: search_subagent removed — validated by validate_search_subagent() in decide()
+    "runSubagent", "Agent", "agent",
 })
 
 _TERMINAL_TOOLS: frozenset = frozenset({
@@ -83,7 +84,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "fbea406feb27fc8273f5e7e52cec52d11b2007658ad5aedf6086764ca5684a65"
+_KNOWN_GOOD_GATE_HASH: str = "7867990dc10eb746ed4dec44a5e42abe7bfebeaf7569e822e70d4087ac40a198"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2112,15 +2113,109 @@ def validate_grep_search(data: dict, ws_root: str) -> str:
 
 
 def validate_semantic_search(data: dict, ws_root: str) -> str:
-    """SAF-003: Validate ``semantic_search`` tool call.
+    """SAF-003 / SAF-044: Validate ``semantic_search`` tool call.
 
-    VS Code's search.exclude settings hide restricted content from semantic
-    index.  Allow semantic search.
+    VS Code's search.exclude settings prevent .github/.vscode/NoAgentZone from
+    being indexed, so natural language queries (including those that mention
+    zone names as text) cannot surface restricted content.  SAF-044 adds
+    defence-in-depth:
 
-    The ``data`` and ``ws_root`` parameters are accepted for API consistency
-    but are not used in the current policy.
+    - Deny path traversal sequences (``..``) embedded in the query.
+    - Deny queries that are absolute paths resolving into a deny zone.
+    - Allow all other queries (general natural language is safe).
     """
-    # FIX-021: VS Code search.exclude hides restricted content from semantic index
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        tool_input = {}
+
+    query = tool_input.get("query")
+    if not isinstance(query, str) or not query:
+        query = data.get("query")
+
+    if not isinstance(query, str):
+        # No query — allow; semantic index is already scoped by search.exclude.
+        return "allow"
+
+    # Deny path traversal sequences.
+    if ".." in query:
+        return "deny"
+
+    # Zone-check absolute path references embedded in the query.
+    # Use a direct pattern check rather than zone_classifier.classify() so that
+    # this validator works correctly in test environments where the workspace
+    # root path does not exist on the real filesystem.
+    norm_query = zone_classifier.normalize_path(query)
+    if norm_query and (
+        (len(norm_query) >= 2 and norm_query[1] == ":")  # Windows: C:/...
+        or norm_query.startswith("/")                      # Unix/POSIX
+    ):
+        if re.search(r"/(\.github|\.vscode|noagentzone)(/|$)", "/" + norm_query):
+            return "deny"
+
+    return "allow"
+
+
+# ---------------------------------------------------------------------------
+# SAF-044: search_subagent — scope query to project folder
+# ---------------------------------------------------------------------------
+
+def validate_search_subagent(data: dict, ws_root: str) -> str:
+    """SAF-044: Validate ``search_subagent`` tool calls.
+
+    ``search_subagent`` accepts both natural language queries and path-like
+    glob patterns, so stricter controls apply than for ``semantic_search``:
+
+    - Deny queries containing deny-zone directory names (``.github``,
+      ``.vscode``, ``NoAgentZone``), checked case-insensitively.
+    - Deny queries containing path traversal sequences (``..``).
+    - Deny queries whose absolute path prefix resolves into a deny zone.
+    - Allow all other queries.
+
+    Supports both the VS Code hook nested format (parameters inside
+    ``tool_input``) and the flat test format (parameters at the top level).
+    """
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        tool_input = {}
+
+    query = tool_input.get("query")
+    if not isinstance(query, str) or not query:
+        query = data.get("query")
+
+    if not isinstance(query, str):
+        # No query — allow; VS Code search.exclude scopes results.
+        return "allow"
+
+    query_lower = query.lower()
+
+    # Deny references to deny-zone directory names (case-insensitive).
+    for zone_name in (".github", ".vscode", "noagentzone"):
+        if zone_name in query_lower:
+            return "deny"
+
+    # Deny path traversal sequences.
+    if ".." in query:
+        return "deny"
+
+    # Zone-check the non-wildcard path prefix for absolute path queries.
+    norm_query = zone_classifier.normalize_path(query)
+    if "*" in norm_query or "?" in norm_query:
+        wc_pos = len(norm_query)
+        for ch in ("*", "?"):
+            pos = norm_query.find(ch)
+            if pos != -1:
+                wc_pos = min(wc_pos, pos)
+        path_prefix = norm_query[:wc_pos].rstrip("/")
+    else:
+        path_prefix = norm_query
+
+    if path_prefix and (
+        (len(path_prefix) >= 2 and path_prefix[1] == ":")  # Windows: C:/...
+        or path_prefix.startswith("/")                      # Unix/POSIX
+    ):
+        if re.search(r"/(\.github|\.vscode|noagentzone)(/|$)", "/" + path_prefix):
+            return "deny"
+
     return "allow"
 
 
@@ -2606,6 +2701,9 @@ def decide(data: dict, ws_root: str) -> str:
         return validate_semantic_search(data, ws_root)
     if tool_name == "grep_search":
         return validate_grep_search(data, ws_root)
+    # SAF-044: search_subagent — scope query to project folder.
+    if tool_name == "search_subagent":
+        return validate_search_subagent(data, ws_root)
 
     # SAF-023: get_errors carries an optional filePaths array; each path must
     # be zone-checked.  Handled before the _EXEMPT_TOOLS fallback so the array
