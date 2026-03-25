@@ -2102,3 +2102,6 @@
 "TST-2221","FIX-076: full regression suite","Regression","FIX-076","Fail","2026-03-25","Windows 11 + Python 3.11","6816 passed, 32 skipped, 3 xfailed, 1 warning in 55.70s",""
 "TST-2222","FIX-076: targeted suite","Unit","FIX-076","Pass","2026-03-25","Windows 11 + Python 3.11","27 passed in 0.40s",""
 "TST-2223","FIX-077: version bump 3.2.2 tests","Unit","FIX-077","Pass","2026-03-26","Windows 11 + Python 3.11","7 passed, 0 failed","config.py, pyproject.toml, setup.iss, build_dmg.sh, build_appimage.sh all show 3.2.2; no stale 3.2.1 remaining"
+"TST-2224","FIX-077: full regression suite","Regression","FIX-077","Fail","2026-03-26","Windows 11 + Python 3.11","6828 passed, 32 skipped, 3 xfailed, 1 warning in 60.37s (0:01:00)",""
+"TST-2225","FIX-077: version 3.2.2 unit tests (13 passed)","Unit","FIX-077","Pass","2026-03-26","Windows 11 + Python 3.11","13 passed, 0 failed","All version files verified: config.py, pyproject.toml, setup.iss, build_dmg.sh, build_appimage.sh. Edge cases: shared version utils, get_display_version fallback, check_for_update mock, parse_version, dev-log check"
+"TST-2226","FIX-077 + FIX-070: regression suite (21 passed)","Regression","FIX-077","Pass","2026-03-26","Windows 11 + Python 3.11","21 passed, 0 failed","FIX-077 tests (13) + FIX-070 tests (8) all pass after version bump to 3.2.2"
