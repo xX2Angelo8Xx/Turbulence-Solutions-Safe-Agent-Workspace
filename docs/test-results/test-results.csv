@@ -1991,3 +1991,5 @@
 "TST-2110","DOC-015 agent self-identification research report tests","Unit","DOC-015","Pass","2026-03-25","Windows 11 + Python 3.11","11 passed, 0 failed","report exists, executive summary, hook payload, model ID, feasibility, security implications, benefits, recommendations"
 "TST-2111","DOC-015 tester validation","Unit","DOC-015","Pass","2026-03-25","Windows 11 + Python 3.11","34 passed, 0 failed (11 dev + 23 tester)","Validated report structure, depth, feasibility/trust/recommendations tables, spoofing scenarios, cross-refs, dev-log consistency, no placeholders"
 "TST-2112","DOC-016 code signing research report tests","Unit","DOC-016","Pass","2026-03-25","Windows 11 + Python 3.11","11 passed, 0 failed","file exists, non-empty, setup section, CI integration, recommendation, comparison matrix, SignPath coverage, Azure coverage, SSL.com coverage, cert management, references"
+"TST-2113","DOC-016: full regression suite","Regression","DOC-016","Fail","2026-03-25","Windows 11 + Python 3.11","14 errors in 2.54s",""
+"TST-2114","DOC-016: targeted suite","Unit","DOC-016","Pass","2026-03-25","Windows 11 + Python 3.11","28 passed in 0.29s",""
