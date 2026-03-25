@@ -39,6 +39,7 @@ Templates (bundled inside Launcher)
 │   ├── bugs/
 │   │   ├── User-Bug-Reports/
 │   │   │   ├── 2026-03-20-workspace-review.md
+│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.1.md
 │   │   │   ├── AgentExperienceReport_v3.1.2.md
 │   │   │   └── BUG_REPORT-MacOS-2.0.0.md
 │   │   └── bugs.csv
@@ -56,6 +57,7 @@ Templates (bundled inside Launcher)
 │   ├── plans/
 │   │   ├── plan-fixLegacyValidationErrors.md
 │   │   ├── plan-project-status-next-steps.md
+│   │   ├── plan-v321-feedback-report.md
 │   │   ├── vscode-session-id-methoden.md
 │   │   └── windows-code-signing.md
 │   ├── Security Audits/
@@ -175,6 +177,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-029/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-030/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -784,6 +789,7 @@ Templates (bundled inside Launcher)
 │   ├── DOC-027/
 │   ├── DOC-028/
 │   ├── DOC-029/
+│   ├── DOC-030/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
