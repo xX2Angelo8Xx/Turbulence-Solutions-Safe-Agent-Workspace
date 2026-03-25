@@ -51,11 +51,13 @@ Templates (bundled inside Launcher)
 │   │   ├── 2026-03-20-maintenance.md
 │   │   ├── 2026-03-20b-maintenance.md
 │   │   ├── 2026-03-24-maintenance.md
+│   │   ├── 2026-03-25-maintenance.md
 │   │   └── action-tracker.json
 │   ├── plans/
 │   │   ├── plan-fixLegacyValidationErrors.md
 │   │   ├── plan-project-status-next-steps.md
-│   │   └── vscode-session-id-methoden.md
+│   │   ├── vscode-session-id-methoden.md
+│   │   └── windows-code-signing.md
 │   ├── Security Audits/
 │   │   ├── SECURITY_ADVANCED_ATTACK_ANALYSIS-V3.0.0-18-03.26.md
 │   │   ├── SECURITY_AUDIT_REPORT-16-03.26-Handwritten.md
@@ -111,9 +113,28 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-011/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   ├── research-report.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-012/
+│   │   │   ├── dev-log.md
+│   │   │   ├── research-report.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-013/
+│   │   │   ├── dev-log.md
+│   │   │   ├── research-report.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-014/
+│   │   │   ├── dev-log.md
+│   │   │   ├── research-report.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-015/
+│   │   │   ├── dev-log.md
+│   │   │   ├── research-report.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-016/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-001/
 │   │   │   ├── dev-log.md
@@ -386,14 +407,12 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-020/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-021/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-022/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── INS-001/
@@ -462,7 +481,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── INS-023/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── MNT-001/
@@ -589,7 +607,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-040/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-041/
@@ -599,7 +616,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-043/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-044/
@@ -617,6 +633,7 @@ Templates (bundled inside Launcher)
 │   ├── hooks/
 │   │   └── pre-commit
 │   ├── __init__.py
+│   ├── _add_wps_batch.py
 │   ├── _repair_csvs.py
 │   ├── _verify.py
 │   ├── add_bug.py
@@ -695,6 +712,7 @@ Templates (bundled inside Launcher)
 │   ├── DOC-013/
 │   ├── DOC-014/
 │   ├── DOC-015/
+│   ├── DOC-016/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
