@@ -690,6 +690,10 @@ Templates (bundled inside Launcher)
 │   │   ├── SAF-045/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── SAF-048/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
 │   │   └── workpackages.csv
 │   ├── architecture.md
@@ -959,6 +963,7 @@ Templates (bundled inside Launcher)
 │   ├── SAF-043/
 │   ├── SAF-044/
 │   ├── SAF-045/
+│   ├── SAF-048/
 │   ├── shared/
 │   ├── __init__.py
 │   └── conftest.py
