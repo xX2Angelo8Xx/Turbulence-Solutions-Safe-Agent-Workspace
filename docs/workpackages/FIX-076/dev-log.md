@@ -42,3 +42,21 @@ Fix the Reset Agent Blocks button visibility and functionality in the Settings d
 ## Known Limitations
 
 - The dialog is fixed-size (`resizable(False, False)`). Future sections would require another height increase.
+
+---
+
+## Iteration 2 — 2026-03-25
+
+**Trigger:** Tester regression — `test_dialog_geometry_is_480x280` asserted the old geometry string `"480x280"`, which contradicts the fix implemented in iteration 1 (geometry is now `"480x480"`).
+
+### Changes
+
+- `tests/GUI-018/test_gui018_edge_cases.py`
+  - Renamed `test_dialog_geometry_is_480x280` → `test_dialog_geometry_is_480x480`
+  - Updated docstring: "480×280" → "480×480"
+  - Updated assertion: `assert_called_with("480x280")` → `assert_called_with("480x480")`
+  - Updated module docstring entry to say `"480x480"`
+
+### Test Results
+
+All 64 tests passed (tests/FIX-076/ + tests/GUI-018/).

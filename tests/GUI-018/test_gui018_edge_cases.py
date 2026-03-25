@@ -8,7 +8,7 @@ Covers gaps not addressed by the developer's 25 tests:
   - Close button is bound to _dialog.destroy (not a lambda or different callable)
   - Browse selects path containing spaces
   - Auto-detect uses python3 on macOS (darwin)
-  - Dialog geometry string is "480x280"
+  - Dialog geometry string is "480x480"
   - shim_config imports exposed in app module namespace
 """
 
@@ -136,13 +136,13 @@ class TestMultipleDialogOpens:
 # ---------------------------------------------------------------------------
 
 class TestDialogGeometry:
-    def test_dialog_geometry_is_480x280(self) -> None:
-        """The settings dialog must request a 480×280 geometry."""
+    def test_dialog_geometry_is_480x480(self) -> None:
+        """The settings dialog must request a 480×480 geometry."""
         parent = MagicMock()
         with patch("launcher.gui.app.read_python_path", return_value=None):
             from launcher.gui.app import SettingsDialog
             dlg = SettingsDialog(parent)
-        dlg._dialog.geometry.assert_called_with("480x280")
+        dlg._dialog.geometry.assert_called_with("480x480")
 
     def test_dialog_is_not_resizable(self) -> None:
         """The dialog must be non-resizable on both axes."""
