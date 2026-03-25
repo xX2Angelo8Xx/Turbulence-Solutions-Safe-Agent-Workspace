@@ -85,7 +85,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "ef030b7f6621993751cefcb2df0378b7850e146744772dfae9d91e25fd52e2b3"
+_KNOWN_GOOD_GATE_HASH: str = "0b15c9bb9fe24ed1931b267c1074d32f4316d3c5972c028e20ce9c3033a6b5c9"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -106,6 +106,11 @@ _DENY_THRESHOLD_DEFAULT: int = 20
 
 # Default: counter is active unless config disables it.
 _COUNTER_ENABLED_DEFAULT: bool = True
+
+# SAF-051: Inactivity gap that signals a new conversation in the fallback path.
+# When the OTel JSONL session ID is unavailable, a gap longer than this value
+# between tool calls is treated as a new conversation → new UUID → counter reset.
+_FALLBACK_SESSION_TTL_SECONDS: int = 1800  # 30 minutes
 
 # File names (relative to the scripts directory)
 _STATE_FILE_NAME: str = ".hook_state.json"
@@ -1028,21 +1033,45 @@ def _save_state(state_path: str, state: dict) -> None:
 def _get_session_id(scripts_dir: str, state: dict) -> "tuple[str, dict]":
     """Resolve the active session ID.
 
-    Returns the session ID from the OTel JSONL file when available.
-    Falls back to a persisted UUID4 stored in the state dict; creates one
-    if none exists yet.  The (possibly modified) state dict is returned as
-    the second element so the caller can persist it.
+    Returns the session ID from the OTel JSONL file when available (primary).
+    Falls back to a UUID4 stored in the state dict.  A new UUID is issued
+    whenever the fallback has been inactive for longer than
+    ``_FALLBACK_SESSION_TTL_SECONDS`` (default: 30 min), treating the gap as a
+    new conversation start so the denial counter resets to 0.  The heartbeat
+    timestamp ``_fallback_last_seen`` is refreshed on every call to keep an
+    active conversation alive.
     """
     otel_sid = _read_otel_session_id(scripts_dir)
     if otel_sid:
         return otel_sid, state
 
-    # Fallback: reuse or create a UUID4-based session ID
+    # SAF-051: TTL-based fallback session expiry.
+    now = datetime.datetime.utcnow()
     fallback_id = state.get("_fallback_session_id")
-    if not isinstance(fallback_id, str) or not fallback_id:
+    last_seen_iso = state.get("_fallback_last_seen", "")
+
+    expired = False
+    if isinstance(fallback_id, str) and fallback_id:
+        if not isinstance(last_seen_iso, str) or not last_seen_iso:
+            # No heartbeat recorded → legacy state without TTL tracking → treat
+            # as expired so the session migrates to the new TTL-aware scheme.
+            expired = True
+        else:
+            try:
+                last_seen = datetime.datetime.fromisoformat(last_seen_iso.rstrip("Z"))
+                age_seconds = (now - last_seen).total_seconds()
+                expired = age_seconds >= _FALLBACK_SESSION_TTL_SECONDS
+            except (ValueError, TypeError):
+                expired = True  # unparseable timestamp → treat as expired
+
+    needs_new_id = not isinstance(fallback_id, str) or not fallback_id or expired
+    if needs_new_id:
         fallback_id = str(uuid.uuid4())
         state["_fallback_session_id"] = fallback_id
-        state["_fallback_created"] = _utc_now_iso()
+        state["_fallback_created"] = now.isoformat() + "Z"
+
+    # Refresh heartbeat so the next call knows this session is still active.
+    state["_fallback_last_seen"] = now.isoformat() + "Z"
 
     return fallback_id, state
 
