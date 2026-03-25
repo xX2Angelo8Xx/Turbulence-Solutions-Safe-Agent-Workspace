@@ -177,3 +177,56 @@ def test_file_search_permission_is_zone_checked():
     assert "zone-checked" in combined.lower(), (
         "file_search permission should be 'Zone-checked' to reflect actual enforcement"
     )
+
+
+# ---------------------------------------------------------------------------
+# 7. Edge cases (Tester-added)
+# ---------------------------------------------------------------------------
+
+def test_grep_search_mentions_noagentzone_example():
+    """grep_search row must include NoAgentZone as a concrete example of a denied zone."""
+    content = _load_agent_rules()
+    lines = content.splitlines()
+    grep_lines = [ln for ln in lines if "grep_search" in ln and "|" in ln]
+    assert grep_lines, "grep_search row not found"
+    combined = " ".join(grep_lines)
+    assert "NoAgentZone" in combined, (
+        "grep_search row should include 'NoAgentZone' as a concrete example of a blocked zone"
+    )
+
+
+def test_file_search_uses_query_parameter_not_only_include_pattern():
+    """file_search row should reference 'query' as the restricted param (not confuse with grep_search's 'includePattern')."""
+    content = _load_agent_rules()
+    lines = content.splitlines()
+    file_search_lines = [ln for ln in lines if "file_search" in ln and "|" in ln]
+    assert file_search_lines, "file_search row not found"
+    combined = " ".join(file_search_lines)
+    # file_search uses 'query' parameter for zone targeting; the docs should mention it
+    assert "query" in combined.lower(), (
+        "file_search row must mention 'query' as the parameter that is zone-checked "
+        "(file_search does not have an 'includePattern' param)"
+    )
+
+
+def test_search_tools_section_header_present():
+    """The 'Search Tools' subsection header in the Tool Permission Matrix must still exist."""
+    content = _load_agent_rules()
+    assert "Search Tools" in content, (
+        "Tool Permission Matrix must still contain a 'Search Tools' section header"
+    )
+
+
+def test_grep_search_blocked_appears_for_both_restrictions():
+    """grep_search row must say 'blocked' for BOTH the includePattern restriction AND includeIgnoredFiles restriction."""
+    content = _load_agent_rules()
+    lines = content.splitlines()
+    grep_lines = [ln for ln in lines if "grep_search" in ln and "|" in ln]
+    assert grep_lines, "grep_search row not found"
+    combined = " ".join(grep_lines).lower()
+    # Count occurrences of 'blocked' — expect at least 2 (one per restriction)
+    blocked_count = combined.count("blocked")
+    assert blocked_count >= 2, (
+        f"grep_search row should mention 'blocked' at least twice (once for includePattern, "
+        f"once for includeIgnoredFiles), but found {blocked_count} occurrence(s)"
+    )
