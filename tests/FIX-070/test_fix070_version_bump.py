@@ -140,10 +140,10 @@ _VERSION_FILES = [
 ]
 
 
-def test_current_version_is_3_2_0() -> None:
-    """CURRENT_VERSION (read from config.py) must equal the expected release version 3.2.0."""
-    assert CURRENT_VERSION == "3.2.0", (
-        f"Expected CURRENT_VERSION == '3.2.0', got '{CURRENT_VERSION}'"
+def test_current_version_is_3_2_1() -> None:
+    """CURRENT_VERSION (read from config.py) must equal the expected release version 3.2.1."""
+    assert CURRENT_VERSION == "3.2.1", (
+        f"Expected CURRENT_VERSION == '3.2.1', got '{CURRENT_VERSION}'"
     )
 
 
