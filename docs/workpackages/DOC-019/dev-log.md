@@ -58,3 +58,20 @@ All 10 tests pass. Logged via `scripts/add_test_result.py`.
 - [x] Test results logged
 - [x] `validate_workspace.py --wp DOC-019` passes
 - [x] All changes staged and committed
+
+---
+
+## Iteration 2 — Tester Feedback Fix (2026-03-25)
+
+### Issue
+
+`tests/DOC-018/test_doc018_tester_edge_cases.py::test_agents_dir_contains_only_readme` failed because DOC-019 legitimately added `programmer.agent.md` to `agents/`, making the phase-gate assertion stale. Also BUG-106 was logged by Tester to track this regression.
+
+### Changes Made
+
+- **`tests/DOC-018/test_doc018_tester_edge_cases.py`** — Renamed `test_agents_dir_contains_only_readme` to `test_agents_dir_contains_readme`. Updated assertion from `visible == ["README.md"]` (exact equality) to `"README.md" in visible` (membership check). Updated docstring to reflect that additional `.agent.md` files are added by DOC-019..028.
+- **`docs/bugs/bugs.csv`** — Updated BUG-106 status from `Open` to `Closed`, set Fixed In WP to `DOC-019`, added resolution note.
+
+### Test Results
+
+43 tests pass (DOC-018: 20, DOC-019: 23). 0 failures.

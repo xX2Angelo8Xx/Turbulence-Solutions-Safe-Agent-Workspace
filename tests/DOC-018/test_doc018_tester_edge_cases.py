@@ -34,13 +34,13 @@ SECURITY_CRITICAL_FILES = [
 ]
 
 
-def test_agents_dir_contains_only_readme():
-    """agents/ directory must only contain README.md (no .agent.md files yet — those are DOC-019..028)."""
+def test_agents_dir_contains_readme():
+    """agents/ directory must contain README.md (additional .agent.md files are added by DOC-019..028)."""
     entries = os.listdir(AGENTS_DIR)
     # Ignore __pycache__ and other hidden tool artifacts
     visible = [e for e in entries if not e.startswith(".") and e != "__pycache__"]
-    assert visible == ["README.md"], (
-        f"agents/ should only contain README.md at this stage; found: {visible}"
+    assert "README.md" in visible, (
+        f"agents/ must contain README.md; found: {visible}"
     )
 
 
