@@ -2,21 +2,30 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-03-25  
-**Iteration:** 1
+**Iteration:** 2
 
 ## Summary
 
-The coordinator.agent.md template was correctly updated: all 10 agent names are PascalCase throughout the document (frontmatter, Delegation Table, How You Work, Persona, What You Do Not Do). The DOC-030-specific test suite (26 tests) passes cleanly. However, the PascalCase change introduces **9 regressions in `tests/DOC-029/`** — those tests hard-code lowercase agent names that DOC-030 intentionally changed. The Developer must update the DOC-029 test files before this WP can be approved.
+The coordinator.agent.md template was correctly updated: all 10 agent names are PascalCase throughout the document (frontmatter, Delegation Table, How You Work, Persona, What You Do Not Do). After Developer Iteration 2, both the DOC-029 regression tests and the DOC-030 test suite pass completely. **74/74 tests pass.** No new regressions introduced. Full suite pre-existing failures (72 tests in unrelated WPs: FIX-039, FIX-042, FIX-049, INS-014/015/017/019, MNT-002, SAF-010, SAF-025) were confirmed to predate this branch and are not caused by DOC-030 changes (verified via `git diff origin/main...HEAD --name-only`).
 
 ## Tests Executed
+
+### Iteration 1 (FAIL)
 
 | Test | Type | Result | TST-ID | Notes |
 |------|------|--------|--------|-------|
 | DOC-030 suite — 13 developer tests | Unit | PASS | TST-2177 | Frontmatter, Body, Delegation Table, Persona, What You Do Not Do |
 | DOC-030 suite — 13 tester edge-case tests | Unit | PASS | TST-2177 | Full-file scan, frontmatter integrity, How You Work, file sanity |
-| Full regression suite — DOC-029 tests | Regression | FAIL | TST-2178 | 9 tests broke; see Bugs Found below |
+| Full regression suite — DOC-029 tests | Regression | FAIL | TST-2178 | 9 tests broke; see Iteration 1 Findings below |
 
-### DOC-030 Suite: 26/26 Passed
+### Iteration 2 (PASS)
+
+| Test | Type | Result | TST-ID | Notes |
+|------|------|--------|--------|-------|
+| DOC-030 targeted suite (26 tests) | Unit | PASS | TST-2180 | All 26 DOC-030 tests pass |
+| DOC-029 + DOC-030 combined (74 tests) | Regression | PASS | TST-2181 | 74 passed, 0 failed — all regressions resolved |
+
+### DOC-030 Suite: 26/26 Passed (Iteration 2)
 
 Classes and tests in `tests/DOC-030/`:
 
@@ -33,60 +42,30 @@ Classes and tests in `tests/DOC-030/`:
 | `TestFileSanity` (tester) | 4 |
 | **Total** | **26** |
 
-### Regression Failures: 9 Tests in `tests/DOC-029/`
+### DOC-029 Regressions: Resolved in Iteration 2
 
-All 9 failures are caused by DOC-029 tests expecting **lowercase** agent names, which DOC-030 intentionally changed to PascalCase:
+The 9 regression failures from Iteration 1 are fully resolved. Developer updated:
+- `tests/DOC-029/test_doc029_coordinator_agent.py` — `EXPECTED_AGENTS` set changed to PascalCase
+- `tests/DOC-029/test_doc029_edge_cases.py` — `EXPECTED_AGENTS` list and all `TestAtSyntaxCrossReferences` assertions updated to PascalCase
 
-| Failing Test | File | Root Cause |
-|---|---|---|
-| `TestCoordinatorAgents::test_all_10_specialist_agents_present` | `test_doc029_coordinator_agent.py` | `EXPECTED_AGENTS` uses lowercase |
-| `TestAgentsListExactCount::test_all_expected_agents_present` | `test_doc029_edge_cases.py` | `EXPECTED_AGENTS` uses lowercase |
-| `TestAgentsListExactCount::test_no_unexpected_agents` | `test_doc029_edge_cases.py` | PascalCase flagged as "unexpected" |
-| `TestAtSyntaxCrossReferences::test_at_syntax_used_for_programmer` | `test_doc029_edge_cases.py` | Looks for `@programmer` (lowercase) |
-| `TestAtSyntaxCrossReferences::test_at_syntax_used_for_tester` | `test_doc029_edge_cases.py` | Looks for `@tester` (lowercase) |
-| `TestAtSyntaxCrossReferences::test_at_syntax_used_for_planner` | `test_doc029_edge_cases.py` | Looks for `@planner` (lowercase) |
-| `TestAtSyntaxCrossReferences::test_at_syntax_used_for_fixer` | `test_doc029_edge_cases.py` | Looks for `@fixer` (lowercase) |
-| `TestAtSyntaxCrossReferences::test_at_syntax_used_for_criticist` | `test_doc029_edge_cases.py` | Looks for `@criticist` (lowercase) |
-| `TestAtSyntaxCrossReferences::test_at_syntax_present_for_all_10_agents` | `test_doc029_edge_cases.py` | Looks for all 10 lowercase `@agent` refs |
+All 48 DOC-029 tests now pass. Combined DOC-029 + DOC-030: **74/74 passed**.
+
+### Iteration 1 — Regression Failures (Historical, Now Fixed)
+
+All 9 failures in Iteration 1 were caused by DOC-029 tests expecting **lowercase** agent names, which DOC-030 intentionally changed to PascalCase. All resolved by Developer Iteration 2.
 
 ## Bugs Found
 
-None new. The regressions are a direct and expected consequence of fixing the bug (BUG-120). The DOC-029 tests simply need to be updated to reflect the now-correct PascalCase behavior.
-
-## TODOs for Developer
-
-- [ ] **Update `tests/DOC-029/test_doc029_coordinator_agent.py`** — change `EXPECTED_AGENTS` set from lowercase to PascalCase:
-  ```python
-  # OLD (incorrect after DOC-030)
-  EXPECTED_AGENTS = {
-      "programmer", "tester", "brainstormer", "researcher",
-      "scientist", "criticist", "planner", "fixer", "writer", "prototyper"
-  }
-  # NEW (correct)
-  EXPECTED_AGENTS = {
-      "Programmer", "Tester", "Brainstormer", "Researcher",
-      "Scientist", "Criticist", "Planner", "Fixer", "Writer", "Prototyper"
-  }
-  ```
-
-- [ ] **Update `tests/DOC-029/test_doc029_edge_cases.py`** — apply the same PascalCase change to `EXPECTED_AGENTS`, AND update the `TestAtSyntaxCrossReferences` assertions from `@lowercase` to `@PascalCase`:
-  ```python
-  # In EXPECTED_AGENTS set — same change as above
-  
-  # In TestAtSyntaxCrossReferences methods, change references like:
-  assert "@programmer" in self.body  →  assert "@Programmer" in self.body
-  assert "@tester" in self.body      →  assert "@Tester" in self.body
-  assert "@planner" in self.body     →  assert "@Planner" in self.body
-  assert "@fixer" in self.body       →  assert "@Fixer" in self.body
-  assert "@criticist" in self.body   →  assert "@Criticist" in self.body
-  # Also update test_at_syntax_present_for_all_10_agents loop to use PascalCase
-  ```
-
-- [ ] After updating the DOC-029 tests, run the full `tests/DOC-029/` suite (all 48 tests must pass) and `tests/DOC-030/` suite (all 26 tests must pass).
-- [ ] Re-submit for Tester review.
+None. The Iteration 1 regressions were a direct and expected consequence of fixing BUG-120 — the DOC-029 tests needed updating to reflect the now-correct PascalCase behavior.
 
 ## Verdict
 
-**FAIL — Return to Developer.**
+**PASS — Marking WP as Done.**
 
-The coordinator.agent.md template changes are correct and the DOC-030 test suite passes (26/26). However, 9 pre-existing tests in `tests/DOC-029/` now fail because they expected the old buggy lowercase names. The Developer must update those tests to use PascalCase before this WP can be marked Done.
+- coordinator.agent.md template: all 10 agent names correctly use PascalCase throughout (frontmatter, Delegation Table, How You Work, Persona, What You Do Not Do).
+- DOC-030 test suite: **26/26 passed**
+- DOC-029 regression suite: **48/48 passed** (regressions fixed by Developer Iteration 2)
+- Combined DOC-029 + DOC-030: **74/74 passed**
+- Full test suite pre-existing failures (72 tests in FIX-039, FIX-042, FIX-049, INS-014/015/017/019, MNT-002, SAF-010, SAF-025) confirmed to predate this branch — not caused by DOC-030.
+- BUG-120 is closed.
+
