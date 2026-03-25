@@ -91,3 +91,29 @@ In `validate_memory()` in `templates/agent-workbench/.github/hooks/scripts/secur
 ### Tests
 - All 57 SAF-048 tests pass (33 developer + 24 tester edge-case tests including the 18 previously failing)
 - Results logged as TST-2188
+
+---
+
+## Iteration 3 — SAF-038 Regression Fix (2026-03-25)
+
+### Tester Findings (Iteration 2)
+Tester returned WP with 1 regression (BUG-125, High):
+- `tests/SAF-038/test_saf038_edge_cases.py::TestNullByteInjection::test_memory_null_byte_in_project_path_allow` expected `allow`, got `deny`.
+- Root cause: SAF-048 Iteration 2 BUG-123 fix adds a null-byte check in `validate_memory()` that fires before `zone_classifier`. The old behaviour relied on `zone_classifier.normalize_path` stripping the null byte and then allowing the path — an accidental weakness.
+
+### Resolution — Option A (policy clarification)
+Updated `tests/SAF-038/test_saf038_edge_cases.py`:
+- Renamed `test_memory_null_byte_in_project_path_allow` → `test_memory_null_byte_in_project_path_deny`.
+- Changed assertion from `allow` to `deny`.
+- Updated docstring to document this as an intentional security improvement: null bytes have no legitimate use in any file path and should be denied regardless of whether the rest of the path resolves inside the project folder.
+
+No changes to `security_gate.py` — the SAF-048 null-byte check is correct and intentional.
+
+### BUG-125 Closed
+BUG-125 marked Closed in `docs/bugs/bugs.csv` with Fixed In WP = SAF-048.
+
+### Files Changed
+- `tests/SAF-038/test_saf038_edge_cases.py` — test renamed and assertion updated
+
+### Tests
+- All SAF-048 tests pass; all SAF-038 tests pass (0 failures).

@@ -90,12 +90,15 @@ class TestNullByteInjection:
         data = {"tool_input": {"filePath": path}}
         assert sg.validate_memory(data, WS) == "deny"
 
-    def test_memory_null_byte_in_project_path_allow(self):
-        # Null byte inside a project-folder path: after stripping it still
-        # resolves to project/memories/notes.md → allow
+    def test_memory_null_byte_in_project_path_deny(self):
+        # SAF-048 intentional security improvement (BUG-125 resolution):
+        # Null bytes have no legitimate use in any file path. SAF-048 added
+        # an early null-byte check in validate_memory() that fires before
+        # zone_classifier is reached. Even a project-folder path with a null
+        # byte is denied. The old 'allow' was an accidental weakness.
         path = f"{WS}/project/memories\x00/notes.md"
         data = {"tool_input": {"filePath": path}}
-        assert sg.validate_memory(data, WS) == "allow"
+        assert sg.validate_memory(data, WS) == "deny"
 
     def test_create_directory_null_byte_traversal_deny(self):
         path = f"{WS}/project/\x00../../../.github/injected"
