@@ -2016,3 +2016,4 @@
 "TST-2135","DOC-020 brainstormer agent tests","Unit","DOC-020","Pass","2026-03-25","Windows 11 + Python 3.11","23 passed, 0 failed","file exists, YAML frontmatter valid, required fields, tools read/search only, no edit tools, persona quality checks"
 "TST-2136","DOC-020: full regression suite","Unit","DOC-020","Fail","2026-03-25","Windows 11 + Python 3.11","5901 passed, 32 skipped, 3 xfailed, 1 warning in 47.04s",""
 "TST-2137","DOC-020: brainstormer agent tests (23 passed)","Unit","DOC-020","Pass","2026-03-25","Windows 11 + Python 3.11","All 23 tests passed","file exists, YAML valid, required tools present, forbidden tools absent, persona body quality, no placeholders, encoding check"
+"TST-2138","DOC-021 tester agent unit tests","Unit","DOC-021","Pass","2026-03-25","Windows 11 + Python 3.11","22 passed, 0 failed","file existence, YAML frontmatter, required fields, tools list (read/edit/search/execute), persona body, edge cases"
