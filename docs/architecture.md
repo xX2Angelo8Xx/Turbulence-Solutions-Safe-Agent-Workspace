@@ -110,6 +110,11 @@ Templates (bundled inside Launcher)
 │   │   ├── DOC-010/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── DOC-011/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   ├── research-report.md
+│   │   │   └── test-report.md
 │   │   ├── FIX-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -685,6 +690,11 @@ Templates (bundled inside Launcher)
 │   ├── DOC-008/
 │   ├── DOC-009/
 │   ├── DOC-010/
+│   ├── DOC-011/
+│   ├── DOC-012/
+│   ├── DOC-013/
+│   ├── DOC-014/
+│   ├── DOC-015/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
