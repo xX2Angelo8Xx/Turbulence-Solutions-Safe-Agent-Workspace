@@ -2095,3 +2095,7 @@
 "TST-2214","FIX-074: full regression suite","Regression","FIX-074","Fail","2026-03-25","Windows 11 + Python 3.11","6788 passed, 32 skipped, 3 xfailed, 1 warning in 65.60s (0:01:05)",""
 "TST-2215","FIX-074: targeted suite","Unit","FIX-074","Pass","2026-03-25","Windows 11 + Python 3.11","30 passed in 0.45s",""
 "TST-2216","FIX-076 reset agent blocks tests","Unit","FIX-076","Pass","2026-03-25","Windows 11 + Python 3.11","17 passed, 0 failed","reset hook state, handler error/success paths, dialog geometry regression, widget existence"
+"TST-2217","FIX-076: targeted suite","Regression","FIX-076","Pass","2026-03-25","Windows 11 + Python 3.11","27 passed in 0.52s",""
+"TST-2218","FIX-076: full regression suite","Regression","FIX-076","Fail","2026-03-25","Windows 11 + Python 3.11","6814 passed, 32 skipped, 3 xfailed, 1 warning in 72.72s (0:01:12)",""
+"TST-2219","FIX-076: full regression suite","Regression","FIX-076","Fail","2026-03-25","Windows 11 + Python 3.11","6814 passed, 32 skipped, 3 xfailed, 1 warning in 57.40s",""
+"TST-2220","FIX-076: targeted suite","Unit","FIX-076","Pass","2026-03-25","Windows 11 + Python 3.11","27 passed in 0.41s",""
