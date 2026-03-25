@@ -85,7 +85,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "c453763711aff3617a03df7ab6391b10c9109337536427470b071c10c4462c09"
+_KNOWN_GOOD_GATE_HASH: str = "ef030b7f6621993751cefcb2df0378b7850e146744772dfae9d91e25fd52e2b3"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2145,13 +2145,40 @@ def _include_pattern_targets_deny_zone(norm_pattern: str, ws_root: str) -> bool:
             return False
         return True
 
-    # Relative pattern: deny if ANY component explicitly names a deny zone.
-    # This ensures .github/.vscode/noagentzone cannot be targeted at any depth
-    # (e.g. ".github/**", "**/.github/**", "src/.github/**").
-    # Wildcards like "*.py", "**", "*" are never equal to a deny zone name.
+    # Relative pattern: walk left-to-right.
+    # Deny only when a deny-zone component appears before the agent's project
+    # folder anchor.  Only the project folder itself (e.g. "project") counts as
+    # a protective anchor because it scopes the deny-zone name inside the agent's
+    # own work area ("project/.github/**" → allow).
+    # Any other concrete directory (e.g. "src", "tests") does NOT anchor: a deny
+    # zone inside "src/" is still reachable at workspace root via symlinks or
+    # misconfigurations, so we deny conservatively.
+    # Wildcards (*, **, or anything starting with *) are NOT anchors because they
+    # can expand to reach the workspace-root deny zone.
+    # Examples:
+    #   ".github/**"             → deny zone, no project anchor → DENY
+    #   "**/.github/**"          → wildcard, then deny zone, no project anchor → DENY
+    #   "*/.github/**"           → wildcard, then deny zone, no project anchor → DENY
+    #   "src/.github/**"         → "src" is not the project folder → DENY
+    #   "project/.github/**"     → "project" IS the project folder anchor → ALLOW
+    #   "project/src/.vscode/**" → project anchor seen first → ALLOW
+    try:
+        project_dir = zone_classifier.detect_project_folder(Path(ws_root)) if ws_root else None
+    except Exception:
+        project_dir = None
+
     components = [c.lower() for c in norm_pattern.split("/")]
-    if any(c in _WILDCARD_DENY_ZONES for c in components):
-        return True
+    has_project_anchor = False
+    for component in components:
+        if component in _WILDCARD_DENY_ZONES:
+            if not has_project_anchor:
+                return True
+            # Scoped inside the project folder — deny-zone name is in the agent's
+            # own work area, not the workspace-root deny zone.
+            continue
+        if component and not component.startswith("*"):
+            if project_dir and component == project_dir:
+                has_project_anchor = True
     return False
 
 

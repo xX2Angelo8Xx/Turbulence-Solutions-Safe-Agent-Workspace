@@ -4,7 +4,7 @@
 **Title:** Prevent grep_search information leak on workspace root files  
 **Branch:** SAF-050/grep-search-leak  
 **Assigned To:** Developer Agent  
-**Status:** In Progress  
+**Status:** Review  
 
 ---
 
@@ -81,3 +81,24 @@ Test coverage:
 ## Known Limitations
 
 The no-`includePattern` case relies on VS Code's `search.exclude` to exclude `.github/`, `.vscode/`, and `**/NoAgentZone/**`. This is intentional: the security gate can only allow or deny the grep_search call as a whole, not filter individual results. The `search.exclude` configuration is under the security system's control.
+
+---
+
+## Iteration 2 — BUG-127 & BUG-128 Fixes
+
+**Tester findings (from test-report.md):**
+- **BUG-127** — `_include_pattern_targets_deny_zone` used `any(c in _WILDCARD_DENY_ZONES for c in components)` which incorrectly denied patterns like `project/.github/**` (deny zone nested inside the agent's project folder).
+- **BUG-128** — `update_hashes.py` was not run after modifying `security_gate.py`, leaving `_KNOWN_GOOD_GATE_HASH` stale.
+
+**Fix for BUG-127:** Replaced the `any()` check with a left-to-right component walk. A deny-zone component is only blocked when no project-folder anchor precedes it. A "project-folder anchor" is specifically the agent's project folder name (from `zone_classifier.detect_project_folder(ws_root)`), not any arbitrary concrete directory. This ensures:
+- `project/.github/**` → ALLOWED (project folder anchors the deny zone)
+- `project/src/.vscode/**` → ALLOWED (project folder anchor seen first)
+- `src/.github/**` → DENIED (`src` is not the project folder)
+- `**/.github/**` → DENIED (wildcard is not a project folder anchor)
+- `*/.github/**` → DENIED (wildcard is not a project folder anchor)
+
+**Fix for BUG-128:** Ran `update_hashes.py` after fixing BUG-127.
+
+**Tests added:** `tests/SAF-050/test_saf050_tester_edge_cases.py` (8 tests — written by Tester, verified by Developer).
+
+**All 49 SAF-050 tests pass. SAF-003 brace-expansion regression also verified (57/57 passing).**
