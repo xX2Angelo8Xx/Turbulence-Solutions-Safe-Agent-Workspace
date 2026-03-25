@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import stat
 from pathlib import Path
 
 _COUNTER_CONFIG_PATH = Path(".github") / "hooks" / "scripts" / "counter_config.json"
@@ -85,8 +86,16 @@ def create_project(
         for dirpath, _dirnames, filenames in os.walk(target):
             for filename in filenames:
                 if filename == "README.md":
+                    path = os.path.join(dirpath, filename)
                     try:
-                        os.unlink(os.path.join(dirpath, filename))
+                        os.unlink(path)
+                    except PermissionError:
+                        # Read-only file (common on Windows) — clear write-protect then retry.
+                        try:
+                            os.chmod(path, stat.S_IWRITE)
+                            os.unlink(path)
+                        except OSError:
+                            pass
                     except FileNotFoundError:
                         pass
 

@@ -51,3 +51,25 @@ All 7 tests pass. See test-results.csv for logged entry.
 
 ## Known Limitations
 None.
+
+---
+
+## Iteration 2 — Fix read-only README.md crash (BUG-105)
+
+### Problem
+The Tester's edge-case test `TestReadonlyReadme::test_readonly_readme_does_not_crash_project_creation`
+failed because `except FileNotFoundError` did not cover `PermissionError`, which Windows
+raises when `os.unlink` is called on a read-only file.
+
+### Fix Applied
+`src/launcher/core/project_creator.py`:
+1. Added `import stat` at module level.
+2. Changed the exception handling in the README deletion loop:
+   - First try `os.unlink(path)` as before.
+   - On `PermissionError`: clear write-protection via `os.chmod(path, stat.S_IWRITE)`,
+     then retry `os.unlink(path)`. Any remaining `OSError` is silently suppressed.
+   - `FileNotFoundError` is still caught separately (no regression for race-condition edge case).
+
+### Tests
+All 22 tests in `tests/INS-023/` pass (20 passed, 2 skipped on Windows — symlinks and
+case-sensitive FS are platform-limited, skip is intentional).
