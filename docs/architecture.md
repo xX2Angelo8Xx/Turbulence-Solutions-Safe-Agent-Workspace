@@ -137,7 +137,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-018/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-001/
@@ -350,6 +349,13 @@ Templates (bundled inside Launcher)
 │   │   ├── FIX-070/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── FIX-071/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   ├── fix_8space_coding_paths.py
+│   │   │   ├── fix_remaining_coding_paths.py
+│   │   │   ├── test-report.md
+│   │   │   └── transform_tests.py
 │   │   ├── GUI-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -791,6 +797,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-068/
 │   ├── FIX-069/
 │   ├── FIX-070/
+│   ├── FIX-071/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
