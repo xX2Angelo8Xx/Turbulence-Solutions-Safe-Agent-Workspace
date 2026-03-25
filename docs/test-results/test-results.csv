@@ -2094,3 +2094,4 @@
 "TST-2213","FIX-074 project type dropdown tests","Unit","FIX-074","Pass","2026-03-25","Windows 11 + Python 3.11","19 passed, 0 failed","constant check, dropdown configure values, _get_template_options compat, _on_template_selected guard, _on_create_project guard, initial state"
 "TST-2214","FIX-074: full regression suite","Regression","FIX-074","Fail","2026-03-25","Windows 11 + Python 3.11","6788 passed, 32 skipped, 3 xfailed, 1 warning in 65.60s (0:01:05)",""
 "TST-2215","FIX-074: targeted suite","Unit","FIX-074","Pass","2026-03-25","Windows 11 + Python 3.11","30 passed in 0.45s",""
+"TST-2216","FIX-076 reset agent blocks tests","Unit","FIX-076","Pass","2026-03-25","Windows 11 + Python 3.11","17 passed, 0 failed","reset hook state, handler error/success paths, dialog geometry regression, widget existence"

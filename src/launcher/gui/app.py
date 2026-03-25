@@ -598,7 +598,7 @@ class SettingsDialog:
     def __init__(self, parent: ctk.CTk) -> None:
         self._dialog = ctk.CTkToplevel(parent)
         self._dialog.title("Settings")
-        self._dialog.geometry("480x280")
+        self._dialog.geometry("480x480")
         self._dialog.resizable(False, False)
         self._dialog.configure(fg_color=COLOR_PRIMARY)
         self._dialog.grab_set()
@@ -606,6 +606,7 @@ class SettingsDialog:
 
     def _build_ui(self) -> None:
         """Build the settings dialog widgets."""
+        self._dialog.grid_columnconfigure(1, weight=1)
         # Section title
         ctk.CTkLabel(
             self._dialog,
