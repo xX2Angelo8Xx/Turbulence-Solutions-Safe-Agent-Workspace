@@ -691,6 +691,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-046/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-047/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -971,6 +974,7 @@ Templates (bundled inside Launcher)
 │   ├── SAF-044/
 │   ├── SAF-045/
 │   ├── SAF-046/
+│   ├── SAF-047/
 │   ├── SAF-048/
 │   ├── SAF-049/
 │   ├── shared/
