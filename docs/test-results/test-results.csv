@@ -1994,3 +1994,6 @@
 "TST-2113","DOC-016: full regression suite","Regression","DOC-016","Fail","2026-03-25","Windows 11 + Python 3.11","14 errors in 2.54s",""
 "TST-2114","DOC-016: targeted suite","Unit","DOC-016","Pass","2026-03-25","Windows 11 + Python 3.11","28 passed in 0.29s",""
 "TST-2115","GUI-023 template rename tests","Unit","GUI-023","Pass","2026-03-25","Windows 11 + Python 3.11","16 passed, 0 failed","directory existence, _format_template_name, list_templates, is_template_ready, TEMPLATES_DIR"
+"TST-2116","GUI-023: targeted suite","Unit","GUI-023","Pass","2026-03-25","Windows 11 + Python 3.11","16 passed in 0.22s",""
+"TST-2117","GUI-023: full regression suite","Regression","GUI-023","Fail","2026-03-25","Windows 11 + Python 3.11","71 errors in 3.43s",""
+"TST-2118","GUI-023 tester edge-case suite","Unit","GUI-023","Pass","2026-03-25","Windows 11 + Python 3.11","42 passed, 0 failed","Tester-added tests: format boundaries, list_templates robustness, is_template_ready edge cases, security-critical file presence, no broken src refs, launcher.spec generic bundling"
