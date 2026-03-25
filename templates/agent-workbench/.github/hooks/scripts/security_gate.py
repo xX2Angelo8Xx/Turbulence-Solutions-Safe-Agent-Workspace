@@ -84,7 +84,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "e29df798232a8d45f2691e9f86822a312e630d33a64b8027dd071a435a11d994"
+_KNOWN_GOOD_GATE_HASH: str = "299aa4a5ebb9a00e33b437f4d6656237d53ae7684c416231f783db8aaf5d2535"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2421,11 +2421,20 @@ def validate_get_errors(data: dict, ws_root: str) -> str:
 # ---------------------------------------------------------------------------
 
 def validate_memory(data: dict, ws_root: str) -> str:
-    """SAF-038: Validate memory tool calls.
+    """SAF-038/SAF-048: Validate memory tool calls.
 
     Extracts the target file path from the payload (``filePath`` in
     ``tool_input``, then ``filePath`` or ``path`` at the top level).
-    Allows the call only when the path resolves inside the project folder.
+
+    SAF-048: Virtual VS Code memory paths (``/memories/`` prefix) are not
+    filesystem paths and cannot resolve to denied zones.  They are handled
+    before zone classification:
+    - Reads on any ``/memories/`` path → allow.
+    - Writes are permitted only when the path is under ``/memories/session/``.
+      Write operations are detected via the ``command`` field in ``tool_input``
+      (any value containing "save", "write", "create", "update", or "delete").
+
+    Non-virtual paths continue through normal zone classification.
     Fails closed — returns "deny" when no path is present.
     """
     tool_input = data.get("tool_input") or {}
@@ -2441,6 +2450,18 @@ def validate_memory(data: dict, ws_root: str) -> str:
     if not isinstance(raw_path, str) or not raw_path:
         # No path found — fail closed
         return "deny"
+
+    # SAF-048: Virtual VS Code memory paths are not filesystem paths and cannot
+    # escape to denied zones — handle them before calling zone_classifier.
+    norm_virtual = raw_path.replace("\\", "/")
+    if norm_virtual == "/memories" or norm_virtual.startswith("/memories/"):
+        command = str(tool_input.get("command") or "").lower()
+        _WRITE_OPS = ("save", "write", "create", "update", "delete")
+        is_write = any(op in command for op in _WRITE_OPS)
+        if is_write and not norm_virtual.startswith("/memories/session/"):
+            # Writes outside /memories/session/ are not permitted
+            return "deny"
+        return "allow"
 
     zone = zone_classifier.classify(raw_path, ws_root)
     if zone == "allow":
