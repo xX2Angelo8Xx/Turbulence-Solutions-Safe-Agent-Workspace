@@ -2043,3 +2043,4 @@
 "TST-2162","FIX-072 dropdown filter tests","Unit","FIX-072","Pass","2026-03-25","Windows 11 + Python 3.11","9 passed, 0 failed","ready templates included, unready excluded, no coming-soon suffix, attr removed, on_template_selected, BUG-107 regression"
 "TST-2163","FIX-072: full regression suite","Regression","FIX-072","Fail","2026-03-25","Windows 11 + Python 3.11","11 passed"" in result.stdout, (",""
 "TST-2164","FIX-072: targeted suite","Unit","FIX-072","Pass","2026-03-25","Windows 11 + Python 3.11","17 passed in 0.33s",""
+"TST-2165","FIX-072 iteration 2: GUI-002 and GUI-014 test regression fixes","Unit","FIX-072","Pass","2026-03-25","Windows 11 + Python 3.11","70 passed, 0 failed (FIX-072+GUI-002+GUI-014 suite)","16 test regressions fixed: removed/updated coming-soon assertions in GUI-014 (10 tests) and GUI-002 (6 tests)"

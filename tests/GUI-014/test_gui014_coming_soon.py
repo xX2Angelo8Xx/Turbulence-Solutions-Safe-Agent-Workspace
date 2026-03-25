@@ -90,8 +90,8 @@ class TestIsTemplateReady:
 # ---------------------------------------------------------------------------
 
 class TestGetTemplateOptions:
-    def test_coming_soon_label_appended_to_unready(self, tmp_path: Path):
-        """Unready templates get ' ...coming soon' in their display name."""
+    def test_unready_template_excluded_from_options(self, tmp_path: Path):
+        """Unready templates must not appear in the options list at all."""
         (tmp_path / "coding").mkdir()
         (tmp_path / "coding" / "app.py").write_text("")
         (tmp_path / "certification-pipeline").mkdir()
@@ -101,8 +101,8 @@ class TestGetTemplateOptions:
             app = _fresh_app()
             options = app._get_template_options()
 
-        assert any("coming soon" in o for o in options)
-        assert "Certification Pipeline ...coming soon" in options
+        assert not any("Certification Pipeline" in o for o in options)
+        assert not any("coming soon" in o for o in options)
 
     def test_ready_template_has_no_coming_soon_label(self, tmp_path: Path):
         """Ready templates must NOT have ' ...coming soon' appended."""
@@ -115,8 +115,8 @@ class TestGetTemplateOptions:
 
         assert all("coming soon" not in o for o in options)
 
-    def test_returns_both_ready_and_coming_soon(self, tmp_path: Path):
-        """Both kinds of templates appear in the options list."""
+    def test_returns_only_ready_templates(self, tmp_path: Path):
+        """Only ready templates appear in the options list; unready ones are absent."""
         (tmp_path / "agent-workbench").mkdir()
         (tmp_path / "agent-workbench" / "app.py").write_text("")
         (tmp_path / "certification-pipeline").mkdir()
@@ -125,25 +125,11 @@ class TestGetTemplateOptions:
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
             options = app._get_template_options()
-            coming_soon = app._coming_soon_options
 
-        assert len(options) == 2
-        assert len(coming_soon) == 1
+        assert len(options) == 1
         assert "Agent Workbench" in options
+        assert not any("Certification Pipeline" in o for o in options)
 
-    def test_coming_soon_set_contains_only_unready_display_names(self, tmp_path: Path):
-        """The returned coming_soon set contains only the unready entries."""
-        (tmp_path / "agent-workbench").mkdir()
-        (tmp_path / "agent-workbench" / "app.py").write_text("")
-        (tmp_path / "certification-pipeline").mkdir()
-        (tmp_path / "certification-pipeline" / "README.md").write_text("")
-
-        with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
-            app = _fresh_app()
-            options, coming_soon = app._get_template_options()
-
-        assert "Certification Pipeline ...coming soon" in coming_soon
-        assert "Agent Workbench" not in coming_soon
 
 
 # ---------------------------------------------------------------------------
@@ -163,8 +149,8 @@ class TestDropdownDefaultSelection:
 
         assert app._current_template == "Coding"
 
-    def test_default_does_not_select_coming_soon(self, tmp_path: Path):
-        """The default selection must never be a coming-soon item."""
+    def test_default_does_not_select_unready_template(self, tmp_path: Path):
+        """The default selection must be a ready template, not an unready one."""
         (tmp_path / "coding").mkdir()
         (tmp_path / "coding" / "app.py").write_text("")
         (tmp_path / "certification-pipeline").mkdir()
@@ -173,40 +159,12 @@ class TestDropdownDefaultSelection:
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
 
-        assert app._current_template not in app._coming_soon_options
+        assert app._current_template == "Coding"
+        assert "coming soon" not in app._current_template
 
-    def test_coming_soon_options_set_populated(self, tmp_path: Path):
-        """App._coming_soon_options should contain the coming-soon display names."""
-        (tmp_path / "coding").mkdir()
-        (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "certification-pipeline").mkdir()
-        (tmp_path / "certification-pipeline" / "README.md").write_text("")
-
-        with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
-            app = _fresh_app()
-
-        assert "Certification Pipeline ...coming soon" in app._coming_soon_options
 
 
 class TestOnTemplateSelected:
-    def test_revert_on_coming_soon_selection(self, tmp_path: Path):
-        """Selecting a coming-soon option must revert the dropdown to _current_template."""
-        (tmp_path / "coding").mkdir()
-        (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "certification-pipeline").mkdir()
-        (tmp_path / "certification-pipeline" / "README.md").write_text("")
-
-        with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
-            app = _fresh_app()
-
-        previous = app._current_template  # "Coding"
-        app._on_template_selected("Certification Pipeline ...coming soon")
-
-        # _current_template must not have changed
-        assert app._current_template == previous
-        # The dropdown must have been set back to the previous value
-        app.project_type_dropdown.set.assert_called_with(previous)
-
     def test_valid_selection_updates_current_template(self, tmp_path: Path):
         """Selecting a ready template updates _current_template."""
         (tmp_path / "alpha").mkdir()
@@ -220,19 +178,6 @@ class TestOnTemplateSelected:
         app._on_template_selected("Beta")
         assert app._current_template == "Beta"
 
-    def test_coming_soon_selection_does_not_update_current_template(self, tmp_path: Path):
-        """Selecting a coming-soon option must NOT update _current_template."""
-        (tmp_path / "coding").mkdir()
-        (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "draft").mkdir()
-        (tmp_path / "draft" / "README.md").write_text("")
-
-        with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
-            app = _fresh_app()
-
-        original = app._current_template
-        app._on_template_selected("Draft ...coming soon")
-        assert app._current_template == original
 
 
 # ---------------------------------------------------------------------------
@@ -283,9 +228,8 @@ class TestCreateProjectUsesCurrentTemplate:
 class TestAllTemplatesComingSoon:
     """Edge case: every template in the directory has only README.md."""
 
-    def test_current_template_fallback_when_all_coming_soon(self, tmp_path: Path):
-        """When no template is ready, _current_template falls back to the first
-        coming-soon option (not an empty string) so the dropdown is not blank."""
+    def test_current_template_is_empty_when_no_ready_templates(self, tmp_path: Path):
+        """When no template is ready, _current_template is an empty string."""
         (tmp_path / "alpha").mkdir()
         (tmp_path / "alpha" / "README.md").write_text("")
         (tmp_path / "beta").mkdir()
@@ -294,23 +238,8 @@ class TestAllTemplatesComingSoon:
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
 
-        # Both are coming-soon; fallback picks the first option.
-        assert app._current_template != ""
-        assert app._current_template in ("Alpha ...coming soon", "Beta ...coming soon")
+        assert app._current_template == ""
 
-    def test_coming_soon_set_has_all_when_none_ready(self, tmp_path: Path):
-        """With all templates unready, _coming_soon_options contains every display name."""
-        (tmp_path / "alpha").mkdir()
-        (tmp_path / "alpha" / "README.md").write_text("")
-        (tmp_path / "beta").mkdir()
-        (tmp_path / "beta" / "README.md").write_text("")
-
-        with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
-            app = _fresh_app()
-
-        assert "Alpha ...coming soon" in app._coming_soon_options
-        assert "Beta ...coming soon" in app._coming_soon_options
-        assert len(app._coming_soon_options) == 2
 
 
 class TestCreateProjectComingSoonBypass:
@@ -367,15 +296,15 @@ class TestRealTemplatesDirectory:
         assert is_template_ready(REAL_TEMPLATES_DIR, "certification-pipeline") is False
 
     def test_real_templates_display_names(self):
-        """Against the real templates/ dir the app produces 'Coding' (ready)
-        and 'Certification Pipeline ...coming soon' (not ready)."""
+        """Against the real templates/ dir the app shows only ready templates;
+        'Certification Pipeline' is absent since it only has README.md."""
         from launcher.config import TEMPLATES_DIR as REAL_TEMPLATES_DIR
         _CTK_MOCK.reset_mock()
         app = App()
         options = app._get_template_options()
         assert "Agent Workbench" in options
-        assert "Certification Pipeline ...coming soon" in options
-        assert not any(o.endswith("...coming soon") and "Coding" in o for o in options)
+        assert not any("Certification Pipeline" in o for o in options)
+        assert not any("coming soon" in o for o in options)
 
 
 class TestIsTemplateReadyEdgeCases:
