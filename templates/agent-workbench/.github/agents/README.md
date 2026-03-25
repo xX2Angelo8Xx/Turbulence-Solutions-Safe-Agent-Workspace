@@ -19,6 +19,7 @@ Each `.agent.md` file activates a focused mode you invoke with `@<agent-name>` i
 | Fixer | `fixer.agent.md` | Diagnoses errors and traces root causes; implements targeted fixes |
 | Writer | `writer.agent.md` | Drafts documentation, READMEs, comments, and changelogs |
 | Prototyper | `prototyper.agent.md` | Builds quick proof-of-concept code; trades perfection for speed |
+| Coordinator | `coordinator.agent.md` | Decomposes complex goals, delegates to specialist agents, and validates output |
 
 ---
 
