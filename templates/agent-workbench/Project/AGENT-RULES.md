@@ -52,8 +52,8 @@ The following paths are **permanently off-limits**. No workpackage, exception, o
 | `list_dir` | Zone-checked | Allowed everywhere except `NoAgentZone/` internals |
 | `create_directory` | Zone-checked | Allowed in project folder only |
 | **Search Tools** | | |
-| `grep_search` | Allowed | Searches are read-only; no zone restriction |
-| `file_search` | Allowed | Read-only glob search; no zone restriction |
+| `grep_search` | Zone-checked | Read-only text search; general pattern search is allowed; `includePattern` targeting denied zones (e.g., `NoAgentZone/**`) is blocked; `includeIgnoredFiles: true` is blocked |
+| `file_search` | Zone-checked | Read-only glob search; general pattern search is allowed; `query` targeting denied zones (e.g., `NoAgentZone/**`) is blocked; `includeIgnoredFiles: true` is blocked |
 | `semantic_search` | Allowed | Read-only semantic search; no zone restriction |
 | **Terminal** | Zone-checked | See [Terminal Rules](#4-terminal-rules) |
 | **Git** | Zone-checked | See [Git Rules](#5-git-rules) |
