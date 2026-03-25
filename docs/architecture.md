@@ -456,6 +456,10 @@ Templates (bundled inside Launcher)
 │   │   ├── INS-022/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── INS-023/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── MNT-001/
 │   │   │   └── dev-log.md
 │   │   ├── MNT-002/
@@ -794,6 +798,7 @@ Templates (bundled inside Launcher)
 │   ├── INS-020/
 │   ├── INS-021/
 │   ├── INS-022/
+│   ├── INS-023/
 │   ├── MNT-001/
 │   ├── MNT-002/
 │   ├── SAF-001/
