@@ -119,6 +119,10 @@ docs/maintenance/YYYY-MM-DD-maintenance.md
 **Awaiting human review** — Do NOT implement any changes until approved.
 ```
 
+### Post-Log Actions
+
+After writing the maintenance log, the Maintenance Agent (or human) MUST add all proposed actions from the log to `docs/maintenance/action-tracker.json` as new ACT-NNN entries with status `Open`. This step is **mandatory** — actions that remain only in the log text are not tracked and are likely to be missed.
+
 ---
 
 ## Human Verification

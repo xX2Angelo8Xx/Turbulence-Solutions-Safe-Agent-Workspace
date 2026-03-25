@@ -95,6 +95,142 @@
       "priority": "Info",
       "status": "Done",
       "resolved_by": "FIX-068"
+    },
+    {
+      "action_id": "ACT-012",
+      "source_log": "2026-03-24-maintenance.md",
+      "description": "Create missing user stories US-033 through US-039 in user-stories.csv",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "Phase 3 batch commit 2026-03-25"
+    },
+    {
+      "action_id": "ACT-013",
+      "source_log": "2026-03-24-maintenance.md",
+      "description": "Close BUG-093, BUG-094, BUG-095 — set Status to Closed",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "2026-03-24 maintenance"
+    },
+    {
+      "action_id": "ACT-014",
+      "source_log": "2026-03-24-maintenance.md",
+      "description": "Delete orphaned .finalization-state.json files in FIX-070 and SAF-037",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "2026-03-24 maintenance"
+    },
+    {
+      "action_id": "ACT-015",
+      "source_log": "2026-03-24-maintenance.md",
+      "description": "Add 13 missing WP back-references to US Linked WPs columns",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "Phase 3 batch commit 2026-03-25"
+    },
+    {
+      "action_id": "ACT-016",
+      "source_log": "2026-03-24-maintenance.md",
+      "description": "Accept XFail as valid test status in validate_workspace.py",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "Already in VALID_TST_STATUS set"
+    },
+    {
+      "action_id": "ACT-017",
+      "source_log": "2026-03-24-maintenance.md",
+      "description": "Add post-finalization sanity check for .finalization-state.json to agent-workflow.md",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-018",
+      "source_log": "2026-03-24-maintenance.md",
+      "description": "Add Tester checklist step: scan bugs.csv for Fixed entries and close them",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-019",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "Commit dirty working tree with CSV requoting + Phase 3 WP additions + US cascades",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-020",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "Delete 7 stale local branches (SAF-038, SAF-039, SAF-042, DOC-012–015)",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance"
+    },
+    {
+      "action_id": "ACT-021",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "Add proposed actions from 2026-03-24 log to action-tracker.json",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-022",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "Close BUG-097",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-023",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "Mark BUG-102 as deferred",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-024",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "Add action-tracker update rule to maintenance-protocol.md",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-025",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "Add Tester post-finalization bug closure step to agent-workflow.md",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-026",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "Add Developer post-merge branch deletion verification to agent-workflow.md",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-027",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "XFail already accepted in validate_workspace.py",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "Already in VALID_TST_STATUS"
+    },
+    {
+      "action_id": "ACT-028",
+      "source_log": "2026-03-25-maintenance.md",
+      "description": "Consider architecture.md mention of SAF-036/037 counter config",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "2026-03-25 maintenance commit"
     }
   ]
 }

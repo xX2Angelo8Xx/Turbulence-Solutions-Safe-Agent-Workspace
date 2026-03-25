@@ -917,6 +917,7 @@ git config user.email "angelomichaelamon2001@gmail.com"
 This project enforces a **safety-first** development policy:
 
 - The Python security gate (`security_gate.py`) replaces the previous PowerShell/Bash hook scripts, closing all known bypass vectors identified in the security audit.
+- Configurable denial counter with threshold, reset, and disable options (SAF-036/SAF-037).
 - All security-critical code requires both a protection test and a bypass-attempt test.
 - Cross-platform compatibility (Windows, macOS, Linux) is mandatory for all safety features.
 - See [copilot-instructions.md](../.github/instructions/copilot-instructions.md) for the landing page and [work-rules/index.md](work-rules/index.md) for the complete rule set enforced on all contributors and AI agents.

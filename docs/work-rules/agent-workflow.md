@@ -49,6 +49,8 @@ Before setting WP to Review and handing off:
 4. Commit with message format: `<WP-ID>: <short description>`
 5. Push the feature branch: `git push origin <branch-name>`
 
+After finalization: verify local feature branch is deleted (`git branch -d <branch>`). If `finalize_wp.py` did not delete it, delete manually.
+
 ### Post-Edit Verification (required after every code change)
 
 After making any code edit, the Developer MUST verify the edit was actually persisted to disk. In-memory edits (e.g. from IDE buffers or tool chains) can be silently discarded without error.
