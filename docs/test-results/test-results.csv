@@ -2060,3 +2060,4 @@
 "TST-2179","DOC-030 iteration-2 regression fix","Unit","DOC-030","Pass","2026-03-25","Windows 11 + Python 3.11","74 passed, 0 failed","DOC-029: 48 passed, DOC-030: 26 passed; fixed 9 regressions by updating EXPECTED_AGENTS and @-ref assertions to PascalCase"
 "TST-2180","DOC-030: targeted suite","Unit","DOC-030","Pass","2026-03-25","Windows 11 + Python 3.11","26 passed in 0.29s","Iteration 2: DOC-029 regression tests fixed by Developer"
 "TST-2181","DOC-030: DOC-029+DOC-030 combined suite (74 tests)","Regression","DOC-030","Pass","2026-03-25","Windows 11 + Python 3.11","74 passed, 0 failed","Iteration 2: all 48 DOC-029 tests and 26 DOC-030 tests pass after PascalCase regression fix"
+"TST-2182","FIX-075 window title tests","Unit","FIX-075","Pass","2026-03-25","Windows 11 + Python 3.11","4 passed, 0 failed","APP_NAME value, regression no-old-value, no old string in config source, AST check window.title(APP_NAME)"
