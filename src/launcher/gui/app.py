@@ -96,8 +96,6 @@ class App:
         self._window.configure(fg_color=COLOR_PRIMARY)
         # Tracks the latest available version so the install handler can use it.
         self._latest_version: str = VERSION
-        # Initialized before _build_ui so the dropdown builder can populate them.
-        self._coming_soon_options: set[str] = set()
         self._current_template: str = ""
         self._build_ui()
         # Set window icon from TS-Logo (GUI-013 / FIX-016).
@@ -118,18 +116,11 @@ class App:
 
     def _get_template_options(self) -> list[str]:
         names = list_templates(TEMPLATES_DIR)
-        all_options: list[str] = []
-        coming_soon: set[str] = set()
-        for name in names:
-            display = _format_template_name(name)
-            if not is_template_ready(TEMPLATES_DIR, name):
-                display = f"{display} ...coming soon"
-                coming_soon.add(display)
-            all_options.append(display)
-        # Store coming-soon set as a side effect so _build_ui and _on_template_selected
-        # can access it without a second scan.
-        self._coming_soon_options = coming_soon
-        return all_options
+        return [
+            _format_template_name(name)
+            for name in names
+            if is_template_ready(TEMPLATES_DIR, name)
+        ]
 
     def _build_ui(self) -> None:
         """Construct and arrange all UI widgets."""
@@ -179,10 +170,8 @@ class App:
         ctk.CTkLabel(
             self._window, text="Project Type:", anchor="w", text_color=COLOR_TEXT,
         ).grid(row=3, column=0, padx=(20, 8), pady=12, sticky="w")
-        options = self._get_template_options()  # also populates self._coming_soon_options
-        ready_options = [o for o in options if o not in self._coming_soon_options]
-        # Default to the first ready template so coming-soon items are never pre-selected.
-        self._current_template = ready_options[0] if ready_options else (options[0] if options else "")
+        options = self._get_template_options()
+        self._current_template = options[0] if options else ""
         self.project_type_dropdown = ctk.CTkOptionMenu(
             self._window,
             values=options if options else [""],
@@ -398,10 +387,6 @@ class App:
             self.destination_entry.insert(0, folder)
 
     def _on_template_selected(self, value: str) -> None:
-        """Prevent selection of coming-soon templates by reverting to the previous valid choice."""
-        if value in self._coming_soon_options:
-            self.project_type_dropdown.set(self._current_template)
-            return
         self._current_template = value
 
     def _on_create_project(self) -> None:
