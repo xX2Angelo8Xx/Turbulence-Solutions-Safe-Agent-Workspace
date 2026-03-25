@@ -1997,3 +1997,4 @@
 "TST-2116","GUI-023: targeted suite","Unit","GUI-023","Pass","2026-03-25","Windows 11 + Python 3.11","16 passed in 0.22s",""
 "TST-2117","GUI-023: full regression suite","Regression","GUI-023","Fail","2026-03-25","Windows 11 + Python 3.11","71 errors in 3.43s",""
 "TST-2118","GUI-023 tester edge-case suite","Unit","GUI-023","Pass","2026-03-25","Windows 11 + Python 3.11","42 passed, 0 failed","Tester-added tests: format boundaries, list_templates robustness, is_template_ready edge cases, security-critical file presence, no broken src refs, launcher.spec generic bundling"
+"TST-2119","DOC-018 agents directory tests","Unit","DOC-018","Pass","2026-03-25","Windows 11 + Python 3.11","7 passed, 0 failed","agents dir exists, README mentions all 10 agents, customization instructions, copilot-instructions refs agents, AGENT-RULES section exists, AGENT-RULES lists all agents"

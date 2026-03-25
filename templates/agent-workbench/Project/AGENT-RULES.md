@@ -195,3 +195,24 @@ Common limitations and their approved solutions. Use these patterns — do not i
 | `csv` module may misparse multi-line quoted fields | Use `csv.reader` with `quoting=csv.QUOTE_ALL`; avoid manual string splitting on CSV lines |
 | Temp files created during tests can pollute workspace | Prefix with `tmp_` and delete them in a `finally` block or pytest fixture teardown |
 | `semantic_search` returns stale results after large refactor | Fall back to `grep_search` with a specific pattern to get precise matches |
+
+---
+
+## 8. Available Agent Personas
+
+Custom agents are defined in `.github/agents/`. Invoke them in VS Code Copilot Chat with `@<agent-name>`.
+
+| Agent | Invoke | When to Use |
+|-------|--------|-------------|
+| Programmer | `@programmer` | Implementing features, writing functions, editing code |
+| Brainstormer | `@brainstormer` | Exploring approaches and trade-offs before implementation |
+| Tester | `@tester` | Writing unit/integration tests, validating behavior, finding edge cases |
+| Researcher | `@researcher` | Investigating unfamiliar libraries, APIs, or technologies |
+| Scientist | `@scientist` | Data analysis, benchmarks, hypothesis-driven experiments |
+| Criticist | `@criticist` | Code review, identifying bugs, security review, design critique |
+| Planner | `@planner` | Breaking down large tasks, creating structured work plans |
+| Fixer | `@fixer` | Debugging errors, tracing root causes, implementing targeted fixes |
+| Writer | `@writer` | Documentation, README files, inline comments, changelogs |
+| Prototyper | `@prototyper` | Rapid proof-of-concept code; speed over perfection |
+
+All agents follow the same zone restrictions and tool permissions defined in Sections 1–5 of this document. See `.github/agents/README.md` for customization instructions.

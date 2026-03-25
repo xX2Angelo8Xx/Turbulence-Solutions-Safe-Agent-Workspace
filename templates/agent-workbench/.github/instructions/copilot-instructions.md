@@ -14,6 +14,7 @@ Turbulence Solutions
 - The `.github/` and `.vscode/` folders contain administrator configurations. Do not access or modify them.
 - All output must be in English.
 - A PreToolUse hook enforces tool approval boundaries automatically. Respect its decisions.
+- Specialized agent personas are available in `.github/agents/`. Invoke with `@<agent-name>` in chat. See `.github/agents/README.md` for the full roster.
 
 ## Security — Denied Actions
 
