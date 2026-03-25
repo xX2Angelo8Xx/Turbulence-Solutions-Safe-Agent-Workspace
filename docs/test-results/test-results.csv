@@ -1993,3 +1993,4 @@
 "TST-2112","DOC-016 code signing research report tests","Unit","DOC-016","Pass","2026-03-25","Windows 11 + Python 3.11","11 passed, 0 failed","file exists, non-empty, setup section, CI integration, recommendation, comparison matrix, SignPath coverage, Azure coverage, SSL.com coverage, cert management, references"
 "TST-2113","DOC-016: full regression suite","Regression","DOC-016","Fail","2026-03-25","Windows 11 + Python 3.11","14 errors in 2.54s",""
 "TST-2114","DOC-016: targeted suite","Unit","DOC-016","Pass","2026-03-25","Windows 11 + Python 3.11","28 passed in 0.29s",""
+"TST-2115","GUI-023 template rename tests","Unit","GUI-023","Pass","2026-03-25","Windows 11 + Python 3.11","16 passed, 0 failed","directory existence, _format_template_name, list_templates, is_template_ready, TEMPLATES_DIR"
