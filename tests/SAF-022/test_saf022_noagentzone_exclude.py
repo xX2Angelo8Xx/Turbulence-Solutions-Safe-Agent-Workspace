@@ -19,10 +19,10 @@ import pytest
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
-TEMPLATE_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
-DEFAULT_GATE = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
-TEMPLATE_GATE = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
+DEFAULT_SETTINGS = REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json"
+TEMPLATE_SETTINGS = REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json"
+DEFAULT_GATE = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "security_gate.py"
+TEMPLATE_GATE = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "security_gate.py"
 
 EXCLUDE_KEY = "**/NoAgentZone"
 
@@ -185,8 +185,8 @@ class TestBypassAttempt:
 
     def test_noagentzone_not_set_to_false_in_files_exclude(self):
         """Exclusion value must be True; False would mean VS Code shows the folder."""
-        for label, path in [("templates", "coding", DEFAULT_SETTINGS),
-                             ("templates/coding", TEMPLATE_SETTINGS)]:
+        for label, path in [("templates/agent-workbench", DEFAULT_SETTINGS),
+                             ("templates/agent-workbench", TEMPLATE_SETTINGS)]:
             settings = _load_settings(path)
             val = settings.get("files.exclude", {}).get(EXCLUDE_KEY)
             assert val is True, (
@@ -195,8 +195,8 @@ class TestBypassAttempt:
 
     def test_noagentzone_not_set_to_false_in_search_exclude(self):
         """Exclusion value must be True; False means VS Code would still search it."""
-        for label, path in [("templates", "coding", DEFAULT_SETTINGS),
-                             ("templates/coding", TEMPLATE_SETTINGS)]:
+        for label, path in [("templates/agent-workbench", DEFAULT_SETTINGS),
+                             ("templates/agent-workbench", TEMPLATE_SETTINGS)]:
             settings = _load_settings(path)
             val = settings.get("search.exclude", {}).get(EXCLUDE_KEY)
             assert val is True, (
@@ -213,8 +213,8 @@ class TestBypassAttempt:
 
     def test_exclude_key_uses_glob_pattern(self):
         """**/NoAgentZone pattern matches at any depth; 'NoAgentZone' alone would not."""
-        for label, path in [("templates", "coding", DEFAULT_SETTINGS),
-                             ("templates/coding", TEMPLATE_SETTINGS)]:
+        for label, path in [("templates/agent-workbench", DEFAULT_SETTINGS),
+                             ("templates/agent-workbench", TEMPLATE_SETTINGS)]:
             settings = _load_settings(path)
             files_keys = set(settings.get("files.exclude", {}).keys())
             search_keys = set(settings.get("search.exclude", {}).keys())

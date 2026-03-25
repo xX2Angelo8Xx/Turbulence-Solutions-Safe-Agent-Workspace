@@ -34,7 +34,7 @@ _SCRIPTS_DIR = os.path.abspath(
         os.path.dirname(__file__),
         "..",
         "..",
-        "templates", "coding",
+        "templates", "agent-workbench",
         ".github",
         "hooks",
         "scripts",
@@ -52,7 +52,7 @@ _TEMPLATE_SCRIPTS_DIR = os.path.abspath(
         "..",
         "..",
         "templates",
-        "coding",
+        "agent-workbench",
         ".github",
         "hooks",
         "scripts",
@@ -223,13 +223,13 @@ def test_templates_deny_reason_matches():
     # (sync check via file content inspection)
     template_gate = os.path.join(_TEMPLATE_SCRIPTS_DIR, "security_gate.py")
     assert os.path.isfile(template_gate), (
-        f"templates/coding/ security_gate.py not found at: {template_gate}"
+        f"templates/agent-workbench/ security_gate.py not found at: {template_gate}"
     )
     with open(template_gate, encoding="utf-8") as fh:
         content = fh.read()
     # The generic message must appear verbatim in the templates file
     assert _GENERIC_MESSAGE in content, (
-        "templates/coding/ security_gate.py does not contain the generic _DENY_REASON message.\n"
+        "templates/agent-workbench/ security_gate.py does not contain the generic _DENY_REASON message.\n"
         f"  Expected to find: {_GENERIC_MESSAGE!r}"
     )
     # Restricted zone names must NOT appear on the _DENY_REASON line

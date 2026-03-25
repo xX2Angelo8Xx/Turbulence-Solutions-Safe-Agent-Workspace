@@ -219,7 +219,7 @@ class TestAppThresholdValidation:
         """When get_counter_threshold raises (threshold=0), create_project gets fallback 20."""
         app = self._make_app()
         app.project_name_entry.get.return_value = "TestProject"
-        app.project_type_dropdown.get.return_value = "Coding"
+        app.project_type_dropdown.get.return_value = "Agent Workbench"
         app.destination_entry.get.return_value = "/some/dest"
         app.project_name_error_label.configure = MagicMock()
         app.destination_error_label.configure = MagicMock()
@@ -230,7 +230,7 @@ class TestAppThresholdValidation:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.verify_ts_python", return_value=(True, "ok")), \
              patch("launcher.gui.app.create_project", return_value=Path("/fake/path")) as mock_create:
             app._on_create_project()
@@ -245,7 +245,7 @@ class TestAppThresholdValidation:
         """When get_counter_threshold raises (threshold negative), fallback 20 is used."""
         app = self._make_app()
         app.project_name_entry.get.return_value = "TestProject"
-        app.project_type_dropdown.get.return_value = "Coding"
+        app.project_type_dropdown.get.return_value = "Agent Workbench"
         app.destination_entry.get.return_value = "/some/dest"
         app.project_name_error_label.configure = MagicMock()
         app.destination_error_label.configure = MagicMock()
@@ -255,7 +255,7 @@ class TestAppThresholdValidation:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.verify_ts_python", return_value=(True, "ok")), \
              patch("launcher.gui.app.create_project", return_value=Path("/fake/path")) as mock_create:
             app._on_create_project()

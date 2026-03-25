@@ -19,7 +19,7 @@ import pytest
 SCRIPTS_DIR = str(
     Path(__file__).parents[2]
     / "templates"
-    / "coding"
+    / "agent-workbench"
     / ".github"
     / "hooks"
     / "scripts"

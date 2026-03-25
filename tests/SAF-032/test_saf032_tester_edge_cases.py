@@ -21,7 +21,7 @@ import pytest
 # ---------------------------------------------------------------------------
 _SCRIPTS_DIR = str(
     Path(__file__).resolve().parent.parent.parent
-    / "templates" / "coding" / ".github" / "hooks" / "scripts"
+    / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts"
 )
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)

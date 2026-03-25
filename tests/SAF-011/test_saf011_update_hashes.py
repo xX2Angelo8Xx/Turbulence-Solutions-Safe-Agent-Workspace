@@ -41,14 +41,14 @@ import pytest
 # ---------------------------------------------------------------------------
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_SCRIPTS_DIR = _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts"
+_SCRIPTS_DIR = _REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts"
 _TEMPLATE_SCRIPTS_DIR = (
-    _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts"
+    _REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts"
 )
 _UPDATE_HASHES_PATH = _SCRIPTS_DIR / "update_hashes.py"
 _TEMPLATE_UPDATE_HASHES_PATH = _TEMPLATE_SCRIPTS_DIR / "update_hashes.py"
 _GATE_PATH = _SCRIPTS_DIR / "security_gate.py"
-_SETTINGS_PATH = _REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
+_SETTINGS_PATH = _REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json"
 
 # ---------------------------------------------------------------------------
 # Import the module under test from its non-standard location

@@ -130,7 +130,7 @@ def _subprocess_popen_sentinel():
 
 
 _SG_SCRIPTS_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "templates", "coding",
+    os.path.join(os.path.dirname(__file__), "..", "templates", "agent-workbench",
                  ".github", "hooks", "scripts")
 )
 _HOOK_STATE_PATH = os.path.join(_SG_SCRIPTS_DIR, ".hook_state.json")

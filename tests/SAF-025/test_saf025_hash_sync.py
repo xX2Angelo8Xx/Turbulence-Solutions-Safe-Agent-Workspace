@@ -32,10 +32,10 @@ import pytest
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
-_TC_SCRIPTS = _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts"
-_TC_HOOKS = _REPO_ROOT / "templates" / "coding" / ".github" / "hooks"
+_TC_SCRIPTS = _REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts"
+_TC_HOOKS = _REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks"
 _TC_GATE = _TC_SCRIPTS / "security_gate.py"
-_TC_SETTINGS = _REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
+_TC_SETTINGS = _REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json"
 
 # Make security_gate importable
 if str(_TC_SCRIPTS) not in sys.path:

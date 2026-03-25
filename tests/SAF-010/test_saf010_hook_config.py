@@ -20,9 +20,9 @@ import pytest
 # ---------------------------------------------------------------------------
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_CONFIG_PATH = _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "require-approval.json"
-_SCRIPTS_DIR = _REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts"
-_SETTINGS_PATH = _REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
+_CONFIG_PATH = _REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "require-approval.json"
+_SCRIPTS_DIR = _REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts"
+_SETTINGS_PATH = _REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json"
 
 
 # ---------------------------------------------------------------------------

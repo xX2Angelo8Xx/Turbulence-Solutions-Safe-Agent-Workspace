@@ -12,7 +12,7 @@ import re
 TEMPLATE_FILE = (
     pathlib.Path(__file__).parent.parent.parent
     / "templates"
-    / "coding"
+    / "agent-workbench"
     / ".github"
     / "instructions"
     / "copilot-instructions.md"

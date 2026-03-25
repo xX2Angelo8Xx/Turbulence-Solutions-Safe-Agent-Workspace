@@ -10,7 +10,7 @@ from pathlib import Path
 
 AGENT_RULES_PATH = (
     Path(__file__).parent.parent.parent
-    / "templates" / "coding" / "Project" / "AGENT-RULES.md"
+    / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
 )
 
 

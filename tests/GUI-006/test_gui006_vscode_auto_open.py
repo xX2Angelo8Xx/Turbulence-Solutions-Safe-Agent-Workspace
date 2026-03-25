@@ -36,7 +36,7 @@ from launcher.gui.app import App  # noqa: E402
 
 def _make_app(
     project_name: str = "my-project",
-    template_display: str = "Coding",
+    template_display: str = "Agent Workbench",
     destination: str = "",
     vscode_path: str | None = "/usr/bin/code",
     vscode_checked: bool = True,
@@ -154,7 +154,7 @@ class TestOpenInVSCodeCalledOnSuccess:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=created), \
              patch("launcher.gui.app.messagebox"), \
              patch("launcher.gui.app.open_in_vscode") as mock_open:
@@ -172,7 +172,7 @@ class TestOpenInVSCodeCalledOnSuccess:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=expected_path), \
              patch("launcher.gui.app.messagebox"), \
              patch("launcher.gui.app.open_in_vscode") as mock_open:
@@ -196,7 +196,7 @@ class TestOpenInVSCodeNotCalledWhenUnchecked:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=created), \
              patch("launcher.gui.app.messagebox"), \
              patch("launcher.gui.app.open_in_vscode") as mock_open:
@@ -219,7 +219,7 @@ class TestOpenInVSCodeNotCalledOnFailure:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", side_effect=OSError("disk full")), \
              patch("launcher.gui.app.messagebox"), \
              patch("launcher.gui.app.open_in_vscode") as mock_open:
@@ -262,7 +262,7 @@ class TestOpenInVSCodeNotCalledOnFailure:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.messagebox"), \
              patch("launcher.gui.app.open_in_vscode") as mock_open:
             app._on_create_project()

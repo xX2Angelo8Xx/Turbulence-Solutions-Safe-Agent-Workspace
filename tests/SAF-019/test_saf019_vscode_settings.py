@@ -12,8 +12,8 @@ import pathlib
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 SETTINGS_PATHS = [
-    REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json",
-    REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json",
+    REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json",
+    REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json",
 ]
 
 EXPECTED_AUTO_APPROVE_TOOLS = [

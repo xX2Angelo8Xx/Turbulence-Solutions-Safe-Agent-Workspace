@@ -15,7 +15,7 @@ REPO_ROOT = os.path.abspath(
 
 DEFAULT_PROJECT_FILE = os.path.join(
     REPO_ROOT,
-    "templates", "coding",
+    "templates", "agent-workbench",
     ".github",
     "instructions",
     "copilot-instructions.md",
@@ -24,7 +24,7 @@ DEFAULT_PROJECT_FILE = os.path.join(
 TEMPLATES_CODING_FILE = os.path.join(
     REPO_ROOT,
     "templates",
-    "coding",
+    "agent-workbench",
     ".github",
     "instructions",
     "copilot-instructions.md",

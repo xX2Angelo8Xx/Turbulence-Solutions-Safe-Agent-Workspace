@@ -14,7 +14,7 @@ import pytest
 SCRIPTS_DIR = str(
     Path(__file__).parents[2]
     / "templates"
-    / "coding"
+    / "agent-workbench"
     / ".github"
     / "hooks"
     / "scripts"
@@ -210,11 +210,11 @@ def test_both_copies_identical():
     """templates/coding and templates/coding must have identical security_gate.py."""
     path_a = os.path.join(
         REPO_ROOT,
-        "templates", "coding", ".github", "hooks", "scripts", "security_gate.py",
+        "templates", "agent-workbench", ".github", "hooks", "scripts", "security_gate.py",
     )
     path_b = os.path.join(
         REPO_ROOT,
-        "templates", "coding", ".github", "hooks", "scripts", "security_gate.py",
+        "templates", "agent-workbench", ".github", "hooks", "scripts", "security_gate.py",
     )
     with open(path_a, "rb") as fa:
         a = fa.read()

@@ -32,7 +32,7 @@ from unittest.mock import patch
 
 SCRIPTS_DIR = (
     Path(__file__).resolve().parents[2]
-    / "templates" / "coding" / ".github" / "hooks" / "scripts"
+    / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts"
 )
 sys.path.insert(0, str(SCRIPTS_DIR))
 

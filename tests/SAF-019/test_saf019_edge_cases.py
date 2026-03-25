@@ -17,8 +17,8 @@ import pathlib
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 SETTINGS_PATHS = {
-    "default_project": REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json",
-    "templates_coding": REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json",
+    "default_project": REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json",
+    "templates_coding": REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json",
 }
 
 EXPECTED_TOOLS = ["replace_string_in_file", "multi_replace_string_in_file", "create_file"]

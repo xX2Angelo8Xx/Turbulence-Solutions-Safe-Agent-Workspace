@@ -30,7 +30,7 @@ from unittest.mock import MagicMock, patch
 # Make the security_gate module importable without triggering the integrity
 # checks that depend on the actual template workspace layout.
 # ---------------------------------------------------------------------------
-SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "templates" / "coding" / ".github" / "hooks" / "scripts"
+SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 import security_gate as sg  # noqa: E402

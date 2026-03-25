@@ -24,11 +24,11 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
-DEFAULT_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
-TEMPLATE_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
+DEFAULT_SETTINGS = REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json"
+TEMPLATE_SETTINGS = REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json"
 
-DEFAULT_GATE = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
-TEMPLATE_GATE = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
+DEFAULT_GATE = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "security_gate.py"
+TEMPLATE_GATE = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "security_gate.py"
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -149,7 +149,7 @@ def test_settings_files_are_in_sync():
 def test_security_gate_hashes_valid():
     """SHA256 integrity hashes in security_gate.py must match actual files."""
     for gate_path, settings_path, label in [
-        (TEMPLATE_GATE, TEMPLATE_SETTINGS, "templates/coding"),
+        (TEMPLATE_GATE, TEMPLATE_SETTINGS, "templates/agent-workbench"),
     ]:
         # Verify settings hash
         embedded_settings_hash = _extract_hash(gate_path, "_KNOWN_GOOD_SETTINGS_HASH")

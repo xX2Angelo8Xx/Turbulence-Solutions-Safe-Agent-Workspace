@@ -26,7 +26,7 @@ import pytest
 SCRIPTS_DIR = str(
     Path(__file__).parents[2]
     / "templates"
-    / "coding"
+    / "agent-workbench"
     / ".github"
     / "hooks"
     / "scripts"
@@ -35,7 +35,7 @@ SCRIPTS_DIR = str(
 TEMPLATES_SCRIPTS_DIR = str(
     Path(__file__).parents[2]
     / "templates"
-    / "coding"
+    / "agent-workbench"
     / ".github"
     / "hooks"
     / "scripts"
@@ -242,7 +242,7 @@ def test_both_copies_have_identical_deny_pattern():
     dp_file = (
         Path(__file__).parents[2]
         / "templates"
-        / "coding"
+        / "agent-workbench"
         / ".github"
         / "hooks"
         / "scripts"
@@ -251,7 +251,7 @@ def test_both_copies_have_identical_deny_pattern():
     tc_file = (
         Path(__file__).parents[2]
         / "templates"
-        / "coding"
+        / "agent-workbench"
         / ".github"
         / "hooks"
         / "scripts"
@@ -289,7 +289,7 @@ def test_pattern_has_no_word_boundary_in_source():
     dp_file = (
         Path(__file__).parents[2]
         / "templates"
-        / "coding"
+        / "agent-workbench"
         / ".github"
         / "hooks"
         / "scripts"
@@ -311,7 +311,7 @@ def test_update_hashes_script_exists_default_project():
     script = (
         Path(__file__).parents[2]
         / "templates"
-        / "coding"
+        / "agent-workbench"
         / ".github"
         / "hooks"
         / "scripts"
@@ -325,7 +325,7 @@ def test_update_hashes_script_exists_templates_coding():
     script = (
         Path(__file__).parents[2]
         / "templates"
-        / "coding"
+        / "agent-workbench"
         / ".github"
         / "hooks"
         / "scripts"

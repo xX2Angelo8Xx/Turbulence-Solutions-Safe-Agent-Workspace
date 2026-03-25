@@ -160,7 +160,7 @@ def test_on_create_project_error_dialog_title(tmp_path):
     with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
          patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
          patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-         patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+         patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
          patch("launcher.gui.app._format_template_name", return_value="Coding"), \
          patch("launcher.gui.app.verify_ts_python", return_value=(False, "shim missing")), \
          patch("launcher.gui.app.create_project"), \

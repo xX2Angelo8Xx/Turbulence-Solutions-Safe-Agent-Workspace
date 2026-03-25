@@ -7,9 +7,9 @@ from pathlib import Path
 from launcher.core.project_creator import replace_template_placeholders, create_project
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_DEFAULT_README = _REPO_ROOT / "templates" / "coding" / "README.md"
-_TEMPLATE_README = _REPO_ROOT / "templates" / "coding" / "README.md"
-_NOAGENTZONE_README = _REPO_ROOT / "templates" / "coding" / "NoAgentZone" / "README.md"
+_DEFAULT_README = _REPO_ROOT / "templates" / "agent-workbench" / "README.md"
+_TEMPLATE_README = _REPO_ROOT / "templates" / "agent-workbench" / "README.md"
+_NOAGENTZONE_README = _REPO_ROOT / "templates" / "agent-workbench" / "NoAgentZone" / "README.md"
 
 
 def _write(path: Path, content: str) -> None:
@@ -25,24 +25,24 @@ class TestPlaceholderCount:
     """Verify that each template README has exactly 4 occurrences of {{PROJECT_NAME}}."""
 
     def test_default_readme_has_exactly_four_placeholder_occurrences(self):
-        """templates/coding/README.md contains exactly 4 {{PROJECT_NAME}} tokens."""
+        """templates/agent-workbench/README.md contains exactly 4 {{PROJECT_NAME}} tokens."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
         count = content.count("{{PROJECT_NAME}}")
         assert count == 4, f"Expected 4 occurrences but found {count}"
 
     def test_coding_template_readme_has_exactly_four_placeholder_occurrences(self):
-        """templates/coding/README.md contains exactly 4 {{PROJECT_NAME}} tokens."""
+        """templates/agent-workbench/README.md contains exactly 4 {{PROJECT_NAME}} tokens."""
         content = _TEMPLATE_README.read_text(encoding="utf-8")
         count = content.count("{{PROJECT_NAME}}")
         assert count == 4, f"Expected 4 occurrences but found {count}"
 
     def test_no_workspace_name_placeholder_in_default_readme(self):
-        """templates/coding/README.md does not contain {{WORKSPACE_NAME}} (design decision)."""
+        """templates/agent-workbench/README.md does not contain {{WORKSPACE_NAME}} (design decision)."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
         assert "{{WORKSPACE_NAME}}" not in content
 
     def test_no_workspace_name_placeholder_in_coding_template_readme(self):
-        """templates/coding/README.md does not contain {{WORKSPACE_NAME}} (design decision)."""
+        """templates/agent-workbench/README.md does not contain {{WORKSPACE_NAME}} (design decision)."""
         content = _TEMPLATE_README.read_text(encoding="utf-8")
         assert "{{WORKSPACE_NAME}}" not in content
 

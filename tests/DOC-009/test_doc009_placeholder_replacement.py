@@ -19,7 +19,7 @@ from launcher.core.project_creator import replace_template_placeholders
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).parent.parent.parent
-AGENT_RULES_TEMPLATE = REPO_ROOT / "templates" / "coding" / "Project" / "AGENT-RULES.md"
+AGENT_RULES_TEMPLATE = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
 
 
 # ---------------------------------------------------------------------------
@@ -47,7 +47,7 @@ def test_agent_rules_is_md_file():
 
 
 def test_agent_rules_template_exists():
-    """templates/coding/Project/AGENT-RULES.md must exist in the template."""
+    """templates/agent-workbench/Project/AGENT-RULES.md must exist in the template."""
     assert AGENT_RULES_TEMPLATE.is_file(), (
         f"AGENT-RULES.md not found at {AGENT_RULES_TEMPLATE}"
     )

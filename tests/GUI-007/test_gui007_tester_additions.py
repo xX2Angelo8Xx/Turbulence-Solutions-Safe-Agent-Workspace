@@ -45,7 +45,7 @@ _APP_GLOBALS = App._on_create_project.__globals__
 
 def _make_app(
     project_name: str = "valid-project",
-    template_display: str = "Coding",
+    template_display: str = "Agent Workbench",
     destination: str = "",
 ) -> App:
     """Build a headless App with independent widget mocks pre-wired."""
@@ -258,7 +258,7 @@ class TestOnCreateProjectAdditionalIntegration:
             _APP_GLOBALS,
             {
                 "create_project": MagicMock(side_effect=RuntimeError("disk full")),
-                "list_templates": MagicMock(return_value=["coding"]),
+                "list_templates": MagicMock(return_value=["agent-workbench"]),
                 "messagebox": MagicMock(),
             },
         ) as mocked:
@@ -286,7 +286,7 @@ class TestOnCreateProjectAdditionalIntegration:
             _APP_GLOBALS,
             {
                 "create_project": MagicMock(return_value=tmp_path / "test-project"),
-                "list_templates": MagicMock(return_value=["coding"]),
+                "list_templates": MagicMock(return_value=["agent-workbench"]),
                 "messagebox": MagicMock(),
                 "open_in_vscode": MagicMock(),
             },
@@ -304,7 +304,7 @@ class TestOnCreateProjectAdditionalIntegration:
             _APP_GLOBALS,
             {
                 "create_project": MagicMock(return_value=created),
-                "list_templates": MagicMock(return_value=["coding"]),
+                "list_templates": MagicMock(return_value=["agent-workbench"]),
                 "messagebox": MagicMock(),
                 "open_in_vscode": MagicMock(),
             },
@@ -322,7 +322,7 @@ class TestOnCreateProjectAdditionalIntegration:
             _APP_GLOBALS,
             {
                 "create_project": MagicMock(return_value=tmp_path / folder_name),
-                "list_templates": MagicMock(return_value=["coding"]),
+                "list_templates": MagicMock(return_value=["agent-workbench"]),
                 "messagebox": MagicMock(),
                 "open_in_vscode": MagicMock(),
             },
@@ -348,7 +348,7 @@ class TestOnCreateProjectAdditionalIntegration:
             _APP_GLOBALS,
             {
                 "create_project": MagicMock(return_value=tmp_path / "valid-proj"),
-                "list_templates": MagicMock(return_value=["coding"]),
+                "list_templates": MagicMock(return_value=["agent-workbench"]),
                 "messagebox": MagicMock(),
                 "open_in_vscode": MagicMock(),
             },

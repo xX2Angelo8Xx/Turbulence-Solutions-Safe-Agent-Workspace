@@ -27,7 +27,7 @@ from launcher.gui.app import App  # noqa: E402
 
 def _make_app(
     project_name: str = "MatlabDemo",
-    template_display: str = "Coding",
+    template_display: str = "Agent Workbench",
     destination: str = "",
 ) -> App:
     """Return a fresh App instance with isolated widget mocks."""
@@ -137,7 +137,7 @@ class TestNoOldNamingArtifacts:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=created), \
              patch("launcher.gui.app.messagebox") as mock_mb:
             app._on_create_project()

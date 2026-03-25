@@ -37,7 +37,7 @@ def _make_app() -> "App":  # noqa: F821
 
 
 def _make_app_with_include_readmes(include_readmes: bool, project_name: str = "Demo",
-                                   destination: str = "/tmp", template: str = "Coding") -> "App":  # noqa: F821
+                                   destination: str = "/tmp", template: str = "Agent Workbench") -> "App":  # noqa: F821
     """Return an App with all controls wired up for _on_create_project testing."""
     from launcher.gui.app import App
     _CTK_MOCK.reset_mock()
@@ -180,14 +180,14 @@ class TestCreateProjectReceivesIncludeReadmes:
             include_readmes=True,
             project_name="DemoProject",
             destination=str(tmp_path),
-            template="Coding",
+            template="Agent Workbench",
         )
         created = tmp_path / "TS-SAE-DemoProject"
 
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=created) as mock_create, \
              patch("launcher.gui.app.messagebox"):
             app._on_create_project()
@@ -206,14 +206,14 @@ class TestCreateProjectReceivesIncludeReadmes:
             include_readmes=False,
             project_name="DemoProject",
             destination=str(tmp_path),
-            template="Coding",
+            template="Agent Workbench",
         )
         created = tmp_path / "TS-SAE-DemoProject"
 
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=created) as mock_create, \
              patch("launcher.gui.app.messagebox"):
             app._on_create_project()

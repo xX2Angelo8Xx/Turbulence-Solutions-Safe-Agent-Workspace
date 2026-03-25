@@ -13,7 +13,7 @@ import pytest
 SCRIPTS_DIR = str(
     Path(__file__).parents[2]
     / "templates"
-    / "coding"
+    / "agent-workbench"
     / ".github"
     / "hooks"
     / "scripts"
@@ -364,7 +364,7 @@ def test_templates_security_gate_has_new_commands():
     templates_gate = (
         Path(__file__).parents[2]
         / "templates"
-        / "coding"
+        / "agent-workbench"
         / ".github"
         / "hooks"
         / "scripts"

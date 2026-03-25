@@ -17,7 +17,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-TEMPLATE_SETTINGS = REPO_ROOT / "templates" / "coding" / ".vscode" / "settings.json"
+TEMPLATE_SETTINGS = REPO_ROOT / "templates" / "agent-workbench" / ".vscode" / "settings.json"
 
 GLOB_KEY = "**/NoAgentZone"
 BARE_KEY = "NoAgentZone"
@@ -40,7 +40,7 @@ class TestNoBareNoAgentZoneKey:
     """Bare 'NoAgentZone' (no **) must not appear alongside the glob key."""
 
     @pytest.mark.parametrize("label,path", [
-        ("templates/coding", TEMPLATE_SETTINGS),
+        ("templates/agent-workbench", TEMPLATE_SETTINGS),
     ])
     def test_bare_key_absent_from_files_exclude(self, label, path):
         settings = _load_settings(path)
@@ -50,7 +50,7 @@ class TestNoBareNoAgentZoneKey:
         )
 
     @pytest.mark.parametrize("label,path", [
-        ("templates/coding", TEMPLATE_SETTINGS),
+        ("templates/agent-workbench", TEMPLATE_SETTINGS),
     ])
     def test_bare_key_absent_from_search_exclude(self, label, path):
         settings = _load_settings(path)
@@ -67,7 +67,7 @@ class TestExcludeSectionConsistency:
     """Both exclude sections must contain the same set of keys."""
 
     @pytest.mark.parametrize("label,path", [
-        ("templates/coding", TEMPLATE_SETTINGS),
+        ("templates/agent-workbench", TEMPLATE_SETTINGS),
     ])
     def test_files_and_search_exclude_have_same_keys(self, label, path):
         settings = _load_settings(path)
@@ -89,7 +89,7 @@ class TestExcludeValueTypes:
     """All values in both exclude sections must be the Python bool True."""
 
     @pytest.mark.parametrize("label,path", [
-        ("templates/coding", TEMPLATE_SETTINGS),
+        ("templates/agent-workbench", TEMPLATE_SETTINGS),
     ])
     def test_all_files_exclude_values_are_bool_true(self, label, path):
         settings = _load_settings(path)
@@ -100,7 +100,7 @@ class TestExcludeValueTypes:
             )
 
     @pytest.mark.parametrize("label,path", [
-        ("templates/coding", TEMPLATE_SETTINGS),
+        ("templates/agent-workbench", TEMPLATE_SETTINGS),
     ])
     def test_all_search_exclude_values_are_bool_true(self, label, path):
         settings = _load_settings(path)
@@ -120,7 +120,7 @@ class TestNoBOM:
     """settings.json files must not start with a UTF-8 BOM (EF BB BF)."""
 
     @pytest.mark.parametrize("label,path", [
-        ("templates/coding", TEMPLATE_SETTINGS),
+        ("templates/agent-workbench", TEMPLATE_SETTINGS),
     ])
     def test_no_utf8_bom(self, label, path):
         raw = _load_raw(path)
@@ -138,7 +138,7 @@ class TestExactKeyString:
     """The glob key must be the exact string '**/NoAgentZone'."""
 
     @pytest.mark.parametrize("label,path", [
-        ("templates/coding", TEMPLATE_SETTINGS),
+        ("templates/agent-workbench", TEMPLATE_SETTINGS),
     ])
     def test_no_whitespace_in_key_files_exclude(self, label, path):
         settings = _load_settings(path)
@@ -151,7 +151,7 @@ class TestExactKeyString:
             )
 
     @pytest.mark.parametrize("label,path", [
-        ("templates/coding", TEMPLATE_SETTINGS),
+        ("templates/agent-workbench", TEMPLATE_SETTINGS),
     ])
     def test_no_whitespace_in_key_search_exclude(self, label, path):
         settings = _load_settings(path)

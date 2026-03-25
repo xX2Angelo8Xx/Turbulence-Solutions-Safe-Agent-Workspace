@@ -153,14 +153,14 @@ def test_meipass_empty_string_falls_through_to_dev_path():
 
 
 def test_real_templates_dir_contains_expected_template_names():
-    """Integration: dev TEMPLATES_DIR contains exactly 'coding' and 'creative-marketing'."""
+    """Integration: dev TEMPLATES_DIR contains exactly 'coding' and 'certification-pipeline'."""
     from launcher.core.project_creator import list_templates
 
     dev_templates_dir = _reload_config(meipass_value=None)
     templates = list_templates(dev_templates_dir)
 
-    assert "coding" in templates, f"'coding' missing from {templates}"
-    assert "creative-marketing" in templates, f"'creative-marketing' missing from {templates}"
+    assert "agent-workbench" in templates, f"'agent-workbench' missing from {templates}"
+    assert "certification-pipeline" in templates, f"'certification-pipeline' missing from {templates}"
 
 
 def test_meipass_bundled_templates_discoverable(tmp_path):
@@ -169,16 +169,16 @@ def test_meipass_bundled_templates_discoverable(tmp_path):
     list_templates() must return both names."""
     fake_meipass = str(tmp_path / "MEI_full")
     fake_templates = tmp_path / "MEI_full" / "templates"
-    (fake_templates / "coding").mkdir(parents=True)
-    (fake_templates / "creative-marketing").mkdir()
+    (fake_templates / "agent-workbench").mkdir(parents=True)
+    (fake_templates / "certification-pipeline").mkdir()
 
     templates_dir = _reload_config(meipass_value=fake_meipass)
 
     from launcher.core.project_creator import list_templates
     result = list_templates(templates_dir)
 
-    assert "coding" in result, f"'coding' not found in bundled templates: {result}"
-    assert "creative-marketing" in result, (
-        f"'creative-marketing' not found in bundled templates: {result}"
+    assert "agent-workbench" in result, f"'agent-workbench' not found in bundled templates: {result}"
+    assert "certification-pipeline" in result, (
+        f"'certification-pipeline' not found in bundled templates: {result}"
     )
     assert len(result) == 2, f"Expected 2 templates, got {result}"

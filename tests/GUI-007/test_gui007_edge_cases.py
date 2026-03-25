@@ -40,7 +40,7 @@ _APP_GLOBALS = App._on_create_project.__globals__
 
 def _make_app(
     project_name: str = "valid-project",
-    template_display: str = "Coding",
+    template_display: str = "Agent Workbench",
     destination: str = "",
 ) -> App:
     """Build a headless App with independent widget mocks pre-wired."""

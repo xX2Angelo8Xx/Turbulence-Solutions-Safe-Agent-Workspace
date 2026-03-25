@@ -45,7 +45,7 @@ _SCRIPTS_DIR = os.path.abspath(
         os.path.dirname(__file__),
         "..",
         "..",
-        "templates", "coding",
+        "templates", "agent-workbench",
         ".github",
         "hooks",
         "scripts",
@@ -63,10 +63,10 @@ _REPO_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..")
 )
 _REAL_GATE_FILE = os.path.join(
-    _REPO_ROOT, "templates", "coding", ".github", "hooks", "scripts", "security_gate.py"
+    _REPO_ROOT, "templates", "agent-workbench", ".github", "hooks", "scripts", "security_gate.py"
 )
 _REAL_SETTINGS_FILE = os.path.join(
-    _REPO_ROOT, "templates", "coding", ".vscode", "settings.json"
+    _REPO_ROOT, "templates", "agent-workbench", ".vscode", "settings.json"
 )
 
 

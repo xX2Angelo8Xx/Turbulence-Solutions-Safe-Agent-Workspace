@@ -24,7 +24,7 @@ import pytest
 _SCRIPTS_DIR = os.path.join(
     os.path.dirname(__file__),
     "..", "..",
-    "templates", "coding", ".github", "hooks", "scripts",
+    "templates", "agent-workbench", ".github", "hooks", "scripts",
 )
 _SCRIPTS_DIR = os.path.normpath(_SCRIPTS_DIR)
 if _SCRIPTS_DIR not in sys.path:

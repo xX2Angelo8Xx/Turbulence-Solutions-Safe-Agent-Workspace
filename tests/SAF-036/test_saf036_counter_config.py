@@ -23,7 +23,7 @@ from unittest.mock import patch
 # ---------------------------------------------------------------------------
 # Make the security_gate module importable
 # ---------------------------------------------------------------------------
-SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "templates" / "coding" / ".github" / "hooks" / "scripts"
+SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 import security_gate as sg  # noqa: E402

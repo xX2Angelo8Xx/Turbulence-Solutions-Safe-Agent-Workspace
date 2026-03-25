@@ -7,7 +7,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 def test_require_approval_references_security_gate():
     """require-approval.json must reference security_gate.py, not legacy bash."""
-    config_path = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "require-approval.json"
+    config_path = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "require-approval.json"
     assert config_path.exists(), f"{config_path.relative_to(REPO_ROOT)} must exist"
     
     content = config_path.read_text(encoding="utf-8")
@@ -21,7 +21,7 @@ def test_require_approval_references_security_gate():
 
 def test_no_legacy_bash_reference():
     """require-approval.json must not reference legacy bash hooks."""
-    config_path = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "require-approval.json"
+    config_path = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "require-approval.json"
     content = config_path.read_text(encoding="utf-8")
     
     # Should not have legacy bash script references

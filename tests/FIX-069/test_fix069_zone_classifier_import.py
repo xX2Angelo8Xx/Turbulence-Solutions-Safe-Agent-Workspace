@@ -19,7 +19,7 @@ import pytest
 SCRIPTS_DIR = (
     Path(__file__).resolve().parent.parent.parent
     / "templates"
-    / "coding"
+    / "agent-workbench"
     / ".github"
     / "hooks"
     / "scripts"
@@ -162,7 +162,7 @@ def test_script_dir_resolved_correctly_relative():
         repo_root = Path(__file__).resolve().parent.parent.parent
         os.chdir(repo_root)
 
-        relative_file = Path("templates/coding/.github/hooks/scripts/security_gate.py")
+        relative_file = Path("templates/agent-workbench/.github/hooks/scripts/security_gate.py")
         resolved_parent = relative_file.resolve().parent
 
         assert resolved_parent == SCRIPTS_DIR.resolve(), (

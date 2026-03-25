@@ -44,7 +44,7 @@ class TestFormatTemplateName:
         assert _format_template_name("coding") == "Coding"
 
     def test_hyphenated_to_title_case(self):
-        assert _format_template_name("creative-marketing") == "Creative Marketing"
+        assert _format_template_name("certification-pipeline") == "Certification Pipeline"
 
     def test_underscore_separator(self):
         assert _format_template_name("data_science") == "Data Science"
@@ -73,20 +73,20 @@ class TestGetTemplateOptions:
         return App()
 
     def test_returns_list(self):
-        with _mock_list_templates(["coding"]):
+        with _mock_list_templates(["agent-workbench"]):
             assert isinstance(self._app()._get_template_options(), list)
 
     def test_with_two_subdirs(self):
-        with _mock_list_templates(["coding", "creative-marketing"]):
+        with _mock_list_templates(["agent-workbench", "certification-pipeline"]):
             result = self._app()._get_template_options()
         # coding is ready; creative-marketing only has README.md so gets ' ...coming soon'
-        assert "Coding" in result
-        assert any("Creative Marketing" in entry for entry in result)
+        assert "Agent Workbench" in result
+        assert any("Certification Pipeline" in entry for entry in result)
 
     def test_with_single_subdir(self):
-        with _mock_list_templates(["coding"]):
+        with _mock_list_templates(["agent-workbench"]):
             result = self._app()._get_template_options()
-        assert result == ["Coding"]
+        assert result == ["Agent Workbench"]
 
     def test_empty_list_returns_empty_list(self):
         with _mock_list_templates([]):
@@ -96,9 +96,9 @@ class TestGetTemplateOptions:
     def test_files_are_not_included_only_dirs(self):
         # list_templates itself filters files; here we verify that _get_template_options
         # passes through exactly what list_templates returns (no extra filtering).
-        with _mock_list_templates(["coding"]):
+        with _mock_list_templates(["agent-workbench"]):
             result = self._app()._get_template_options()
-        assert result == ["Coding"]
+        assert result == ["Agent Workbench"]
 
     def test_results_preserve_order_from_list_templates(self):
         with _mock_list_templates(["aaa-first", "mmm-middle", "zzz-last"]):
@@ -117,9 +117,9 @@ class TestListTemplatesIntegration:
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
             (tmpdir / "coding").mkdir()
-            (tmpdir / "creative-marketing").mkdir()
+            (tmpdir / "certification-pipeline").mkdir()
             result = list_templates(tmpdir)
-        assert result == ["coding", "creative-marketing"]
+        assert result == ["certification-pipeline", "coding"]
 
     def test_files_excluded(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -155,23 +155,23 @@ class TestDropdownDynamicLoading:
     def test_dropdown_created_with_values_from_get_template_options(self):
         """CTkOptionMenu must be called with the list returned by _get_template_options."""
         _CTK_MOCK.reset_mock()
-        with _mock_list_templates(["coding", "creative-marketing"]):
+        with _mock_list_templates(["agent-workbench", "certification-pipeline"]):
             App()
         call_kwargs = _CTK_MOCK.CTkOptionMenu.call_args
         values_arg = call_kwargs[1].get("values") or call_kwargs[0][1]
-        assert "Coding" in values_arg
+        assert "Agent Workbench" in values_arg
         # creative-marketing only has README.md → shown with coming-soon label
-        assert any("Creative Marketing" in v for v in values_arg)
+        assert any("Certification Pipeline" in v for v in values_arg)
 
     def test_adding_new_template_dir_changes_options(self):
         """A new subdirectory injected into list_templates output appears in options."""
         _CTK_MOCK.reset_mock()
-        with _mock_list_templates(["coding"]):
+        with _mock_list_templates(["agent-workbench"]):
             before = App()._get_template_options()
-        assert before == ["Coding"]
+        assert before == ["Agent Workbench"]
 
         _CTK_MOCK.reset_mock()
-        with _mock_list_templates(["coding", "data-science"]):
+        with _mock_list_templates(["agent-workbench", "data-science"]):
             after = App()._get_template_options()
         assert any("Data Science" in entry for entry in after)
 
@@ -193,15 +193,15 @@ class TestTemplateDirPresence:
     def test_creative_marketing_dir_exists(self):
         """templates/creative-marketing/ must exist in the repository."""
         templates_dir = launcher_config.TEMPLATES_DIR
-        creative = templates_dir / "creative-marketing"
+        creative = templates_dir / "certification-pipeline"
         assert creative.is_dir(), (
             f"Expected templates/creative-marketing/ to exist at {creative}"
         )
 
     def test_coding_dir_exists(self):
-        """templates/coding/ must exist in the repository."""
+        """templates/agent-workbench/ must exist in the repository."""
         templates_dir = launcher_config.TEMPLATES_DIR
-        coding = templates_dir / "coding"
+        coding = templates_dir / "agent-workbench"
         assert coding.is_dir(), (
             f"Expected templates/coding/ to exist at {coding}"
         )
@@ -210,14 +210,14 @@ class TestTemplateDirPresence:
         """_get_template_options() with the real templates dir includes ''Coding''."""
         _CTK_MOCK.reset_mock()
         result = App()._get_template_options()
-        assert "Coding" in result
+        assert "Agent Workbench" in result
 
     def test_real_templates_dir_options_contain_creative_marketing(self):
         """_get_template_options() with the real templates dir includes a ''Creative Marketing'' entry."""
         _CTK_MOCK.reset_mock()
         result = App()._get_template_options()
         # creative-marketing only has README.md so it gets a ' ...coming soon' label.
-        assert any("Creative Marketing" in option for option in result)
+        assert any("Certification Pipeline" in option for option in result)
 
 
 # ---------------------------------------------------------------------------

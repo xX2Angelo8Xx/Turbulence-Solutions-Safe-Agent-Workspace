@@ -53,7 +53,7 @@ _SCRIPTS_DIR = os.path.abspath(
     os.path.join(
         os.path.dirname(__file__),
         "..", "..",
-        "templates", "coding",
+        "templates", "agent-workbench",
         ".github", "hooks", "scripts",
     )
 )
@@ -64,7 +64,7 @@ import security_gate as sg  # noqa: E402
 
 _SETTINGS_PATH = (
     Path(__file__).resolve().parents[2]
-    / "templates" / "coding" / ".vscode" / "settings.json"
+    / "templates" / "agent-workbench" / ".vscode" / "settings.json"
 )
 
 # Workspace root used across all tests.  The mock_project_folder fixture removes

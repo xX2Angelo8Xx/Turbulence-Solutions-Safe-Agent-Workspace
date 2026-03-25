@@ -10,7 +10,7 @@ import pathlib
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 REQUIRE_APPROVAL_PATH = (
-    REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "require-approval.json"
+    REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "require-approval.json"
 )
 
 

@@ -44,7 +44,7 @@ _APP_GLOBALS = App._on_create_project.__globals__
 
 def _make_app(
     project_name: str = "valid-project",
-    template_display: str = "Coding",
+    template_display: str = "Agent Workbench",
     destination: str = "",
 ) -> App:
     """Build a headless App with independent widget mocks pre-wired."""
@@ -401,7 +401,7 @@ class TestOnCreateProjectErrorClearing:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=tmp_path / "valid"), \
              patch("launcher.gui.app.messagebox"):
             app._on_create_project()
@@ -412,7 +412,7 @@ class TestOnCreateProjectErrorClearing:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=tmp_path / "valid"), \
              patch("launcher.gui.app.messagebox"):
             app._on_create_project()
@@ -429,7 +429,7 @@ class TestOnCreateProjectErrorClearing:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=tmp_path / "valid-name"), \
              patch("launcher.gui.app.messagebox"):
             app._on_create_project()
@@ -443,7 +443,7 @@ class TestOnCreateProjectHappyPath:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", mock_create), \
              patch("launcher.gui.app.messagebox"):
             app._on_create_project()
@@ -455,7 +455,7 @@ class TestOnCreateProjectHappyPath:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", return_value=tmp_path / "my-app"), \
              patch("launcher.gui.app.messagebox", mock_mb):
             app._on_create_project()
@@ -472,7 +472,7 @@ class TestOnCreateProjectHappyPath:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.messagebox", mock_mb):
             app._on_create_project()
         mock_mb.showerror.assert_called_once()
@@ -484,7 +484,7 @@ class TestOnCreateProjectHappyPath:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", side_effect=OSError("disk full")), \
              patch("launcher.gui.app.messagebox", mock_mb):
             app._on_create_project()
@@ -536,7 +536,7 @@ class TestEdgeCases:
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
-             patch("launcher.gui.app.list_templates", return_value=["coding"]), \
+             patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
              patch("launcher.gui.app.create_project", mock_create), \
              patch("launcher.gui.app.messagebox"):
             app._on_create_project()

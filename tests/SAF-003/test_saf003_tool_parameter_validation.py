@@ -25,7 +25,7 @@ _SCRIPTS_DIR = os.path.abspath(
         os.path.dirname(__file__),
         "..",
         "..",
-        "templates", "coding",
+        "templates", "agent-workbench",
         ".github",
         "hooks",
         "scripts",

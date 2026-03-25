@@ -22,7 +22,7 @@ _SCRIPTS_DIR = os.path.normpath(
     os.path.join(
         os.path.dirname(__file__),
         "..", "..",
-        "templates", "coding", ".github", "hooks", "scripts",
+        "templates", "agent-workbench", ".github", "hooks", "scripts",
     )
 )
 if _SCRIPTS_DIR not in sys.path:

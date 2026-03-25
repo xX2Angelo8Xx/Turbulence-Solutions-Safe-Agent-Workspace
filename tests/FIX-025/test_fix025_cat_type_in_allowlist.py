@@ -7,7 +7,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 def test_cat_in_allowlist():
     """'cat' must be in security_gate.py allowlist."""
-    sg_path = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
+    sg_path = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "security_gate.py"
     assert sg_path.exists(), "security_gate.py must exist"
     
     content = sg_path.read_text(encoding="utf-8")
@@ -18,7 +18,7 @@ def test_cat_in_allowlist():
 
 def test_type_in_allowlist():
     """'type' must be in security_gate.py allowlist."""
-    sg_path = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
+    sg_path = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "security_gate.py"
     content = sg_path.read_text(encoding="utf-8")
     
     assert re.search(r'["\']type["\']', content), (
@@ -27,7 +27,7 @@ def test_type_in_allowlist():
 
 def test_cat_type_in_project_fallback_verbs():
     """'cat' and 'type' should be in _PROJECT_FALLBACK_VERBS."""
-    sg_path = REPO_ROOT / "templates" / "coding" / ".github" / "hooks" / "scripts" / "security_gate.py"
+    sg_path = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "security_gate.py"
     content = sg_path.read_text(encoding="utf-8")
     
     assert "_PROJECT_FALLBACK_VERBS" in content, (

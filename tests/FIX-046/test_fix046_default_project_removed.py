@@ -12,10 +12,10 @@ def test_default_project_removed():
     )
 
 def test_templates_coding_exists():
-    """templates/coding/ must exist as the replacement."""
-    templates = REPO_ROOT / "templates" / "coding"
-    assert templates.exists(), "templates/coding/ must exist"
+    """templates/agent-workbench/ must exist as the replacement."""
+    templates = REPO_ROOT / "templates" / "agent-workbench"
+    assert templates.exists(), "templates/agent-workbench/ must exist"
     
     # Should have content
     files = list(templates.rglob("*"))
-    assert len(files) > 0, "templates/coding/ must not be empty"
+    assert len(files) > 0, "templates/agent-workbench/ must not be empty"

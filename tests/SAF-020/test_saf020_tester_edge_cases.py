@@ -27,7 +27,7 @@ import pytest
 # Path setup — resolve security_gate from its non-standard location
 # ---------------------------------------------------------------------------
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-_SCRIPTS_DIR = os.path.join(_REPO_ROOT, "templates", "coding", ".github", "hooks", "scripts")
+_SCRIPTS_DIR = os.path.join(_REPO_ROOT, "templates", "agent-workbench", ".github", "hooks", "scripts")
 
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)

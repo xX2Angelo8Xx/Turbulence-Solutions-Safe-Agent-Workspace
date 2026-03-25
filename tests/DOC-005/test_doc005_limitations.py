@@ -4,8 +4,8 @@ DOC-005 Tests: Known Tool Limitations section in copilot-instructions.md
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_FILE = REPO_ROOT / "templates" / "coding" / ".github" / "instructions" / "copilot-instructions.md"
-TEMPLATE_FILE = REPO_ROOT / "templates" / "coding" / ".github" / "instructions" / "copilot-instructions.md"
+DEFAULT_FILE = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "instructions" / "copilot-instructions.md"
+TEMPLATE_FILE = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "instructions" / "copilot-instructions.md"
 
 HEADING = "## Known Tool Limitations"
 

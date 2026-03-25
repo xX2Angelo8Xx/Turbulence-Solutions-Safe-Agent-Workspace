@@ -29,8 +29,8 @@ import pytest
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
 _TEMPLATES_ROOT = _REPO_ROOT / "templates"
-_CODING_TEMPLATE = _TEMPLATES_ROOT / "coding"
-_DEFAULT_PROJECT = _REPO_ROOT / "templates" / "coding"
+_CODING_TEMPLATE = _TEMPLATES_ROOT / "agent-workbench"
+_DEFAULT_PROJECT = _REPO_ROOT / "templates" / "agent-workbench"
 
 
 # ---------------------------------------------------------------------------
@@ -66,7 +66,7 @@ def _strip_jsonc_line_comments(text: str) -> str:
 
 
 def test_vscode_settings_is_valid_jsonc():
-    """templates/coding/.vscode/settings.json must be parseable JSONC.
+    """templates/agent-workbench/.vscode/settings.json must be parseable JSONC.
 
     VS Code settings files use JSONC (JSON with Comments).  Strip the
     // line-comments before parsing so standard json.loads can validate
@@ -84,7 +84,7 @@ def test_vscode_settings_is_valid_jsonc():
 
 
 def test_require_approval_json_is_valid_json():
-    """templates/coding/.github/hooks/require-approval.json must be valid JSON."""
+    """templates/agent-workbench/.github/hooks/require-approval.json must be valid JSON."""
     json_path = _CODING_TEMPLATE / ".github" / "hooks" / "require-approval.json"
     assert json_path.is_file(), (
         "require-approval.json must exist before JSON validity can be tested"
@@ -124,24 +124,24 @@ def test_no_pyo_files_in_template():
 # ---------------------------------------------------------------------------
 
 def test_readme_content_matches_default_project():
-    """templates/coding/README.md content must exactly match templates/coding/README.md."""
+    """templates/agent-workbench/README.md content must exactly match templates/coding/README.md."""
     template_file = _CODING_TEMPLATE / "README.md"
     source_file = _DEFAULT_PROJECT / "README.md"
-    assert template_file.is_file(), "templates/coding/README.md must exist"
-    assert source_file.is_file(), "templates/coding/README.md must exist (source_file)"
+    assert template_file.is_file(), "templates/agent-workbench/README.md must exist"
+    assert source_file.is_file(), "templates/agent-workbench/README.md must exist (source_file)"
     assert template_file.read_text(encoding="utf-8") == source_file.read_text(encoding="utf-8"), (
-        "templates/coding/README.md not found or not readable"
+        "templates/agent-workbench/README.md not found or not readable"
     )
 
 
 def test_gitignore_content_matches_default_project():
-    """templates/coding/.gitignore content must exactly match templates/coding/.gitignore."""
+    """templates/agent-workbench/.gitignore content must exactly match templates/coding/.gitignore."""
     template_file = _CODING_TEMPLATE / ".gitignore"
     source_file = _DEFAULT_PROJECT / ".gitignore"
-    assert template_file.is_file(), "templates/coding/.gitignore must exist"
-    assert source_file.is_file(), "templates/coding/.gitignore must exist (source_file)"
+    assert template_file.is_file(), "templates/agent-workbench/.gitignore must exist"
+    assert source_file.is_file(), "templates/agent-workbench/.gitignore must exist (source_file)"
     assert template_file.read_text(encoding="utf-8") == source_file.read_text(encoding="utf-8"), (
-        "templates/coding/.gitignore not found or not readable"
+        "templates/agent-workbench/.gitignore not found or not readable"
     )
 
 
@@ -149,8 +149,8 @@ def test_vscode_settings_content_matches_default_project():
     """.vscode/settings.json must match between template and templates/coding/."""
     template_file = _CODING_TEMPLATE / ".vscode" / "settings.json"
     source_file = _DEFAULT_PROJECT / ".vscode" / "settings.json"
-    assert template_file.is_file(), "templates/coding/.vscode/settings.json must exist"
-    assert source_file.is_file(), "templates/coding/.vscode/settings.json must exist (source_file)"
+    assert template_file.is_file(), "templates/agent-workbench/.vscode/settings.json must exist"
+    assert source_file.is_file(), "templates/agent-workbench/.vscode/settings.json must exist (source_file)"
     assert template_file.read_text(encoding="utf-8") == source_file.read_text(encoding="utf-8"), (
         ".vscode/settings.json not found or not readable"
     )
@@ -205,16 +205,16 @@ def test_coding_template_has_no_symlinks():
 
 
 def test_coding_skills_dir_exists():
-    """templates/coding/.github/skills/ must exist."""
+    """templates/agent-workbench/.github/skills/ must exist."""
     assert (_CODING_TEMPLATE / ".github" / "skills").is_dir(), (
-        "templates/coding/.github/skills/ must exist"
+        "templates/agent-workbench/.github/skills/ must exist"
     )
 
 
 def test_coding_prompts_dir_exists():
-    """templates/coding/.github/prompts/ must exist."""
+    """templates/agent-workbench/.github/prompts/ must exist."""
     assert (_CODING_TEMPLATE / ".github" / "prompts").is_dir(), (
-        "templates/coding/.github/prompts/ must exist"
+        "templates/agent-workbench/.github/prompts/ must exist"
     )
 
 

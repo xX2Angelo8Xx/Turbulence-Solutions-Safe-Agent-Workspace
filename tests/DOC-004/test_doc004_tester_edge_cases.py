@@ -15,8 +15,8 @@ import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_README = REPO_ROOT / "templates" / "coding" / "Project" / "README.md"
-TEMPLATE_README = REPO_ROOT / "templates" / "coding" / "Project" / "README.md"
+DEFAULT_README = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "README.md"
+TEMPLATE_README = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "README.md"
 
 
 def _lines(path: Path) -> list[str]:

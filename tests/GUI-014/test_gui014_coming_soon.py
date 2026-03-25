@@ -52,9 +52,9 @@ class TestIsTemplateReady:
 
     def test_not_ready_when_only_readme(self, tmp_path: Path):
         """A directory containing only README.md is NOT ready."""
-        (tmp_path / "creative-marketing").mkdir()
-        (tmp_path / "creative-marketing" / "README.md").write_text("# Coming soon")
-        assert is_template_ready(tmp_path, "creative-marketing") is False
+        (tmp_path / "certification-pipeline").mkdir()
+        (tmp_path / "certification-pipeline" / "README.md").write_text("# Coming soon")
+        assert is_template_ready(tmp_path, "certification-pipeline") is False
 
     def test_not_ready_for_nonexistent_directory(self, tmp_path: Path):
         """A non-existent template name returns False."""
@@ -94,15 +94,15 @@ class TestGetTemplateOptions:
         """Unready templates get ' ...coming soon' in their display name."""
         (tmp_path / "coding").mkdir()
         (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "creative-marketing").mkdir()
-        (tmp_path / "creative-marketing" / "README.md").write_text("")
+        (tmp_path / "certification-pipeline").mkdir()
+        (tmp_path / "certification-pipeline" / "README.md").write_text("")
 
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
             options = app._get_template_options()
 
         assert any("coming soon" in o for o in options)
-        assert "Creative Marketing ...coming soon" in options
+        assert "Certification Pipeline ...coming soon" in options
 
     def test_ready_template_has_no_coming_soon_label(self, tmp_path: Path):
         """Ready templates must NOT have ' ...coming soon' appended."""
@@ -117,10 +117,10 @@ class TestGetTemplateOptions:
 
     def test_returns_both_ready_and_coming_soon(self, tmp_path: Path):
         """Both kinds of templates appear in the options list."""
-        (tmp_path / "coding").mkdir()
-        (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "creative-marketing").mkdir()
-        (tmp_path / "creative-marketing" / "README.md").write_text("")
+        (tmp_path / "agent-workbench").mkdir()
+        (tmp_path / "agent-workbench" / "app.py").write_text("")
+        (tmp_path / "certification-pipeline").mkdir()
+        (tmp_path / "certification-pipeline" / "README.md").write_text("")
 
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
@@ -129,21 +129,21 @@ class TestGetTemplateOptions:
 
         assert len(options) == 2
         assert len(coming_soon) == 1
-        assert "Coding" in options
+        assert "Agent Workbench" in options
 
     def test_coming_soon_set_contains_only_unready_display_names(self, tmp_path: Path):
         """The returned coming_soon set contains only the unready entries."""
-        (tmp_path / "coding").mkdir()
-        (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "creative-marketing").mkdir()
-        (tmp_path / "creative-marketing" / "README.md").write_text("")
+        (tmp_path / "agent-workbench").mkdir()
+        (tmp_path / "agent-workbench" / "app.py").write_text("")
+        (tmp_path / "certification-pipeline").mkdir()
+        (tmp_path / "certification-pipeline" / "README.md").write_text("")
 
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
             options, coming_soon = app._get_template_options()
 
-        assert "Creative Marketing ...coming soon" in coming_soon
-        assert "Coding" not in coming_soon
+        assert "Certification Pipeline ...coming soon" in coming_soon
+        assert "Agent Workbench" not in coming_soon
 
 
 # ---------------------------------------------------------------------------
@@ -155,8 +155,8 @@ class TestDropdownDefaultSelection:
         """App._current_template should be set to the first ready template."""
         (tmp_path / "coding").mkdir()
         (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "creative-marketing").mkdir()
-        (tmp_path / "creative-marketing" / "README.md").write_text("")
+        (tmp_path / "certification-pipeline").mkdir()
+        (tmp_path / "certification-pipeline" / "README.md").write_text("")
 
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
@@ -167,8 +167,8 @@ class TestDropdownDefaultSelection:
         """The default selection must never be a coming-soon item."""
         (tmp_path / "coding").mkdir()
         (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "creative-marketing").mkdir()
-        (tmp_path / "creative-marketing" / "README.md").write_text("")
+        (tmp_path / "certification-pipeline").mkdir()
+        (tmp_path / "certification-pipeline" / "README.md").write_text("")
 
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
@@ -179,13 +179,13 @@ class TestDropdownDefaultSelection:
         """App._coming_soon_options should contain the coming-soon display names."""
         (tmp_path / "coding").mkdir()
         (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "creative-marketing").mkdir()
-        (tmp_path / "creative-marketing" / "README.md").write_text("")
+        (tmp_path / "certification-pipeline").mkdir()
+        (tmp_path / "certification-pipeline" / "README.md").write_text("")
 
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
 
-        assert "Creative Marketing ...coming soon" in app._coming_soon_options
+        assert "Certification Pipeline ...coming soon" in app._coming_soon_options
 
 
 class TestOnTemplateSelected:
@@ -193,14 +193,14 @@ class TestOnTemplateSelected:
         """Selecting a coming-soon option must revert the dropdown to _current_template."""
         (tmp_path / "coding").mkdir()
         (tmp_path / "coding" / "app.py").write_text("")
-        (tmp_path / "creative-marketing").mkdir()
-        (tmp_path / "creative-marketing" / "README.md").write_text("")
+        (tmp_path / "certification-pipeline").mkdir()
+        (tmp_path / "certification-pipeline" / "README.md").write_text("")
 
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path}):
             app = _fresh_app()
 
         previous = app._current_template  # "Coding"
-        app._on_template_selected("Creative Marketing ...coming soon")
+        app._on_template_selected("Certification Pipeline ...coming soon")
 
         # _current_template must not have changed
         assert app._current_template == previous
@@ -321,8 +321,8 @@ class TestCreateProjectComingSoonBypass:
         """If the dropdown somehow returns a coming-soon display name at click time,
         _on_create_project must NOT call create_project — the reverse-map guard
         should return an error and abort."""
-        (tmp_path / "creative-marketing").mkdir()
-        (tmp_path / "creative-marketing" / "README.md").write_text("")
+        (tmp_path / "certification-pipeline").mkdir()
+        (tmp_path / "certification-pipeline" / "README.md").write_text("")
         dest = tmp_path / "dest"
         dest.mkdir()
 
@@ -339,7 +339,7 @@ class TestCreateProjectComingSoonBypass:
         app.destination_error_label = MagicMock()
         # Force the dropdown to return the coming-soon display name (bypass guard).
         app.project_type_dropdown = MagicMock()
-        app.project_type_dropdown.get.return_value = "Creative Marketing ...coming soon"
+        app.project_type_dropdown.get.return_value = "Certification Pipeline ...coming soon"
 
         mock_create = MagicMock()
 
@@ -359,22 +359,22 @@ class TestRealTemplatesDirectory:
     def test_coding_template_is_ready(self):
         """The real templates/coding/ directory must be considered ready."""
         from launcher.config import TEMPLATES_DIR as REAL_TEMPLATES_DIR
-        assert is_template_ready(REAL_TEMPLATES_DIR, "coding") is True
+        assert is_template_ready(REAL_TEMPLATES_DIR, "agent-workbench") is True
 
     def test_creative_marketing_template_is_not_ready(self):
         """The real templates/creative-marketing/ directory must NOT be ready (only README.md)."""
         from launcher.config import TEMPLATES_DIR as REAL_TEMPLATES_DIR
-        assert is_template_ready(REAL_TEMPLATES_DIR, "creative-marketing") is False
+        assert is_template_ready(REAL_TEMPLATES_DIR, "certification-pipeline") is False
 
     def test_real_templates_display_names(self):
         """Against the real templates/ dir the app produces 'Coding' (ready)
-        and 'Creative Marketing ...coming soon' (not ready)."""
+        and 'Certification Pipeline ...coming soon' (not ready)."""
         from launcher.config import TEMPLATES_DIR as REAL_TEMPLATES_DIR
         _CTK_MOCK.reset_mock()
         app = App()
         options = app._get_template_options()
-        assert "Coding" in options
-        assert "Creative Marketing ...coming soon" in options
+        assert "Agent Workbench" in options
+        assert "Certification Pipeline ...coming soon" in options
         assert not any(o.endswith("...coming soon") and "Coding" in o for o in options)
 
 

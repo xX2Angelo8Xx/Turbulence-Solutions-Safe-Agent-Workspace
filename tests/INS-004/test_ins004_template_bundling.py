@@ -18,7 +18,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 TEMPLATES_DIR = REPO_ROOT / "templates"
-CODING_TEMPLATE = TEMPLATES_DIR / "coding"
+CODING_TEMPLATE = TEMPLATES_DIR / "agent-workbench"
 
 # ---------------------------------------------------------------------------
 # 1. templates/ root
@@ -31,7 +31,7 @@ def test_templates_root_dir_exists():
 
 
 def test_coding_template_dir_exists():
-    """templates/coding/ subdirectory must exist."""
+    """templates/agent-workbench/ subdirectory must exist."""
     assert CODING_TEMPLATE.is_dir(), f"Missing: {CODING_TEMPLATE}"
 
 
@@ -200,7 +200,7 @@ def test_list_templates_returns_coding():
     from launcher.core.project_creator import list_templates  # type: ignore
     from launcher import config  # type: ignore
     result = list_templates(config.TEMPLATES_DIR)
-    assert "coding" in result, f"'coding' not found in list_templates result: {result}"
+    assert "agent-workbench" in result, f"'agent-workbench' not found in list_templates result: {result}"
 
 
 def test_list_templates_returns_list():
@@ -271,9 +271,9 @@ def test_template_discoverable_and_copyable():
     from launcher import config  # type: ignore
 
     templates = list_templates(config.TEMPLATES_DIR)
-    assert "coding" in templates, "'coding' template not discoverable"
+    assert "agent-workbench" in templates, "'coding' template not discoverable"
 
-    coding_path = config.TEMPLATES_DIR / "coding"
+    coding_path = config.TEMPLATES_DIR / "agent-workbench"
     with tempfile.TemporaryDirectory() as tmp:
         result = create_project(coding_path, Path(tmp), "test-project")
         assert result.is_dir(), f"Copied project directory does not exist: {result}"
@@ -293,9 +293,9 @@ def test_template_discoverable_and_copyable():
 
 def test_template_files_match_default_project():
     """All files in templates/coding/ (minus __pycache__) must exist in templates/coding/."""
-    default_project = REPO_ROOT / "templates" / "coding"
+    default_project = REPO_ROOT / "templates" / "agent-workbench"
     if not default_project.is_dir():
-        pytest.skip("templates/coding/ not found")
+        pytest.skip("templates/agent-workbench/ not found")
 
     missing = []
     for src_file in default_project.rglob("*"):
@@ -312,11 +312,11 @@ def test_template_files_match_default_project():
 
 
 def test_coding_template_has_no_extra_files_beyond_default_project():
-    """templates/coding/ must not contain files absent from templates/coding/
+    """templates/agent-workbench/ must not contain files absent from templates/coding/
     (prevents template drift / stale artifacts)."""
-    default_project = REPO_ROOT / "templates" / "coding"
+    default_project = REPO_ROOT / "templates" / "agent-workbench"
     if not default_project.is_dir():
-        pytest.skip("templates/coding/ not found")
+        pytest.skip("templates/agent-workbench/ not found")
 
     extra = []
     for tmpl_file in CODING_TEMPLATE.rglob("*"):
@@ -391,9 +391,9 @@ def test_template_security_files_match_default_project_content():
     comments for documentation while the template carries clean JSON.
     For all other files a byte-for-byte comparison is performed.
     """
-    default_project = REPO_ROOT / "templates" / "coding"
+    default_project = REPO_ROOT / "templates" / "agent-workbench"
     if not default_project.is_dir():
-        pytest.skip("templates/coding/ not found")
+        pytest.skip("templates/agent-workbench/ not found")
 
     mismatches = []
     for rel in _key_security_files():
@@ -418,16 +418,16 @@ def test_template_security_files_match_default_project_content():
 
 
 def test_vscode_settings_json_has_all_required_keys():
-    """templates/coding/.vscode/settings.json must contain every security-
+    """templates/agent-workbench/.vscode/settings.json must contain every security-
     critical key present in templates/coding/.vscode/settings.json.
 
     This test is intentionally more lenient than a byte-for-byte comparison:
     templates/coding/ uses JSONC comment syntax for documentation; the template
     carries clean JSON.  What matters is that no security control is absent.
     """
-    default_project = REPO_ROOT / "templates" / "coding"
+    default_project = REPO_ROOT / "templates" / "agent-workbench"
     if not default_project.is_dir():
-        pytest.skip("templates/coding/ not found")
+        pytest.skip("templates/agent-workbench/ not found")
 
     src_parsed = _load_json_ignoring_comments(
         default_project / ".vscode" / "settings.json"
@@ -491,9 +491,9 @@ def test_template_non_json_files_match_default_project_byte_for_byte():
     while the template ships clean JSON — semantic equality is verified by
     test_template_security_files_match_default_project_content instead.
     """
-    default_project = REPO_ROOT / "templates" / "coding"
+    default_project = REPO_ROOT / "templates" / "agent-workbench"
     if not default_project.is_dir():
-        pytest.skip("templates/coding/ not found")
+        pytest.skip("templates/agent-workbench/ not found")
 
     mismatches: list[str] = []
     for tmpl_file in CODING_TEMPLATE.rglob("*"):
@@ -550,7 +550,7 @@ def test_template_copy_preserves_hidden_directories():
     if "coding" not in templates:
         pytest.skip("coding template not available — covered by discovery test")
 
-    coding_path = config.TEMPLATES_DIR / "coding"
+    coding_path = config.TEMPLATES_DIR / "agent-workbench"
     with tempfile.TemporaryDirectory() as tmp:
         result = create_project(coding_path, Path(tmp), "hidden-dir-test")
         assert (result / ".github").is_dir(), ".github not copied to destination"
