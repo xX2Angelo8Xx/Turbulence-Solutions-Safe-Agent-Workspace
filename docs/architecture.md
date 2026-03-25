@@ -392,6 +392,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── test-report.md
 │   │   │   └── transform_tests.py
 │   │   ├── FIX-072/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-073/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -849,6 +852,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-070/
 │   ├── FIX-071/
 │   ├── FIX-072/
+│   ├── FIX-073/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
