@@ -33,6 +33,8 @@ _ALWAYS_ALLOW_TOOLS: frozenset = frozenset({
     "TodoWrite", "TodoRead", "todo_write", "manage_todo_list",
     # SAF-044: search_subagent removed — validated by validate_search_subagent() in decide()
     "runSubagent", "Agent", "agent",
+    # SAF-052: read-only git status tool — no path arguments, no command execution
+    "get_changed_files",
 })
 
 _TERMINAL_TOOLS: frozenset = frozenset({
@@ -85,7 +87,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "0b15c9bb9fe24ed1931b267c1074d32f4316d3c5972c028e20ce9c3033a6b5c9"
+_KNOWN_GOOD_GATE_HASH: str = "efb12c39547fa322c4e869fc9c888625c40c34185e927344dbd806ec95159576"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
