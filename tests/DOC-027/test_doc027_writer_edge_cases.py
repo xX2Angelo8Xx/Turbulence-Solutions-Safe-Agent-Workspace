@@ -4,7 +4,7 @@ Edge-case tests for DOC-027: writer.agent.md — Tester Agent.
 Covers:
 - Exact name value ('Writer'), exact model value ('claude-sonnet-4-5')
 - Exact tool count (7), no duplicates, no extra tools
-- Forbidden tools verified individually (run_in_terminal, fetch_webpage)
+- Forbidden tools verified individually (execute, fetch_webpage)
 - All 5 required body sections present
 - All 3 zone restrictions present (.github/, .vscode/, NoAgentZone/)
 - Agent cross-references (@programmer, @tester, etc.)
@@ -69,10 +69,10 @@ class TestFrontmatterExactValues:
             f"Expected name='Writer', got '{frontmatter['name']}'"
         )
 
-    def test_model_is_claude_sonnet(self, frontmatter):
-        """Model must be exactly 'claude-sonnet-4-5'."""
-        assert frontmatter["model"] == "claude-sonnet-4-5", (
-            f"Expected model='claude-sonnet-4-5', got '{frontmatter['model']}'"
+    def test_model_is_correct(self, frontmatter):
+        """Model must be the correct Copilot model."""
+        assert frontmatter["model"] == ["Claude Opus 4.6 (copilot)"], (
+            f"Expected model=['Claude Opus 4.6 (copilot)'], got '{frontmatter['model']}'"
         )
 
     def test_frontmatter_has_exactly_four_keys(self, frontmatter):
@@ -87,31 +87,32 @@ class TestFrontmatterExactValues:
         assert frontmatter["name"] == str(frontmatter["name"]).strip()
 
     def test_model_no_leading_trailing_whitespace(self, frontmatter):
-        """Model value must not have leading/trailing whitespace."""
-        assert frontmatter["model"] == str(frontmatter["model"]).strip()
+        """Model value must not have leading/trailing whitespace in its string elements."""
+        model = frontmatter["model"]
+        if isinstance(model, list):
+            for item in model:
+                assert str(item) == str(item).strip()
+        else:
+            assert str(model) == str(model).strip()
 
 
 # ── Tool list edge cases ──────────────────────────────────────────────────
 
 EXPECTED_TOOLS = sorted([
-    "read_file",
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
+    "read",
+    "edit",
+    "search",
 ])
 
 
 class TestToolList:
     """Verify the tools list is exactly correct — no more, no less."""
 
-    def test_tool_count_is_seven(self, frontmatter):
-        """Writer must have exactly 7 tools."""
+    def test_tool_count_is_three(self, frontmatter):
+        """Writer must have exactly 3 tools."""
         tools = frontmatter.get("tools", [])
-        assert len(tools) == 7, (
-            f"Expected 7 tools, got {len(tools)}: {tools}"
+        assert len(tools) == 3, (
+            f"Expected 3 tools, got {len(tools)}: {tools}"
         )
 
     def test_no_duplicate_tools(self, frontmatter):
@@ -128,10 +129,10 @@ class TestToolList:
             f"Tools mismatch.\n  Expected: {EXPECTED_TOOLS}\n  Got:      {tools}"
         )
 
-    def test_no_run_in_terminal(self, frontmatter):
-        """run_in_terminal must NOT be in tools — Writer never runs commands."""
+    def test_no_execute_tool(self, frontmatter):
+        """execute must NOT be in tools — Writer never runs commands."""
         tools = frontmatter.get("tools", [])
-        assert "run_in_terminal" not in tools
+        assert "execute" not in tools
 
     def test_no_fetch_webpage(self, frontmatter):
         """fetch_webpage must NOT be in tools — Writer has no web access."""

@@ -8,7 +8,7 @@ Tester-added tests beyond the Developer's original suite. Validates:
 - Cross-references to other agents in "What You Do Not Do"
 - Structural consistency with other agent files
 - No terminal or edit verbs in the body instructions
-- fetch_webpage uniqueness to researcher
+- Researcher relies on read and search tools only (fetch_webpage removed)
 - Frontmatter name is exactly "Researcher"
 - Allowed tools are exactly the expected set (no extras)
 """
@@ -82,12 +82,12 @@ def test_frontmatter_closing_delimiter_before_body():
 # Exact frontmatter values
 # ---------------------------------------------------------------------------
 
-def test_model_is_exactly_claude_sonnet():
-    """Model field must be exactly 'claude-sonnet-4-5'."""
+def test_model_is_correct():
+    """Model field must be the correct Copilot model."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
-    assert fm.get("model") == "claude-sonnet-4-5", (
-        f"Expected model 'claude-sonnet-4-5', got '{fm.get('model')}'"
+    assert fm.get("model") == ["Claude Opus 4.6 (copilot)"], (
+        f"Expected model ['Claude Opus 4.6 (copilot)'], got '{fm.get('model')}'"
     )
 
 
@@ -104,7 +104,7 @@ def test_tools_list_is_exact():
     """Tools list must be exactly the expected set — no extra tools allowed."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
-    expected = {"read_file", "file_search", "grep_search", "semantic_search", "fetch_webpage"}
+    expected = {"read", "search"}
     actual = set(fm.get("tools", []))
     extra = actual - expected
     assert not extra, f"Unexpected extra tools in frontmatter: {extra}"
@@ -233,23 +233,23 @@ def test_what_you_do_not_do_no_terminal_claim():
 # Researcher-unique features
 # ---------------------------------------------------------------------------
 
-def test_fetch_webpage_in_tools():
-    """fetch_webpage must be present — it distinguishes researcher from brainstormer."""
+def test_fetch_webpage_not_in_tools():
+    """fetch_webpage must NOT be present — it is not a standard VS Code tool category."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    assert "fetch_webpage" in tools, "Researcher must have fetch_webpage tool"
+    assert "fetch_webpage" not in tools, "Researcher must not have fetch_webpage tool (not a VS Code category)"
 
 
 def test_brainstormer_does_not_have_fetch_webpage():
-    """Verify researcher is unique: brainstormer should NOT have fetch_webpage."""
+    """Verify brainstormer also does NOT have fetch_webpage."""
     if not BRAINSTORMER_FILE.exists():
         pytest.skip("brainstormer.agent.md not found — cannot compare")
     content = BRAINSTORMER_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
     assert "fetch_webpage" not in tools, (
-        "brainstormer should not have fetch_webpage — that's what differentiates researcher"
+        "brainstormer should not have fetch_webpage"
     )
 
 
@@ -287,15 +287,15 @@ def test_body_does_not_instruct_editing():
             )
 
 
-def test_how_you_work_mentions_fetch_webpage():
-    """'How You Work' steps should mention using fetch_webpage for external docs."""
+def test_how_you_work_uses_read_and_search():
+    """'How You Work' steps should describe using read and search tools for investigation."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     _, body = _parse_frontmatter(content)
     hyw_match = re.search(r"## How You Work\s*\n(.*?)(?=\n## |\Z)", body, re.DOTALL)
     assert hyw_match, "Could not find 'How You Work' section"
-    hyw_section = hyw_match.group(1)
-    assert "fetch_webpage" in hyw_section, (
-        "'How You Work' should mention fetch_webpage for external references"
+    hyw_section = hyw_match.group(1).lower()
+    assert "search" in hyw_section or "read" in hyw_section, (
+        "'How You Work' should describe using read and search tools"
     )
 
 

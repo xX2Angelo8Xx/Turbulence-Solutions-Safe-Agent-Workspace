@@ -40,31 +40,31 @@ def test_frontmatter_has_closing_delimiter():
     assert closing_count >= 1, "No closing '---' frontmatter delimiter found"
 
 
-def test_frontmatter_tools_has_semantic_search():
-    """semantic_search must be listed as a tool (deep search capability)."""
+def test_frontmatter_tools_has_search():
+    """search must be listed as a tool (deep search capability)."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    assert "semantic_search" in tools, "semantic_search not found in tools list"
+    assert "search" in tools, "search not found in tools list"
 
 
-def test_frontmatter_no_create_file_tool():
-    """create_file must NOT be in the tools list — brainstormer never creates files."""
+def test_frontmatter_no_edit_tool():
+    """edit must NOT be in the tools list — brainstormer never creates or edits files."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    assert "create_file" not in tools, (
-        "create_file found in tools list — brainstormer is ideation-only and must not create files"
+    assert "edit" not in tools, (
+        "edit found in tools list — brainstormer is ideation-only and must not edit files"
     )
 
 
-def test_frontmatter_no_run_in_terminal_tool():
-    """run_in_terminal must NOT be in the tools list — brainstormer does not execute code."""
+def test_frontmatter_no_execute_tool():
+    """execute must NOT be in the tools list — brainstormer does not execute code."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    assert "run_in_terminal" not in tools, (
-        "run_in_terminal found in tools list — brainstormer must not execute commands"
+    assert "execute" not in tools, (
+        "execute found in tools list — brainstormer must not execute commands"
     )
 
 

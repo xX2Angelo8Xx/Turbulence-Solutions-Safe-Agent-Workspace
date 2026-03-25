@@ -15,11 +15,10 @@ import yaml
 AGENT_FILE = pathlib.Path(__file__).parents[2] / "templates" / "agent-workbench" / ".github" / "agents" / "programmer.agent.md"
 
 REQUIRED_TOOLS = [
-    "read_file",
-    "create_file",
-    "replace_string_in_file",
-    "grep_search",
-    "run_in_terminal",
+    "read",
+    "edit",
+    "search",
+    "execute",
 ]
 
 

@@ -21,13 +21,10 @@ AGENT_FILE = (
     / "researcher.agent.md"
 )
 
-# Researcher has read + search + fetch_webpage — no edit tools, no terminal
+# Researcher has read + search — no edit tools, no terminal, no web
 REQUIRED_TOOLS = [
-    "read_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
-    "fetch_webpage",
+    "read",
+    "search",
 ]
 
 
@@ -111,9 +108,9 @@ def test_frontmatter_no_edit_tools():
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    forbidden = ["create_file", "replace_string_in_file", "multi_replace_string_in_file", "run_in_terminal"]
+    forbidden = ["edit", "execute", "ask"]
     present = [t for t in forbidden if t in tools]
-    assert not present, f"Researcher must not have edit/terminal tools, but found: {present}"
+    assert not present, f"Researcher must not have edit/terminal/ask tools, but found: {present}"
 
 
 def test_frontmatter_model_present_and_non_empty():

@@ -32,20 +32,17 @@ AGENT_DIR = (
 AGENT_FILE = AGENT_DIR / "criticist.agent.md"
 
 REQUIRED_TOOLS = [
-    "read_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
+    "read",
+    "search",
 ]
 
 FORBIDDEN_TOOLS = [
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "run_in_terminal",
+    "edit",
+    "execute",
+    "ask",
+    "fetch_webpage",
     "edit_notebook_file",
     "run_notebook_cell",
-    "fetch_webpage",
     "create_directory",
     "create_new_jupyter_notebook",
 ]
@@ -76,11 +73,11 @@ class TestFrontmatterExactValues:
         fm, _ = _parse_frontmatter(_read_content())
         assert fm["name"] == "Criticist", f"Expected name 'Criticist', got '{fm['name']}'"
 
-    def test_model_is_exactly_claude_sonnet_4_5(self):
-        """Model must be exactly 'claude-sonnet-4-5'."""
+    def test_model_is_correct(self):
+        """Model must be the correct Copilot model."""
         fm, _ = _parse_frontmatter(_read_content())
-        assert fm["model"] == "claude-sonnet-4-5", (
-            f"Expected model 'claude-sonnet-4-5', got '{fm['model']}'"
+        assert fm["model"] == ["Claude Opus 4.6 (copilot)"], (
+            f"Expected model ['Claude Opus 4.6 (copilot)'], got '{fm['model']}'"
         )
 
     def test_name_has_no_leading_trailing_whitespace(self):
@@ -138,12 +135,12 @@ class TestToolsList:
         missing = [t for t in REQUIRED_TOOLS if t not in tools]
         assert not missing, f"Missing required tools: {missing}"
 
-    def test_tools_count_is_exactly_four(self):
-        """Tools list must have exactly 4 items — the read/search toolset only."""
+    def test_tools_count_is_exactly_two(self):
+        """Tools list must have exactly 2 items — the read/search toolset only."""
         fm, _ = _parse_frontmatter(_read_content())
         tools = fm.get("tools", [])
-        assert len(tools) == 4, (
-            f"Expected exactly 4 tools (read/search only), found {len(tools)}: {tools}"
+        assert len(tools) == 2, (
+            f"Expected exactly 2 tools (read/search only), found {len(tools)}: {tools}"
         )
 
     def test_no_duplicate_tools(self):

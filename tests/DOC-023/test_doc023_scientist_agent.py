@@ -23,14 +23,10 @@ AGENT_FILE = (
 
 # Scientist has full toolset: read, edit, search, execute
 REQUIRED_TOOLS = [
-    "read_file",
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
-    "run_in_terminal",
+    "read",
+    "edit",
+    "search",
+    "execute",
 ]
 
 

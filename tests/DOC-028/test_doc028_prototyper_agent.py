@@ -23,21 +23,18 @@ AGENT_FILE = (
 
 # Prototyper has the full tool set: read + edit + search + execute
 REQUIRED_TOOLS = [
-    "read_file",
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
-    "run_in_terminal",
+    "read",
+    "edit",
+    "search",
+    "execute",
 ]
 
 # These tools must NOT appear in the prototyper's tool list
 FORBIDDEN_TOOLS = [
+    "ask",
+    "fetch_webpage",
     "edit_notebook_file",
     "run_notebook_cell",
-    "fetch_webpage",
 ]
 
 

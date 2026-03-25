@@ -30,14 +30,10 @@ FIXER_FILE = AGENT_DIR / "fixer.agent.md"
 PROGRAMMER_FILE = AGENT_DIR / "programmer.agent.md"
 
 REQUIRED_TOOLS = sorted([
-    "read_file",
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
-    "run_in_terminal",
+    "read",
+    "edit",
+    "search",
+    "execute",
 ])
 
 FORBIDDEN_TOOLS = [
@@ -72,18 +68,18 @@ class TestFrontmatterExactValues:
         fm, _ = _parse(FIXER_FILE)
         assert fm["name"] == "Fixer", f"Expected name 'Fixer', got '{fm['name']}'"
 
-    def test_model_is_claude_sonnet(self):
-        """Model must be 'claude-sonnet-4-5'."""
+    def test_model_is_correct(self):
+        """Model must be the correct Copilot model."""
         fm, _ = _parse(FIXER_FILE)
-        assert fm["model"] == "claude-sonnet-4-5", (
-            f"Expected model 'claude-sonnet-4-5', got '{fm['model']}'"
+        assert fm["model"] == ["Claude Opus 4.6 (copilot)"], (
+            f"Expected model ['Claude Opus 4.6 (copilot)'], got '{fm['model']}'"
         )
 
-    def test_tools_count_is_exactly_8(self):
-        """Tools list must have exactly 8 entries — no more, no less."""
+    def test_tools_count_is_exactly_4(self):
+        """Tools list must have exactly 4 entries — no more, no less."""
         fm, _ = _parse(FIXER_FILE)
-        assert len(fm["tools"]) == 8, (
-            f"Expected 8 tools, got {len(fm['tools'])}: {fm['tools']}"
+        assert len(fm["tools"]) == 4, (
+            f"Expected 4 tools, got {len(fm['tools'])}: {fm['tools']}"
         )
 
     def test_tools_exact_set(self):

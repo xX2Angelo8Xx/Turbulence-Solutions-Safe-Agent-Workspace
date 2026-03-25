@@ -43,8 +43,8 @@ Each file contains YAML frontmatter followed by the agent's system prompt:
 ---
 name: Programmer
 description: Writes and implements code
-tools: [read_file, create_file, replace_string_in_file, grep_search, run_in_terminal]
-model: claude-sonnet-4-5
+tools: [read, edit, search, execute]
+model: ['Claude Opus 4.6 (copilot)']
 ---
 Your system prompt here...
 ```
@@ -52,7 +52,7 @@ Your system prompt here...
 - **`name`** — Display name in the agent picker.
 - **`description`** — Short label shown when selecting the agent.
 - **`tools`** — List of tools the agent may use. Restrict tools to match the agent's role.
-- **`model`** — The model to use (e.g. `claude-sonnet-4-5`, `gpt-4o`).
+- **`model`** — The model to use (e.g. `['Claude Opus 4.6 (copilot)']`, `gpt-4o`).
 - **System prompt** — The instructions that shape the agent's behavior and persona.
 
 All agents follow the zone restrictions and tool rules defined in `{{PROJECT_NAME}}/AGENT-RULES.md`.

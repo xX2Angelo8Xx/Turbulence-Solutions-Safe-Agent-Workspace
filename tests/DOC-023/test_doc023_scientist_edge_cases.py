@@ -31,14 +31,10 @@ AGENT_DIR = (
 AGENT_FILE = AGENT_DIR / "scientist.agent.md"
 
 REQUIRED_TOOLS = [
-    "read_file",
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
-    "run_in_terminal",
+    "read",
+    "edit",
+    "search",
+    "execute",
 ]
 
 
@@ -67,11 +63,11 @@ class TestFrontmatterExactValues:
         fm, _ = _parse_frontmatter(_read_content())
         assert fm["name"] == "Scientist", f"Expected name 'Scientist', got '{fm['name']}'"
 
-    def test_model_is_exactly_claude_sonnet_4_5(self):
-        """Model must be exactly 'claude-sonnet-4-5'."""
+    def test_model_is_correct(self):
+        """Model must be the correct Copilot model."""
         fm, _ = _parse_frontmatter(_read_content())
-        assert fm["model"] == "claude-sonnet-4-5", (
-            f"Expected model 'claude-sonnet-4-5', got '{fm['model']}'"
+        assert fm["model"] == ["Claude Opus 4.6 (copilot)"], (
+            f"Expected model ['Claude Opus 4.6 (copilot)'], got '{fm['model']}'"
         )
 
     def test_name_has_no_leading_trailing_whitespace(self):
@@ -132,11 +128,11 @@ class TestToolsList:
         assert not missing, f"Missing required tools: {missing}"
 
     def test_tools_count_matches(self):
-        """Tools list must have exactly 8 items (the full toolset)."""
+        """Tools list must have exactly 4 items (read, edit, search, execute)."""
         fm, _ = _parse_frontmatter(_read_content())
         tools = fm.get("tools", [])
-        assert len(tools) == 8, (
-            f"Expected 8 tools, found {len(tools)}: {tools}"
+        assert len(tools) == 4, (
+            f"Expected 4 tools, found {len(tools)}: {tools}"
         )
 
     def test_no_duplicate_tools(self):

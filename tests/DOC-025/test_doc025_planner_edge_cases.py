@@ -32,20 +32,17 @@ AGENT_DIR = (
 AGENT_FILE = AGENT_DIR / "planner.agent.md"
 
 REQUIRED_TOOLS = [
-    "read_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
+    "read",
+    "search",
+    "ask",
+    "edit",
 ]
 
 FORBIDDEN_TOOLS = [
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "run_in_terminal",
+    "execute",
+    "fetch_webpage",
     "edit_notebook_file",
     "run_notebook_cell",
-    "fetch_webpage",
     "create_directory",
     "create_new_jupyter_notebook",
 ]
@@ -76,11 +73,11 @@ class TestFrontmatterExactValues:
         fm, _ = _parse_frontmatter(_read_content())
         assert fm["name"] == "Planner", f"Expected name 'Planner', got '{fm['name']}'"
 
-    def test_model_is_exactly_claude_sonnet_4_5(self):
-        """Model must be exactly 'claude-sonnet-4-5'."""
+    def test_model_is_correct(self):
+        """Model must be the correct Copilot model."""
         fm, _ = _parse_frontmatter(_read_content())
-        assert fm["model"] == "claude-sonnet-4-5", (
-            f"Expected model 'claude-sonnet-4-5', got '{fm['model']}'"
+        assert fm["model"] == ["Claude Opus 4.6 (copilot)"], (
+            f"Expected model ['Claude Opus 4.6 (copilot)'], got '{fm['model']}'"
         )
 
     def test_name_has_no_leading_trailing_whitespace(self):
@@ -139,11 +136,11 @@ class TestToolsList:
         assert not missing, f"Missing required tools: {missing}"
 
     def test_tools_count_is_exactly_four(self):
-        """Tools list must have exactly 4 items — the read/search toolset only."""
+        """Tools list must have exactly 4 items — read, search, ask, edit."""
         fm, _ = _parse_frontmatter(_read_content())
         tools = fm.get("tools", [])
         assert len(tools) == 4, (
-            f"Expected exactly 4 tools (read/search only), found {len(tools)}: {tools}"
+            f"Expected exactly 4 tools (read/search/ask/edit), found {len(tools)}: {tools}"
         )
 
     def test_no_duplicate_tools(self):
@@ -164,7 +161,7 @@ class TestToolsList:
         fm, _ = _parse_frontmatter(_read_content())
         tools = fm.get("tools", [])
         assert forbidden not in tools, (
-            f"Forbidden tool '{forbidden}' found. Planner is read-only."
+            f"Forbidden tool '{forbidden}' found. Planner must not have execute or web tools."
         )
 
     def test_tools_exactly_match_required_set(self):
@@ -173,7 +170,7 @@ class TestToolsList:
         tools = set(fm.get("tools", []))
         required = set(REQUIRED_TOOLS)
         extra = tools - required
-        assert not extra, f"Extra tools found: {extra}. Planner must have read/search only."
+        assert not extra, f"Extra tools found: {extra}. Planner must have read/search/ask/edit only."
 
 
 # ---------------------------------------------------------------------------
@@ -421,17 +418,19 @@ class TestConsistencyWithOtherAgents:
         content = _read_content()
         assert content.endswith("\n"), "File should end with a newline"
 
-    def test_tools_match_brainstormer_pattern(self):
-        """Planner tools should match brainstormer (both are read-only agents)."""
+    def test_tools_include_brainstormer_subset(self):
+        """Planner tools must include the brainstormer subset (read, search) plus ask and edit."""
         brainstormer_file = AGENT_DIR / "brainstormer.agent.md"
         if not brainstormer_file.exists():
             pytest.skip("brainstormer.agent.md not found for comparison")
         b_content = brainstormer_file.read_text(encoding="utf-8")
         b_fm, _ = _parse_frontmatter(b_content)
         p_fm, _ = _parse_frontmatter(_read_content())
-        assert set(p_fm.get("tools", [])) == set(b_fm.get("tools", [])), (
-            f"Planner tools {p_fm.get('tools')} should match brainstormer tools "
-            f"{b_fm.get('tools')} (both are read-only agents)"
+        brainstormer_tools = set(b_fm.get("tools", []))
+        planner_tools = set(p_fm.get("tools", []))
+        assert brainstormer_tools.issubset(planner_tools), (
+            f"Planner tools {p_fm.get('tools')} must include all brainstormer tools "
+            f"{b_fm.get('tools')}"
         )
 
     def test_model_matches_brainstormer(self):

@@ -31,14 +31,10 @@ AGENTS_DIR = (
 AGENT_FILE = AGENTS_DIR / "prototyper.agent.md"
 
 REQUIRED_TOOLS = [
-    "read_file",
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
-    "run_in_terminal",
+    "read",
+    "edit",
+    "search",
+    "execute",
 ]
 
 
@@ -71,18 +67,18 @@ class TestExactFrontmatterValues:
             f"Name must be exactly 'Prototyper', got '{fm['name']}'"
         )
 
-    def test_model_is_claude_sonnet_4_5(self):
+    def test_model_is_correct(self):
         fm, _ = _read()
-        assert fm["model"] == "claude-sonnet-4-5", (
-            f"Model must be 'claude-sonnet-4-5', got '{fm['model']}'"
+        assert fm["model"] == ["Claude Opus 4.6 (copilot)"], (
+            f"Model must be ['Claude Opus 4.6 (copilot)'], got '{fm['model']}'"
         )
 
-    def test_exactly_eight_tools(self):
-        """Tool list must contain exactly 8 tools — no more, no less."""
+    def test_exactly_four_tools(self):
+        """Tool list must contain exactly 4 tools — no more, no less."""
         fm, _ = _read()
         tools = fm.get("tools", [])
-        assert len(tools) == 8, (
-            f"Expected exactly 8 tools, got {len(tools)}: {tools}"
+        assert len(tools) == 4, (
+            f"Expected exactly 4 tools, got {len(tools)}: {tools}"
         )
 
     def test_no_extra_tools(self):

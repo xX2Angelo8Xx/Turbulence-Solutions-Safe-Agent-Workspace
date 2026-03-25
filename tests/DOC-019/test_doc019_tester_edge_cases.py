@@ -40,22 +40,22 @@ def test_frontmatter_has_closing_delimiter():
     assert closing_count >= 1, "No closing '---' frontmatter delimiter found"
 
 
-def test_frontmatter_tools_contains_file_search():
-    """file_search must be listed as a tool (search capability requirement)."""
+def test_frontmatter_tools_contains_search():
+    """search must be listed as a tool (search capability requirement)."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    assert "file_search" in tools, "file_search not found in tools list"
+    assert "search" in tools, "search not found in tools list"
 
 
-def test_frontmatter_tools_contains_multi_replace():
-    """multi_replace_string_in_file must be listed (bulk-edit capability)."""
+def test_frontmatter_tools_contains_edit():
+    """edit must be listed (bulk-edit capability)."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    assert "multi_replace_string_in_file" in tools, (
-        "multi_replace_string_in_file not found in tools list — "
-        "bulk-edit capability is required per dev-log decision"
+    assert "edit" in tools, (
+        "edit not found in tools list — "
+        "edit capability is required per dev-log decision"
     )
 
 

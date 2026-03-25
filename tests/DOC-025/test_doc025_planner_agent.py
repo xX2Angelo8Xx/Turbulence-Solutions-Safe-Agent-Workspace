@@ -21,23 +21,20 @@ AGENT_FILE = (
     / "planner.agent.md"
 )
 
-# Planner is planning-only: read and search tools only
+# Planner can now ask clarifying questions and create plan files: read, search, ask, edit
 REQUIRED_TOOLS = [
-    "read_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
+    "read",
+    "search",
+    "ask",
+    "edit",
 ]
 
-# Edit/execute tools must NOT appear in the planner's tool list
+# Execute and web tools must NOT appear in the planner's tool list
 FORBIDDEN_TOOLS = [
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "run_in_terminal",
+    "execute",
+    "fetch_webpage",
     "edit_notebook_file",
     "run_notebook_cell",
-    "fetch_webpage",
 ]
 
 

@@ -40,28 +40,28 @@ def test_frontmatter_has_closing_delimiter():
     assert closing_count >= 1, "No closing '---' frontmatter delimiter found"
 
 
-def test_frontmatter_has_run_in_terminal():
-    """run_in_terminal must be listed as a tool — tester must be able to execute tests."""
+def test_frontmatter_has_execute():
+    """execute must be listed as a tool — tester must be able to run tests."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    assert "run_in_terminal" in tools, "run_in_terminal not found in tools list — tester must be able to run tests"
+    assert "execute" in tools, "execute not found in tools list — tester must be able to run tests"
 
 
-def test_frontmatter_has_create_file():
-    """create_file must be listed as a tool — tester must be able to write test files."""
+def test_frontmatter_has_edit():
+    """edit must be listed as a tool — tester must be able to write test files."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    assert "create_file" in tools, "create_file not found in tools list — tester must be able to write test files"
+    assert "edit" in tools, "edit not found in tools list — tester must be able to write test files"
 
 
-def test_frontmatter_has_semantic_search():
-    """semantic_search must be listed as a tool (deep codebase search capability)."""
+def test_frontmatter_has_search():
+    """search must be listed as a tool (deep codebase search capability)."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     tools = fm.get("tools", [])
-    assert "semantic_search" in tools, "semantic_search not found in tools list"
+    assert "search" in tools, "search not found in tools list"
 
 
 def test_frontmatter_model_is_not_placeholder():

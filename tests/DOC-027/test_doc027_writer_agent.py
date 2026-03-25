@@ -23,21 +23,18 @@ AGENT_FILE = (
 
 # Writer has read + edit + search tools
 REQUIRED_TOOLS = [
-    "read_file",
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
+    "read",
+    "edit",
+    "search",
 ]
 
 # Terminal and web tools must NOT appear in the writer's tool list
 FORBIDDEN_TOOLS = [
-    "run_in_terminal",
+    "execute",
+    "ask",
+    "fetch_webpage",
     "edit_notebook_file",
     "run_notebook_cell",
-    "fetch_webpage",
 ]
 
 

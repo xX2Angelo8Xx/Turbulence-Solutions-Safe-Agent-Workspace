@@ -23,21 +23,18 @@ AGENT_FILE = (
 
 # Criticist is review-only: read and search tools only
 REQUIRED_TOOLS = [
-    "read_file",
-    "file_search",
-    "grep_search",
-    "semantic_search",
+    "read",
+    "search",
 ]
 
 # Edit/execute tools must NOT appear in the criticist's tool list
 FORBIDDEN_TOOLS = [
-    "create_file",
-    "replace_string_in_file",
-    "multi_replace_string_in_file",
-    "run_in_terminal",
+    "edit",
+    "execute",
+    "ask",
+    "fetch_webpage",
     "edit_notebook_file",
     "run_notebook_cell",
-    "fetch_webpage",
 ]
 
 
