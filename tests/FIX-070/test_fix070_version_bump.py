@@ -1,6 +1,6 @@
-"""Tests for FIX-070: Bump version to 3.1.2.
+"""Tests for FIX-070: Version bump verification.
 
-Verifies that all 5 version reference locations have been updated to 3.1.2.
+Verifies that all 5 version reference locations have been updated to 3.2.0.
 Uses CURRENT_VERSION from tests/shared/version_utils.py (dynamically read
 from src/launcher/config.py) so this test survives future version bumps.
 """
@@ -130,7 +130,7 @@ def test_all_versions_consistent() -> None:
 # Tester edge-case tests (added during review)
 # ---------------------------------------------------------------------------
 
-STALE_VERSION = "3.1.1"
+STALE_VERSION = "3.1.2"
 _VERSION_FILES = [
     REPO_ROOT / "src" / "launcher" / "config.py",
     REPO_ROOT / "pyproject.toml",
@@ -140,15 +140,15 @@ _VERSION_FILES = [
 ]
 
 
-def test_current_version_is_3_1_2() -> None:
-    """CURRENT_VERSION (read from config.py) must equal the expected release version 3.1.2."""
-    assert CURRENT_VERSION == "3.1.2", (
-        f"Expected CURRENT_VERSION == '3.1.2', got '{CURRENT_VERSION}'"
+def test_current_version_is_3_2_0() -> None:
+    """CURRENT_VERSION (read from config.py) must equal the expected release version 3.2.0."""
+    assert CURRENT_VERSION == "3.2.0", (
+        f"Expected CURRENT_VERSION == '3.2.0', got '{CURRENT_VERSION}'"
     )
 
 
-def test_no_stale_3_1_1_in_version_files() -> None:
-    """None of the 5 canonical version files may still contain the old version 3.1.1."""
+def test_no_stale_3_1_2_in_version_files() -> None:
+    """None of the 5 canonical version files may still contain the old version 3.1.2."""
     stale_found: dict[str, list[int]] = {}
     for path in _VERSION_FILES:
         assert path.exists(), f"Version file not found: {path}"
