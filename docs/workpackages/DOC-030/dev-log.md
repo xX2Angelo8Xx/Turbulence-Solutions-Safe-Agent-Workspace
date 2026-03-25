@@ -65,3 +65,20 @@ All tests passed. See test-results.csv for logged results.
 | Bug | Fixed In |
 |-----|----------|
 | BUG-120 | DOC-030 |
+
+---
+
+## Iteration 2 — 2026-03-25
+
+### Tester Findings
+Iteration 1 was returned FAIL: 9 regression tests in `tests/DOC-029/` failed because those tests had hardcoded lowercase agent names that DOC-030 intentionally changed to PascalCase.
+
+### Changes Made
+
+| File | Change |
+|------|--------|
+| `tests/DOC-029/test_doc029_coordinator_agent.py` | Updated `EXPECTED_AGENTS` set from lowercase to PascalCase |
+| `tests/DOC-029/test_doc029_edge_cases.py` | Updated `EXPECTED_AGENTS` list from lowercase to PascalCase; updated all `TestAtSyntaxCrossReferences` assertions from `@lowercase` to `@PascalCase` |
+
+### Test Results
+Ran `pytest tests/DOC-029/ tests/DOC-030/ -v`: **74 passed, 0 failed**.

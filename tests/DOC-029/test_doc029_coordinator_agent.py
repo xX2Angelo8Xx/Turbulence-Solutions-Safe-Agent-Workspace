@@ -16,8 +16,8 @@ README_PATH = os.path.join(
 
 EXPECTED_TOOLS = {"read", "edit", "search", "execute", "agent", "todo", "ask"}
 EXPECTED_AGENTS = {
-    "programmer", "tester", "brainstormer", "researcher",
-    "scientist", "criticist", "planner", "fixer", "writer", "prototyper"
+    "Programmer", "Tester", "Brainstormer", "Researcher",
+    "Scientist", "Criticist", "Planner", "Fixer", "Writer", "Prototyper"
 }
 
 

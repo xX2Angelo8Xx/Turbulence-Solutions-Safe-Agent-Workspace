@@ -29,8 +29,8 @@ README_PATH = os.path.join(
 
 EXPECTED_TOOLS = {"read", "edit", "search", "execute", "agent", "todo", "ask"}
 EXPECTED_AGENTS = [
-    "programmer", "tester", "brainstormer", "researcher",
-    "scientist", "criticist", "planner", "fixer", "writer", "prototyper"
+    "Programmer", "Tester", "Brainstormer", "Researcher",
+    "Scientist", "Criticist", "Planner", "Fixer", "Writer", "Prototyper"
 ]
 STANDARD_MODEL = ["Claude Opus 4.6 (copilot)"]
 DENIED_PATHS = [".github/", ".vscode/", "NoAgentZone/"]
@@ -156,19 +156,19 @@ class TestAtSyntaxCrossReferences:
         self.data, self.body, self.full = _load_frontmatter(COORDINATOR_PATH)
 
     def test_at_syntax_used_for_programmer(self):
-        assert "@programmer" in self.body, "Body does not reference @programmer"
+        assert "@Programmer" in self.body, "Body does not reference @Programmer"
 
     def test_at_syntax_used_for_tester(self):
-        assert "@tester" in self.body, "Body does not reference @tester"
+        assert "@Tester" in self.body, "Body does not reference @Tester"
 
     def test_at_syntax_used_for_planner(self):
-        assert "@planner" in self.body, "Body does not reference @planner"
+        assert "@Planner" in self.body, "Body does not reference @Planner"
 
     def test_at_syntax_used_for_fixer(self):
-        assert "@fixer" in self.body, "Body does not reference @fixer"
+        assert "@Fixer" in self.body, "Body does not reference @Fixer"
 
     def test_at_syntax_used_for_criticist(self):
-        assert "@criticist" in self.body, "Body does not reference @criticist"
+        assert "@Criticist" in self.body, "Body does not reference @Criticist"
 
     def test_at_syntax_present_for_all_10_agents(self):
         missing = [a for a in EXPECTED_AGENTS if f"@{a}" not in self.body]
