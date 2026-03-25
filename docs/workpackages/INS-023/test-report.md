@@ -3,19 +3,21 @@
 **Tester:** Tester Agent  
 **Date:** 2026-03-25  
 **Branch:** `INS-023/skip-readmes`  
-**Verdict:** **FAIL — return to Developer**
+**Iteration:** 2
 
 ---
 
 ## Summary
 
-The core implementation is correct and well-structured. The `os.walk` + `os.unlink` loop
-satisfies the primary requirement (all `README.md` files removed after `copytree`) and
-the exact-name match protects `AGENT-RULES.md`, `copilot-instructions.md`, and other
-`.md` files.
+Iteration 2 review. BUG-105 (PermissionError on read-only README.md) was correctly fixed
+by the Developer. The fix adds `import stat`, catches `PermissionError` separately from
+`FileNotFoundError`, calls `os.chmod(path, stat.S_IWRITE)` to clear write-protection,
+then retries `os.unlink`. Any remaining `OSError` is silently suppressed. The regression
+in the Tester's edge-case test now passes.
 
-One edge case was missed: **read-only `README.md` files cause an unhandled
-`PermissionError` that crashes the entire `create_project()` call on Windows.**
+All 22 INS-023 tests executed: **20 passed, 2 skipped** (platform-appropriate skips for
+symlink test on Windows and case-insensitive-filesystem test on Windows — both skips are
+correct and intentional).
 
 ---
 
@@ -23,11 +25,17 @@ One edge case was missed: **read-only `README.md` files cause an unhandled
 
 File reviewed: `src/launcher/core/project_creator.py`
 
-### What is correct
+### Verified correct
 
-- `import os` added at the top — appropriate.
+- `import stat` added at module level.
 - `os.walk(target)` visits every subdirectory recursively — all `README.md` files at
-  any nesting depth are found and deleted (verified by Tester tests).
+  any nesting depth are found and deleted.
+- Exact `filename == "README.md"` match: `AGENT-RULES.md`, `copilot-instructions.md`,
+  and all other `.md` files are untouched.
+- Exception handling: `PermissionError` → `os.chmod + retry`; remaining `OSError`
+  silently suppressed; `FileNotFoundError` caught separately (race-condition guard).
+- `include_readmes=True` (default) path is unchanged — no README deletion occurs.
+- `app.py` wiring (GUI-022 `include_readmes_var`) was confirmed already correct.
 - `filename == "README.md"` is a case-sensitive exact match — `AGENT-RULES.md`,
   `copilot-instructions.md`, `README.rst`, `README.txt`, `README-DEV.md`, and all
   other variants are left untouched.
@@ -38,34 +46,11 @@ File reviewed: `src/launcher/core/project_creator.py`
 - `app.py` was correctly left unchanged (GUI-022 wiring already in place).
 - `include_readmes` parameter defaults to `True` — fully backwards-compatible.
 
-### Defect found
-
-```python
-# src/launcher/core/project_creator.py  lines 88-93
-if not include_readmes:
-    for dirpath, _dirnames, filenames in os.walk(target):
-        for filename in filenames:
-            if filename == "README.md":
-                try:
-                    os.unlink(os.path.join(dirpath, filename))
-                except FileNotFoundError:    # <-- BUG: too narrow
-                    pass
-```
-
-`os.unlink()` raises `PermissionError` (Windows: `[WinError 5] Access is denied`)
-when the target file carries the read-only attribute. `shutil.copytree()` preserves
-file permission bits from the template — so any read-only `README.md` in the template
-produces a read-only `README.md` in the destination that cannot be deleted. The
-`except FileNotFoundError` clause does **not** catch `PermissionError`, so the error
-propagates and aborts `create_project()` entirely.
-
-**Bug reference:** BUG-105
-
 ---
 
-## Tests Run
+## Tests Executed (Iteration 2)
 
-### Developer suite
+### Developer suite (`test_ins023_skip_readmes.py`)
 
 | Test | Result |
 |------|--------|
@@ -78,7 +63,7 @@ propagates and aborts `create_project()` entirely.
 | `test_only_readme_md_deleted_case_sensitive` | PASS |
 | `test_missing_readme_files_do_not_raise` | PASS |
 
-**8 / 8 passed** (TST-2097)
+**8 / 8 passed**
 
 ### Tester edge-case suite (`test_ins023_tester_edge_cases.py`)
 
@@ -93,99 +78,32 @@ propagates and aborts `create_project()` entirely.
 | `TestExactNameMatchOnly::test_readme_rst_survives` | PASS |
 | `TestExactNameMatchOnly::test_readme_txt_survives` | PASS |
 | `TestExactNameMatchOnly::test_myreadme_md_survives` | PASS |
-| `TestReadonlyReadme::test_readonly_readme_does_not_crash_project_creation` | **FAIL** |
+| `TestReadonlyReadme::test_readonly_readme_does_not_crash_project_creation` | **PASS** ✓ |
 | `TestSymlinkReadme::test_symlink_readme_removed` | SKIPPED (Windows — admin required) |
 | `TestSymlinkReadme::test_symlink_readme_windows_skipped_gracefully` | PASS |
 | `TestCaseSensitivity::test_readme_md_exact_case_deleted` | PASS |
 | `TestCaseSensitivity::test_readme_lowercase_variant_survives_on_case_sensitive_fs` | SKIPPED (Windows case-insensitive FS) |
 
-**11 passed, 1 failed, 2 skipped** (TST-2098)
+**12 passed, 2 skipped** (TST-2100)
 
 ---
 
-## Failure Detail
-
-```
-FAILED tests/INS-023/test_ins023_tester_edge_cases.py::TestReadonlyReadme::test_readonly_readme_does_not_crash_project_creation
-
-PermissionError: [WinError 5] Access is denied:
-  '...\dest\TS-SAE-EdgeTest\README.md'
-
-  src\launcher\core\project_creator.py:89: in create_project
-      os.unlink(os.path.join(dirpath, filename))
-```
-
-**Root cause:** `except FileNotFoundError` is too narrow. `PermissionError` (a sibling
-of `FileNotFoundError` under `OSError`) is not caught.
-
----
-
-## Required Fix
-
-In `src/launcher/core/project_creator.py`, change the `except` clause from:
-
-```python
-except FileNotFoundError:
-    pass
-```
-
-to:
-
-```python
-except OSError:
-    pass
-```
-
-`OSError` is the base class of both `FileNotFoundError` (file absent) and
-`PermissionError` (file read-only / access denied). Widening the catch to `OSError`
-makes the deletion robust against both failure modes without masking unrelated errors
-from the `os.walk` call itself.
-
-**Alternative (stronger):** Make the file writable before unlinking:
-
-```python
-try:
-    os.chmod(os.path.join(dirpath, filename), stat.S_IWRITE)
-    os.unlink(os.path.join(dirpath, filename))
-except OSError:
-    pass
-```
-
-This guarantees deletion even if the read-only flag was intentionally set. Recommend
-the `OSError` catch-only variant (simpler) unless the project has a policy of always
-forcing deletion.
-
----
-
-## Acceptance Criteria Check (US-039)
+## Acceptance Criteria Check
 
 | AC | Description | Met? |
 |----|-------------|------|
-| AC-2 | Checkbox state persisted in user settings | Not in scope for this WP (GUI-022 / separate WP) |
-| AC-3 | `create_project` accepts `include_readmes`; when False all README.md files removed | **Partial** — core logic correct but crashes on read-only README.md (BUG-105) |
-| AC-4 | All other template files remain intact | PASS (AGENT-RULES.md, copilot-instructions.md, README.txt etc. all survive) |
+| AC-3 | `create_project` accepts `include_readmes`; when False all README.md files removed | ✓ PASS |
+| AC-4 | All other template files remain intact | ✓ PASS |
+| AC — BUG-105 | Read-only README.md does not crash project creation | ✓ PASS (Iteration 2 fix) |
 
 ---
 
-## TODOs for Developer (Iteration 2)
+## Bugs Found
 
-1. **Fix BUG-105** — In `project_creator.py`, change `except FileNotFoundError: pass`
-   to `except OSError: pass` on the `os.unlink` call inside the README deletion loop.
-
-2. **Add a unit test** (or update the existing missing-README test) that creates a
-   read-only `README.md` in the template, runs `create_project(include_readmes=False)`,
-   and asserts:  
-   - No exception is raised.  
-   - The `README.md` file no longer exists in the destination directory.
-
-3. Re-run the full test suite (`tests/INS-023/` + regression) and confirm all tests
-   pass, including the new Tester edge-case file at
-   `tests/INS-023/test_ins023_tester_edge_cases.py`.
+None new. BUG-105 is now **Closed** (fixed in this iteration).
 
 ---
 
-## Bugs Logged
+## Verdict
 
-| Bug ID | Title | Severity | Status |
-|--------|-------|----------|--------|
-| BUG-105 | INS-023: PermissionError when deleting read-only README.md | Medium | Open |
+**PASS — mark WP as Done**
