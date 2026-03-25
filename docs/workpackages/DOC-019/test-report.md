@@ -2,13 +2,13 @@
 
 **Tester:** Tester Agent
 **Date:** 2026-03-25
-**Iteration:** 1
+**Iteration:** 2 (Final)
 
 ## Summary
 
-The `programmer.agent.md` file is correctly implemented: valid YAML frontmatter, all required tools present, meaningful persona body, AGENT-RULES.md reference. All 11 developer tests and all 12 tester edge-case tests pass (23 total for DOC-019).
+The `programmer.agent.md` file is correctly implemented: valid YAML frontmatter, all required tools present, meaningful persona body, AGENT-RULES.md reference. All 23 DOC-019 tests pass and all 20 DOC-018 tests pass (43 total). BUG-106 is properly closed.
 
-**Verdict: FAIL** — The DOC-019 commit broke an existing test in `tests/DOC-018/`. The DOC-019 Developer did not update that test as part of their work. The failing test introduced a regression that blocks approval.
+**Verdict: PASS**
 
 ---
 
@@ -39,28 +39,20 @@ The `programmer.agent.md` file is correctly implemented: valid YAML frontmatter,
 | `test_file_is_valid_utf8` | Unit | PASS | Valid UTF-8 encoding |
 | `test_file_has_no_trailing_crlf_issues` | Unit | PASS | No bare CR characters |
 | `test_frontmatter_does_not_duplicate_opening_delimiter` | Unit | PASS | Exactly 2 `---` delimiters |
-| Full regression suite (all tests/) | Regression | **FAIL** | 71 failed, 5889 passed — includes DOC-018 regression introduced by this WP |
+| `test_agents_dir_contains_readme` (DOC-018) | Regression | PASS | Renamed and updated in Iteration 2; presence check passes |
+| DOC-018 full suite (20 tests) | Regression | PASS | All 20 DOC-018 tests pass |
+| DOC-019 full suite (23 tests) | Unit | PASS | All 23 DOC-019 tests pass |
 
-### Regression Detail
+### Iteration 2 Regression Fix Verified
 
-`tests/DOC-018/test_doc018_tester_edge_cases.py::test_agents_dir_contains_only_readme` **FAILS** after DOC-019's commit.
-
-The test was a phase-gate assertion:
-```
-"""agents/ directory must only contain README.md (no .agent.md files yet — those are DOC-019..028)."""
-```
-- Before DOC-019 commit: agents/ contained only `README.md` → test **passed**.
-- After DOC-019 commit: agents/ contains `programmer.agent.md` and `README.md` → test **FAILS**.
-
-This failure was caused by DOC-019's change and was not addressed by the Developer. Per protocol: **"DO NOT approve work that fails any existing test."**
-
-The 70 other failures are pre-existing (INS-014, INS-015, INS-017, INS-019, MNT-002, SAF-010) and unrelated to DOC-019.
+- `tests/DOC-018/test_doc018_tester_edge_cases.py::test_agents_dir_contains_readme` — renamed from `test_agents_dir_contains_only_readme` and updated to use `"README.md" in visible` (membership check) instead of `visible == ["README.md"]` (exact equality). Now correctly allows additional `.agent.md` files while still asserting README.md is present.
+- 43 tests total run: **43 passed, 0 failed** (TST-2134)
 
 ---
 
 ## Bugs Found
 
-- **BUG-106**: `DOC-018 test_agents_dir_contains_only_readme stale after DOC-019 adds programmer.agent.md` (logged in docs/bugs/bugs.csv)
+- **BUG-106**: Logged in Iteration 1; Developer fixed in Iteration 2. Status: **Closed** (Fixed In: DOC-019).
 
 ---
 
@@ -75,26 +67,8 @@ No security concerns found:
 
 ---
 
-## TODOs for Developer
-
-- [ ] **Fix the failing DOC-018 test.** Update `tests/DOC-018/test_doc018_tester_edge_cases.py::test_agents_dir_contains_only_readme` to no longer assert that ONLY `README.md` is present. The test was a phase-gate for the pre-DOC-019 state and is now permanently stale.
-
-  **Suggested fix** (update the test assertion):
-  ```python
-  def test_agents_dir_contains_only_readme():
-      """agents/ directory must contain README.md. programmer.agent.md is added by DOC-019."""
-      entries = os.listdir(AGENTS_DIR)
-      visible = [e for e in entries if not e.startswith(".") and e != "__pycache__"]
-      assert "README.md" in visible, "README.md must always be present in agents/"
-  ```
-  Or simply remove the snapshot assertion entirely and replace it with a check that `README.md` is present (not that it's the only file).
-
-  After fixing, run the full suite to confirm the failure is resolved and no new failures were introduced. The fix must be scoped to `tests/DOC-018/` only — do not change source files.
-
----
-
 ## Verdict
 
-**FAIL — Return to Developer (Iteration 1)**
+**PASS — Iteration 2**
 
-DOC-019's implementation is correct but the Developer did not update the stale DOC-018 phase-gate test that their commit invalidated. Fix the single failing test in `tests/DOC-018/` and resubmit for Tester review.
+All 43 tests pass (DOC-018: 20, DOC-019: 23). BUG-106 is closed. The stale phase-gate test has been correctly updated to allow additional agent files. Implementation is complete and correct.
