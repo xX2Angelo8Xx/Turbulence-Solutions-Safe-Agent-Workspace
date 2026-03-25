@@ -85,7 +85,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "59829259316042c0e7e63efa7d69a55a00030eca077ddacc932f99a4cf5822b0"
+_KNOWN_GOOD_GATE_HASH: str = "7bbb635bbca224ac82bfdd7a894ee44477e2c00f637d20ee71239b0298e28354"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2807,6 +2807,14 @@ def decide(data: dict, ws_root: str) -> str:
         # SAF-032: Block file tools from accessing .git internals even when the
         # path is inside the project folder (allow zone).  Covers read_file,
         # list_dir, edit_notebook_file, and any other exempt tool.
+        if zone_classifier.is_git_internals(raw_path):
+            return "deny"
+        return "allow"
+    # SAF-046: Allow read-only access to the workspace root itself and its
+    # direct non-denied children (e.g. pyproject.toml, README.md) per
+    # AGENT-RULES §1 and §3.  Write tools use validate_write_tool() which
+    # only allows the project folder, so workspace root remains write-denied.
+    if zone_classifier.is_workspace_root_readable(raw_path, ws_root):
         if zone_classifier.is_git_internals(raw_path):
             return "deny"
         return "allow"

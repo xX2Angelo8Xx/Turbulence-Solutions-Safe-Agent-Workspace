@@ -149,6 +149,56 @@ def is_git_internals(path: str) -> bool:
     return "/.git/" in norm or norm.endswith("/.git")
 
 
+def is_workspace_root_readable(raw_path: str, ws_root: str) -> bool:
+    """Return True if *raw_path* is the workspace root or a direct non-denied child.
+
+    SAF-046: AGENT-RULES §1 and §3 allow agents to read top-level config files
+    (e.g. pyproject.toml, README.md) and to list the workspace root directory.
+    This predicate is used by security_gate.py for READ-ONLY exempt tools only —
+    write tools continue to use classify() which restricts writes to the project
+    folder.
+
+    Rules:
+    - The workspace root itself (``norm == ws_clean``) → True  (supports list_dir)
+    - A direct child of the workspace root whose name is NOT in ``_DENY_DIRS`` → True
+    - Anything deeper than one level, or inside a denied zone → False
+
+    Parameters
+    ----------
+    raw_path : str
+        Path from the VS Code hook payload.
+    ws_root : str
+        Workspace root in normalized form (forward slashes, lowercase).
+
+    Returns
+    -------
+    bool
+    """
+    norm = normalize_path(raw_path)
+
+    # Resolve relative paths the same way classify() does.
+    if not re.match(r"^[a-z]:", norm) and not norm.startswith("/"):
+        norm = posixpath.normpath(ws_root.rstrip("/") + "/" + norm)
+
+    ws_clean = ws_root.rstrip("/")
+
+    # Workspace root itself — supports list_dir on root.
+    if norm == ws_clean:
+        return True
+
+    # Direct child — supports read_file on root-level files/directories.
+    path = PurePosixPath(norm)
+    root = PurePosixPath(ws_clean)
+    try:
+        rel = path.relative_to(root)
+        if len(rel.parts) == 1 and rel.parts[0] not in _DENY_DIRS:
+            return True
+    except ValueError:
+        pass
+
+    return False
+
+
 def classify(raw_path: str, ws_root: str) -> ZoneDecision:
     """Classify *raw_path* against the 2-tier zone system.
 

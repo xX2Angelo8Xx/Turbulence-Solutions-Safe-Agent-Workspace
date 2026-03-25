@@ -117,30 +117,30 @@ def test_decide_path_traversal_to_vscode_returns_deny(sg):
 
 
 # ---------------------------------------------------------------------------
-# 3. Root-level workspace files (no subfolder) must be denied
+# 3. Root-level workspace files — SAF-046: now allowed for read tools
 # ---------------------------------------------------------------------------
 
 def test_decide_root_level_file_returns_deny(sg):
-    """A file directly in workspace root (no subfolder) must return deny."""
+    """SAF-046: read_file on a direct workspace-root file must now return allow."""
     data = {
         "tool_name": "read_file",
         "tool_input": {"filePath": f"{WS}/README.md"},
     }
     result = sg.decide(data, WS)
-    assert result == "deny", (
-        f"decide() returned {result!r} for root-level file — expected 'deny'"
+    assert result == "allow", (
+        f"decide() returned {result!r} for root-level file — expected 'allow' (SAF-046)"
     )
 
 
 def test_decide_workspace_root_itself_returns_deny(sg):
-    """Targeting the workspace root itself must return deny."""
+    """SAF-046: list_dir on the workspace root itself must now return allow."""
     data = {
         "tool_name": "list_dir",
         "tool_input": {"path": WS},
     }
     result = sg.decide(data, WS)
-    assert result == "deny", (
-        f"decide() returned {result!r} for workspace root path — expected 'deny'"
+    assert result == "allow", (
+        f"decide() returned {result!r} for workspace root path — expected 'allow' (SAF-046)"
     )
 
 
