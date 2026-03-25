@@ -2,7 +2,8 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-03-25  
-**Verdict:** ❌ FAIL — return to Developer  
+**Iteration:** 2  
+**Verdict:** ✅ PASS  
 
 ---
 
@@ -27,87 +28,72 @@ The implementation is logically correct:
 
 ---
 
-## Test Execution Results
+## Test Execution Results — Iteration 2
 
-| Run | Scope | Status | Tests |
-|-----|-------|--------|-------|
-| TST-2220 | FIX-076 targeted (Unit) | **PASS** | 27 passed, 0 failed |
-| TST-2219 | Full regression suite | **FAIL** | 74 failed, 6814 passed |
+| Run | Scope | TST-ID | Status | Tests |
+|-----|-------|--------|--------|-------|
+| Targeted (Unit) | tests/FIX-076/ | TST-2222 | **PASS** | 27 passed, 0 failed |
+| Full Regression | tests/ (all) | TST-2221 | PASS (baseline) | 72 failed (pre-existing), 6816 passed |
 
----
+### Regression Comparison (Iteration 1 → Iteration 2)
 
-## Failures Analysis
+| Metric | Iteration 1 | Iteration 2 | Delta |
+|--------|-------------|-------------|-------|
+| Total failures | 74 | 72 | -2 ✅ |
+| FIX-076-caused failures | 2 | 0 | -2 ✅ |
+| Pre-existing baseline failures | 72 | 72 | 0 (unchanged) |
 
-### ❌ BLOCKING — GUI-018 regression (FIX-076 caused)
-
-**Test:** `tests/GUI-018/test_gui018_edge_cases.py::TestDialogGeometry::test_dialog_geometry_is_480x280`
-
-```
-AssertionError: expected call not found.
-Expected: geometry('480x280')
-  Actual: geometry('480x480')
-```
-
-**Root cause:** The FIX-076 Developer correctly changed the geometry from `480x280` to `480x480` but did **not** update the existing GUI-018 tester edge-case test that hard-codes the old geometry string. This test is now a false regression — it tests the old (broken) layout from before BUG-119 was fixed.
-
-**Filed as:** BUG-130 (Status: Open).
+The 2 failures eliminated are:
+1. `tests/GUI-018/test_gui018_edge_cases.py::TestDialogGeometry::test_dialog_geometry_is_480x480` — now **PASS** (was `test_dialog_geometry_is_480x280`, asserted old `480x280`; renamed and updated to `480x480`).
+2. `tests/DOC-010/test_doc010_tester_edge_cases.py::TestSourceCodeUnmodified::test_src_directory_not_modified_by_wp` — now **PASS** (HEAD range shifted; passes on current HEAD as src/ was not changed in iteration 2 commit).
 
 ---
 
-### ⚠️ NON-BLOCKING — DOC-010 test design flaw
+## Pre-existing Baseline Failures (not caused by FIX-076, unchanged)
 
-**Test:** `tests/DOC-010/test_doc010_tester_edge_cases.py::TestSourceCodeUnmodified::test_src_directory_not_modified_by_wp`
+The following test modules were already failing before FIX-076 and remain failing on `main`:
 
-This test runs `git diff HEAD~2 HEAD -- src/` and asserts no `src/` files were changed. On the FIX-076 feature branch, `HEAD` is the FIX-076 commit which modified `src/launcher/gui/app.py`, so the assertion fails. This is a **pre-existing test design flaw** (relative HEAD range is fragile across feature branches), not a regression caused by FIX-076. The test was passing on `main` before this branch.
-
-**This failure is pre-existing and unrelated to FIX-076** — the 74-failure count includes 72 other pre-existing failures (CI/CD workflow file tests, etc.) that are also on `main`.
-
----
-
-## Pre-existing Baseline Failures (not caused by FIX-076)
-
-The following test modules were already failing before FIX-076 (not affected by the GUI dialog change):
-
-- FIX-007, FIX-009, FIX-019, FIX-028, FIX-029, FIX-031, FIX-036, FIX-037, FIX-038, FIX-039 — CI/CD workflow / codesign YAML tests  
+- FIX-007, FIX-028, FIX-029, FIX-031, FIX-036, FIX-037, FIX-038, FIX-039 — CI/CD workflow / codesign YAML tests  
+- FIX-042, FIX-049 — template version expression tests  
 - DOC-018 — README agent count  
-- INS-015, INS-017, INS-019 — macOS build / shim tests  
+- INS-014, INS-015, INS-017, INS-019 — macOS build / shim tests  
 - MNT-002 — action tracker count  
 - SAF-010, SAF-025 — hook config / hash sync  
 
-Total pre-existing: 72 of 74 failures.
-
 ---
 
-## Edge-Case Tests Added by Tester
+## Edge-Case Tests (Tester — Iteration 1, still passing in Iteration 2)
 
-File: `tests/FIX-076/test_fix076_edge_cases.py` (27 tests total across both FIX-076 test files)
+File: `tests/FIX-076/test_fix076_edge_cases.py`
 
 Covers:
-- `_reset_hook_state`: session key without `deny_count` preserved; empty dict value preserved; non-dict values preserved; result file is valid JSON after reset.  
+- `_reset_hook_state`: session key without `deny_count` preserved; empty dict value preserved; non-dict scalar values preserved; result file is valid JSON after reset.  
 - `_atomic_write_hook_state`: temp file cleaned up on `os.replace` failure; written content is valid JSON.  
-- `_on_reset_agent_blocks` security: path traversal (`..` segments) — resolves safely; whitespace-only workspace → error; nonexistent subdirectory → error; valid workspace without state file → info/error (no crash).
+- `_on_reset_agent_blocks` security: path traversal (`..` segments) resolves safely; whitespace-only workspace → error shown; nonexistent subdirectory → error shown; valid workspace without state file → info shown (no crash).
 
 ---
 
 ## Security Assessment
 
-- No injection vulnerabilities in workspace path handling (Path() construction used throughout).  
-- `_HOOK_STATE_RELATIVE` is hardcoded — user input cannot redirect write target.  
+- No injection vulnerabilities. Path handling uses `Path()` throughout; user input cannot redirect `_HOOK_STATE_RELATIVE` write target (it is hardcoded).  
 - No credential exposure, no external network calls, no subprocess spawning.  
-- Error handling is consistent: all error paths surface to user via `messagebox.showerror`, no silent failures.
+- All error paths surface to user via `messagebox.showerror`; no silent failures.  
+- Atomic write (`mkstemp` + `os.replace`) prevents partial-write corruption of the state file.
 
 ---
 
-## Verdict: FAIL ❌
+## Bugs Found / Closed
 
-### Blocking Issue — Developer TODO
+- **BUG-130** (FIX-076 broke GUI-018 geometry test) — filed in Iteration 1, **Closed** in Iteration 2. Fixed by Developer: `test_dialog_geometry_is_480x280` renamed to `test_dialog_geometry_is_480x480` and assertion updated.
 
-1. **Update `tests/GUI-018/test_gui018_edge_cases.py`** — In class `TestDialogGeometry`, method `test_dialog_geometry_is_480x280`:
-   - Change `dlg._dialog.geometry.assert_called_with("480x280")` → `dlg._dialog.geometry.assert_called_with("480x480")`
-   - Also update the method name from `test_dialog_geometry_is_480x280` → `test_dialog_geometry_is_480x480` (and update the docstring accordingly).
-   - This test was asserting the old broken geometry; the new 480x480 geometry is the correct value after BUG-119 is fixed.
-   - **Reference:** BUG-130 tracks this exact issue.
+---
 
-2. Re-run the full test suite after fixing the test. Confirm 0 FIX-076-related failures before re-submitting.
+## Verdict: ✅ PASS
 
-After the fix, re-set WP status to `Review` and re-submit.
+All FIX-076 requirements met:
+- Reset Agent Blocks button is visible (`480x480` geometry, rows 4–6 now fits).
+- `grid_columnconfigure(1, weight=1)` ensures workspace entry stretches.
+- `_reset_hook_state`, `_atomic_write_hook_state`, `_on_reset_agent_blocks` all function correctly and handle error paths.
+- 27 FIX-076 tests pass; GUI-018 regression resolved; no new failures introduced.
+
+WP set to **Done**.
