@@ -40,6 +40,7 @@ Templates (bundled inside Launcher)
 │   │   ├── User-Bug-Reports/
 │   │   │   ├── 2026-03-20-workspace-review.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.1.md
+│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.2.md
 │   │   │   ├── AgentExperienceReport_v3.1.2.md
 │   │   │   └── BUG_REPORT-MacOS-2.0.0.md
 │   │   └── bugs.csv
@@ -413,6 +414,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-076/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-077/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -896,6 +900,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-074/
 │   ├── FIX-075/
 │   ├── FIX-076/
+│   ├── FIX-077/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
