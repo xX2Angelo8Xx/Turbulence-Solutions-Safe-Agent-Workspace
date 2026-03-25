@@ -85,7 +85,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "7bbb635bbca224ac82bfdd7a894ee44477e2c00f637d20ee71239b0298e28354"
+_KNOWN_GOOD_GATE_HASH: str = "8c604d3e8e9997e010fd90d928a2dd70f551f5d0ef9beea8bde0af0e97172546"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -549,6 +549,21 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         path_args_restricted=False,
         allow_arbitrary_paths=True,
         notes="Alias for Get-Command",
+    ),
+    # SAF-047: Get-Location prints CWD; no path args needed
+    "get-location": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=False,
+        allow_arbitrary_paths=True,
+        notes="PowerShell Get-Location; prints CWD",
+    ),
+    "gl": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=False,
+        allow_arbitrary_paths=True,
+        notes="Alias for Get-Location",
     ),
     "env": CommandRule(
         denied_flags=frozenset(),
@@ -1363,6 +1378,41 @@ def _check_path_arg(token: str, ws_root: str) -> bool:
     return zone != "deny"
 
 
+def _check_workspace_path_arg(token: str, ws_root: str) -> bool:
+    """Return True if *token* is a safe path for workspace-scoped terminal commands.
+
+    SAF-047: Terminal commands are workspace-scoped per AGENT-RULES §4.
+    Allows paths within the workspace root; denies paths outside or targeting
+    protected zones (.github, .vscode, noagentzone at any depth).
+    """
+    if "$" in token:
+        return False
+    # SAF-020: Wildcard bypass prevention (defense in depth)
+    if _wildcard_prefix_matches_deny_zone(token):
+        return False
+    if not _is_path_like(token):
+        return True  # not a path; no zone concern
+    norm = posixpath.normpath(token.replace("\\", "/"))
+    # SAF-030: Deny tilde — expands to home directory at shell runtime (outside workspace)
+    if norm == "~" or norm.startswith("~/") or re.match(r"^~[^/]", norm):
+        return False
+    ws_clean = ws_root.rstrip("/")
+    # Resolve relative paths against workspace root
+    if not (re.match(r"^[a-z]:", norm.lower()) or norm.startswith("/")):
+        norm = posixpath.normpath(ws_clean + "/" + norm)
+    norm_lower = norm.lower()
+    ws_lower = ws_clean.lower()
+    # Must be within workspace root (or be the workspace root itself)
+    if not (norm_lower.startswith(ws_lower + "/") or norm_lower == ws_lower):
+        return False
+    # Must not target protected zones at any depth in the path
+    rel = norm_lower[len(ws_lower):].strip("/")
+    for part in rel.split("/"):
+        if part in (".github", ".vscode", "noagentzone"):
+            return False
+    return True
+
+
 # FIX-022: Verb category safe for project-folder fallback (read/execute only).
 # Destructive commands (rm, del, remove-item, etc.) are intentionally excluded
 # to prevent `rm ./root_config.json` from being mis-classified as project-local.
@@ -1383,6 +1433,8 @@ _PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
     "copy-item", "cp", "copy", "mv", "move", "move-item",
     # SAF-041: shell utility commands — path args zone-checked
     "touch", "chmod", "ln",
+    # SAF-047: git commands are workspace-scoped per AGENT-RULES §4
+    "git",
 })
 
 # SAF-029: PowerShell delete cmdlets that receive project-folder fallback for
@@ -1404,6 +1456,10 @@ def _try_project_fallback(norm_relative: str, ws_root: str) -> bool:
     """
     # Only handle truly relative paths
     if re.match(r"^[a-z]:", norm_relative.lower()) or norm_relative.startswith("/"):
+        return False
+    # SAF-047: Reject URL-like tokens (e.g. https:/evil.com after posixpath.normpath
+    # strips the double slash from https://evil.com).  URLs are not filesystem paths.
+    if re.match(r"^[a-z][a-z0-9+\-.]*:/", norm_relative):
         return False
     parts = [p for p in norm_relative.split("/") if p and p not in (".", "..")]
     if not parts or parts[0] == "~":
@@ -1626,7 +1682,7 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                             # in the project-folder fallback without requiring a
                             # trailing slash.  We test norm_fb (not raw stripped) so
                             # that "./file.txt" (stripped starts with ".", but
-                            # norm_fb is "file.txt") is NOT included.  
+                            # norm_fb is "file.txt") is NOT included.
                             # _try_project_fallback already rejects deny-zone names
                             # (.github, .vscode, noagentzone).
                             # SAF-031: bare "." = project root; allowed for pip/python
@@ -1660,6 +1716,7 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                                     _prev_was_flag = False
                                     continue
                     return False
+
 
     # 6. Shell redirect zone check (BUG-013 / BUG-016).
     # Three redirect forms are handled:
@@ -1925,6 +1982,28 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                 pass
             elif re.match(r"^pip3\.\d+$", verb_lower):
                 verb_lower = "pip3"
+
+            # SAF-047: Normalize venv-path-prefixed Python/pip executables so that
+            # commands like `.venv/Scripts/python -m pytest tests/` are recognized
+            # as the standard "python" verb and validated against the allowlist.
+            # The venv directory itself is workspace-scope checked before normalizing.
+            _venv_exe_m = re.match(
+                r'^(?P<pfx>(?:[^/]*/)*\.?venv/(?:scripts?|bin)/)(?P<exe>python[0-9.]*|pip[0-9.]*)(?:\.exe)?$',
+                verb.replace("\\", "/"),
+                re.IGNORECASE,
+            )
+            if _venv_exe_m:
+                _venv_dir = _venv_exe_m.group("pfx").rstrip("/")
+                _exe_base = _venv_exe_m.group("exe").lower()
+                if re.match(r'^python3\.\d+$', _exe_base):
+                    _exe_base = "python3"
+                elif re.match(r'^pip3\.\d+$', _exe_base):
+                    _exe_base = "pip3"
+                _norm_venv = posixpath.normpath(_venv_dir.replace("\\", "/"))
+                if _check_workspace_path_arg(_norm_venv, ws_root) or _try_project_fallback(_norm_venv, ws_root):
+                    verb_lower = _exe_base
+                else:
+                    return ("deny", f"Venv executable outside allowed zone: {_DENY_REASON}")
 
             # FIX-022: venv activation scripts (.venv/Scripts/Activate.ps1 etc.)
             if verb_lower.endswith(("activate", "activate.bat", "activate.ps1")):
