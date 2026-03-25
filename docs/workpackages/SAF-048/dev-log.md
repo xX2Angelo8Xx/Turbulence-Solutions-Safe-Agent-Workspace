@@ -58,3 +58,36 @@ Detect virtual memory paths before calling `zone_classifier.classify()`:
 
 ## Test Results
 - All tests passed. Results logged via `scripts/add_test_result.py`.
+
+---
+
+## Iteration 2 — Security Fixes (2026-03-25)
+
+### Tester Findings (Iteration 1)
+Tester returned WP with 18 security failures across 4 categories:
+- **BUG-121 (High):** Path traversal READ bypass — `/memories/../../.github/secrets` bypasses virtual check
+- **BUG-122 (High):** `session/../` WRITE bypass — `/memories/session/../preferences.md` escapes session boundary
+- **BUG-123 (Medium):** Null bytes and Unicode control/format characters (RLO U+202E, BOM U+FEFF) passed through unchecked
+- **BUG-124 (Low):** No `.lower()` — `/MEMORIES/session/` denied instead of allowed
+
+### Root Cause
+`norm_virtual = raw_path.replace("\\", "/")` normalised backslashes but did not resolve `..` segments, reject bad characters, or lowercase the path before the `/memories/` prefix check.
+
+### Fixes Applied
+In `validate_memory()` in `templates/agent-workbench/.github/hooks/scripts/security_gate.py`:
+
+1. **BUG-123:** Added character validation immediately after backslash normalization — rejects paths containing null bytes (`\x00`) or any Unicode character in category `Cc` (control) or `Cf` (format), using `unicodedata.category()`. Added `import unicodedata` to module imports.
+
+2. **BUG-121 / BUG-122:** Applied `posixpath.normpath()` after bad-character check to resolve all `..` and `.` segments before the `/memories/` prefix check. This collapses `/memories/../../.github` to `/.github` (not a memory path → zone classifier → deny) and `/memories/session/../preferences.md` to `/memories/preferences.md` (not a session path → write denied).
+
+3. **BUG-124:** Applied `.lower()` to `norm_virtual` after `normpath()` so `/MEMORIES/session/` and `/Memories/Session/` are recognized as virtual memory paths identical to `/memories/session/`.
+
+4. Re-ran `update_hashes.py` to update `_KNOWN_GOOD_GATE_HASH`.
+
+### Files Changed
+- `templates/agent-workbench/.github/hooks/scripts/security_gate.py` — fixed `validate_memory()`; added `import unicodedata`
+- `docs/bugs/bugs.csv` — BUG-121, BUG-122, BUG-123, BUG-124 marked Closed with Fixed In WP = SAF-048
+
+### Tests
+- All 57 SAF-048 tests pass (33 developer + 24 tester edge-case tests including the 18 previously failing)
+- Results logged as TST-2188

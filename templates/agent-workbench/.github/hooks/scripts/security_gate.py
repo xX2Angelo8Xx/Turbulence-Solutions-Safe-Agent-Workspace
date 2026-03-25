@@ -7,6 +7,7 @@ import json
 import os
 import posixpath
 import re
+import unicodedata
 import shlex
 import sys
 import tempfile
@@ -84,7 +85,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "299aa4a5ebb9a00e33b437f4d6656237d53ae7684c416231f783db8aaf5d2535"
+_KNOWN_GOOD_GATE_HASH: str = "59829259316042c0e7e63efa7d69a55a00030eca077ddacc932f99a4cf5822b0"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2454,6 +2455,24 @@ def validate_memory(data: dict, ws_root: str) -> str:
     # SAF-048: Virtual VS Code memory paths are not filesystem paths and cannot
     # escape to denied zones — handle them before calling zone_classifier.
     norm_virtual = raw_path.replace("\\", "/")
+
+    # BUG-123: Reject null bytes and Unicode control/format characters before
+    # any further processing — they are never legitimate in memory paths.
+    _FORBIDDEN_CATS = {"Cc", "Cf"}
+    if "\x00" in norm_virtual or any(
+        unicodedata.category(ch) in _FORBIDDEN_CATS for ch in norm_virtual
+    ):
+        return "deny"
+
+    # BUG-121 / BUG-122: Resolve dot-dot segments so traversal paths like
+    # /memories/../../.github and /memories/session/../preferences.md can no
+    # longer bypass the virtual-path check or the write-protection boundary.
+    norm_virtual = posixpath.normpath(norm_virtual)
+
+    # BUG-124: Case-normalize so /MEMORIES/session/ is treated identically to
+    # /memories/session/.
+    norm_virtual = norm_virtual.lower()
+
     if norm_virtual == "/memories" or norm_virtual.startswith("/memories/"):
         command = str(tool_input.get("command") or "").lower()
         _WRITE_OPS = ("save", "write", "create", "update", "delete")
