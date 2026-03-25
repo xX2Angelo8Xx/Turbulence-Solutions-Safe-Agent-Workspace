@@ -96,13 +96,14 @@ def test_is_truthy_flag_none():
 # ===========================================================================
 
 def test_validate_include_pattern_safe_wildcard_glob():
-    # TST-278 — broad wildcard glob in 2-tier model: classifies as deny (not in project folder)
-    assert sg._validate_include_pattern("**/*.py", WS) == "deny"
+    # TST-278 — SAF-050: broad wildcard glob is a general pattern — must be allowed
+    # (read_file allows all workspace content not in a deny zone; grep_search must match)
+    assert sg._validate_include_pattern("**/*.py", WS) == "allow"
 
 
 def test_validate_include_pattern_src_subdir():
-    # TST-279 — src/ glob in 2-tier model: classifies as deny (src is not project folder)
-    assert sg._validate_include_pattern("src/**", WS) == "deny"
+    # TST-279 — SAF-050: src/ is not a deny zone — relative non-deny-zone path must be allowed
+    assert sg._validate_include_pattern("src/**", WS) == "allow"
 
 
 def test_validate_include_pattern_github():
@@ -394,14 +395,15 @@ def test_decide_grep_search_clean_params_project_path_allowed():
 
 
 def test_decide_grep_search_clean_params_no_path_asks():
-    # TST-310 — full decide() pipeline: grep_search with safe params, no path → deny
+    # TST-310 — SAF-050: grep_search with general glob includePattern → allow
+    # (general globs like **/*.py don't target any deny zone)
     data = {
         "tool_name": "grep_search",
         "query": "import os",
         "includePattern": "**/*.py",
     }
     result = sg.decide(data, WS)
-    assert result == "deny"
+    assert result == "allow"
 
 
 def test_decide_semantic_search_always_ask():
@@ -463,9 +465,10 @@ def test_brace_expansion_partial_deny():
 
 
 def test_brace_expansion_safe_pattern():
-    # TST-317 — in 2-tier model, {src,tests}/**/*.py expands to non-project zones → deny
+    # TST-317 — SAF-050: {src,tests}/**/*.py expands to src/**/*.py and tests/**/*.py;
+    # neither contains a deny zone component → allow
     data = {"tool_name": "grep_search", "includePattern": "{src,tests}/**/*.py"}
-    assert sg.decide(data, WS) == "deny"
+    assert sg.decide(data, WS) == "allow"
 
 
 def test_brace_expansion_nested_deny():
@@ -498,12 +501,12 @@ def test_brace_expansion_deeply_nested_deny():
 
 def test_brace_expansion_empty_brace_group_no_crash():
     # TST-341 — empty brace group {}/** — [^{}]+ requires ≥1 char so {} is NOT
-    # expanded; classify treats {}/** as non-project path → deny in 2-tier model.
+    # expanded; the pattern {}/** contains no deny zone component (SAF-050) → allow.
     # Must not cause a crash.
     data = {"tool_name": "grep_search", "includePattern": "{}/**"}
     result = sg.decide(data, WS)
-    assert result == "deny", (
-        f"Empty brace group {{}}/** produces a non-project path, expected deny; got {result!r}"
+    assert result == "allow", (
+        f"Empty brace group {{}}/** contains no deny zone component, expected allow; got {result!r}"
     )
 
 
@@ -514,12 +517,12 @@ def test_brace_expansion_single_element_deny():
 
 
 def test_brace_expansion_all_safe_items_not_denied():
-    # TST-343 — in 2-tier model, {src,tests,Project}/**/*.py: src and tests expand
-    # to non-project paths which are classified as deny. The first deny short-circuits.
+    # TST-343 — SAF-050: {src,tests,Project}/**/*.py expands to paths with no deny
+    # zone components; all expansions are general patterns → allow.
     data = {"tool_name": "grep_search", "includePattern": "{src,tests,Project}/**/*.py"}
     result = sg.decide(data, WS)
-    assert result == "deny", (
-        f"In 2-tier model non-project zone expansions are denied; got {result!r}"
+    assert result == "allow", (
+        f"Brace expansion with no deny zone components should be allowed (SAF-050); got {result!r}"
     )
 
 

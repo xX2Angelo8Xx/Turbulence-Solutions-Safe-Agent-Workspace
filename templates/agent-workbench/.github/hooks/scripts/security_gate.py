@@ -85,7 +85,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "8c604d3e8e9997e010fd90d928a2dd70f551f5d0ef9beea8bde0af0e97172546"
+_KNOWN_GOOD_GATE_HASH: str = "c453763711aff3617a03df7ab6391b10c9109337536427470b071c10c4462c09"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2111,11 +2111,63 @@ def _expand_braces(pattern: str) -> list[str]:
     return results
 
 
+def _include_pattern_targets_deny_zone(norm_pattern: str, ws_root: str) -> bool:
+    """SAF-050: Return True if *norm_pattern* explicitly targets a deny zone.
+
+    Replaces the broad ``zone_classifier.classify()`` check that was used in
+    ``_validate_include_pattern``.  ``classify()`` returns ``"deny"`` for any
+    path outside the project folder, which incorrectly blocks legitimate general
+    glob patterns such as ``*.py`` or workspace-root files such as
+    ``pyproject.toml``.
+
+    Rules:
+    - **Relative patterns:** deny only if the **first** path component is a deny
+      zone name (``.github``, ``.vscode``, ``noagentzone``).  This blocks
+      workspace-root references (``.github/**``, ``.vscode/settings.json``)
+      while allowing patterns that start inside an allowed folder
+      (``project/.github/**``, ``src/.vscode/**``).  General globs (``*.py``,
+      ``**/*.ts``) and workspace-root file names (``pyproject.toml``) have no
+      deny zone as their first component, so they pass.
+    - **Absolute patterns:** use ``zone_classifier.classify()`` (project-folder
+      paths are allowed) then ``zone_classifier.is_workspace_root_readable()``
+      (workspace-root files are allowed per SAF-046).  Anything else is denied.
+    """
+    if not norm_pattern:
+        return False
+
+    # Absolute path — use zone_classifier + workspace-root readable fallback
+    if re.match(r"^[a-z]:", norm_pattern) or norm_pattern.startswith("/"):
+        zone = zone_classifier.classify(norm_pattern, ws_root)
+        if zone == "allow":
+            return False
+        # SAF-050: Allow workspace-root-readable paths consistent with SAF-046
+        if zone_classifier.is_workspace_root_readable(norm_pattern, ws_root):
+            return False
+        return True
+
+    # Relative pattern: deny if ANY component explicitly names a deny zone.
+    # This ensures .github/.vscode/noagentzone cannot be targeted at any depth
+    # (e.g. ".github/**", "**/.github/**", "src/.github/**").
+    # Wildcards like "*.py", "**", "*" are never equal to a deny zone name.
+    components = [c.lower() for c in norm_pattern.split("/")]
+    if any(c in _WILDCARD_DENY_ZONES for c in components):
+        return True
+    return False
+
+
 def _validate_include_pattern(pattern: str, ws_root: str) -> str:
     """Validate a grep_search ``includePattern`` glob value.
 
     Normalizes the pattern, checks for residual ``..`` traversal sequences,
-    and delegates zone membership to ``zone_classifier.classify()``.
+    and uses a targeted deny-zone check (``_include_pattern_targets_deny_zone``)
+    to block patterns that explicitly reference a restricted directory.
+
+    SAF-050: The previous implementation used ``zone_classifier.classify()``
+    which returns ``"deny"`` for any path outside the project folder.  This
+    over-restricted legitimate general globs (``*.py``) and workspace-root file
+    patterns (``pyproject.toml``) that ``read_file`` allows after SAF-046.
+    The new check only denies patterns whose first path component is a deny zone
+    name; VS Code ``search.exclude`` provides defence-in-depth for the rest.
 
     Returns ``"deny"`` if the pattern targets a deny zone or encodes a path
     traversal attempt.  Returns ``"allow"`` otherwise.
@@ -2134,12 +2186,12 @@ def _validate_include_pattern(pattern: str, ws_root: str) -> str:
         expanded_norm = zone_classifier.normalize_path(expanded)
         if ".." in expanded_norm:
             return "deny"
-        if zone_classifier.classify(expanded, ws_root) == "deny":
+        if _include_pattern_targets_deny_zone(expanded_norm, ws_root):
             return "deny"
 
-    # Delegate zone membership: covers both Method 1 (relative_to) and
-    # Method 2 (regex pattern scan) inside zone_classifier.
-    if zone_classifier.classify(pattern, ws_root) == "deny":
+    # Final check on the normalized original pattern (safety net for non-brace
+    # patterns and absolute-path inputs that resolve to a deny zone).
+    if _include_pattern_targets_deny_zone(normalized, ws_root):
         return "deny"
 
     return "allow"
@@ -2188,6 +2240,9 @@ def validate_grep_search(data: dict, ws_root: str) -> str:
         return "allow"
     zone = zone_classifier.classify(raw_path, ws_root)
     if zone == "allow":
+        return "allow"
+    # SAF-050: Allow workspace-root-readable paths per SAF-046 (consistent with read_file)
+    if zone_classifier.is_workspace_root_readable(raw_path, ws_root):
         return "allow"
     return "deny"
 
