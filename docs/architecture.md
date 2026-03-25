@@ -12,8 +12,8 @@ Installer (.exe / .dmg / .AppImage)
         └── Optionally opens VS Code with the new workspace
 
 Templates (bundled inside Launcher)
-  └── coding/          ← Coding workspace template (shipped to users)
-  └── creative-marketing/   ← Marketing/creative template
+  └── agent-workbench/   ← Agent Workbench template (shipped to users)
+  └── certification-pipeline/   ← Certification Pipeline template
 ```
 
 ## Repository Structure

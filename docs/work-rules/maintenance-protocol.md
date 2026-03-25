@@ -61,7 +61,7 @@ The following checks are executed in order. Each item produces a **Pass**, **War
 ### 9. Structural Integrity
 - Is `copilot-instructions.md` still under 40 lines with no detailed process rules?
 - Are all agent files in `.github/agents/` syntactically valid with required YAML frontmatter?
-- Is the `templates/coding/` template unmodified (no accidental test changes)?
+- Is the `templates/agent-workbench/` template unmodified (no accidental test changes)?
 - Are all scripts in `scripts/` syntactically valid and runnable?
 
 ### 10. Recurring Issue Tracking

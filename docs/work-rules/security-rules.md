@@ -26,7 +26,7 @@ This project has the highest security classification. Every decision — code, c
 
 ## Restricted Zones
 
-Within `templates/coding/`, the following directories are off-limits:
+Within `templates/agent-workbench/`, the following directories are off-limits:
 
 | Zone | Access | Reason |
 |------|--------|--------|

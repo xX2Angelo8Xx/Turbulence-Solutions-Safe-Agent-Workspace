@@ -78,8 +78,8 @@ Key workpackages: GUI-008, GUI-009, GUI-010, INS-009, INS-010, INS-011.
 
 | Template | Folder | Description |
 |----------|--------|-------------|
-| Coding | `templates/coding/` | Standard AI-assisted coding workspace with full safety gate |
-| Creative / Marketing | `templates/creative/` | Planned — future template for marketing and creative work |
+| Agent Workbench | `templates/agent-workbench/` | Standard AI-assisted coding workspace with full safety gate |
+| Certification Pipeline | `templates/certification-pipeline/` | Planned — future template for certification and pipeline work |
 
 ---
 
