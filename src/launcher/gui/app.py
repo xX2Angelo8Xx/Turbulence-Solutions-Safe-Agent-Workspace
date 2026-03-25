@@ -32,6 +32,11 @@ from launcher.gui.validation import (
 _WINDOW_WIDTH: int = 580
 _WINDOW_HEIGHT: int = 630
 
+# Label used for the disabled "coming soon" entry in the Project Type dropdown.
+# CTkOptionMenu has no native disabled-item support, so we guard selection in
+# _on_template_selected() and _on_create_project() (FIX-074).
+_COMING_SOON_LABEL: str = "Certification Pipeline — Coming Soon..."
+
 # Path within a workspace root where the hook state file lives.
 _HOOK_STATE_RELATIVE: str = ".github/hooks/scripts/.hook_state.json"
 
@@ -116,10 +121,12 @@ class App:
 
     def _get_template_options(self) -> list[str]:
         names = list_templates(TEMPLATES_DIR)
+        # Exclude certification-pipeline: it is represented by the static _COMING_SOON_LABEL
+        # entry in the dropdown and must never appear as a selectable option (FIX-074).
         return [
             _format_template_name(name)
             for name in names
-            if is_template_ready(TEMPLATES_DIR, name)
+            if is_template_ready(TEMPLATES_DIR, name) and name != "certification-pipeline"
         ]
 
     def _build_ui(self) -> None:
@@ -179,6 +186,11 @@ class App:
             fg_color=COLOR_SECONDARY,
             button_color=COLOR_SECONDARY,
             text_color=COLOR_TEXT,
+        )
+        # Append the disabled coming-soon entry after construction so that
+        # _get_template_options() stays clean (FIX-074).
+        self.project_type_dropdown.configure(
+            values=(options if options else [""]) + [_COMING_SOON_LABEL]
         )
         if self._current_template:
             self.project_type_dropdown.set(self._current_template)
@@ -387,6 +399,10 @@ class App:
             self.destination_entry.insert(0, folder)
 
     def _on_template_selected(self, value: str) -> None:
+        # Coming-soon entry is not selectable — revert to current valid template (FIX-074).
+        if value == _COMING_SOON_LABEL:
+            self.project_type_dropdown.set(self._current_template)
+            return
         self._current_template = value
 
     def _on_create_project(self) -> None:
@@ -394,6 +410,14 @@ class App:
         folder_name = self.project_name_entry.get().strip()
         display_template = self.project_type_dropdown.get()
         destination_str = self.destination_entry.get().strip()
+
+        # Guard: coming-soon entry must never trigger project creation (FIX-074).
+        if display_template == _COMING_SOON_LABEL:
+            messagebox.showinfo(
+                "Not Available",
+                "Certification Pipeline is not yet available. Stay tuned!",
+            )
+            return
 
         # Clear previous inline errors before re-validating.
         self.project_name_error_label.configure(text="")
