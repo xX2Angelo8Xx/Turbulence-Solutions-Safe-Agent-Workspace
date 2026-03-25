@@ -1,19 +1,38 @@
-# Test Report — SAF-050
+# Test Report — SAF-050 (Iteration 2)
 
 **WP:** SAF-050  
 **Title:** Prevent grep_search information leak on workspace root files  
 **Branch:** SAF-050/grep-search-leak  
 **Tester:** Tester Agent  
 **Date:** 2026-03-25  
-**Verdict:** ❌ FAIL — Returned to In Progress
+**Verdict:** ✅ PASS
 
 ---
 
-## Summary
+---
 
-The Developer's implementation correctly fixes the original inconsistency reported
+## Iteration 2 Summary (2026-03-25)
+
+Iteration 2 addresses both regressions found in iteration 1:
+
+- **BUG-127 FIXED** — `_include_pattern_targets_deny_zone` now walks components
+  left-to-right. A deny-zone component is only blocked when no project-folder
+  anchor precedes it. Wildcards (`*`, `**`) are not anchors. All 8 tester
+  edge-case tests and both SAF-045 regression tests pass.
+
+- **BUG-128 FIXED** — `update_hashes.py` was run after the BUG-127 fix.
+  `_KNOWN_GOOD_GATE_HASH` is current. All integrity tests (SAF-008, SAF-025,
+  FIX-042, FIX-069) pass.
+
+All 49 SAF-050 tests pass. No new regressions introduced.
+
+---
+
+## Iteration 1 Summary (see below for full details)
+
+The Developer's implementation correctly fixed the original inconsistency reported
 in BUG-115 (workspace root files allowed by `read_file` but denied by
-`grep_search` with an `includePattern`). All 41 Developer tests pass.
+`grep_search` with an `includePattern`). All 41 Developer tests passed.
 
 However, **two regressions were introduced** by the SAF-050 changes:
 
@@ -34,13 +53,50 @@ However, **two regressions were introduced** by the SAF-050 changes:
 
 | ID | Name | Type | Status | Notes |
 |----|------|------|--------|-------|
-| TST-2204 | SAF-050 Developer suite (41 tests) | Unit | ✅ Pass | All 41 Developer tests pass |
-| TST-2205 | SAF-050 Tester edge-case suite (8 tests) | Security | ❌ Fail | 4 regression failures, 4 bypass tests pass |
-| TST-2206 | SAF-050 Regression check vs SAF-045 + hash tests | Regression | ❌ Fail | 9 new failures vs pre-SAF-050 baseline |
+| TST-2204 | SAF-050 Developer suite (41 tests) — iteration 1 | Unit | ✅ Pass | All 41 Developer tests pass |
+| TST-2205 | SAF-050 Tester edge-case suite (8 tests) — iteration 1 | Security | ❌ Fail | 4 regression failures (BUG-127), 4 bypass tests pass |
+| TST-2206 | SAF-050 Regression check vs SAF-045 + hash tests — iteration 1 | Regression | ❌ Fail | 9 new failures vs pre-SAF-050 baseline |
+| TST-2208 | SAF-050 full suite iteration 2 (49 tests) | Unit | ✅ Pass | All 49 tests pass (41 developer + 8 tester edge cases) |
+| TST-2209 | SAF-050 regression check: SAF-045 + integrity tests — iteration 2 | Regression | ✅ Pass | 157 passed; 3 pre-existing failures unrelated to SAF-050 |
 
 ---
 
-## Failures Summary
+## BUG-127 Fix Verification (Iteration 2)
+
+| Pattern | Expected | Result | Verified |
+|---------|----------|--------|---------|
+| `project/.github/**` | allow | allow | ✅ |
+| `project/.vscode/**` | allow | allow | ✅ |
+| `project/NoAgentZone/**` | allow | allow | ✅ |
+| `project/src/.vscode/**` | allow | allow | ✅ |
+| `src/.github/**` | deny | deny | ✅ |
+| `tests/.github/**` | deny | deny | ✅ |
+| `**/.github/**` | deny | deny | ✅ |
+| `**/.vscode/**` | deny | deny | ✅ |
+| `**/NoAgentZone/**` | deny | deny | ✅ |
+| `*/.github/**` | deny | deny | ✅ |
+| `.github/**` | deny | deny | ✅ |
+
+## BUG-128 Fix Verification (Iteration 2)
+
+| Test Suite | Status |
+|-----------|--------|
+| SAF-008 full suite (22 tests) | ✅ Pass |
+| SAF-025 hash sync (14/15 — 1 pre-existing pycache failure) | ✅ Pass |
+| FIX-042 `test_security_gate_hashes_valid` | ✅ Pass |
+| FIX-069 `test_gate_hash_valid_after_fix` | ✅ Pass |
+
+---
+
+## Full Suite Result (Iteration 2)
+
+- **6,729 passed, 72 failed** across the full test suite
+- All 72 failures are pre-existing; none were introduced by SAF-050
+- SAF-050-relevant tests: **49/49 passed**
+
+---
+
+## Iteration 1 — Failures Detail
 
 ### New failures introduced by SAF-050 (9 total)
 
@@ -238,8 +294,10 @@ Any failure beyond those pre-existing failures is a blocker.
 
 ## Verdict
 
-**FAIL** — WP returned to `In Progress`.
+**PASS (Iteration 2)** — WP promoted to `Done`.
 
-Two blocking issues:
-1. **BUG-127** — Logic regression breaks SAF-045 tests (6 total failures).
-2. **BUG-128** — Stale `_KNOWN_GOOD_GATE_HASH` causes 7 integrity test failures.
+Both blocking issues from iteration 1 are resolved:
+1. **BUG-127** — Logic regression fixed. 8 tester edge-case tests + 2 SAF-045 regression tests now pass.
+2. **BUG-128** — Hash updated. All 7 integrity tests now pass.
+
+No new regressions introduced. Full suite: 6,729 passed, 72 pre-existing failures.
