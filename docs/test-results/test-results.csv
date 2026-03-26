@@ -2106,3 +2106,5 @@
 "TST-2225","FIX-077: version 3.2.2 unit tests (13 passed)","Unit","FIX-077","Pass","2026-03-26","Windows 11 + Python 3.11","13 passed, 0 failed","All version files verified: config.py, pyproject.toml, setup.iss, build_dmg.sh, build_appimage.sh. Edge cases: shared version utils, get_display_version fallback, check_for_update mock, parse_version, dev-log check"
 "TST-2226","FIX-077 + FIX-070: regression suite (21 passed)","Regression","FIX-077","Pass","2026-03-26","Windows 11 + Python 3.11","21 passed, 0 failed","FIX-077 tests (13) + FIX-070 tests (8) all pass after version bump to 3.2.2"
 "TST-2227","SAF-052 get_changed_files security gate tests","Unit","SAF-052","Pass","2026-03-26","Windows 11 + Python 3.11","12 passed, 0 failed","get_changed_files in _ALWAYS_ALLOW_TOOLS, decide returns allow, hash verification, regression guard"
+"TST-2228","SAF-052: full regression suite","Regression","SAF-052","Fail","2026-03-26","Windows 11 + Python 3.11","6841 passed, 32 skipped, 3 xfailed in 57.23s",""
+"TST-2229","SAF-052: targeted suite","Unit","SAF-052","Pass","2026-03-26","Windows 11 + Python 3.11","25 passed in 0.41s",""
