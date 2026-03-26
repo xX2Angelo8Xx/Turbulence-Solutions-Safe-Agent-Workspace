@@ -2109,3 +2109,6 @@
 "TST-2228","SAF-052: full regression suite","Regression","SAF-052","Fail","2026-03-26","Windows 11 + Python 3.11","6841 passed, 32 skipped, 3 xfailed in 57.23s",""
 "TST-2229","SAF-052: targeted suite","Unit","SAF-052","Pass","2026-03-26","Windows 11 + Python 3.11","25 passed in 0.41s",""
 "TST-2230","FIX-078 version bump 3.2.3 tests","Unit","FIX-078","Pass","2026-03-26","Windows 11 + Python 3.11","28 passed, 0 failed","7 new FIX-078 tests + 13 FIX-077 updated + 8 FIX-070 updated; all 5 version files verified at 3.2.3"
+"TST-2231","FIX-078 version bump 3.2.3 basic tests","Unit","FIX-078","Pass","2026-03-26","Windows 11 + Python 3.11","7 passed, 0 failed","Per-file assertions for all 5 canonical version files, stale version check, all-agree check"
+"TST-2232","FIX-078 version bump 3.2.3 edge case tests","Unit","FIX-078","Pass","2026-03-26","Windows 11 + Python 3.11","9 passed, 0 failed","Tester additions: semver format, no leading zeros, exact string, import, get_display_version fallback, parse_version tuple, tuple comparison, single define in iss, no 3.2.1 stale"
+"TST-2233","FIX-078 full regression suite FIX-070 + FIX-077 + FIX-078","Unit","FIX-078","Pass","2026-03-26","Windows 11 + Python 3.11","37 passed, 0 failed","Complete run: 16 FIX-070 tests, 10 FIX-077 tests, 7+9=16 FIX-078 tests. All green."
