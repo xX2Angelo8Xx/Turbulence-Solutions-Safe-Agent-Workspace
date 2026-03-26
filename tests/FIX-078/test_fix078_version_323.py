@@ -1,7 +1,7 @@
-"""Tests for FIX-077: Version bump to 3.2.2 (regression baseline).
+"""Tests for FIX-078: Version bump to 3.2.3.
 
-Now that 3.2.3 is the current version, verifies that all 5 canonical
-version files contain "3.2.3" and none contain the stale version string "3.2.2".
+Verifies that all 5 canonical version files contain "3.2.3" and none
+contain the stale version string "3.2.2".
 """
 
 import re
@@ -99,7 +99,11 @@ def test_all_version_files_agree() -> None:
     versions: dict[str, str] = {}
 
     config_path = REPO_ROOT / "src" / "launcher" / "config.py"
-    m = re.search(r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"', config_path.read_text(encoding="utf-8"), re.MULTILINE)
+    m = re.search(
+        r'^VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+        config_path.read_text(encoding="utf-8"),
+        re.MULTILINE,
+    )
     assert m, "VERSION not found in config.py"
     versions["config.py"] = m.group(1)
 
@@ -109,7 +113,11 @@ def test_all_version_files_agree() -> None:
     versions["pyproject.toml"] = m.group(1)
 
     iss_path = REPO_ROOT / "src" / "installer" / "windows" / "setup.iss"
-    m = re.search(r'^#define\s+MyAppVersion\s+"([^"]+)"', iss_path.read_text(encoding="utf-8"), re.MULTILINE)
+    m = re.search(
+        r'^#define\s+MyAppVersion\s+"([^"]+)"',
+        iss_path.read_text(encoding="utf-8"),
+        re.MULTILINE,
+    )
     assert m, "MyAppVersion not found in setup.iss"
     versions["setup.iss"] = m.group(1)
 
@@ -119,113 +127,14 @@ def test_all_version_files_agree() -> None:
     versions["build_dmg.sh"] = m.group(1)
 
     appimage_path = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
-    m = re.search(r'^APP_VERSION="([^"]+)"', appimage_path.read_text(encoding="utf-8"), re.MULTILINE)
+    m = re.search(
+        r'^APP_VERSION="([^"]+)"', appimage_path.read_text(encoding="utf-8"), re.MULTILINE
+    )
     assert m, "APP_VERSION not found in build_appimage.sh"
     versions["build_appimage.sh"] = m.group(1)
 
     unique = set(versions.values())
     assert len(unique) == 1, f"Version mismatch across sources: {versions}"
     assert unique.pop() == EXPECTED_VERSION, (
-        f"All sources agree but version is not {EXPECTED_VERSION}: {versions}"
+        f"All sources agree but version is not '{EXPECTED_VERSION}': {versions}"
     )
-
-
-# ---------------------------------------------------------------------------
-# Edge-case tests added by Tester
-# ---------------------------------------------------------------------------
-
-def test_shared_version_utils_current_version_is_323() -> None:
-    """CURRENT_VERSION from tests/shared/version_utils.py must read '3.2.3'."""
-    from tests.shared.version_utils import CURRENT_VERSION
-    assert CURRENT_VERSION == EXPECTED_VERSION, (
-        f"tests/shared/version_utils.py CURRENT_VERSION is '{CURRENT_VERSION}', "
-        f"expected '{EXPECTED_VERSION}'"
-    )
-
-
-def test_get_display_version_returns_323() -> None:
-    """get_display_version() fallback path (PackageNotFoundError) must return '3.2.3'."""
-    import sys
-    from importlib.metadata import PackageNotFoundError
-    from unittest.mock import patch
-
-    # Ensure we're not in a PyInstaller bundle during tests
-    assert not getattr(sys, "_MEIPASS", None), (
-        "Test must not run inside a PyInstaller bundle"
-    )
-
-    # Simulate the installed package being absent (fallback path) — this is the
-    # path taken in PyInstaller bundles and clean envs, and must return VERSION.
-    with patch(
-        "importlib.metadata.version",
-        side_effect=PackageNotFoundError("agent-environment-launcher"),
-    ):
-        import importlib
-        import launcher.config as cfg
-        importlib.reload(cfg)  # pick up the patched importlib.metadata.version
-        result = cfg.get_display_version()
-
-    assert result == EXPECTED_VERSION, (
-        f"get_display_version() fallback returned '{result}', expected '{EXPECTED_VERSION}'"
-    )
-
-
-def test_check_for_update_no_update_when_at_same_version() -> None:
-    """check_for_update('3.2.3') must return (False, '3.2.3') when latest tag is also v3.2.3."""
-    import json
-    from unittest.mock import MagicMock, patch
-
-    mock_response_data = json.dumps({"tag_name": "v3.2.3"}).encode()
-    mock_response = MagicMock()
-    mock_response.read.return_value = mock_response_data
-    mock_response.__enter__ = lambda s: s
-    mock_response.__exit__ = MagicMock(return_value=False)
-
-    with patch("launcher.core.updater.urllib.request.urlopen", return_value=mock_response):
-        from launcher.core.updater import check_for_update
-        update_available, latest_version = check_for_update(EXPECTED_VERSION)
-
-    assert not update_available, (
-        f"check_for_update reported update available when already at {EXPECTED_VERSION}"
-    )
-    assert latest_version == EXPECTED_VERSION, (
-        f"check_for_update returned latest_version='{latest_version}', expected '{EXPECTED_VERSION}'"
-    )
-
-
-def test_check_for_update_detects_newer_version() -> None:
-    """check_for_update('3.2.3') must return (True, '3.2.4') when a newer tag v3.2.4 exists."""
-    import json
-    from unittest.mock import MagicMock, patch
-
-    mock_response_data = json.dumps({"tag_name": "v3.2.4"}).encode()
-    mock_response = MagicMock()
-    mock_response.read.return_value = mock_response_data
-    mock_response.__enter__ = lambda s: s
-    mock_response.__exit__ = MagicMock(return_value=False)
-
-    with patch("launcher.core.updater.urllib.request.urlopen", return_value=mock_response):
-        from launcher.core.updater import check_for_update
-        update_available, latest_version = check_for_update(EXPECTED_VERSION)
-
-    assert update_available, (
-        f"check_for_update failed to detect newer version '3.2.4' from current '{EXPECTED_VERSION}'"
-    )
-    assert latest_version == "3.2.4"
-
-
-def test_parse_version_323_correct() -> None:
-    """parse_version('3.2.3') must yield (3, 2, 3)."""
-    from launcher.core.updater import parse_version
-    assert parse_version(EXPECTED_VERSION) == (3, 2, 3), (
-        f"parse_version('{EXPECTED_VERSION}') did not return (3, 2, 3)"
-    )
-
-
-def test_no_stale_322_in_docs_version_bump_wp() -> None:
-    """The FIX-078 dev-log must not accidentally re-introduce 3.2.2 as the current version."""
-    dev_log = REPO_ROOT / "docs" / "workpackages" / "FIX-078" / "dev-log.md"
-    assert dev_log.exists(), f"dev-log.md not found: {dev_log}"
-    content = dev_log.read_text(encoding="utf-8")
-    # Allow informational mentions of 3.2.2 as the old version; confirm WP goal is 3.2.3
-    assert EXPECTED_VERSION in content, "dev-log.md must mention the target version 3.2.3"

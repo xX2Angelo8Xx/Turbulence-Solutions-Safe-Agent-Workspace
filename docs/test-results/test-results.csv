@@ -2108,3 +2108,4 @@
 "TST-2227","SAF-052 get_changed_files security gate tests","Unit","SAF-052","Pass","2026-03-26","Windows 11 + Python 3.11","12 passed, 0 failed","get_changed_files in _ALWAYS_ALLOW_TOOLS, decide returns allow, hash verification, regression guard"
 "TST-2228","SAF-052: full regression suite","Regression","SAF-052","Fail","2026-03-26","Windows 11 + Python 3.11","6841 passed, 32 skipped, 3 xfailed in 57.23s",""
 "TST-2229","SAF-052: targeted suite","Unit","SAF-052","Pass","2026-03-26","Windows 11 + Python 3.11","25 passed in 0.41s",""
+"TST-2230","FIX-078 version bump 3.2.3 tests","Unit","FIX-078","Pass","2026-03-26","Windows 11 + Python 3.11","28 passed, 0 failed","7 new FIX-078 tests + 13 FIX-077 updated + 8 FIX-070 updated; all 5 version files verified at 3.2.3"

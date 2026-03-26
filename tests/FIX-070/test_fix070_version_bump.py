@@ -130,7 +130,7 @@ def test_all_versions_consistent() -> None:
 # Tester edge-case tests (added during review)
 # ---------------------------------------------------------------------------
 
-STALE_VERSION = "3.2.1"
+STALE_VERSION = "3.2.2"
 _VERSION_FILES = [
     REPO_ROOT / "src" / "launcher" / "config.py",
     REPO_ROOT / "pyproject.toml",
@@ -140,15 +140,15 @@ _VERSION_FILES = [
 ]
 
 
-def test_current_version_is_3_2_2() -> None:
-    """CURRENT_VERSION (read from config.py) must equal the expected release version 3.2.2."""
-    assert CURRENT_VERSION == "3.2.2", (
-        f"Expected CURRENT_VERSION == '3.2.2', got '{CURRENT_VERSION}'"
+def test_current_version_is_3_2_3() -> None:
+    """CURRENT_VERSION (read from config.py) must equal the expected release version 3.2.3."""
+    assert CURRENT_VERSION == "3.2.3", (
+        f"Expected CURRENT_VERSION == '3.2.3', got '{CURRENT_VERSION}'"
     )
 
 
-def test_no_stale_3_2_1_in_version_files() -> None:
-    """None of the 5 canonical version files may still contain the old version 3.2.1."""
+def test_no_stale_3_2_2_in_version_files() -> None:
+    """None of the 5 canonical version files may still contain the old version 3.2.2."""
     stale_found: dict[str, list[int]] = {}
     for path in _VERSION_FILES:
         assert path.exists(), f"Version file not found: {path}"
