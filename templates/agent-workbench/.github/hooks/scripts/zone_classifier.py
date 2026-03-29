@@ -40,10 +40,10 @@ from typing import Literal
 ZoneDecision = Literal["allow", "deny"]
 
 # Deny-zone folder names (lowercase — all comparisons are case-insensitive)
-_DENY_DIRS: frozenset[str] = frozenset({".github", ".vscode", "noagentzone"})
+_DENY_DIRS: frozenset[str] = frozenset({".github", ".vscode", "noagentzone", ".git", ".hg", ".svn"})
 
 # Method 2 compiled pattern — anchored on a "/" to avoid mid-segment matches
-_BLOCKED_PATTERN = re.compile(r"/(\.github|\.vscode|noagentzone)(/|$)")
+_BLOCKED_PATTERN = re.compile(r"/(\.github|\.vscode|noagentzone|\.git|\.hg|\.svn)(/|$)")
 
 
 def detect_project_folder(workspace_root: Path) -> str:
@@ -75,6 +75,9 @@ def detect_project_folder(workspace_root: Path) -> str:
         key=str.lower,
     )
     for entry in entries:
+        # Skip all dot-prefixed directories — no hidden directory should be the project folder.
+        if entry.startswith("."):
+            continue
         if entry.lower() not in _DENY_DIRS:
             return entry.lower()
     raise RuntimeError(

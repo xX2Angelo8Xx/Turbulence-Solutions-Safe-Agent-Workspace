@@ -85,11 +85,11 @@ def _decide_path(tool_name: str, path: str, path_field: str = "filePath") -> str
 # ===========================================================================
 
 def test_is_workspace_root_readable_returns_true_for_git_dir():
-    """.git is a direct non-denied child — is_workspace_root_readable() returns
-    True because .git is NOT in _DENY_DIRS.  The .git block is enforced by
-    is_git_internals() in decide(), not by is_workspace_root_readable()."""
-    # Document the current behavior: the function alone does NOT block .git.
-    assert zc.is_workspace_root_readable(f"{WS}/.git", WS) is True
+    """.git is now in _DENY_DIRS (SAF-057) — is_workspace_root_readable() returns
+    False because .git is in _DENY_DIRS.  Defense in depth: both _DENY_DIRS and
+    is_git_internals() block .git access."""
+    # SAF-057: .git added to _DENY_DIRS — is_workspace_root_readable() now returns False.
+    assert zc.is_workspace_root_readable(f"{WS}/.git", WS) is False
 
 
 def test_decide_still_denies_git_dir_at_workspace_root():
