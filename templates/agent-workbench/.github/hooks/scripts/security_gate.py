@@ -65,6 +65,26 @@ _WRITE_TOOLS: frozenset = frozenset({
     "replace_string_in_file", "multi_replace_string_in_file",
 })
 
+# SAF-055: Read-only tool names that may access whitelisted .github/ subdirectories.
+_READ_ONLY_TOOLS: frozenset[str] = frozenset({"read_file", "Read", "list_dir"})
+
+# SAF-055: Agent-facing .github/ subdirectories whitelisted for read-only access.
+# .github/hooks/ (security gate code) remains fully denied for all operations.
+_GITHUB_READ_ALLOWED: frozenset[str] = frozenset({
+    ".github/agents",
+    ".github/skills",
+    ".github/prompts",
+    ".github/instructions",
+})
+
+# SAF-055: Compiled pattern for efficiently matching whitelisted .github/ paths.
+# Handles both relative paths (.github/agents/foo.md) and absolute paths
+# (c:/workspace/.github/agents/foo.md). The trailing (?:/|$) prevents matching
+# prefixes of non-whitelisted names (e.g. .github/agents-extra).
+_GITHUB_READ_ALLOWED_RE: re.Pattern[str] = re.compile(
+    r"(?:^|/)\.github/(?:agents|skills|prompts|instructions)(?:/|$)"
+)
+
 # query and pattern are search-content fields, not file-system paths.
 # Extracting them for zone classification causes false positives on
 # legitimate grep_search / semantic_search calls.
@@ -87,7 +107,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "efb12c39547fa322c4e869fc9c888625c40c34185e927344dbd806ec95159576"
+_KNOWN_GOOD_GATE_HASH: str = "b1440aa225888641fba96e5f888dea899af3dd1040d7c82cc14adad8c3f07a20"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -3010,6 +3030,14 @@ def decide(data: dict, ws_root: str) -> str:
         if zone_classifier.is_git_internals(raw_path):
             return "deny"
         return "allow"
+    # SAF-055: Allow read-only access to agent-facing .github/ subdirectories.
+    # .github/hooks/ and write operations to all .github/ paths remain denied.
+    # Write tools are already handled by validate_write_tool() above and never
+    # reach this path, but _READ_ONLY_TOOLS guard makes intent explicit.
+    if tool_name in _READ_ONLY_TOOLS:
+        norm_path = normalize_path(raw_path)
+        if _GITHUB_READ_ALLOWED_RE.search(norm_path):
+            return "allow"
     return "deny"
 
 
