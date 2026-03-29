@@ -33,8 +33,7 @@ _ALWAYS_ALLOW_TOOLS: frozenset = frozenset({
     "TodoWrite", "TodoRead", "todo_write", "manage_todo_list",
     # SAF-044: search_subagent removed — validated by validate_search_subagent() in decide()
     "runSubagent", "Agent", "agent",
-    # SAF-052: read-only git status tool — no path arguments, no command execution
-    "get_changed_files",
+    # SAF-058: get_changed_files removed — validated by validate_get_changed_files() in decide()
 })
 
 _TERMINAL_TOOLS: frozenset = frozenset({
@@ -107,7 +106,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "b1440aa225888641fba96e5f888dea899af3dd1040d7c82cc14adad8c3f07a20"
+_KNOWN_GOOD_GATE_HASH: str = "cd86ece3cf27e535c7fd7e8508ca3dc4db93ee509f19929c16a7482eeb9e2b91"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2922,6 +2921,50 @@ def _has_recursive_flag(verb_lower: str, tokens: list[str]) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# SAF-058: get_changed_files — conditional .git/ placement check
+# ---------------------------------------------------------------------------
+
+def validate_get_changed_files(ws_root: str) -> str:
+    """SAF-058: Validate get_changed_files tool calls.
+
+    get_changed_files returns git diff output.  When a git repository exists at
+    the workspace root level (outside the project folder), it tracks all files
+    in the workspace — including denied zones.  In that case the tool must be
+    denied to prevent zone bypass.
+
+    Logic:
+    - .git/ exists at workspace root → deny (whole-workspace git, denied zones exposed)
+    - .git/ exists inside the project folder → allow (scoped to project only)
+    - No .git/ found anywhere → allow (tool returns a harmless "no repo" message)
+
+    Fails closed — returns "deny" on any OS error during the filesystem check.
+    """
+    try:
+        # Check for .git/ at workspace root (outside project folder)
+        ws_git = os.path.join(ws_root.replace("/", os.sep), ".git")
+        if os.path.isdir(ws_git):
+            return "deny"
+
+        # Check for .git/ inside the detected project folder
+        try:
+            project_dir = zone_classifier.detect_project_folder(Path(ws_root))
+            project_git = os.path.join(
+                ws_root.replace("/", os.sep), project_dir, ".git"
+            )
+            if os.path.isdir(project_git):
+                return "allow"
+        except RuntimeError:
+            # No project folder found — no .git/ to check
+            pass
+
+        # No .git/ found at all — tool returns harmless "no repo" message
+        return "allow"
+    except OSError:
+        # Fail closed on any filesystem access error
+        return "deny"
+
+
+# ---------------------------------------------------------------------------
 # Decision engine
 # ---------------------------------------------------------------------------
 
@@ -2956,6 +2999,10 @@ def decide(data: dict, ws_root: str) -> str:
     # SAF-044: search_subagent — scope query to project folder.
     if tool_name == "search_subagent":
         return validate_search_subagent(data, ws_root)
+
+    # SAF-058: get_changed_files — conditional .git/ placement check.
+    if tool_name == "get_changed_files":
+        return validate_get_changed_files(ws_root)
 
     # SAF-023: get_errors carries an optional filePaths array; each path must
     # be zone-checked.  Handled before the _EXEMPT_TOOLS fallback so the array

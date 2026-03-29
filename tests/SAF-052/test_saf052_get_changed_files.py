@@ -37,13 +37,16 @@ WS_ROOT = str(SCRIPTS_DIR.parents[3])  # workspace root (4 levels up from script
 
 
 class TestGetChangedFilesInAlwaysAllow(unittest.TestCase):
-    """get_changed_files must be in _ALWAYS_ALLOW_TOOLS."""
+    """SAF-058: get_changed_files was moved from _ALWAYS_ALLOW_TOOLS to
+    validate_get_changed_files() for conditional .git/ placement check."""
 
     def test_get_changed_files_in_always_allow_tools(self):
-        self.assertIn(
+        # SAF-058: get_changed_files was moved out of _ALWAYS_ALLOW_TOOLS to
+        # validate_get_changed_files() which applies a conditional .git/ check.
+        self.assertNotIn(
             "get_changed_files",
             sg._ALWAYS_ALLOW_TOOLS,
-            "get_changed_files must be in _ALWAYS_ALLOW_TOOLS",
+            "SAF-058: get_changed_files must NOT be in _ALWAYS_ALLOW_TOOLS",
         )
 
     def test_always_allow_tools_is_frozenset(self):
