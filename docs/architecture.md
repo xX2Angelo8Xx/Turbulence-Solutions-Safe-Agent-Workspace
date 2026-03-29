@@ -33,6 +33,8 @@ Templates (bundled inside Launcher)
 │   │   └── tester.agent.md
 │   ├── instructions/
 │   │   └── copilot-instructions.md
+│   ├── prompts/
+│   │   └── status-report.prompt.md
 │   └── workflows/
 │       └── release.yml
 ├── docs/
@@ -41,8 +43,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── 2026-03-20-workspace-review.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.1.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.2.md
+│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.3.md
 │   │   │   ├── AgentExperienceReport_v3.1.2.md
-│   │   │   └── BUG_REPORT-MacOS-2.0.0.md
+│   │   │   ├── BUG_REPORT-MacOS-2.0.0.md
+│   │   │   └── SAE_macOS_Error_Report_v323.md
 │   │   └── bugs.csv
 │   ├── maintenance/
 │   │   ├── .gitkeep
@@ -59,6 +63,7 @@ Templates (bundled inside Launcher)
 │   │   ├── plan-fixLegacyValidationErrors.md
 │   │   ├── plan-project-status-next-steps.md
 │   │   ├── plan-v321-feedback-report.md
+│   │   ├── plan-v324-update.md
 │   │   ├── vscode-session-id-methoden.md
 │   │   └── windows-code-signing.md
 │   ├── Security Audits/
@@ -68,6 +73,8 @@ Templates (bundled inside Launcher)
 │   │   ├── SECURITY_AUDIT_REPORT-V2.0.0-17.03.26.md
 │   │   ├── SECURITY_AUDIT_VERIFICATION_REPORT-V2.1.2-18-03.26.md
 │   │   └── SECURITY_VERIFICATION_REPORT-17-03.26.md
+│   ├── status-reports/
+│   │   └── 2026-03-29-status-report.md
 │   ├── test-results/
 │   │   └── test-results.csv
 │   ├── user-stories/
@@ -420,7 +427,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-078/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-001/
@@ -727,6 +733,10 @@ Templates (bundled inside Launcher)
 │   │   ├── SAF-052/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── SAF-055/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
 │   │   └── workpackages.csv
 │   ├── architecture.md
@@ -1007,6 +1017,7 @@ Templates (bundled inside Launcher)
 │   ├── SAF-050/
 │   ├── SAF-051/
 │   ├── SAF-052/
+│   ├── SAF-055/
 │   ├── shared/
 │   ├── __init__.py
 │   └── conftest.py
