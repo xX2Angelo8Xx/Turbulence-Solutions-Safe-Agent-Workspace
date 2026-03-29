@@ -79,9 +79,11 @@ You may run terminal commands whose working directory and scope stay within the 
 cd "{{WORKSPACE_NAME}}"
 cd "{{WORKSPACE_NAME}}/{{PROJECT_NAME}}"
 
-# Python (always via .venv)
-.venv\Scripts\python script.py
-.venv\Scripts\python -m pytest tests/ -v
+# Python — prefer .venv when it exists; fall back to system Python if not
+.venv\Scripts\python script.py               # preferred when .venv is present
+.venv\Scripts\python -m pytest tests/ -v     # preferred when .venv is present
+python script.py                             # acceptable when no .venv exists
+python -m pytest tests/ -v                  # acceptable when no .venv exists
 .venv\Scripts\pip install <package>          # installs into .venv only
 
 # Git (standard operations — see Git Rules)

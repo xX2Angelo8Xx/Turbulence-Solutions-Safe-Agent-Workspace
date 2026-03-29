@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> **First Action — Read Rule Book:** Before any work, read `{{PROJECT_NAME}}/AGENT-RULES.md` for your complete permissions and rules.
+> **First Action — Read Rule Book:** Before any work, read `{{PROJECT_NAME}}/AGENT-RULES.md` for your complete permissions and rules. That file is the comprehensive reference for zone access, tool permissions, terminal rules, git rules, and known workarounds.
 
 # Turbulence Solutions – Copilot Instructions
 
@@ -22,19 +22,6 @@ Turbulence Solutions
 - **Do NOT retry** denied actions. Do not attempt alternative tools, paths, subagents, or terminal commands to access the same resource.
 - Do NOT use terminal commands (`run_in_terminal`) to read, list, modify, or delete files in `.github/`, `.vscode/`, or `NoAgentZone/`. Terminal commands targeting these folders will also be blocked.
 - If you are a subagent and your action is denied, **immediately report the denial back** to your parent agent and stop. Do not loop or retry.
-
-## Coding Standards
-
-- Write clean, well-commented code.
-- Use meaningful variable and function names.
-- Follow the conventions of the language being used.
-- Prefer readability over cleverness.
-
-## Communication
-
-- Be concise and direct.
-- When uncertain, ask clarifying questions using the ask_questions tool.
-- Explain your reasoning when making architectural decisions.
 
 ## Known Tool Limitations
 
