@@ -2,7 +2,7 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-03-30  
-**Verdict:** FAIL  
+**Verdict:** PASS (Iteration 2)  
 
 ---
 
@@ -111,6 +111,52 @@ Severity: Medium
 
 ---
 
-## Verdict: FAIL
+## Verdict (Iteration 1): FAIL
 
 WP returned to **In Progress**. See TODOs above.
+
+---
+
+## Iteration 2 Re-Test — 2026-03-30
+
+### Fixes Applied by Developer
+
+- Removed `"memory"` from `LIMITATION_ENTRIES` in `tests/DOC-005/test_doc005_limitations.py`
+- Deleted `test_table_contains_memory_tool_entry` function entirely
+
+### Verification
+
+- `"memory"` is **not** present in `LIMITATION_ENTRIES` ✓
+- `test_table_contains_memory_tool_entry` is **gone** ✓
+
+### Test Runs
+
+**Focused (DOC-032 + DOC-005):**
+```
+.venv\Scripts\python.exe -m pytest tests/DOC-032/ tests/DOC-005/ -v
+```
+**Result: 17 passed, 0 failed** ✓
+
+**Full regression:**
+```
+.venv\Scripts\python.exe -m pytest tests/ --tb=short -q
+```
+**Result: 164 failed, 7478 passed, 33 skipped**
+
+All 164 failures are pre-existing on `main` (INS-007, INS-014, INS-015, INS-017, INS-019, INS-029, MNT-002, SAF-010, SAF-025, DOC-008). Confirmed: the same failures exist on `main` before DOC-032 was applied. **Zero new failures introduced by DOC-032.** ✓
+
+### Review (Iteration 2)
+
+| Check | Result |
+|-------|--------|
+| `dev-log.md` Iteration 2 section present | PASS |
+| `"memory"` removed from `LIMITATION_ENTRIES` | PASS |
+| `test_table_contains_memory_tool_entry` function deleted | PASS |
+| DOC-032 + DOC-005 focused tests: 17/17 passing | PASS |
+| No new regressions in full suite | PASS |
+
+---
+
+## Verdict (Iteration 2): PASS
+
+WP marked **Done**.
