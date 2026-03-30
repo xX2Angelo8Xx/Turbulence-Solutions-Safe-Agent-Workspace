@@ -29,6 +29,10 @@ def main() -> None:
     # check), we skip the blocking GUI launch so the subprocess exits cleanly.
     if os.environ.get("PYTEST_CURRENT_TEST"):
         return
+    # FIX-080: Handle --version before any GUI imports (tkinter may not be available).
+    if "--version" in sys.argv:
+        print(f"{APP_NAME} {VERSION}")
+        sys.exit(0)
     # FIX-056: Deploy the ts-python shim on first launch (macOS/Linux only).
     ensure_shim_deployed()
     from launcher.gui.app import App
