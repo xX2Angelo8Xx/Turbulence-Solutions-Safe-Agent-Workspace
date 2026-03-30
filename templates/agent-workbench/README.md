@@ -1,42 +1,21 @@
-# Turbulence Solutions — Safe AI Agent Workspace
+# {{WORKSPACE_NAME}}
 
-TS-SAE workspace for safe AI agent development. Before taking any action, read **`AGENT-RULES.md`** in your project folder — it defines your full permissions, zone boundaries, and tool rules.
+Welcome to your Turbulence Solutions Safe Agent Workspace.
 
-## Folder Structure
+## Workspace Structure
 
-| Folder | Agent Access | Description |
-|--------|-------------|-------------|
-| `{{PROJECT_NAME}}/` | Auto-allowed (exempt tools) | Working directory for all project files |
-| `NoAgentZone/` | Blocked | Sensitive files — no AI access permitted |
-| `.github/` | Blocked (hidden) | Hook scripts, Copilot config, agents, prompts, skills |
-| `.vscode/` | Blocked (hidden) | VS Code workspace settings and security config |
+| Folder | Purpose |
+|--------|---------|
+| `{{PROJECT_NAME}}/` | Your project folder. Place your files here. AI agents work in this folder. |
+| `NoAgentZone/` | Private files. AI agents cannot access this folder. |
+| `.github/` | Workspace configuration. Do not modify. |
+| `.vscode/` | VS Code settings. Do not modify. |
 
-## Security Zones
+## Getting Started
 
-The PreToolUse hook (`.github/hooks/scripts/require-approval.sh`) enforces three security tiers:
+Place your project files in `{{PROJECT_NAME}}/`. Open Copilot Chat and start a conversation — agents will work within that folder.
 
-### Tier 1 — Auto-Allow
+## AI Agent Rules
 
-Exempt tools targeting `{{PROJECT_NAME}}/` proceed without a dialog.
-
-### Tier 2 — Force Ask
-
-Exempt tools outside `{{PROJECT_NAME}}/`, or any non-exempt tool anywhere, trigger a VS Code approval dialog.
-
-### Tier 3 — Hard Block
-
-Any tool targeting `.github/`, `.vscode/`, or `NoAgentZone/` is denied outright. No dialog, no override.
-
-### Exempt Tools
-
-These tools are auto-allowed inside `{{PROJECT_NAME}}/` and trigger an approval dialog elsewhere:
-
-`read_file`, `edit_file`, `replace_string_in_file`, `create_file`, `multi_replace_string_in_file`, `write_file`, `list_dir`, `search`, `grep_search`, `semantic_search`, `file_search`, `manage_todo_list`, `runSubagent`, `search_subagent`
-
-**Always allowed** (no path check): `ask_questions` / `vscode_ask_questions`
-
-### Non-Exempt Tools
-
-Terminal commands, MCP tools, external tools, browser tools, etc. — these **always** require manual approval regardless of path.
-
+Agents follow the rules defined in `{{PROJECT_NAME}}/AGENT-RULES.md`. You can edit that file to customise agent behaviour for your project.
 
