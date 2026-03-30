@@ -108,7 +108,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "9d4249569be46f2f6f97ca82afefb2f366c3fe502f321dc991e35146ea60caac"
+_KNOWN_GOOD_GATE_HASH: str = "b33715daefbfd62d5c9068ec308b6e036351e4f4c32a755f65c2462a2e4c62f0"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1567,6 +1567,7 @@ _PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
     "cat", "type", "get-content", "gc", "select-string",
     "findstr", "grep", "wc", "file", "stat",
     "get-childitem", "gci", "ls", "dir",
+    "test-path",
     "more", "head", "tail", "less",
     "pytest", "mypy", "flake8", "black", "isort", "ruff",
     "code", "dotnet", "node", "npm", "npx",
