@@ -12,7 +12,96 @@ on:
         default: 'v3.0.1'
 
 jobs:
+  validate-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          VERSION="${TAG#v}"
+          echo "TAG=$TAG"
+          echo "VERSION=$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check config.py VERSION
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          ACTUAL=$(grep -oP 'VERSION\s*(?::\s*str\s*)?\=\s*"\K[^"]+' src/launcher/config.py || true)
+          echo "Expected: $VERSION"
+          echo "Actual:   $ACTUAL"
+          if [ "$ACTUAL" != "$VERSION" ]; then
+            echo "ERROR: src/launcher/config.py VERSION mismatch." >&2
+            exit 1
+          fi
+          echo "OK: src/launcher/config.py"
+
+      - name: Check pyproject.toml version
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          ACTUAL=$(grep -oP '^version\s*=\s*"\K[^"]+' pyproject.toml || true)
+          echo "Expected: $VERSION"
+          echo "Actual:   $ACTUAL"
+          if [ "$ACTUAL" != "$VERSION" ]; then
+            echo "ERROR: pyproject.toml version mismatch." >&2
+            exit 1
+          fi
+          echo "OK: pyproject.toml"
+
+      - name: Check setup.iss MyAppVersion
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          ACTUAL=$(grep -oP '#define MyAppVersion "\K[^"]+' src/installer/windows/setup.iss || true)
+          echo "Expected: $VERSION"
+          echo "Actual:   $ACTUAL"
+          if [ "$ACTUAL" != "$VERSION" ]; then
+            echo "ERROR: src/installer/windows/setup.iss MyAppVersion mismatch." >&2
+            exit 1
+          fi
+          echo "OK: src/installer/windows/setup.iss"
+
+      - name: Check build_dmg.sh APP_VERSION
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          ACTUAL=$(grep -oP 'APP_VERSION="\K[^"]+' src/installer/macos/build_dmg.sh || true)
+          echo "Expected: $VERSION"
+          echo "Actual:   $ACTUAL"
+          if [ "$ACTUAL" != "$VERSION" ]; then
+            echo "ERROR: src/installer/macos/build_dmg.sh APP_VERSION mismatch." >&2
+            exit 1
+          fi
+          echo "OK: src/installer/macos/build_dmg.sh"
+
+      - name: Check build_appimage.sh APP_VERSION
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          ACTUAL=$(grep -oP 'APP_VERSION="\K[^"]+' src/installer/linux/build_appimage.sh || true)
+          echo "Expected: $VERSION"
+          echo "Actual:   $ACTUAL"
+          if [ "$ACTUAL" != "$VERSION" ]; then
+            echo "ERROR: src/installer/linux/build_appimage.sh APP_VERSION mismatch." >&2
+            exit 1
+          fi
+          echo "OK: src/installer/linux/build_appimage.sh"
+
+      - name: Version validation summary
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          echo "All 5 version files match tag version: $VERSION"
+          echo "  - src/launcher/config.py"
+          echo "  - pyproject.toml"
+          echo "  - src/installer/windows/setup.iss"
+          echo "  - src/installer/macos/build_dmg.sh"
+          echo "  - src/installer/linux/build_appimage.sh"
+
   windows-build:
+    needs: [validate-version]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,6 +142,7 @@ jobs:
           path: src/installer/windows/Output/AgentEnvironmentLauncher-Setup.exe
 
   macos-arm-build:
+    needs: [validate-version]
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -103,6 +193,7 @@ jobs:
           path: dist/*.dmg
 
   linux-build:
+    needs: [validate-version]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
