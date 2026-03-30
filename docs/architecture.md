@@ -46,6 +46,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.2.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.3.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.4.md
+│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.5.md
 │   │   │   ├── AgentExperienceReport_v3.1.2.md
 │   │   │   ├── BUG_REPORT-MacOS-2.0.0.md
 │   │   │   └── SAE_macOS_Error_Report_v323.md
@@ -452,7 +453,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-087/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-001/
@@ -793,6 +793,10 @@ Templates (bundled inside Launcher)
 │   │   ├── SAF-061/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── SAF-062/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
 │   │   └── workpackages.csv
 │   ├── architecture.md
@@ -1096,6 +1100,7 @@ Templates (bundled inside Launcher)
 │   ├── SAF-059/
 │   ├── SAF-060/
 │   ├── SAF-061/
+│   ├── SAF-062/
 │   ├── shared/
 │   ├── __init__.py
 │   └── conftest.py
