@@ -430,7 +430,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-079/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-001/
@@ -571,6 +570,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── INS-023/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── INS-026/
+│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── MNT-001/
@@ -780,6 +783,7 @@ Templates (bundled inside Launcher)
 │   ├── csv_utils.py
 │   ├── dedup_test_ids.py
 │   ├── finalize_wp.py
+│   ├── install-macos.sh
 │   ├── install_hooks.py
 │   ├── README.md
 │   ├── run_tests.py
@@ -988,6 +992,7 @@ Templates (bundled inside Launcher)
 │   ├── INS-021/
 │   ├── INS-022/
 │   ├── INS-023/
+│   ├── INS-026/
 │   ├── MNT-001/
 │   ├── MNT-002/
 │   ├── SAF-001/
@@ -1053,6 +1058,7 @@ Templates (bundled inside Launcher)
 │   ├── __init__.py
 │   └── conftest.py
 ├── launcher.spec
+├── Makefile
 ├── pyproject.toml
 ├── TS-Logo.ico
 └── TS-Logo.png
