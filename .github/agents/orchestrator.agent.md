@@ -51,14 +51,23 @@ When a Tester marks a WP as `Done`:
 
 ## CI/CD Pipeline Trigger
 
-After completing a development phase or when a new version is committed and tagged:
-1. **Verify the tag exists** on main: `git tag -l "v*"` to confirm the version tag is present.
-2. **Verify the tag was pushed** to remote: `git ls-remote --tags origin` to confirm the tag reached GitHub.
-3. The CI/CD pipeline (`.github/workflows/release.yml`) triggers automatically on tag pushes matching `v*.*.*`. Pushing the tag is sufficient — no manual workflow dispatch is needed.
-4. **If the tag was created but not yet pushed**, push it: `git push origin <tag-name>`.
-5. **If the tag needs to be (re)created** (e.g., after a post-tag fix): delete the old tag locally and remotely (`git tag -d <tag> && git push origin --delete <tag>`), then recreate and push (`git tag -a <tag> -m "<message>" && git push origin <tag>`).
-6. **Log the CI/CD trigger** in your session context, noting the tag name and commit hash.
-7. Inform the user that the CI/CD pipeline has been triggered and they can monitor progress on GitHub Actions.
+After completing a development phase and all WPs are finalized on main:
+
+### Primary Method — Release Script
+1. **Run the release script**: `.venv\Scripts\python scripts/release.py <version>` (e.g., `scripts/release.py 3.2.7`)
+   - The script bumps all 5 version files (config.py, pyproject.toml, setup.iss, build_dmg.sh, build_appimage.sh)
+   - Validates all files were updated correctly
+   - Creates a release commit and annotated tag
+   - Pushes both to origin
+2. Use `--dry-run` to preview changes: `.venv\Scripts\python scripts/release.py 3.2.7 --dry-run`
+3. The CI/CD pipeline (`.github/workflows/release.yml`) triggers automatically on the tag push. A `validate-version` job runs before all builds to catch any version mismatch.
+4. **Log the CI/CD trigger** in your session context, noting the tag name and commit hash.
+5. Inform the user that the CI/CD pipeline has been triggered and they can monitor progress on GitHub Actions.
+
+### Fallback — Manual Re-tagging
+If a tag needs to be recreated after a post-tag fix:
+1. Delete the old tag: `git tag -d <tag>; git push origin --delete <tag>`
+2. Run the release script again with the same version: `.venv\Scripts\python scripts/release.py <version>`
 
 ## WP Splitting
 
