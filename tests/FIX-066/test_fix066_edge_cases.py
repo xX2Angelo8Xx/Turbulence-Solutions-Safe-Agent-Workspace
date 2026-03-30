@@ -66,10 +66,11 @@ def _read_bug_row(csv_path: Path, bug_id: str) -> dict:
 
 class TestCascadeBugStatusEdgeCases:
 
-    def test_fixed_status_bug_not_closed(self, tmp_path: Path) -> None:
-        """Bug with 'Fixed' status referenced in dev-log is NOT auto-closed.
+    def test_fixed_status_bug_is_closed(self, tmp_path: Path) -> None:
+        """Bug with 'Fixed' status referenced in dev-log IS auto-closed.
 
-        'Fixed' is neither Open nor In Progress, so Phase 2 should skip it.
+        FIX-081 corrected the Phase 2 filter to include 'Fixed' status.
+        An already-set Fixed In WP is preserved; status becomes Closed.
         """
         bug_csv = _make_bug_csv(tmp_path, [
             {"ID": "BUG-110", "Status": "Fixed", "Fixed In WP": "FIX-040"},
@@ -83,8 +84,8 @@ class TestCascadeBugStatusEdgeCases:
             _cascade_bug_status("FIX-050", dry_run=False)
 
         bug = _read_bug_row(bug_csv, "BUG-110")
-        assert bug["Status"] == "Fixed"          # unchanged
-        assert bug["Fixed In WP"] == "FIX-040"   # unchanged
+        assert bug["Status"] == "Closed"         # FIX-081: Fixed bugs are now closed
+        assert bug["Fixed In WP"] == "FIX-040"   # existing Fixed In WP preserved
 
     def test_nonexistent_bug_id_in_dev_log_no_crash(self, tmp_path: Path) -> None:
         """Dev-log references a bug ID that doesn't exist — must not raise."""

@@ -2164,3 +2164,4 @@
 "TST-2283","MNT-003 maintenance cleanup tests","Unit","MNT-003","Pass","2026-03-30","Windows 11 + Python 3.11","17 passed, 0 failed","12 state-file deletion checks, 1 bug closure check (21 bugs), 4 action-tracker checks"
 "TST-2284","MNT-003: full regression suite","Regression","MNT-003","Fail","2026-03-30","Windows 11 + Python 3.11","7375 passed, 33 skipped, 3 xfailed, 2 warnings in 63.40s (0:01:03)",""
 "TST-2285","MNT-003: targeted suite","Unit","MNT-003","Pass","2026-03-30","Windows 11 + Python 3.11","24 passed in 0.26s",""
+"TST-2286","FIX-081: bug cascade logic tests","Unit","FIX-081","Pass","2026-03-30","Windows 11 + Python 3.11","21 passed, 0 failed","Phase1 status filter (Open/Fixed/InProgress), Phase2 status filter, BUG-regex 3+ digits, error isolation per bug"

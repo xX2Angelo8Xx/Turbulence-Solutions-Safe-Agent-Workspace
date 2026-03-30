@@ -160,31 +160,41 @@ def _cascade_us_status(wp_id: str, dry_run: bool) -> None:
     print(f"  Warning: User Story {us_id} not found in user-stories.csv")
 
 
-def _cascade_bug_status(wp_id: str, dry_run: bool) -> None:
-    """Close bugs linked to this WP, and auto-close bugs referenced in dev-log/test-report."""
+def _cascade_bug_status(wp_id: str, dry_run: bool) -> bool:
+    """Close bugs linked to this WP, and auto-close bugs referenced in dev-log/test-report.
+
+    Returns True if all bugs were processed without error, False if any update failed.
+    """
     _, bug_rows = read_csv(BUG_CSV)
     already_closed: set[str] = set()
+    all_succeeded = True
 
-    # Phase 1: existing logic — close bugs where Fixed In WP matches exactly
+    # Phase 1: close bugs where Fixed In WP matches exactly (RC-1 fix: include Fixed/In Progress)
     for bug in bug_rows:
         fixed_wp = bug.get("Fixed In WP", "").strip()
-        if fixed_wp == wp_id and bug.get("Status") == "Open":
+        if fixed_wp == wp_id and bug.get("Status") in ("Open", "Fixed", "In Progress"):
             bug_id = bug["ID"]
             if dry_run:
                 print(f"  [DRY RUN] Close {bug_id} (fixed by {wp_id})")
             else:
-                update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
-                print(f"  Closed {bug_id} (fixed by {wp_id})")
+                try:
+                    update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
+                    print(f"  Closed {bug_id} (fixed by {wp_id})")
+                except Exception as exc:
+                    print(f"  ERROR: Failed to close {bug_id}: {exc}")
+                    all_succeeded = False
+                    continue
             already_closed.add(bug_id)
 
     # Phase 2: scan dev-log.md and test-report.md for BUG-NNN references
+    # RC-3 fix: use BUG-\d{3,} to match 3-or-more digit IDs (e.g. BUG-1000)
     wp_folder = REPO_ROOT / "docs" / "workpackages" / wp_id
     bug_refs: set[str] = set()
     for filename in ("dev-log.md", "test-report.md"):
         filepath = wp_folder / filename
         if filepath.exists():
             content = filepath.read_text(encoding="utf-8", errors="replace")
-            bug_refs.update(re.findall(r"BUG-\d{3}", content))
+            bug_refs.update(re.findall(r"BUG-\d{3,}", content))
 
     # Re-read bugs after Phase 1 updates (status may have changed)
     if bug_refs:
@@ -200,17 +210,23 @@ def _cascade_bug_status(wp_id: str, dry_run: bool) -> None:
             status = bug.get("Status", "").strip()
             if status in ("Closed", "Verified"):
                 continue
-            if status not in ("Open", "In Progress"):
+            # RC-2 fix: include "Fixed" in the set of statuses eligible for auto-closure
+            if status not in ("Open", "In Progress", "Fixed"):
                 continue
             if dry_run:
                 print(f"  [DRY RUN] Auto-closed {bug_id} (referenced in dev-log/test-report, fixed by {wp_id})")
             else:
-                fixed_wp = bug.get("Fixed In WP", "").strip()
-                if not fixed_wp:
-                    update_cell(BUG_CSV, "ID", bug_id, "Fixed In WP", wp_id)
-                update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
-                print(f"  Auto-closed {bug_id} (referenced in dev-log/test-report, fixed by {wp_id})")
-                print(f"  Closed {bug_id} (fixed by {wp_id})")
+                try:
+                    fixed_wp = bug.get("Fixed In WP", "").strip()
+                    if not fixed_wp:
+                        update_cell(BUG_CSV, "ID", bug_id, "Fixed In WP", wp_id)
+                    update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
+                    print(f"  Auto-closed {bug_id} (referenced in dev-log/test-report, fixed by {wp_id})")
+                except Exception as exc:
+                    print(f"  ERROR: Failed to auto-close {bug_id}: {exc}")
+                    all_succeeded = False
+
+    return all_succeeded
 
 
 def _sync_architecture(dry_run: bool) -> None:
@@ -389,10 +405,13 @@ def finalize(wp_id: str, dry_run: bool) -> int:
     # Step 9: Cascade Bug status
     if not state.get("bug_cascaded"):
         print(f"\n--- Step 7: Cascade Bug status ---")
-        _cascade_bug_status(wp_id, dry_run)
+        cascade_ok = _cascade_bug_status(wp_id, dry_run)
         if not dry_run:
-            state["bug_cascaded"] = True
-            _save_state(wp_id, state)
+            if cascade_ok:
+                state["bug_cascaded"] = True
+                _save_state(wp_id, state)
+            else:
+                print(f"  WARNING: Some bug updates failed — bug_cascaded NOT marked complete. Re-run to retry.")
     else:
         print(f"\n--- Step 7: Cascade Bug status (already done) ---")
 
