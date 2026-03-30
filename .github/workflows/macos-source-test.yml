@@ -1,0 +1,38 @@
+name: macOS Source Install Test
+
+# INS-028: Validate the macOS source install path (scripts/install-macos.sh from INS-026)
+# on every push to main, pull request, and manual trigger.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  macos-source-install:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run macOS source install script
+        run: bash scripts/install-macos.sh
+
+      - name: Verify agent-launcher --version
+        run: ~/.local/share/TurbulenceSolutions/bin/agent-launcher --version
+
+      - name: Verify ts-python --version
+        run: ~/.local/share/TurbulenceSolutions/bin/ts-python --version
+
+      - name: Run test suite with venv Python
+        run: ~/.local/share/TurbulenceSolutions/venv/bin/python -m pytest tests/ -x --tb=short
