@@ -70,13 +70,20 @@ class TestExcludeSectionConsistency:
         ("templates/agent-workbench", TEMPLATE_SETTINGS),
     ])
     def test_files_and_search_exclude_have_same_keys(self, label, path):
+        # FIX-079 (BUG-146): NoAgentZone is intentionally only in search.exclude,
+        # not in files.exclude. Verify the expected intentional difference.
         settings = _load_settings(path)
         files_keys = set(settings.get("files.exclude", {}).keys())
         search_keys = set(settings.get("search.exclude", {}).keys())
-        assert files_keys == search_keys, (
-            f"[{label}] files.exclude and search.exclude have different key sets.\n"
-            f"  Only in files.exclude:  {files_keys - search_keys}\n"
-            f"  Only in search.exclude: {search_keys - files_keys}"
+        only_in_search = search_keys - files_keys
+        only_in_files = files_keys - search_keys
+        # NoAgentZone glob may be only in search.exclude — that is the correct state.
+        unexpected_only_in_search = only_in_search - {"**/NoAgentZone"}
+        assert not unexpected_only_in_search, (
+            f"[{label}] Unexpected keys only in search.exclude: {unexpected_only_in_search}"
+        )
+        assert not only_in_files, (
+            f"[{label}] Unexpected keys only in files.exclude: {only_in_files}"
         )
 
 

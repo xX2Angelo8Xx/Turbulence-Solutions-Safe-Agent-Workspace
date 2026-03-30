@@ -1,8 +1,7 @@
 {
   "files.exclude": {
     ".github": true,
-    ".vscode": true,
-    "**/NoAgentZone": true
+    ".vscode": true
   },
   "search.exclude": {
     ".github": true,

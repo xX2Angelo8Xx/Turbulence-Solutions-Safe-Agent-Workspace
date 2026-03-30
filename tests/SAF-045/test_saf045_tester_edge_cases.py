@@ -271,20 +271,16 @@ def _load_settings() -> dict:
 
 
 def test_settings_files_exclude_noagentzone_uses_glob():
-    """The NoAgentZone entry in files.exclude must use **/NoAgentZone (glob).
-
-    A bare 'NoAgentZone' key only hides a top-level folder. The glob pattern
-    **/NoAgentZone hides the folder at any depth — which is the correct
-    defense against placing a NoAgentZone/ inside the project folder.
-    """
+    # FIX-079 (BUG-146): NoAgentZone intentionally removed from files.exclude.
+    # Verify it is absent (no glob and no bare key). The glob is in search.exclude.
     settings = _load_settings()
     files_exclude = settings.get("files.exclude", {})
     glob_present = any(
         k.startswith("**/") and "noagentzone" in k.lower()
         for k in files_exclude
     )
-    assert glob_present, (
-        "files.exclude must contain a **/NoAgentZone glob entry, not just 'NoAgentZone'. "
+    assert not glob_present, (
+        "files.exclude must NOT contain a **/NoAgentZone glob entry after FIX-079 (BUG-146). "
         f"Current keys: {list(files_exclude.keys())}"
     )
 

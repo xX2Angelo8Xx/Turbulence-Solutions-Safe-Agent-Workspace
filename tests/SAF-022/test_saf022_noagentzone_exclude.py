@@ -59,16 +59,20 @@ class TestDefaultSettingsExclusion:
     """templates/coding settings.json contains NoAgentZone exclusions."""
 
     def test_files_exclude_noagentzone_present(self):
+        # FIX-079: NoAgentZone must NOT be in files.exclude (BUG-146 fix).
+        # Users need to see the folder in the VS Code explorer.
+        # Security gate enforces access control independently of this setting.
         settings = _load_settings(DEFAULT_SETTINGS)
         assert "files.exclude" in settings, "files.exclude key missing"
-        assert EXCLUDE_KEY in settings["files.exclude"], (
-            f"{EXCLUDE_KEY} not found in files.exclude"
+        assert EXCLUDE_KEY not in settings["files.exclude"], (
+            f"{EXCLUDE_KEY} found in files.exclude — FIX-079 removed it to show the folder in the explorer"
         )
 
     def test_files_exclude_noagentzone_is_true(self):
+        # FIX-079: key is intentionally absent from files.exclude.
         settings = _load_settings(DEFAULT_SETTINGS)
-        assert settings["files.exclude"][EXCLUDE_KEY] is True, (
-            f"{EXCLUDE_KEY} must be true in files.exclude"
+        assert EXCLUDE_KEY not in settings.get("files.exclude", {}), (
+            f"{EXCLUDE_KEY} present in files.exclude — FIX-079 removed it (BUG-146)"
         )
 
     def test_search_exclude_noagentzone_present(self):
@@ -100,15 +104,19 @@ class TestTemplateSettingsExclusion:
     """templates/coding settings.json contains NoAgentZone exclusions."""
 
     def test_files_exclude_noagentzone_present(self):
+        # FIX-079: NoAgentZone must NOT be in files.exclude (BUG-146 fix).
         settings = _load_settings(TEMPLATE_SETTINGS)
         assert "files.exclude" in settings, "files.exclude key missing"
-        assert EXCLUDE_KEY in settings["files.exclude"], (
-            f"{EXCLUDE_KEY} not found in files.exclude"
+        assert EXCLUDE_KEY not in settings["files.exclude"], (
+            f"{EXCLUDE_KEY} found in files.exclude — FIX-079 removed it to show the folder in the explorer"
         )
 
     def test_files_exclude_noagentzone_is_true(self):
+        # FIX-079: key is intentionally absent from files.exclude.
         settings = _load_settings(TEMPLATE_SETTINGS)
-        assert settings["files.exclude"][EXCLUDE_KEY] is True
+        assert EXCLUDE_KEY not in settings.get("files.exclude", {}), (
+            f"{EXCLUDE_KEY} present in files.exclude — FIX-079 removed it (BUG-146)"
+        )
 
     def test_search_exclude_noagentzone_present(self):
         settings = _load_settings(TEMPLATE_SETTINGS)
@@ -184,13 +192,15 @@ class TestBypassAttempt:
     """Attempt to verify the exclusion cannot be trivially weakened."""
 
     def test_noagentzone_not_set_to_false_in_files_exclude(self):
-        """Exclusion value must be True; False would mean VS Code shows the folder."""
+        # FIX-079 (BUG-146): NoAgentZone is intentionally absent from files.exclude
+        # so the folder is visible in the VS Code explorer. Absence is stronger
+        # than False — there is no entry to weaken. Verify it is absent.
         for label, path in [("templates/agent-workbench", DEFAULT_SETTINGS),
                              ("templates/agent-workbench", TEMPLATE_SETTINGS)]:
             settings = _load_settings(path)
             val = settings.get("files.exclude", {}).get(EXCLUDE_KEY)
-            assert val is True, (
-                f"[{label}] files.exclude[{EXCLUDE_KEY!r}] = {val!r}, expected True"
+            assert val is None, (
+                f"[{label}] files.exclude[{EXCLUDE_KEY!r}] = {val!r}, expected absent (None)"
             )
 
     def test_noagentzone_not_set_to_false_in_search_exclude(self):
@@ -212,16 +222,17 @@ class TestBypassAttempt:
                 pytest.fail(f"{path.name} is not valid JSON: {exc}")
 
     def test_exclude_key_uses_glob_pattern(self):
-        """**/NoAgentZone pattern matches at any depth; 'NoAgentZone' alone would not."""
+        # FIX-079 (BUG-146): NoAgentZone removed from files.exclude.
+        # Verify the glob pattern is still used in search.exclude (the correct section)
+        # and that no bare 'NoAgentZone' key is present in either section.
         for label, path in [("templates/agent-workbench", DEFAULT_SETTINGS),
                              ("templates/agent-workbench", TEMPLATE_SETTINGS)]:
             settings = _load_settings(path)
-            files_keys = set(settings.get("files.exclude", {}).keys())
             search_keys = set(settings.get("search.exclude", {}).keys())
-            assert EXCLUDE_KEY in files_keys, (
-                f"[{label}] Glob pattern {EXCLUDE_KEY!r} missing from files.exclude; "
-                f"plain 'NoAgentZone' without ** would not match nested directories."
-            )
             assert EXCLUDE_KEY in search_keys, (
                 f"[{label}] Glob pattern {EXCLUDE_KEY!r} missing from search.exclude"
+            )
+            files_keys = set(settings.get("files.exclude", {}).keys())
+            assert EXCLUDE_KEY not in files_keys, (
+                f"[{label}] Glob pattern {EXCLUDE_KEY!r} should be absent from files.exclude (FIX-079)"
             )

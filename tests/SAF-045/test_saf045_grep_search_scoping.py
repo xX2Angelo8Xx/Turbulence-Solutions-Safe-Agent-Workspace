@@ -297,14 +297,15 @@ def test_settings_files_exclude_vscode():
 
 
 def test_settings_files_exclude_noagentzone():
-    """settings.json files.exclude hides NoAgentZone (SAF-045 gap fix)."""
+    # FIX-079 (BUG-146): NoAgentZone must NOT be in files.exclude — it should
+    # be visible in the VS Code explorer. Security gate handles access control.
     settings = _load_settings()
     files_exclude = settings.get("files.exclude", {})
     noagentzone_covered = any(
         "noagentzone" in k.lower() for k, v in files_exclude.items() if v is True
     )
-    assert noagentzone_covered, (
-        "files.exclude must contain a NoAgentZone entry — "
+    assert not noagentzone_covered, (
+        "files.exclude must NOT contain a NoAgentZone entry after FIX-079 (BUG-146) — "
         f"current keys: {list(files_exclude.keys())}"
     )
 
@@ -343,16 +344,23 @@ def test_settings_search_exclude_noagentzone():
 
 
 def test_settings_files_exclude_all_three_zones():
-    """settings.json files.exclude covers all three restricted zones."""
+    # FIX-079 (BUG-146): NoAgentZone intentionally removed from files.exclude.
+    # files.exclude should cover .github and .vscode only.
+    # NoAgentZone coverage moved to search.exclude exclusively.
     settings = _load_settings()
     files_exclude = settings.get("files.exclude", {})
     enabled_keys = {k.lower() for k, v in files_exclude.items() if v is True}
-    for zone in (".github", ".vscode", "noagentzone"):
+    for zone in (".github", ".vscode"):
         covered = any(zone in k for k in enabled_keys)
         assert covered, (
             f"files.exclude does not cover zone '{zone}' — "
             f"keys: {list(files_exclude.keys())}"
         )
+    # NoAgentZone must NOT be in files.exclude after FIX-079
+    noagentzone_covered = any("noagentzone" in k for k in enabled_keys)
+    assert not noagentzone_covered, (
+        "files.exclude must NOT contain noagentzone after FIX-079 (BUG-146)"
+    )
 
 
 def test_settings_search_exclude_all_three_zones():
