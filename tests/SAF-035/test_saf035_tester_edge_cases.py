@@ -232,6 +232,9 @@ class TestThresholdEdgeCases(unittest.TestCase):
         state: dict = {}
         for _ in range(5):
             sg._increment_deny_counter(state, "session-safe", 0)
+            # SAF-061: clear timestamp so each call is treated as a separate block
+            if "session-safe" in state and isinstance(state["session-safe"], dict):
+                state["session-safe"]["timestamp"] = ""
         # All 5 increments must complete without error
         self.assertEqual(state["session-safe"]["deny_count"], 5)
         self.assertTrue(state["session-safe"]["locked"])
@@ -374,6 +377,9 @@ class TestLockedSessionPersistsAcrossInvocations(unittest.TestCase):
             threshold = 3
             for _ in range(threshold):
                 sg._increment_deny_counter(state, session_id, threshold)
+                # SAF-061: clear timestamp so each call is treated as a separate block
+                if session_id in state and isinstance(state[session_id], dict):
+                    state[session_id]["timestamp"] = ""
             sg._save_state(state_path, state)
 
             # Reload (simulate new invocation)

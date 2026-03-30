@@ -64,6 +64,9 @@ class TestCustomThreshold(unittest.TestCase):
             session_id = "test-custom-threshold"
             for i in range(custom_threshold):
                 state = sg._load_state(state_path)
+                # SAF-061: clear timestamp so each call is treated as a separate block
+                if session_id in state and isinstance(state[session_id], dict):
+                    state[session_id]["timestamp"] = ""
                 count, locked = sg._increment_deny_counter(
                     state, session_id, cfg["lockout_threshold"]
                 )

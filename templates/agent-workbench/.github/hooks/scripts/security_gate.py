@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import dataclasses
 import datetime
 import hashlib
@@ -7,6 +8,7 @@ import json
 import os
 import posixpath
 import re
+import time
 import unicodedata
 import shlex
 import sys
@@ -106,7 +108,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "bb8adec87cee790132ece924dbe0ca1702ce559f76366531a2266ba02a2de0aa"
+_KNOWN_GOOD_GATE_HASH: str = "634768c335f2389d0c7c072a867bb71cd4cb57b71a57bd2430ed4fa206a374b6"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -137,6 +139,16 @@ _FALLBACK_SESSION_TTL_SECONDS: int = 1800  # 30 minutes
 _STATE_FILE_NAME: str = ".hook_state.json"
 _OTEL_JSONL_NAME: str = "copilot-otel.jsonl"
 _COUNTER_CONFIG_NAME: str = "counter_config.json"
+
+# SAF-061: Parallel denial batching constants.
+# Lock file used for cross-platform exclusive read-modify-write on state file.
+_LOCK_FILE_NAME: str = ".hook_state.lock"
+# Denials arriving within this window are treated as one parallel batch (one block).
+_DENY_BATCH_WINDOW_MS: int = 100
+# Lock acquisition: retry up to this many times before falling back to unlocked.
+_LOCK_ACQUIRE_RETRIES: int = 20
+# Seconds to sleep between lock acquisition retries.
+_LOCK_ACQUIRE_DELAY_S: float = 0.05
 
 
 # ---------------------------------------------------------------------------
@@ -1082,6 +1094,37 @@ def _save_state(state_path: str, state: dict) -> None:
         pass
 
 
+@contextlib.contextmanager
+def _state_lock(lock_path: str):
+    """SAF-061: Cross-platform exclusive lock for atomic state read-modify-write.
+
+    Uses os.open with O_CREAT|O_EXCL for atomic lock file creation (works on
+    all major filesystems for local VS Code usage). Retries up to
+    _LOCK_ACQUIRE_RETRIES times with _LOCK_ACQUIRE_DELAY_S between attempts.
+    Falls back to unlocked operation if the lock cannot be acquired — the
+    counter is non-blocking and best-effort, so a graceful fallback is correct.
+    """
+    fd = None
+    for _ in range(_LOCK_ACQUIRE_RETRIES):
+        try:
+            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            break
+        except FileExistsError:
+            time.sleep(_LOCK_ACQUIRE_DELAY_S)
+    try:
+        yield
+    finally:
+        if fd is not None:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+            try:
+                os.unlink(lock_path)
+            except OSError:
+                pass
+
+
 def _get_session_id(scripts_dir: str, state: dict) -> "tuple[str, dict]":
     """Resolve the active session ID.
 
@@ -1135,13 +1178,32 @@ def _increment_deny_counter(
 
     Returns ``(new_deny_count, now_locked)`` where *now_locked* is True if
     this increment reaches or exceeds *threshold*.
+
+    SAF-061: Batch-window deduplication — if the stored timestamp for this
+    session is within _DENY_BATCH_WINDOW_MS of now, the call is treated as
+    part of the same parallel batch and the counter is NOT incremented.
+    This, combined with _state_lock(), ensures parallel denied tool calls
+    in the same VS Code batch share a single block increment.
     """
     if session_id not in state or not isinstance(state[session_id], dict):
         state[session_id] = {"deny_count": 0, "locked": False, "timestamp": ""}
 
     entry = state[session_id]
-    entry["deny_count"] = entry.get("deny_count", 0) + 1
-    entry["timestamp"] = _utc_now_iso()
+
+    # SAF-061: Check whether this deny is part of an in-flight parallel batch.
+    last_ts = entry.get("timestamp", "")
+    is_same_batch = False
+    if last_ts:
+        try:
+            last_dt = datetime.datetime.fromisoformat(last_ts.rstrip("Z"))
+            age_ms = (datetime.datetime.utcnow() - last_dt).total_seconds() * 1000
+            is_same_batch = age_ms < _DENY_BATCH_WINDOW_MS
+        except (ValueError, TypeError):
+            pass
+
+    if not is_same_batch:
+        entry["deny_count"] = entry.get("deny_count", 0) + 1
+        entry["timestamp"] = _utc_now_iso()
 
     now_locked = entry["deny_count"] >= threshold
     if now_locked:
@@ -3219,11 +3281,17 @@ def main() -> None:
             print(build_response("allow"), flush=True)
         else:
             if counter_enabled:
-                # SAF-035: Increment deny counter and build progressive deny message
-                deny_count, now_locked = _increment_deny_counter(
-                    state, session_id, threshold
-                )
-                _save_state(state_path, state)
+                # SAF-061: Atomic read-modify-write under exclusive file lock.
+                # Re-read state inside the lock so we see any writes from a
+                # parallel process that acquired the lock first (batch window).
+                lock_path = os.path.join(scripts_dir, _LOCK_FILE_NAME)
+                with _state_lock(lock_path):
+                    state = _load_state(state_path)
+                    session_id, state = _get_session_id(scripts_dir, state)
+                    deny_count, now_locked = _increment_deny_counter(
+                        state, session_id, threshold
+                    )
+                    _save_state(state_path, state)
                 if now_locked:
                     deny_reason = (
                         f"Session locked — {threshold} denied actions reached. "

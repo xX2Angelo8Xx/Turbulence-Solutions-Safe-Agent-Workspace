@@ -111,7 +111,9 @@ class TestCounterIncrements(unittest.TestCase):
 
             for expected_count in range(1, 5):
                 state = sg._load_state(state_path)
-                # Ensure session exists with correct prior count
+                # SAF-061: clear timestamp so each call is treated as a separate block
+                if session_id in state and isinstance(state[session_id], dict):
+                    state[session_id]["timestamp"] = ""
                 count, locked = sg._increment_deny_counter(
                     state, session_id, sg._DENY_THRESHOLD_DEFAULT
                 )
@@ -138,6 +140,9 @@ class TestBlockNofMMessage(unittest.TestCase):
 
             for n in range(1, 4):
                 state = sg._load_state(state_path)
+                # SAF-061: clear timestamp so each call is treated as a separate block
+                if session_id in state and isinstance(state[session_id], dict):
+                    state[session_id]["timestamp"] = ""
                 count, now_locked = sg._increment_deny_counter(state, session_id, threshold)
                 sg._save_state(state_path, state)
 
@@ -162,6 +167,9 @@ class TestSessionLocksAtThreshold(unittest.TestCase):
 
             for i in range(threshold):
                 state = sg._load_state(state_path)
+                # SAF-061: clear timestamp so each call is treated as a separate block
+                if session_id in state and isinstance(state[session_id], dict):
+                    state[session_id]["timestamp"] = ""
                 count, now_locked = sg._increment_deny_counter(state, session_id, threshold)
                 sg._save_state(state_path, state)
 
@@ -280,6 +288,9 @@ class TestIndependentSessionCounters(unittest.TestCase):
             # Add 5 denials to session A
             for _ in range(5):
                 state = sg._load_state(state_path)
+                # SAF-061: clear timestamp so each call is treated as a separate block
+                if session_a in state and isinstance(state[session_a], dict):
+                    state[session_a]["timestamp"] = ""
                 sg._increment_deny_counter(state, session_a, threshold)
                 sg._save_state(state_path, state)
 
@@ -457,6 +468,9 @@ class TestStatePersistence(unittest.TestCase):
 
             for expected in range(1, 6):
                 state = sg._load_state(state_path)
+                # SAF-061: clear timestamp so each call is treated as a separate block
+                if session_id in state and isinstance(state[session_id], dict):
+                    state[session_id]["timestamp"] = ""
                 count, _ = sg._increment_deny_counter(state, session_id, sg._DENY_THRESHOLD_DEFAULT)
                 sg._save_state(state_path, state)
                 self.assertEqual(count, expected)
@@ -647,9 +661,15 @@ class TestMainIntegration(unittest.TestCase):
                 "tool_input": {"command": "rm -rf /"},
             })
 
-            # Run exactly M deny decisions
+            # Run exactly M deny decisions (SAF-061: reset timestamp between calls
+            # so each is treated as a separate block, not a parallel batch).
             for _ in range(threshold):
                 self._run_main(payload, state_path)
+                _s = sg._load_state(state_path)
+                for _v in _s.values():
+                    if isinstance(_v, dict) and "timestamp" in _v:
+                        _v["timestamp"] = ""
+                sg._save_state(state_path, _s)
 
             # The next call must return the lockout message
             response = self._run_main(payload, state_path)

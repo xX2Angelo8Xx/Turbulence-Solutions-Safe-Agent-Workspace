@@ -2136,3 +2136,4 @@
 "TST-2255","SAF-060 tester edge cases","Security","SAF-060","Pass","2026-03-30","Windows 11 + Python 3.11","24 passed, 0 failed","Path traversal, empty/null/non-string paths, filePath+path conflict, system paths, data field not fallback"
 "TST-2256","SAF-060 SAF-048 regression suite","Regression","SAF-060","Pass","2026-03-30","Windows 11 + Python 3.11","77 passed, 0 failed","Full SAF-048 regression suite - no regressions from SAF-060 fix"
 "TST-2257","SAF-060 full suite regression check","Regression","SAF-060","Pass","2026-03-30","Windows 11 + Python 3.11","7114 passed, 73 pre-existing failures (unchanged from main), 33 skipped","73 failures identical to main baseline - SAF-060 introduces zero new regressions"
+"TST-2258","SAF-061 denial batching tests","Unit","SAF-061","Pass","2026-03-30","Windows 11 + Python 3.11","15 passed, 0 failed","batch window, file lock, concurrency, boundary conditions"
