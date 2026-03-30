@@ -465,7 +465,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-088/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-001/
@@ -626,6 +625,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── MNT-003/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-004/
+│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-001/
@@ -831,6 +834,7 @@ Templates (bundled inside Launcher)
 │   ├── install-macos.sh
 │   ├── install_hooks.py
 │   ├── README.md
+│   ├── release.py
 │   ├── run_tests.py
 │   ├── update_architecture.py
 │   ├── update_bug_status.py
@@ -1057,6 +1061,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-001/
 │   ├── MNT-002/
 │   ├── MNT-003/
+│   ├── MNT-004/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
