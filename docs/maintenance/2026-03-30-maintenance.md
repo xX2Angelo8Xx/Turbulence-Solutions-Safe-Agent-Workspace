@@ -157,4 +157,9 @@ After human review and approval, add the following 5 entries to `docs/maintenanc
 
 ## Status
 
-**Phase 0 complete** — Data cleanup implemented via MNT-003. Structural fixes continue in FIX-081, FIX-082, FIX-083.
+**All phases complete.**
+
+- Phase 0: Data cleanup — MNT-003 (Done)
+- Phase 1: Bug cascade fix — FIX-081 (Done)
+- Phase 2: Tooling improvements — FIX-082 (Done)
+- Phase 3: Workflow documentation — FIX-083 (Done)

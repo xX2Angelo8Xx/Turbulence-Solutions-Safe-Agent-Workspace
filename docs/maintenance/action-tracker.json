@@ -253,7 +253,7 @@
       "source_log": "2026-03-30-maintenance.md",
       "description": "Fix finalize_wp.py bug cascade to handle Fixed status",
       "priority": "Warning",
-      "status": "Open",
+      "status": "Done",
       "resolved_by": "FIX-081"
     },
     {
@@ -261,7 +261,7 @@
       "source_log": "2026-03-30-maintenance.md",
       "description": "Add update_bug_status.py tool and validate_workspace.py --fix flag",
       "priority": "Info",
-      "status": "Open",
+      "status": "Done",
       "resolved_by": "FIX-082"
     },
     {
@@ -269,7 +269,7 @@
       "source_log": "2026-03-30-maintenance.md",
       "description": "Update workflow docs: remove Verified status, add tool references",
       "priority": "Info",
-      "status": "Open",
+      "status": "Done",
       "resolved_by": "FIX-083"
     }
   ]

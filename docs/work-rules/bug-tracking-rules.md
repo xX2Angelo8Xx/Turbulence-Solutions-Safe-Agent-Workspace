@@ -40,14 +40,15 @@ Rules for logging, triaging, and resolving bugs.
 ## Status Lifecycle
 
 ```
-Open → In Progress → Fixed → Verified → Closed
+Open → In Progress → Fixed → Closed
 ```
 
 - **Open** — Bug reported, awaiting assignment.
 - **In Progress** — A developer is actively working on a fix.
 - **Fixed** — Fix implemented and committed. Awaiting verification.
-- **Verified** — Fix confirmed by tester or reporter. Bug does not recur.
-- **Closed** — Verified and done. No further action needed.
+- **Closed** — Fix verified by Tester during WP review and confirmed at finalization. No further action needed.
+
+> **Note:** The `finalize_wp.py` script auto-closes bugs in `Fixed` status when their `Fixed In WP` references a Done workpackage. Manual closure via `scripts/update_bug_status.py` is available as a backup.
 
 ## Rules
 

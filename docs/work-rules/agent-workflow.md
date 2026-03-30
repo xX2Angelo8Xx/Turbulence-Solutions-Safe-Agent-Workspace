@@ -102,7 +102,8 @@ Before marking a WP as Done, the Tester MUST verify:
 5. All bugs found during testing are logged in `docs/bugs/bugs.csv`.
 6. WP branch follows `<WP-ID>/<short-desc>` naming convention.
 7. No `tmp_` files remain in `docs/workpackages/<WP-ID>/` or `tests/<WP-ID>/`.
-8. Scan `docs/bugs/bugs.csv` for any bug with `Fixed In WP` matching this WP-ID and Status=`Fixed`. Set those bugs to `Closed`.
+8. For each bug in `docs/bugs/bugs.csv` with `Fixed In WP` matching this WP-ID and Status=`Fixed`, run:
+   `.venv\Scripts\python scripts/update_bug_status.py <BUG-ID> --status Closed`
 9. Run `git add -A` to stage all new test files and CSV updates.
 10. Commit: `<WP-ID>: Tester PASS`
 11. Push: `git push origin <branch-name>`
@@ -126,12 +127,13 @@ The script performs **all** finalization steps automatically:
 6. Syncs `docs/architecture.md` via `scripts/update_architecture.py`
 7. Commits cascade changes and pushes
 8. Verifies no stale merged branches remain
+9. Deletes `docs/workpackages/<WP-ID>/.finalization-state.json`
 
 Use `--dry-run` to preview without executing: `.venv\Scripts\python scripts/finalize_wp.py <WP-ID> --dry-run`
 
 **Do NOT perform these steps manually.** The script exists to prevent the finalization errors that have recurred across every maintenance cycle.
 
-**Post-finalization sanity check:** After running `finalize_wp.py`, verify that `docs/workpackages/<WP-ID>/.finalization-state.json` does NOT exist. If it persists, delete it manually and commit.
+**Post-finalization sanity check:** After running `finalize_wp.py`, verify that `docs/workpackages/<WP-ID>/.finalization-state.json` does NOT exist. If it persists, run `scripts/validate_workspace.py --full --fix` to auto-clean orphaned state files.
 
 ---
 
@@ -205,6 +207,7 @@ The following operations **MUST** be performed via helper scripts. Direct manual
 | Deduplicate TST-IDs | `scripts/dedup_test_ids.py` | Maintenance |
 | Install Git hooks | `scripts/install_hooks.py` | Setup (once after clone) |
 | Archive old test results | `scripts/archive_test_results.py` | Maintenance |
+| Update bug status | `scripts/update_bug_status.py` | Tester, Maintenance |
 
 See `scripts/README.md` for full usage documentation.
 
