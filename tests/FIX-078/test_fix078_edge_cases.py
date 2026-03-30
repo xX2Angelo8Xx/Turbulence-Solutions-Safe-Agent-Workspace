@@ -11,9 +11,9 @@ from unittest.mock import patch
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXPECTED_VERSION = "3.2.3"
-STALE_VERSION = "3.2.2"
-STALE_PREV = "3.2.1"
+EXPECTED_VERSION = "3.2.4"
+STALE_VERSION = "3.2.3"
+STALE_PREV = "3.2.2"
 
 _VERSION_FILES = [
     REPO_ROOT / "src" / "launcher" / "config.py",
@@ -39,7 +39,7 @@ def test_version_components_no_leading_zeros() -> None:
     """Each component of '3.2.3' must parse as a non-negative integer with no leading zeros."""
     parts = EXPECTED_VERSION.split(".")
     assert len(parts) == 3, f"Expected 3 components, got {len(parts)}: {parts}"
-    expected_ints = (3, 2, 3)
+    expected_ints = (3, 2, 4)
     for part, expected in zip(parts, expected_ints):
         # A leading-zero int would stringify differently, e.g. "03" != str(int("03"))
         assert part == str(int(part)), (
@@ -52,7 +52,7 @@ def test_version_components_no_leading_zeros() -> None:
 
 def test_version_is_exactly_323_not_superstring() -> None:
     """Version string must be exactly '3.2.3', not a longer string like '3.2.30' or '3.2.32'."""
-    assert EXPECTED_VERSION == "3.2.3"
+    assert EXPECTED_VERSION == "3.2.4"
     assert len(EXPECTED_VERSION) == 5, (
         f"Version string '{EXPECTED_VERSION}' has unexpected length {len(EXPECTED_VERSION)}"
     )
@@ -102,8 +102,8 @@ def test_parse_version_323_returns_correct_tuple() -> None:
     from launcher.core.updater import parse_version  # noqa: PLC0415
 
     result = parse_version(EXPECTED_VERSION)
-    assert result == (3, 2, 3), (
-        f"parse_version('{EXPECTED_VERSION}') returned {result}, expected (3, 2, 3)"
+    assert result == (3, 2, 4), (
+        f"parse_version('{EXPECTED_VERSION}') returned {result}, expected (3, 2, 4)"
     )
 
 

@@ -9,8 +9,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-EXPECTED_VERSION = "3.2.3"
-STALE_VERSION = "3.2.2"
+EXPECTED_VERSION = "3.2.4"
+STALE_VERSION = "3.2.3"
 
 _VERSION_FILES = [
     REPO_ROOT / "src" / "launcher" / "config.py",
