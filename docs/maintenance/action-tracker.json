@@ -231,6 +231,46 @@
       "priority": "Info",
       "status": "Done",
       "resolved_by": "2026-03-25 maintenance commit"
+    },
+    {
+      "action_id": "ACT-029",
+      "source_log": "2026-03-30-maintenance.md",
+      "description": "Delete 12 orphaned .finalization-state.json files",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "MNT-003"
+    },
+    {
+      "action_id": "ACT-030",
+      "source_log": "2026-03-30-maintenance.md",
+      "description": "Close 21 Fixed bugs (BUG-111 through BUG-149)",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "MNT-003"
+    },
+    {
+      "action_id": "ACT-031",
+      "source_log": "2026-03-30-maintenance.md",
+      "description": "Fix finalize_wp.py bug cascade to handle Fixed status",
+      "priority": "Warning",
+      "status": "Open",
+      "resolved_by": "FIX-081"
+    },
+    {
+      "action_id": "ACT-032",
+      "source_log": "2026-03-30-maintenance.md",
+      "description": "Add update_bug_status.py tool and validate_workspace.py --fix flag",
+      "priority": "Info",
+      "status": "Open",
+      "resolved_by": "FIX-082"
+    },
+    {
+      "action_id": "ACT-033",
+      "source_log": "2026-03-30-maintenance.md",
+      "description": "Update workflow docs: remove Verified status, add tool references",
+      "priority": "Info",
+      "status": "Open",
+      "resolved_by": "FIX-083"
     }
   ]
 }
