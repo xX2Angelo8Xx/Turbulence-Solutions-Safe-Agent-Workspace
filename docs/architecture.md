@@ -45,6 +45,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.1.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.2.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.3.md
+│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.4.md
 │   │   │   ├── AgentExperienceReport_v3.1.2.md
 │   │   │   ├── BUG_REPORT-MacOS-2.0.0.md
 │   │   │   └── SAE_macOS_Error_Report_v323.md
@@ -433,6 +434,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-081/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-082/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -799,6 +803,7 @@ Templates (bundled inside Launcher)
 │   ├── README.md
 │   ├── run_tests.py
 │   ├── update_architecture.py
+│   ├── update_bug_status.py
 │   └── validate_workspace.py
 ├── src/
 │   ├── installer/
@@ -960,6 +965,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-079/
 │   ├── FIX-080/
 │   ├── FIX-081/
+│   ├── FIX-082/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
