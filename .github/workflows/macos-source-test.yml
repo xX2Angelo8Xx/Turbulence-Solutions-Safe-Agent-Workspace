@@ -34,5 +34,8 @@ jobs:
       - name: Verify ts-python --version
         run: ~/.local/share/TurbulenceSolutions/bin/ts-python --version
 
+      - name: Install test dependencies
+        run: ~/.local/share/TurbulenceSolutions/venv/bin/pip install pytest
+
       - name: Run test suite with venv Python
         run: ~/.local/share/TurbulenceSolutions/venv/bin/python -m pytest tests/ -x --tb=short
