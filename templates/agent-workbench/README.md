@@ -1,6 +1,6 @@
-# Turbulence Solutions – Default Project Template
+# Turbulence Solutions — Safe AI Agent Workspace
 
-Standard project template with AI agent safety controls for VS Code + GitHub Copilot.
+TS-SAE workspace for safe AI agent development. Before taking any action, read **`AGENT-RULES.md`** in your project folder — it defines your full permissions, zone boundaries, and tool rules.
 
 ## Folder Structure
 
