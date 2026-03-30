@@ -106,7 +106,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "cd86ece3cf27e535c7fd7e8508ca3dc4db93ee509f19929c16a7482eeb9e2b91"
+_KNOWN_GOOD_GATE_HASH: str = "ba43c50f923012cb83fffabc40578b3414bae9f690189102d76f39f038373e41"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -203,6 +203,20 @@ _EXPLICIT_DENY_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"update_hashes"),  # SAF-033: block any command containing 'update_hashes' (substring, case-insensitive via lowered_segment)
 ]
 
+# BUG-140: Indices into _OBFUSCATION_PATTERNS that must be applied to ALL
+# non-venv segments regardless of whether the primary verb is allowlisted.
+# These patterns detect pipe-to-interpreter, subshell expansion, and process
+# substitution — constructs that are dangerous irrespective of the leading verb.
+# Pattern indices (0-based):
+#   8  = P-10: PowerShell -EncodedCommand
+#   12 = P-14: & $var  (dynamic call via variable)
+#   14 = P-16: | interpreter  (pipe to shell / interpreter)
+#   15 = P-17: | iex
+#   16 = P-18: ` ` backtick subshell
+#   17 = P-19: $(  subshell
+#   26 = P-28: [<>](  process substitution
+_CRITICAL_OBFUSCATION_INDICES: frozenset[int] = frozenset({8, 12, 14, 15, 16, 17, 26})
+
 
 # FIX-034: Pre-scan pattern for venv activation commands.
 # Detected BEFORE Stage 3 obfuscation patterns so that `source` (P-22) and
@@ -221,6 +235,15 @@ _VENV_ACTIVATION_SEG_RE: re.Pattern[str] = re.compile(
     r')'
     r'\s*$',
     re.IGNORECASE,
+)
+
+# BUG-142: Pattern for PowerShell parenthesized subexpressions.
+# Matches (inner_cmd).Property or (inner_cmd).Property.Method etc.
+# Group 1 captures the inner command text to be validated in place of
+# the full expression.  Non-$() grouping only — $( is caught by P-19
+# before this pattern is consulted.
+_PAREN_SUBEXPR_RE: re.Pattern[str] = re.compile(
+    r'^\((.+)\)(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*$'
 )
 
 
@@ -766,6 +789,14 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         path_args_restricted=True,
         allow_arbitrary_paths=False,
         notes="Unix/Windows file info; path args zone-checked",
+    ),
+    # BUG-143: Test-Path — read-only PowerShell path existence check
+    "test-path": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell read-only path existence check; path args zone-checked",
     ),
     # Category M — Write file commands (SAF-015)
     "set-content": CommandRule(
@@ -1985,11 +2016,48 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
             return ("allow", None)
 
         # Stage 3 — obfuscation pre-scan on non-venv segments only
-        lowered = " ; ".join(
+        # BUG-140: Two-pass scan.
+        # Pass 1 (critical): Check _CRITICAL_OBFUSCATION_INDICES against ALL
+        # non-venv segments — these patterns detect pipe-to-interpreter, subshell
+        # expansion, and process substitution regardless of the leading verb.
+        # Pass 2 (full): Check ALL remaining patterns, but ONLY against segments
+        # whose primary verb is NOT in the allowlist.  Allowlisted-verb segments
+        # are skipped in Pass 2 because their path arguments might legitimately
+        # contain tokens that match obfuscation patterns (e.g. a folder named
+        # "exec-scripts/" would trigger P-21 \bexec\b on allowlisted del/cat/etc.).
+        # Stage 5 arg-zone checks provide the security guarantee for those segments.
+
+        # Determine which non-venv segments have allowlisted primary verbs.
+        _s3_allowlisted: set[int] = set()
+        for _s3i, _s3seg in enumerate(all_segments):
+            if _s3i in _venv_seg_indices:
+                continue
+            # BUG-142: Unwrap (inner_cmd).property before extracting the verb.
+            _s3seg_inner = _s3seg
+            _s3_paren = _PAREN_SUBEXPR_RE.match(_s3seg.strip())
+            if _s3_paren:
+                _s3seg_inner = _s3_paren.group(1)
+            _s3toks = _tokenize_segment(_s3seg_inner)
+            _s3verb = _extract_verb(_s3toks).lower() if _s3toks else ""
+            if _s3verb in _COMMAND_ALLOWLIST:
+                _s3_allowlisted.add(_s3i)
+
+        # Build scan texts for each pass.
+        all_non_venv_lowered = " ; ".join(
             s for i, s in enumerate(all_segments) if i not in _venv_seg_indices
         ).lower()
-        for pattern in _OBFUSCATION_PATTERNS:
-            if pattern.search(lowered):
+        non_allowlisted_lowered = " ; ".join(
+            s for i, s in enumerate(all_segments)
+            if i not in _venv_seg_indices and i not in _s3_allowlisted
+        ).lower()
+
+        for _pidx, pattern in enumerate(_OBFUSCATION_PATTERNS):
+            target = (
+                all_non_venv_lowered
+                if _pidx in _CRITICAL_OBFUSCATION_INDICES
+                else non_allowlisted_lowered
+            )
+            if pattern.search(target):
                 return ("deny", f"Command blocked by obfuscation pre-scan: {_DENY_REASON}")
 
         # Stage 4 — split into segments; evaluate each non-venv segment independently
@@ -1998,6 +2066,15 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
             return ("allow", None)
 
         for segment in segments:
+            # BUG-142: Unwrap parenthesized subexpressions like (Get-Content f).Count
+            # before tokenizing.  The outer parens group a sub-command for property
+            # or method access; extract the inner command and validate it in place
+            # of the full expression.  Non-$() grouping only — $( subshells are
+            # caught by Stage 3 P-19 before reaching this point.
+            _paren_m = _PAREN_SUBEXPR_RE.match(segment.strip())
+            if _paren_m:
+                segment = _paren_m.group(1)
+
             tokens = _tokenize_segment(segment)
             if not tokens:
                 # Could not tokenize — fail closed
@@ -2090,7 +2167,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                 if matched_exception:
                     # Residual checks still apply (Section 12.4)
                     for pat in _OBFUSCATION_PATTERNS:
-                        if pat.search(lowered):
+                        if pat.search(all_non_venv_lowered):
                             return ("deny", f"Exception-listed command blocked by obfuscation pre-scan: {_DENY_REASON}")
                     # Zone-check path args in the segment
                     for tok in tokens[1:]:
