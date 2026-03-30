@@ -100,8 +100,8 @@ def test_action_tracker_open_actions() -> None:
 
     for action_id in ("ACT-031", "ACT-032", "ACT-033"):
         assert action_id in entries
-        assert entries[action_id]["status"] == "Open", (
-            f"{action_id} expected status Open, got {entries[action_id]['status']!r}"
+        assert entries[action_id]["status"] == "Done", (
+            f"{action_id} expected status Done, got {entries[action_id]['status']!r}"
         )
 
 
@@ -196,11 +196,11 @@ def test_excluded_bugs_not_unintentionally_closed() -> None:
 
 
 def test_maintenance_log_phase0_complete() -> None:
-    """2026-03-30-maintenance.md must reflect Phase 0 completion."""
+    """2026-03-30-maintenance.md must reflect all phases complete."""
     log_path = REPO_ROOT / "docs/maintenance/2026-03-30-maintenance.md"
     content = log_path.read_text(encoding="utf-8")
-    assert "Phase 0 complete" in content, (
-        "Maintenance log does not show Phase 0 completion"
+    assert "All phases complete" in content, (
+        "Maintenance log does not show all phases complete"
     )
     assert "MNT-003" in content, (
         "Maintenance log does not reference MNT-003"

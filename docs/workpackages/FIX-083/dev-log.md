@@ -50,3 +50,24 @@ Four documentation files were modified:
 ## Known Limitations
 
 None. This WP is documentation-only. No code files were modified.
+
+---
+
+## Iteration 2 — 2026-03-30
+
+### Tester Findings
+
+Two regressions in `tests/MNT-003/test_mnt003_cleanup.py`:
+
+1. `test_action_tracker_open_actions` — test still asserted ACT-031/032/033 status == "Open" after FIX-083 correctly set them to "Done".
+2. `test_maintenance_log_phase0_complete` — test still asserted "Phase 0 complete" after FIX-083 correctly updated the log to "All phases complete".
+
+### Changes Made
+
+- `tests/MNT-003/test_mnt003_cleanup.py`:
+  - `test_action_tracker_open_actions`: changed expected status from `"Open"` to `"Done"` for ACT-031, ACT-032, ACT-033.
+  - `test_maintenance_log_phase0_complete`: changed assertion from `"Phase 0 complete"` to `"All phases complete"`; updated docstring accordingly.
+
+### Test Results
+
+- `pytest tests/MNT-003/ tests/FIX-083/ -v` → **35 passed, 0 failed**
