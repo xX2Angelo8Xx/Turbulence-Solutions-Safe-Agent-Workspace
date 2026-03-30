@@ -10,6 +10,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from launcher.core.updater import _REPO_ROOT
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -24,20 +26,94 @@ def _validate_installer_path(installer_path: Path) -> None:
         raise ValueError(f"Installer path is not a regular file: {installer_path}")
 
 
-def apply_update(installer_path: Path) -> None:
+def apply_source_update(
+    repo_root: Path | None = None,
+    pip_executable: str | None = None,
+) -> None:
+    """Update a source-mode install via git pull + pip install.
+
+    Runs `git pull --ff-only` to update the repository, then
+    `pip install .` (using the current venv's pip) to refresh the
+    installed package.  Raises RuntimeError on any failure so the caller
+    can surface a meaningful error message to the user.
+
+    Parameters
+    ----------
+    repo_root:
+        Path to the repository root.  Defaults to the auto-detected
+        ``_REPO_ROOT`` so callers don't need to pass it normally.
+    pip_executable:
+        Path or name of the pip executable to use.  Defaults to the pip
+        interpreter sitting next to the currently running Python binary,
+        which is correct for venv installs.
+    """
+    root = repo_root if repo_root is not None else _REPO_ROOT
+
+    # Resolve pip alongside the current interpreter so we use the venv's pip.
+    if pip_executable is None:
+        python = Path(sys.executable)
+        # On Windows the Scripts dir uses pip.exe; on Unix it's bin/pip.
+        scripts_dir = "Scripts" if sys.platform == "win32" else "bin"
+        pip = python.parent.parent / scripts_dir / "pip"
+        pip_executable = str(pip)
+
+    _LOGGER.info("Source-mode update: git pull --ff-only in %s", root)
+    pull_result = subprocess.run(
+        ["git", "pull", "--ff-only"],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=60,
+    )
+    if pull_result.returncode != 0:
+        stderr = pull_result.stderr.strip()
+        raise RuntimeError(
+            f"git pull --ff-only failed (rc={pull_result.returncode}): {stderr}"
+        )
+    _LOGGER.info("git pull succeeded: %s", pull_result.stdout.strip())
+
+    _LOGGER.info("Source-mode update: pip install . with %s", pip_executable)
+    pip_result = subprocess.run(
+        [pip_executable, "install", "."],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=120,
+    )
+    if pip_result.returncode != 0:
+        stderr = pip_result.stderr.strip()
+        raise RuntimeError(
+            f"pip install . failed (rc={pip_result.returncode}): {stderr}"
+        )
+    _LOGGER.info("pip install succeeded.")
+
+
+def apply_update(installer_path: Path | None = None) -> None:
     """Launch the downloaded installer and exit the current Launcher instance.
 
-    Platform dispatch:
+    Pass ``installer_path=None`` (or omit it) to trigger a source-mode update
+    (git pull + pip install).  Pass a ``Path`` to an installer file to use the
+    binary update path (existing behavior, unchanged).
+
+    Platform dispatch (binary/frozen mode):
     - Windows: runs the Inno Setup .exe silently, then sys.exit(0).
     - macOS:   mounts the .dmg, copies the .app bundle to /Applications,
                unmounts, then sys.exit(0).
     - Linux:   makes the AppImage executable, swaps it with os.replace,
                then relaunches via os.execv.
 
-    Raises FileNotFoundError if installer_path does not exist.
-    Raises ValueError if installer_path is not a regular file.
+    Raises FileNotFoundError if installer_path does not exist (binary mode only).
+    Raises ValueError if installer_path is not a regular file (binary mode only).
     Raises RuntimeError on any unrecoverable platform-level error.
     """
+    # Source-mode update: caller passes None (no binary installer needed).
+    if installer_path is None:
+        _LOGGER.info("No installer path — running source-mode update")
+        apply_source_update()
+        return
+
     _validate_installer_path(installer_path)
     _LOGGER.info(
         "Applying update from: %s (platform=%s)", installer_path, sys.platform

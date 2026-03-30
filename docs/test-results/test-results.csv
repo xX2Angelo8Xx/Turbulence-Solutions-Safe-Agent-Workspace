@@ -2148,3 +2148,4 @@
 "TST-2267","INS-026 macOS install script tests","Unit","INS-026","Pass","2026-03-30","Windows 11 + Python 3.11","33 passed, 0 failed","install-macos.sh, Makefile, macos-installation-guide.md static analysis tests"
 "TST-2268","INS-026: full regression suite","Regression","INS-026","Fail","2026-03-30","Windows 11 + Python 3.11","7258 passed, 33 skipped, 3 xfailed, 1 warning in 53.13s",""
 "TST-2269","INS-026: install script + docs tests (55 passed)","Unit","INS-026","Pass","2026-03-30","Windows 11 + Python 3.11","55 passed, 0 failed","33 developer tests + 22 tester edge-case tests: strict mode, security (no eval, no CRLF in script), CI non-interactive path, shim chmod, Makefile safety, WP reference compliance"
+"TST-2270","INS-027 source-mode unit tests","Unit","INS-027","Pass","2026-03-30","Windows 11 + Python 3.11","16 passed, 0 failed","is_source_mode, check_for_update_source, apply_source_update, apply_update dispatch"
