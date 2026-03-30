@@ -10,21 +10,31 @@ Usage:
 """
 
 import argparse
+import json
 import re
 import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import REPO_ROOT, read_csv
+from csv_utils import REPO_ROOT, read_csv, update_cell
 
 WP_CSV = REPO_ROOT / "docs" / "workpackages" / "workpackages.csv"
 US_CSV = REPO_ROOT / "docs" / "user-stories" / "user-stories.csv"
 BUG_CSV = REPO_ROOT / "docs" / "bugs" / "bugs.csv"
 TST_CSV = REPO_ROOT / "docs" / "test-results" / "test-results.csv"
+EXCEPTIONS_JSON = REPO_ROOT / "docs" / "workpackages" / "validation-exceptions.json"
 
-# WPs that are exempt from test-report.md (decomposed or maintenance)
-EXEMPT_PREFIXES_TEST_REPORT = {"MNT-"}
+
+def _load_exceptions() -> dict:
+    """Load validation exceptions from validation-exceptions.json."""
+    if not EXCEPTIONS_JSON.exists():
+        return {}
+    try:
+        data = json.loads(EXCEPTIONS_JSON.read_text(encoding="utf-8"))
+        return {k: v for k, v in data.items() if not k.startswith("_")}
+    except (json.JSONDecodeError, OSError):
+        return {}
 
 
 class ValidationResult:
@@ -78,7 +88,13 @@ def _check_duplicate_ids(path: Path, id_column: str, result: ValidationResult) -
             result.error(f"Duplicate ID {rid} ({count}x) in {path.name}")
 
 
-def _check_wp_artifacts(wp_id: str, status: str, comments: str, result: ValidationResult) -> None:
+def _check_wp_artifacts(
+    wp_id: str,
+    status: str,
+    comments: str,
+    result: ValidationResult,
+    exceptions: dict | None = None,
+) -> None:
     """Check that a Done WP has required artifacts.
 
     For Done WPs, missing artifacts are ERRORS (not warnings) because the
@@ -91,11 +107,11 @@ def _check_wp_artifacts(wp_id: str, status: str, comments: str, result: Validati
     if "decomposed" in comments.lower() or "Decomposed" in comments:
         return
 
-    # Skip exempt prefixes
-    if any(wp_id.startswith(p) for p in EXEMPT_PREFIXES_TEST_REPORT):
-        is_exempt = True
-    else:
-        is_exempt = False
+    if exceptions is None:
+        exceptions = {}
+    exc_skip = set(exceptions.get(wp_id, {}).get("skip_checks", []))
+    skip_test_report = "test-report" in exc_skip
+    skip_test_folder = "test-folder" in exc_skip
 
     wp_folder = REPO_ROOT / "docs" / "workpackages" / wp_id
     dev_log = wp_folder / "dev-log.md"
@@ -105,13 +121,14 @@ def _check_wp_artifacts(wp_id: str, status: str, comments: str, result: Validati
     if not dev_log.exists():
         result.error(f"{wp_id}: missing docs/workpackages/{wp_id}/dev-log.md")
 
-    if not is_exempt and not test_report.exists():
+    if not skip_test_report and not test_report.exists():
         result.error(f"{wp_id}: missing docs/workpackages/{wp_id}/test-report.md")
 
-    if not test_dir.exists():
-        result.error(f"{wp_id}: missing tests/{wp_id}/ directory")
-    elif not any(test_dir.glob("test_*.py")):
-        result.error(f"{wp_id}: tests/{wp_id}/ exists but contains no test_*.py files")
+    if not skip_test_folder:
+        if not test_dir.exists():
+            result.error(f"{wp_id}: missing tests/{wp_id}/ directory")
+        elif not any(test_dir.glob("test_*.py")):
+            result.error(f"{wp_id}: tests/{wp_id}/ exists but contains no test_*.py files")
 
     # Check for leftover temporary files
     for folder in (wp_folder, test_dir):
@@ -180,8 +197,11 @@ def _check_branch_naming(result: ValidationResult) -> None:
         )
 
 
-def _check_tst_coverage(result: ValidationResult) -> None:
+def _check_tst_coverage(result: ValidationResult, exceptions: dict | None = None) -> None:
     """Check that every Done WP with code changes has passing test results."""
+    if exceptions is None:
+        exceptions = {}
+
     _, wp_rows = read_csv(WP_CSV)
     _, tst_rows = read_csv(TST_CSV)
 
@@ -203,8 +223,9 @@ def _check_tst_coverage(result: ValidationResult) -> None:
         # Skip decomposed WPs
         if "decomposed" in comments.lower():
             continue
-        # Skip exempt prefixes
-        if any(wp_id.startswith(p) for p in EXEMPT_PREFIXES_TEST_REPORT):
+        # Skip WPs with exceptions covering test-report or test-folder
+        exc_skip = set(exceptions.get(wp_id, {}).get("skip_checks", []))
+        if "test-report" in exc_skip or "test-folder" in exc_skip:
             continue
 
         if wp_id not in wp_with_pass:
@@ -331,8 +352,41 @@ def _check_stale_branches(result: ValidationResult) -> None:
         )
 
 
+def apply_fixes() -> int:
+    """Auto-fix detectable issues. Returns the number of fixes applied."""
+    fixes = 0
+
+    _, wp_rows = read_csv(WP_CSV)
+    wp_status = {r["ID"]: r["Status"] for r in wp_rows}
+
+    # Fix 1: Delete orphaned .finalization-state.json for Done WPs
+    wp_base = REPO_ROOT / "docs" / "workpackages"
+    for state_file in wp_base.glob("*/.finalization-state.json"):
+        wp_id = state_file.parent.name
+        if wp_status.get(wp_id) == "Done":
+            state_file.unlink()
+            print(f"FIX: Deleted orphaned .finalization-state.json for {wp_id}")
+            fixes += 1
+
+    # Fix 2: Close Fixed bugs whose fix-WP is Done
+    _, bug_rows = read_csv(BUG_CSV)
+    for bug in bug_rows:
+        bug_id = bug.get("ID", "")
+        bug_status = bug.get("Status", "").strip()
+        fixed_wp = bug.get("Fixed In WP", "").strip()
+        if bug_status == "Fixed" and fixed_wp:
+            if wp_status.get(fixed_wp) == "Done":
+                update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
+                print(f"FIX: Closed {bug_id} (fixed by Done WP {fixed_wp})")
+                fixes += 1
+
+    return fixes
+
+
 def validate_full(result: ValidationResult) -> None:
     """Run all validation checks."""
+    exceptions = _load_exceptions()
+
     # Duplicate ID checks
     _check_duplicate_ids(TST_CSV, "ID", result)
     _check_duplicate_ids(WP_CSV, "ID", result)
@@ -344,11 +398,11 @@ def validate_full(result: ValidationResult) -> None:
     for wp in wp_rows:
         if wp.get("Status") == "Done":
             _check_wp_artifacts(
-                wp["ID"], wp["Status"], wp.get("Comments", ""), result
+                wp["ID"], wp["Status"], wp.get("Comments", ""), result, exceptions
             )
 
     # TST coverage cross-validation
-    _check_tst_coverage(result)
+    _check_tst_coverage(result, exceptions)
 
     # Status cascade checks
     _check_bug_cascade(result)
@@ -372,6 +426,8 @@ def validate_full(result: ValidationResult) -> None:
 
 def validate_wp(wp_id: str, result: ValidationResult) -> None:
     """Run validation checks scoped to a single workpackage."""
+    exceptions = _load_exceptions()
+
     # Duplicate IDs (always check — other WPs may have caused collisions)
     _check_duplicate_ids(TST_CSV, "ID", result)
 
@@ -380,7 +436,7 @@ def validate_wp(wp_id: str, result: ValidationResult) -> None:
     for wp in wp_rows:
         if wp["ID"] == wp_id:
             _check_wp_artifacts(
-                wp["ID"], wp["Status"], wp.get("Comments", ""), result
+                wp["ID"], wp["Status"], wp.get("Comments", ""), result, exceptions
             )
             break
     else:
@@ -412,8 +468,22 @@ def main() -> int:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--full", action="store_true", help="Run all checks")
     group.add_argument("--wp", help="Validate a single workpackage (e.g. GUI-001)")
+    parser.add_argument(
+        "--fix",
+        action="store_true",
+        help="Auto-fix detectable issues (full mode only)",
+    )
 
     args = parser.parse_args()
+
+    if args.fix and args.wp:
+        print("ERROR: --fix cannot be used with --wp (full mode only)", file=sys.stderr)
+        return 1
+
+    if args.fix:
+        fixes = apply_fixes()
+        print(f"Applied {fixes} fix(es).")
+
     result = ValidationResult()
 
     if args.full:
