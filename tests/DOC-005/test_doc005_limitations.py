@@ -16,7 +16,6 @@ LIMITATION_ENTRIES = [
     "pip install",
     "Venv activation",
     "Venv python",
-    "memory",
 ]
 
 
@@ -71,7 +70,3 @@ def test_table_contains_venv_python_entry():
     content = _read(DEFAULT_FILE)
     assert "Venv python" in content
 
-
-def test_table_contains_memory_tool_entry():
-    content = _read(DEFAULT_FILE)
-    assert "`memory` tool" in content

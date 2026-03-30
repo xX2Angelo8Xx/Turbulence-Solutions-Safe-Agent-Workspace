@@ -39,3 +39,28 @@ Tests verify:
 ## Test Results
 
 All tests pass. See `docs/test-results/test-results.csv` for logged results.
+
+---
+
+## Iteration 2 — Tester Regression Fix
+
+**Date:** 2026-03-30
+
+### Tester Finding
+
+`tests/DOC-005/test_doc005_limitations.py` had a regression:
+- `"memory"` was still present in `LIMITATION_ENTRIES`
+- `test_table_contains_memory_tool_entry` still asserted the removed row's presence
+
+### Fix Applied
+
+- Removed `"memory"` from `LIMITATION_ENTRIES` in `tests/DOC-005/test_doc005_limitations.py`
+- Deleted `test_table_contains_memory_tool_entry` function entirely
+
+### Files Changed
+
+- `tests/DOC-005/test_doc005_limitations.py`
+
+### Test Results
+
+17 tests passed, 0 failed (`tests/DOC-032/` + `tests/DOC-005/`). Logged as TST-2324.
