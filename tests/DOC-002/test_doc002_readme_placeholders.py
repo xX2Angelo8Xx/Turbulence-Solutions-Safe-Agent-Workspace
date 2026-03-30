@@ -59,20 +59,20 @@ class TestTemplateFilesContainPlaceholder:
         template_content = _TEMPLATE_README.read_text(encoding="utf-8")
         assert default_content == template_content
 
-    def test_placeholder_present_in_tier1_description(self):
-        """Tier 1 Auto-Allow section references {{PROJECT_NAME}}/ not Project/."""
+    def test_placeholder_present_in_getting_started_section(self):
+        """Getting Started section references {{PROJECT_NAME}}/ not Project/."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
-        assert "targeting `{{PROJECT_NAME}}/` proceed without a dialog" in content
+        assert "Place your project files in `{{PROJECT_NAME}}/`." in content
 
-    def test_placeholder_present_in_tier2_description(self):
-        """Tier 2 Force Ask section references {{PROJECT_NAME}}/ not Project/."""
+    def test_placeholder_present_in_agent_rules_section(self):
+        """Agent Rules section references {{PROJECT_NAME}}/ path to AGENT-RULES.md."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
-        assert "outside `{{PROJECT_NAME}}/`" in content
+        assert "`{{PROJECT_NAME}}/AGENT-RULES.md`" in content
 
-    def test_placeholder_present_in_exempt_tools_section(self):
-        """Exempt Tools section references {{PROJECT_NAME}}/ not Project/."""
+    def test_placeholder_present_in_folder_table_row(self):
+        """Workspace structure table row uses {{PROJECT_NAME}}/ as the project folder entry."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
-        assert "inside `{{PROJECT_NAME}}/`" in content
+        assert "| `{{PROJECT_NAME}}/` |" in content
 
 
 # ---------------------------------------------------------------------------
