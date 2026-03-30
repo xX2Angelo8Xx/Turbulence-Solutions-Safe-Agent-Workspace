@@ -88,6 +88,7 @@ end;
 // ts-python shim knows where to find the bundled Python executable.
 // Using Append=False overwrites any existing file, which handles
 // reinstall/update where {app} may have changed.
+// FIX-085: Log the written path and verify python-embed\python.exe exists.
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   ConfigDir: String;
@@ -99,9 +100,16 @@ begin
     ConfigDir := ExpandConstant('{localappdata}\TurbulenceSolutions');
     ConfigFile := ConfigDir + '\python-path.txt';
     PythonPath := ExpandConstant('{app}\python-embed\python.exe');
+    Log('FIX-085: Writing python-path.txt with path: ' + PythonPath);
     if not DirExists(ConfigDir) then
       CreateDir(ConfigDir);
     SaveStringToFile(ConfigFile, PythonPath, False);
+    // Verify that python-embed\python.exe actually exists after extraction.
+    if not FileExists(PythonPath) then
+      Log('FIX-085: WARNING — python-embed\python.exe not found at: ' + PythonPath +
+          '. The launcher startup self-healing will attempt auto-recovery on first run.')
+    else
+      Log('FIX-085: python-path.txt written and verified OK: ' + PythonPath);
   end;
 end;
 

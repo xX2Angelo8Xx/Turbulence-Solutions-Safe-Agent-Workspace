@@ -19,7 +19,7 @@ from launcher.core.updater import check_for_update
 from launcher.core.downloader import download_update
 from launcher.core.applier import apply_update
 from launcher.core.project_creator import create_project, is_template_ready, list_templates
-from launcher.core.shim_config import read_python_path, verify_ts_python, write_python_path
+from launcher.core.shim_config import read_python_path, verify_ts_python, write_python_path, ensure_python_path_valid
 from launcher.core.user_settings import get_setting, set_setting
 from launcher.core.vscode import find_vscode, open_in_vscode
 from launcher.gui.components import make_browse_row, make_label_entry_row
@@ -118,6 +118,16 @@ class App:
             pass
         # Silent background update check on launch (GUI-009).
         threading.Thread(target=self._run_update_check, daemon=True).start()
+        # Validate python-path.txt on every startup and auto-recover if corrupt (FIX-085).
+        if not ensure_python_path_valid():
+            messagebox.showwarning(
+                "Python Runtime Not Found",
+                "The bundled Python runtime path could not be verified and automatic "
+                "recovery failed.\n\n"
+                "The security gate may not function correctly.\n\n"
+                "Please open Settings \u2192 Relocate Python Runtime and use "
+                "Auto-detect or Browse to set the correct path.",
+            )
 
     def _get_template_options(self) -> list[str]:
         names = list_templates(TEMPLATES_DIR)

@@ -211,3 +211,54 @@ def _add_to_shell_profile(bin_dir: str) -> None:
                 f.write(export_line)
         except OSError:
             pass  # Best-effort — don't fail if profile is read-only
+
+
+def _find_bundled_python_for_recovery() -> "Path | None":
+    """Locate the bundled Python executable for path auto-recovery.
+
+    Mirrors the logic in SettingsDialog._find_bundled_python() but lives here
+    so it can be used without importing any GUI module.
+    """
+    import sys
+
+    if hasattr(sys, "_MEIPASS"):
+        # Running from a PyInstaller bundle — executable sits next to python-embed/.
+        exe_dir = Path(sys.executable).parent
+    else:
+        # Development layout: .venv/Scripts/python.exe → go up two levels to repo root.
+        exe_dir = Path(sys.executable).parent.parent
+
+    if sys.platform == "win32":
+        candidate = exe_dir / "python-embed" / "python.exe"
+    else:
+        for name in ("python3", "python"):
+            c = exe_dir / "python-embed" / name
+            if c.exists():
+                return c
+        candidate = exe_dir / "python-embed" / "python3"
+
+    return candidate if candidate.exists() else None
+
+
+def ensure_python_path_valid() -> bool:
+    """Validate python-path.txt and auto-recover if the path is missing or invalid.
+
+    Called at launcher startup (FIX-085) to self-heal after an in-app update
+    that may have corrupted or not written python-path.txt correctly.
+
+    Returns True if, after this call, python-path.txt points to an existing
+    executable.  Returns False if the path could not be established (auto-detect
+    also failed) — the caller should warn the user to configure manually.
+    """
+    python_path = read_python_path()
+    if python_path is not None and python_path.exists():
+        # Already valid — nothing to do.
+        return True
+
+    # Path is missing, empty, or points to a non-existent file.  Attempt recovery.
+    recovered = _find_bundled_python_for_recovery()
+    if recovered is not None:
+        write_python_path(recovered)
+        return True
+
+    return False
