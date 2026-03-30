@@ -35,4 +35,3 @@ Some terminal commands are blocked by the security hook. Use the listed alternat
 | `pip install` via terminal | `install_python_packages` tool |
 | Venv activation (`.\venv\Scripts\activate`) | Run `venv\Scripts\python.exe` directly |
 | Venv python (`venv\Scripts\python.exe -c "..."`) | Use system `python` command |
-| `memory` tool | Not available (blocked by design) |
