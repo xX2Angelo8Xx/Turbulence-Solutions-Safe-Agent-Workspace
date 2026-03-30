@@ -1,109 +1,287 @@
 # macOS Installation Guide — Agent Environment Launcher
 
-## Why This Is Needed
+## Overview
 
-macOS Gatekeeper blocks applications that are not signed with an Apple Developer ID certificate and notarized by Apple. Since Agent Environment Launcher uses ad-hoc code signing (no Developer ID), macOS will display a warning when you first open the app after downloading it.
+Agent Environment Launcher can be installed on macOS directly from the source
+repository using Python and `pip`. This is the **primary and recommended method**
+because it avoids Gatekeeper, code-signing, and notarization requirements
+entirely — no `xattr` workarounds, no quarantine dialogs, no SIGKILL crashes.
 
-You may see one of these messages:
-- **"AgentEnvironmentLauncher" is damaged and can't be opened.**
-- **"AgentEnvironmentLauncher" can't be opened because Apple cannot check it for malicious software.**
-- **"AgentEnvironmentLauncher" can't be opened because it is from an unidentified developer.**
-
-This is expected behavior for internally distributed applications without Apple notarization. The app is safe to use.
+A pre-built DMG is available as an **alternative** (see [DMG Install](#dmg-install-alternative))
+but is blocked by macOS Gatekeeper until the project obtains an Apple
+Developer ID certificate. Until then, use the source install below.
 
 ---
 
-## Installation Steps
+## Prerequisites
 
-### Step 1: Download the DMG
+Before you begin, ensure the following are installed:
 
-Download the latest `AgentEnvironmentLauncher-x.x.x-arm64.dmg` from the GitHub Releases page.
+| Requirement | Minimum Version | How to Install |
+|-------------|----------------|----------------|
+| **Python** | 3.11 or newer | [python.org](https://www.python.org/downloads/) or `brew install python@3.11` |
+| **git** | any recent | Xcode CLT: `xcode-select --install` |
+| **Xcode Command Line Tools** | latest | `xcode-select --install` |
 
-### Step 2: Mount the DMG
-
-Double-click the `.dmg` file to mount it. Drag `AgentEnvironmentLauncher.app` to your **Applications** folder (or any folder of your choice).
-
-### Step 3: Remove the Quarantine Flag
-
-macOS marks all files downloaded from the internet with a quarantine attribute. This must be removed before the app can launch.
-
-**Open Terminal** (Applications → Utilities → Terminal) and run:
+### Install Xcode Command Line Tools
 
 ```bash
-xattr -cr /Applications/AgentEnvironmentLauncher.app
+xcode-select --install
 ```
 
-> If you placed the app in a different folder, adjust the path accordingly.
+A dialog will appear; click **Install**. This also installs `git`.
 
-### Step 4: Launch the App
+### Verify Python 3.11+
 
-Double-click `AgentEnvironmentLauncher.app` to launch it. It should now open without any Gatekeeper warnings.
+```bash
+python3 --version
+```
+
+If the version shown is below 3.11, install a newer Python:
+
+```bash
+# Via Homebrew (recommended)
+brew install python@3.11
+
+# Or download the macOS installer from:
+# https://www.python.org/downloads/
+```
 
 ---
 
-## Alternative Methods
+## Quick Start (Source Install)
 
-If you prefer not to use Terminal, there are two other approaches:
+```bash
+# 1. Clone the repository
+git clone https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
+cd Turbulence-Solutions-Safe-Agent-Workspace
 
-### Method A: Right-Click → Open
+# 2. Run the installer
+make install-macos
+# or equivalently:
+# bash scripts/install-macos.sh
 
-1. Right-click (or Control-click) `AgentEnvironmentLauncher.app`
-2. Select **Open** from the context menu
-3. A dialog appears: "macOS cannot verify the developer..." — click **Open**
-4. The app launches. Subsequent launches via double-click will work normally.
+# 3. Reload your shell (the installer will tell you which file)
+source ~/.zshrc   # or ~/.bashrc
 
-### Method B: System Settings
+# 4. Launch
+agent-launcher
+```
 
-1. Try to open the app normally (it will be blocked)
-2. Open **System Settings** → **Privacy & Security**
-3. Scroll down to the **Security** section
-4. You will see: "AgentEnvironmentLauncher was blocked..." with an **Open Anyway** button
-5. Click **Open Anyway** and confirm
+The entire process takes about 1–2 minutes on a typical internet connection.
+
+---
+
+## What the Install Script Does
+
+`scripts/install-macos.sh` performs these steps automatically:
+
+1. **Checks Python 3.11+** is available on the system.
+2. **Checks git** is installed.
+3. **Creates a virtualenv** at `~/.local/share/TurbulenceSolutions/venv/`.
+4. **Installs the package** via `pip install .` from the repository root.
+5. **Deploys the `ts-python` shim** at
+   `~/.local/share/TurbulenceSolutions/bin/ts-python` — a wrapper that points
+   to the virtualenv Python (not a bundled Python.framework).
+6. **Writes `python-path.txt`** with the absolute path to the venv Python.
+7. **Creates an `agent-launcher` command** in
+   `~/.local/share/TurbulenceSolutions/bin/` pointing to the venv entry point.
+8. **Adds the bin directory to PATH** in your shell profile (`~/.zshrc` or
+   `~/.bashrc`), guarded against duplicate entries.
+
+The script is **idempotent** — running it a second time is safe.
+
+---
+
+## Step-by-Step Instructions
+
+### Step 1 — Clone the repository
+
+```bash
+git clone https://github.com/xX2Angelo8Xx/Turbulence-Solutions-Safe-Agent-Workspace.git
+cd Turbulence-Solutions-Safe-Agent-Workspace
+```
+
+### Step 2 — Run the installer
+
+```bash
+make install-macos
+```
+
+You will see progress output. If prompted about adding to PATH, press **Enter**
+to accept (recommended).
+
+### Step 3 — Reload your shell
+
+```bash
+source ~/.zshrc    # if using zsh (default on macOS 10.15+)
+# or
+source ~/.bashrc   # if using bash
+```
+
+### Step 4 — Verify the installation
+
+```bash
+agent-launcher --version
+ts-python --version
+```
+
+Both commands should print the version number without errors.
+
+### Step 5 — Launch
+
+```bash
+agent-launcher
+```
+
+The GUI will open. No quarantine dialogs, no code-signing prompts.
+
+---
+
+## Updating
+
+Pull the latest changes and reinstall:
+
+```bash
+cd Turbulence-Solutions-Safe-Agent-Workspace
+make update-macos
+```
+
+---
+
+## Uninstalling
+
+Run:
+
+```bash
+make uninstall-macos
+```
+
+This prints the exact commands to remove the installation. It does **not**
+delete anything automatically — copy and run the printed commands yourself
+to avoid accidental data loss.
 
 ---
 
 ## Troubleshooting
 
-### "App is damaged and can't be opened"
+### `command not found: agent-launcher`
 
-This specifically means the quarantine attribute is still present. Use the Terminal method:
+The bin directory is not yet in your PATH. Either:
+
+1. Reload your shell: `source ~/.zshrc`
+2. Or run the launcher directly:
+   ```bash
+   ~/.local/share/TurbulenceSolutions/venv/bin/agent-launcher
+   ```
+3. Or re-run the installer; it will add the PATH entry if missing.
+
+### `python3: command not found` / Python version too old
+
+Install Python 3.11 or newer:
+
+```bash
+# Homebrew
+brew install python@3.11
+
+# Or download from https://www.python.org/downloads/
+```
+
+Then re-run `make install-macos`.
+
+### `xcode-select: error: command line tools are not installed`
+
+Install Xcode Command Line Tools:
+
+```bash
+xcode-select --install
+```
+
+### `git: command not found`
+
+git is bundled with Xcode CLT. Run `xcode-select --install`.
+
+### `pip install` fails with permission error
+
+The install goes into `~/.local/` (your home directory) — no `sudo` is needed.
+If you see permission errors, check that `~/.local/` is writable:
+
+```bash
+ls -la ~/.local/
+```
+
+### App closes immediately / crashes on launch
+
+Run from Terminal to see the error output:
+
+```bash
+~/.local/share/TurbulenceSolutions/venv/bin/agent-launcher
+```
+
+Capture the output and report it to the development team.
+
+### Checking the installation
+
+```bash
+# Show installed venv Python path
+cat ~/.local/share/TurbulenceSolutions/python-path.txt
+
+# Confirm package is installed
+~/.local/share/TurbulenceSolutions/venv/bin/pip show agent-environment-launcher
+
+# Confirm entry point
+ls -la ~/.local/share/TurbulenceSolutions/bin/
+```
+
+---
+
+## Architecture Notes
+
+**Why source install instead of DMG?**
+
+The pre-built DMG uses PyInstaller to bundle Python.framework into the app.
+This causes three known issues on macOS:
+
+- **BUG-147** — SIGKILL crash: macOS kills the app due to memory pressure from
+  the embedded framework.
+- **BUG-148** — Code signature corruption: PyInstaller's ad-hoc signing breaks
+  when moved to `~/Applications/` or network drives.
+- **BUG-149** — Gatekeeper blocks the app without an Apple Developer ID cert.
+
+The source install uses the system/Homebrew Python directly inside a
+standard virtualenv — no embedded framework, no signature issues, no
+Gatekeeper friction.
+
+---
+
+## DMG Install (Alternative)
+
+> **Status:** Pending resolution of BUG-148 (code signature corruption) and
+> BUG-149 (Gatekeeper). The DMG is available but not recommended until the
+> project obtains an Apple Developer ID certificate.
+
+If you still want to use the DMG:
+
+### Step 1: Download the DMG
+
+Download the latest `AgentEnvironmentLauncher-x.x.x-arm64.dmg` from the
+GitHub Releases page.
+
+### Step 2: Mount and copy
+
+Double-click the `.dmg` file. Drag `AgentEnvironmentLauncher.app` to your
+**Applications** folder.
+
+### Step 3: Remove the quarantine flag
 
 ```bash
 xattr -cr /Applications/AgentEnvironmentLauncher.app
 ```
 
-### App closes immediately after opening
+### Step 4: Launch
 
-If the app launches but immediately closes, check the system log for details:
+Double-click `AgentEnvironmentLauncher.app`.
 
-```bash
-# View recent crash logs
-log show --predicate 'subsystem == "com.apple.launchd"' --last 1m
-```
-
-Report the output to the development team.
-
-### Verifying the app signature
-
-To confirm the app is properly signed:
-
-```bash
-codesign --verify --verbose /Applications/AgentEnvironmentLauncher.app
-```
-
-Expected output: `valid on disk` — this confirms structural integrity.
-
----
-
-## For Developers
-
-The app is ad-hoc signed with entitlements that allow:
-- Unsigned executable memory (required by embedded Python.framework)
-- Disabled library validation (required for PyInstaller-bundled .dylib/.so files)
-- DYLD environment variables (required by PyInstaller's bootloader)
-
-To enable "zero-friction" installation without the `xattr` workaround, the project would need:
-1. Apple Developer ID certificate ($99/year)
-2. Code signing with the Developer ID in CI
-3. Notarization via `xcrun notarytool submit`
-4. Stapling the notarization ticket to the DMG
+> **Note:** Even after removing quarantine, you may encounter SIGKILL crashes
+> (BUG-147) or code signing errors (BUG-148). Use the source install to avoid
+> these issues entirely.
