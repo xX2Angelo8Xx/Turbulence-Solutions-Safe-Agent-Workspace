@@ -83,7 +83,9 @@ def test_windows_shim_missing_config_error():
     # Must check if config file exists before proceeding
     assert "if not exist" in text.lower() or "if not exist" in text, \
         "Windows shim must check if config file exists"
-    assert "exit /b 1" in text, "Windows shim must exit with code 1 on error"
+    # FIX-084: exit code changed from 1 to 0 so VS Code treats the deny JSON
+    # response as a valid hook response rather than a crashed hook.
+    assert "exit /b 0" in text, "Windows shim must exit with code 0 when outputting deny JSON"
 
 
 def test_windows_shim_missing_python_error():
@@ -158,7 +160,9 @@ def test_unix_shim_missing_config_error():
     text = _read_sh_text()
     assert '[ ! -f' in text or "! -f" in text, \
         "Unix shim must check if config file exists"
-    assert "exit 1" in text, "Unix shim must exit with code 1 on error"
+    # FIX-084: exit code changed from 1 to 0 so VS Code treats the deny JSON
+    # response as a valid hook response rather than a crashed hook.
+    assert "exit 0" in text, "Unix shim must exit with code 0 when outputting deny JSON"
 
 
 def test_unix_shim_missing_python_error():
