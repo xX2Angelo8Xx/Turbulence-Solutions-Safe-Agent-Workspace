@@ -243,7 +243,7 @@ def test_pytest_uses_fail_fast_flag(workflow_yaml):
     for job in jobs.values():
         for step in job.get("steps", []):
             run = step.get("run", "")
-            if "pytest" in run:
+            if "python -m pytest" in run:
                 assert "-x" in run, (
                     f"pytest step should use '-x' (fail fast) flag. Got: {run!r}"
                 )
@@ -255,7 +255,7 @@ def test_pytest_uses_short_traceback(workflow_yaml):
     for job in jobs.values():
         for step in job.get("steps", []):
             run = step.get("run", "")
-            if "pytest" in run:
+            if "python -m pytest" in run:
                 assert "--tb=short" in run, (
                     f"pytest step should use '--tb=short' for concise CI output. Got: {run!r}"
                 )
