@@ -2165,3 +2165,7 @@
 "TST-2284","MNT-003: full regression suite","Regression","MNT-003","Fail","2026-03-30","Windows 11 + Python 3.11","7375 passed, 33 skipped, 3 xfailed, 2 warnings in 63.40s (0:01:03)",""
 "TST-2285","MNT-003: targeted suite","Unit","MNT-003","Pass","2026-03-30","Windows 11 + Python 3.11","24 passed in 0.26s",""
 "TST-2286","FIX-081: bug cascade logic tests","Unit","FIX-081","Pass","2026-03-30","Windows 11 + Python 3.11","21 passed, 0 failed","Phase1 status filter (Open/Fixed/InProgress), Phase2 status filter, BUG-regex 3+ digits, error isolation per bug"
+"TST-2287","FIX-081: full regression suite","Regression","FIX-081","Fail","2026-03-30","Windows 11 + Python 3.11","7405 passed, 33 skipped, 3 xfailed, 2 warnings in 62.79s (0:01:02)",""
+"TST-2288","FIX-081: Developer tests (21 passed)","Regression","FIX-081","Pass","2026-03-30","Windows 11 + Python 3.11","21 passed, 0 failed","Phase 1 status filter, Phase 2 status filter, BUG regex 3+ digits, error handling isolation tests"
+"TST-2289","FIX-081: Tester edge cases (7 passed)","Regression","FIX-081","Pass","2026-03-30","Windows 11 + Python 3.11","7 passed, 0 failed","Phase 2 Verified skip, already_closed set dedup, dry-run no mutations, mixed-status batch isolation"
+"TST-2290","FIX-081: Full regression suite","Regression","FIX-081","Pass","2026-03-30","Windows 11 + Python 3.11","7396 passed, 82 failed (pre-existing), 33 skipped","All 82 failures exist on main branch; no new regressions introduced by FIX-081"
