@@ -106,7 +106,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "c75f433e700610db8d5531cb8a9c499ed75e28d8aeb150
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "ba43c50f923012cb83fffabc40578b3414bae9f690189102d76f39f038373e41"
+_KNOWN_GOOD_GATE_HASH: str = "bb8adec87cee790132ece924dbe0ca1702ce559f76366531a2266ba02a2de0aa"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2732,6 +2732,9 @@ def validate_memory(data: dict, ws_root: str) -> str:
 
     # Prefer nested tool_input key (VS Code hook format)
     raw_path = tool_input.get("filePath")
+    if not isinstance(raw_path, str) or not raw_path:
+        # SAF-060: VS Code memory tool sends path as "path" key, not "filePath"
+        raw_path = tool_input.get("path")
     if not isinstance(raw_path, str) or not raw_path:
         raw_path = data.get("filePath")
     if not isinstance(raw_path, str) or not raw_path:

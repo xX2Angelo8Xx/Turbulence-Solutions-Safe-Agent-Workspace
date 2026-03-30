@@ -2131,3 +2131,4 @@
 "TST-2250","SAF-059: Developer suite (51 tests)","Unit","SAF-059","Pass","2026-03-30","Windows 11 + Python 3.11","51 passed, 0 failed","BUG-140 remove-item/del consistency, BUG-141 dir -Name flag, BUG-142 paren subexpressions, BUG-143 test-path allowlist; critical Stage 3 bypass tests"
 "TST-2251","SAF-059: Regression suite (812 tests)","Unit","SAF-059","Pass","2026-03-30","Windows 11 + Python 3.11","812 passed, 0 failed","SAF-005/006/014/015/016/020/026/028/035/036 all passing. No regressions from the 4 terminal filtering fixes."
 "TST-2252","SAF-059 regression suite","Unit","SAF-059","Pass","2026-03-30","Windows 11 Python 3.11","812 passed 0 failed","SAF-005 006 014 015 016 020 026 028 035 036 all passing no regressions"
+"TST-2253","SAF-060 memory path key fix tests","Unit","SAF-060","Pass","2026-03-30","Windows 11 + Python 3.11","15 passed, 0 failed","path key extraction, decide() integration, security deny cases, backward compatibility"
