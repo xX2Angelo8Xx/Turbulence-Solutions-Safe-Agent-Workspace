@@ -2233,3 +2233,6 @@
 "TST-2352","DOC-034: tester edge-case tests (8 passed)","Unit","DOC-034","Pass","2026-03-31","Windows 11 + Python 3.11","All 8 edge-case tests passed","Tests: release.py file exists, venv path, 5 version files named, no deprecated manual edits, valid frontmatter, structural headings intact, Primary before Fallback, git tag -a only in fallback"
 "TST-2353","DOC-034: MNT-004 and MNT-005 regression (100 passed, 1 xfailed)","Regression","DOC-034","Pass","2026-03-31","Windows 11 + Python 3.11","100 passed, 1 xfailed","MNT-004 release script tests and MNT-005 CI version validation tests - no regression from DOC-034 changes"
 "TST-2354","DOC-035 agentdocs integration tests","Unit","DOC-035","Pass","2026-03-31","Windows 11 + Python 3.11","23 passed, 0 failed","file existence, README content, AGENT-RULES update, copilot-instructions update, workspace README update"
+"TST-2355","DOC-035 AgentDocs template review","Unit","DOC-035","Pass","2026-03-31","Manual review","All files verified","Documentation-only WP - manual review"
+"TST-2356","DOC-036 Agent persona rewrite review","Unit","DOC-036","Pass","2026-03-31","Manual review","All 6 agents verified","Documentation-only WP - manual review"
+"TST-2357","DOC-037 Structured prompts review","Unit","DOC-037","Pass","2026-03-31","Manual review","All 3 prompts verified","Documentation-only WP - manual review"
