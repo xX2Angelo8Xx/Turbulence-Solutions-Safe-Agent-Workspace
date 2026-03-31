@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -24,6 +25,11 @@ def open_in_vscode(workspace_path: Path) -> bool:
     if exe is None:
         return False
 
+    kwargs: dict = {}
+    if sys.platform == "win32":
+        # Suppress the console window that appears when launching code.cmd on Windows.
+        kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
     # Use a list argument — never shell=True — to prevent command injection.
-    subprocess.Popen([exe, str(workspace_path)])  # noqa: S603
+    subprocess.Popen([exe, str(workspace_path)], **kwargs)  # noqa: S603
     return True

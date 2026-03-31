@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 
 
 def get_github_token() -> str | None:
@@ -27,12 +28,17 @@ def get_github_token() -> str | None:
         return token
 
     # 3. Try GitHub CLI — subprocess.run with list args, not shell=True
+    kwargs: dict = {}
+    if sys.platform == "win32":
+        kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
     try:
         result = subprocess.run(
             ["gh", "auth", "token"],
             capture_output=True,
             text=True,
             timeout=3,
+            **kwargs,
         )
         if result.returncode == 0:
             token = result.stdout.strip()

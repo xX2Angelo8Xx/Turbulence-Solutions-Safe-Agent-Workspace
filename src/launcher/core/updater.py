@@ -80,6 +80,10 @@ def _get_local_git_version(repo_root: Path) -> str:
 
     Falls back to '0.0.0' if no tags exist or git is unavailable.
     """
+    kwargs: dict = {}
+    if sys.platform == "win32":
+        kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
     try:
         result = subprocess.run(
             ["git", "describe", "--tags", "--abbrev=0"],
@@ -88,6 +92,7 @@ def _get_local_git_version(repo_root: Path) -> str:
             text=True,
             check=False,
             timeout=10,
+            **kwargs,
         )
         if result.returncode == 0:
             return result.stdout.strip().lstrip("v")
@@ -106,6 +111,10 @@ def check_for_update_source(
     On any error, silently returns (False, '0.0.0').
     """
     root = repo_root if repo_root is not None else _REPO_ROOT
+    fetch_kwargs: dict = {}
+    if sys.platform == "win32":
+        fetch_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
     try:
         # Fetch latest remote tags so the comparison is accurate.
         subprocess.run(
@@ -114,6 +123,7 @@ def check_for_update_source(
             capture_output=True,
             check=False,
             timeout=15,
+            **fetch_kwargs,
         )
         local_version = _get_local_git_version(root)
         # Re-use the existing GitHub Releases API call.
