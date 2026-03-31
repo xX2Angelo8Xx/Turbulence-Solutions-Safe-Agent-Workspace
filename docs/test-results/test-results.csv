@@ -2241,3 +2241,5 @@
 "TST-2360","DOC-038 skills replacement","Unit","DOC-038","Pass","2026-03-31","Windows 11 Python 3.11","8 passed 0 failed","agentdocs-update and safety-critical skills"
 "TST-2361","DOC-039 Tidyup agent","Unit","DOC-039","Pass","2026-03-31","Windows 11 Python 3.11","7 passed 0 failed","Tidyup agent and Coordinator integration"
 "TST-2362","FIX-089 inno-setup install-delete tests","Unit","FIX-089","Pass","2026-03-31","Windows 11 + Python 3.11","7 passed, 0 failed","Tests: iss-exists, install-delete-section, targets-templates, type-filesandordirs, files-recursesubdirs-intact, order-before-files, name-exact"
+"TST-2363","FIX-089: targeted suite","Unit","FIX-089","Pass","2026-03-31","Windows 11 + Python 3.11","18 passed in 0.27s",""
+"TST-2364","FIX-089: full regression suite","Regression","FIX-089","Fail","2026-03-31","Windows 11 + Python 3.11","11 passed"" in result.stdout, (",""
