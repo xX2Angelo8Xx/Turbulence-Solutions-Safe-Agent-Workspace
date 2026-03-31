@@ -10,6 +10,7 @@ Turbulence Solutions
 ## Workspace Rules
 
 - The `{{PROJECT_NAME}}/` folder is the designated working directory. Place all project files there.
+- The `{{PROJECT_NAME}}/AgentDocs/` folder is the shared knowledge base. All agents read from and write to it. See `{{PROJECT_NAME}}/AgentDocs/README.md` for the philosophy and conventions.
 - The `NoAgentZone/` folder is strictly off-limits. Never read, write, or reference files in it.
 - The `.github/` and `.vscode/` folders contain administrator configurations. Do not access or modify them.
 - All output must be in English.

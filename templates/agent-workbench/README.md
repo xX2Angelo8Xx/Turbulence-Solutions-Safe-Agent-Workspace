@@ -7,6 +7,7 @@ Welcome to your Turbulence Solutions Safe Agent Workspace.
 | Folder | Purpose |
 |--------|---------|
 | `{{PROJECT_NAME}}/` | Your project folder. Place your files here. AI agents work in this folder. |
+| `{{PROJECT_NAME}}/AgentDocs/` | Shared knowledge base for agents and humans. Central source of truth. |
 | `NoAgentZone/` | Private files. AI agents cannot access this folder. |
 | `.github/` | Workspace configuration. Do not modify. |
 | `.vscode/` | VS Code settings. Do not modify. |

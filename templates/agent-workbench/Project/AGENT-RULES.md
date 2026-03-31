@@ -27,6 +27,23 @@ In the **workspace root** (`{{WORKSPACE_NAME}}/`) you may:
 
 ---
 
+## 1a. AgentDocs — Central Knowledge Base
+
+The `{{PROJECT_NAME}}/AgentDocs/` folder is the shared documentation brain for all agents. Follow these rules:
+
+1. **At session start:** Read `AgentDocs/progress.md` to understand current project state before doing anything else.
+2. **Before finishing:** Update the AgentDocs document relevant to your work:
+   - Planner → `architecture.md`, `decisions.md`
+   - Researcher → `research-log.md`
+   - Brainstormer → `open-questions.md`
+   - Programmer, Tester → `progress.md`
+   - Coordinator → `progress.md`, `decisions.md`
+3. **Tag your entries** with your agent name and the current date.
+4. **Do not create new files** in AgentDocs unless the user explicitly requests it. Update existing documents instead.
+5. **Rewrite stale sections** rather than appending contradictions.
+
+---
+
 ## 2. Denied Zones
 
 The following paths enforce permanent restrictions. No workpackage, exception, or special instruction overrides these.

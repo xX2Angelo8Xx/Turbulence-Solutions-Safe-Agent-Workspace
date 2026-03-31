@@ -1,7 +1,7 @@
 ---
 name: story-writer
 description: "Use when creating or refining user stories from user input. Generates well-structured, acceptance-criteria-rich user stories aligned with the project vision. Requires human approval before writing to the CSV. Use for: user story creation, story refinement, acceptance criteria definition."
-tools: [read, edit, search, todo]
+tools: [read, agent, edit, search, todo]
 model: ['GPT-5.4 (copilot)']
 argument-hint: "Describe the feature or need you want turned into a user story (e.g., 'users should be able to reset their password')"
 ---
