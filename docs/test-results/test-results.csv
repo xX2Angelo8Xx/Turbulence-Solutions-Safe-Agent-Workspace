@@ -2236,3 +2236,7 @@
 "TST-2355","DOC-035 AgentDocs template review","Unit","DOC-035","Pass","2026-03-31","Manual review","All files verified","Documentation-only WP - manual review"
 "TST-2356","DOC-036 Agent persona rewrite review","Unit","DOC-036","Pass","2026-03-31","Manual review","All 6 agents verified","Documentation-only WP - manual review"
 "TST-2357","DOC-037 Structured prompts review","Unit","DOC-037","Pass","2026-03-31","Manual review","All 3 prompts verified","Documentation-only WP - manual review"
+"TST-2358","DOC-038 skills replacement","Unit","DOC-038","Pass","2026-03-31","Windows 11 + Python 3.11","8 passed 0 failed","ts-code-review deleted, agentdocs-update and safety-critical created"
+"TST-2359","DOC-039 Tidyup agent","Unit","DOC-039","Pass","2026-03-31","Windows 11 + Python 3.11","7 passed 0 failed","Tidyup agent created, Coordinator integrated, no deleted agent references"
+"TST-2360","DOC-038 skills replacement","Unit","DOC-038","Pass","2026-03-31","Windows 11 Python 3.11","8 passed 0 failed","agentdocs-update and safety-critical skills"
+"TST-2361","DOC-039 Tidyup agent","Unit","DOC-039","Pass","2026-03-31","Windows 11 Python 3.11","7 passed 0 failed","Tidyup agent and Coordinator integration"
