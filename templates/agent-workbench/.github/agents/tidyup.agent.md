@@ -1,8 +1,8 @@
 ---
 name: Tidyup
 description: "Checks that AgentDocs match the actual project state. Finds and fixes documentation drift — the cleanup crew."
-tools: [read, search, edit, execute]
-model: ['Claude Opus 4.6 (copilot)']
+tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, execute, read, agent, edit, search, todo]
+model: ['Claude Sonnet 4.6 (copilot)']
 argument-hint: "Run a docs audit, or specify what to check (e.g., 'verify architecture.md matches the codebase')"
 ---
 

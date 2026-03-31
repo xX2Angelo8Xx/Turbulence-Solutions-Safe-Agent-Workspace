@@ -1,7 +1,7 @@
 ---
 name: Planner
 description: "Creates structured plans, maps dependencies, and produces actionable task lists — planning only, no implementation"
-tools: [read, search, ask, edit]
+tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, read, agent, edit, search]
 model: ['Claude Opus 4.6 (copilot)']
 ---
 
