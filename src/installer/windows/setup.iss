@@ -28,6 +28,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
+[InstallDelete]
+; FIX-089: Remove stale template files from previous installations.
+; Inno Setup overlays new files but never deletes old ones, so template
+; files deleted between versions would persist and contaminate new workspaces.
+Type: filesandordirs; Name: "{app}\_internal\templates"
+
 [Files]
 Source: "..\..\..\dist\launcher\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; INS-018 / FIX-055: Bundle the Python embeddable distribution so the security gate can
