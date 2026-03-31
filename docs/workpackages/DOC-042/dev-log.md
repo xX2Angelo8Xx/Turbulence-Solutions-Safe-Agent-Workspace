@@ -58,4 +58,24 @@ All 18 tests passed on Windows 11 + Python 3.11.
 - [x] 6 agents use `Claude Sonnet 4.6 (copilot)`, Planner retains `Claude Opus 4.6 (copilot)`
 - [x] All agents have expanded tool lists including `vscode/memory`, `vscode/vscodeAPI`, `vscode/askQuestions`
 - [x] Newly created workspaces will use the updated defaults
+
+---
+
+## Iteration 2 — BUG-166 Fix (2026-03-31)
+
+**Tester returned WP:** Tester found the `argument-hint` field in `coordinator.agent.md` had an unclosed double-quoted string, causing `yaml.safe_load()` to raise a `ScannerError`. 6 of 21 edge-case tests failed as a result.
+
+**Fix applied:** Added missing closing `"` to line 7 of `templates/agent-workbench/.github/agents/coordinator.agent.md`.
+
+**Before:**
+```yaml
+argument-hint: "Describe the goal or plan you want to autonomously be worked on. 
+```
+
+**After:**
+```yaml
+argument-hint: "Describe the goal or plan you want to autonomously be worked on."
+```
+
+**Test result:** All 41 tests pass (TST-2381). BUG-166 fixed in this iteration.
 - [x] No unrelated files modified
