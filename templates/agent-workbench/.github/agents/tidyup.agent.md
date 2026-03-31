@@ -46,6 +46,12 @@ You audit `AgentDocs/` documents against the actual project code, structure, and
 - Are any "Open" questions already resolved by existing code or decisions?
 - Are there questions that have become irrelevant?
 
+### Plan files (plan*.md)
+- Are tasks in the plan still accurate, or have they been completed or changed?
+- Are there plan files for goals that have been fully completed? (flag for archiving or deletion)
+- Is `progress.md` referencing the correct active plan?
+- Do task owners in the plan match the actual agents doing the work?
+
 ## Output
 
 After completing an audit, produce a summary:

@@ -19,9 +19,10 @@ Central knowledge base for this project. All agents and humans read from and con
 | `research-log.md` | Findings with sources and links | Researcher |
 | `progress.md` | What is done, in progress, and next | All agents |
 | `open-questions.md` | Unresolved trade-offs needing human input | Brainstormer, any agent |
+| `plan.md` / `plan-*.md` | Active plans — task breakdowns with dependencies and ownership | Planner |
 
 ## Rules
 
-- **Do not create additional files** in this folder unless explicitly asked by the user.
+- **Do not create additional files** in this folder unless explicitly asked by the user — **except for plan files** (`plan.md`, `plan-*.md`), which Planner may create as part of its standard workflow.
 - **Tag your entries** with your agent name and date so others can trace contributions.
 - **Update, don't append forever.** When a section becomes stale, rewrite it rather than adding a contradicting paragraph below.

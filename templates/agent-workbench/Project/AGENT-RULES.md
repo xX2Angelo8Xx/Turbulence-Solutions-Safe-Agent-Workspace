@@ -33,12 +33,12 @@ The `{{PROJECT_NAME}}/AgentDocs/` folder is the shared documentation brain for a
 
 1. **At session start:** Read `AgentDocs/progress.md` to understand current project state before doing anything else.
 2. **Before finishing:** Update the AgentDocs document relevant to your work:
-   - Planner → `architecture.md`, `decisions.md`
+   - Planner → `architecture.md`, `decisions.md`, **plan files (`plan.md`, `plan-*.md`)**
    - Researcher → `research-log.md`
    - Brainstormer → `open-questions.md`
    - Programmer, Tester → `progress.md`
-   - Coordinator → `progress.md`, `decisions.md`
-   - Tidyup → all AgentDocs documents (audit and fix drift)
+   - Coordinator → `progress.md`, `decisions.md`, **references active plan file**
+   - Tidyup → all AgentDocs documents (audit and fix drift), **including plan files**
 3. **Tag your entries** with your agent name and the current date.
 4. **Do not create new files** in AgentDocs unless the user explicitly requests it. Update existing documents instead.
 5. **Rewrite stale sections** rather than appending contradictions.
