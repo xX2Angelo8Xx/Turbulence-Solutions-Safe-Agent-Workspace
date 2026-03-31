@@ -2243,3 +2243,4 @@
 "TST-2362","FIX-089 inno-setup install-delete tests","Unit","FIX-089","Pass","2026-03-31","Windows 11 + Python 3.11","7 passed, 0 failed","Tests: iss-exists, install-delete-section, targets-templates, type-filesandordirs, files-recursesubdirs-intact, order-before-files, name-exact"
 "TST-2363","FIX-089: targeted suite","Unit","FIX-089","Pass","2026-03-31","Windows 11 + Python 3.11","18 passed in 0.27s",""
 "TST-2364","FIX-089: full regression suite","Regression","FIX-089","Fail","2026-03-31","Windows 11 + Python 3.11","11 passed"" in result.stdout, (",""
+"TST-2365","DOC-040 version file tests","Unit","DOC-040","Pass","2026-03-31","Windows 11 + Python 3.11","8 passed, 0 failed","template file existence, placeholder content, replacement logic, semver validation, custom version, all-tokens replacement"

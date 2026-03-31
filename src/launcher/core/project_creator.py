@@ -11,6 +11,8 @@ import shutil
 import stat
 from pathlib import Path
 
+from launcher.config import VERSION
+
 _COUNTER_CONFIG_PATH = Path(".github") / "hooks" / "scripts" / "counter_config.json"
 _DEFAULT_COUNTER_ENABLED = True
 _DEFAULT_COUNTER_THRESHOLD = 20
@@ -102,12 +104,15 @@ def create_project(
     return target
 
 
-def replace_template_placeholders(project_dir: Path, project_name: str) -> None:
-    """Replace placeholder tokens in all .md files under *project_dir*.
+def replace_template_placeholders(
+    project_dir: Path, project_name: str, version: str = VERSION
+) -> None:
+    """Replace placeholder tokens in .md files and the .github/version file under *project_dir*.
 
     Tokens replaced:
       {{PROJECT_NAME}}    → project_name
       {{WORKSPACE_NAME}}  → TS-SAE-{project_name}
+      {{VERSION}}         → version
 
     All .md files in the project tree are processed via rglob, including
     (but not limited to):
@@ -115,12 +120,16 @@ def replace_template_placeholders(project_dir: Path, project_name: str) -> None:
       - <project_name>/README.md
       - .github/instructions/copilot-instructions.md
 
-    Non-.md files and binary files are skipped.
+    The `.github/version` file (extensionless) is also processed so that
+    `{{VERSION}}` is replaced with the launcher version string.
+
+    Non-.md files (except the version file) and binary files are skipped.
     The function is idempotent: if no placeholder is found the file is not written.
     """
     workspace_name = f"TS-SAE-{project_name}"
 
-    for file_path in project_dir.rglob("*.md"):
+    candidates = list(project_dir.rglob("*.md")) + list(project_dir.rglob("version"))
+    for file_path in candidates:
         if not file_path.is_file():
             continue
         try:
@@ -131,6 +140,7 @@ def replace_template_placeholders(project_dir: Path, project_name: str) -> None:
 
         updated = original.replace("{{PROJECT_NAME}}", project_name)
         updated = updated.replace("{{WORKSPACE_NAME}}", workspace_name)
+        updated = updated.replace("{{VERSION}}", version)
 
         if updated != original:
             try:
