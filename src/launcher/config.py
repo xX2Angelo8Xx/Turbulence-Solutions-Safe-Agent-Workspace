@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 APP_NAME: str = "TS - Safe Agent Environment"
-VERSION: str = "3.3.3"
+VERSION: str = "3.3.4"
 COLOR_PRIMARY: str = "#0A1D4E"
 COLOR_SECONDARY: str = "#5BC5F2"
 COLOR_TEXT: str = "#FFFFFF"
