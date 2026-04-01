@@ -58,8 +58,8 @@ def create_project(
             f"Destination path does not exist or is not a directory: {destination}"
         )
 
-    # Prepend the TS-SAE- brand prefix to the folder name.
-    prefixed_name = f"TS-SAE-{folder_name}"
+    # Prepend the SAE- brand prefix to the folder name.
+    prefixed_name = f"SAE-{folder_name}"
 
     # Guard against path-traversal in folder_name (e.g. "../../etc").
     target = (destination / prefixed_name).resolve()
@@ -111,7 +111,7 @@ def replace_template_placeholders(
 
     Tokens replaced:
       {{PROJECT_NAME}}    → project_name
-      {{WORKSPACE_NAME}}  → TS-SAE-{project_name}
+      {{WORKSPACE_NAME}}  → SAE-{project_name}
       {{VERSION}}         → version
 
     All .md files in the project tree are processed via rglob, including
@@ -126,7 +126,7 @@ def replace_template_placeholders(
     Non-.md files (except the version file) and binary files are skipped.
     The function is idempotent: if no placeholder is found the file is not written.
     """
-    workspace_name = f"TS-SAE-{project_name}"
+    workspace_name = f"SAE-{project_name}"
 
     candidates = list(project_dir.rglob("*.md")) + list(project_dir.rglob("version"))
     for file_path in candidates:
