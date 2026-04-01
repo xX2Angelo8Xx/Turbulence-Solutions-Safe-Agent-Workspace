@@ -3,7 +3,7 @@ name: Coordinator
 description: "Orchestrates specialist agents to turn a goal into a working demonstrator. Delegates, monitors, and delivers."
 tools: [vscode, execute, read, agent, edit, search, web/githubRepo, todo]
 agents: [Programmer, Tester, Brainstormer, Researcher, Planner, Workspace-Cleaner]
-model: ['Claude Sonnet 4.6 (copilot)']
+model: ['Claude Opus 4.6 (copilot)', 'Claude Sonnet 4.6 (copilot)']
 argument-hint: "Describe the goal or plan you want to autonomously be worked on."
 ---
 
