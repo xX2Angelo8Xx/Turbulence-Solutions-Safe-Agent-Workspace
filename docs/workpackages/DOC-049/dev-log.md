@@ -50,3 +50,27 @@ All tests passed. See `docs/test-results/test-results.csv` for log entry.
 
 ## Known Limitations
 None.
+
+---
+
+## Iteration 2 — 2026-04-01
+
+### Tester Findings (from test-report.md)
+Three edge-case tests added by the Tester failed:
+1. Wrong AgentDocs path (`templates/agent-workbench/AgentDocs/` → should be `templates/agent-workbench/Project/AgentDocs/`)
+2. Non-existent files `TOOL-MATRIX.md` and `QUICKREF.md` listed in AgentDocs table
+3. Non-existent skills directory `.github/agents/skills/` claimed in Agent System section
+
+### Fixes Applied
+
+1. **AgentDocs path**: Updated `docs/architecture.md` line referencing AgentDocs to use correct path `templates/agent-workbench/Project/AgentDocs/`.
+
+2. **AgentDocs file table**: Removed `TOOL-MATRIX.md` and `QUICKREF.md` entries. Replaced with actual files found at `templates/agent-workbench/Project/AgentDocs/`: `AGENT-RULES.md`, `architecture.md`, `decisions.md`, `open-questions.md`, `plan.md`, `progress.md`, `research-log.md`.
+
+3. **Skills directory**: Removed incorrect sentence "Reusable skill definitions are stored in `.github/agents/skills/` and are referenced from agent frontmatter." (that directory does not exist in the source repo; template skills live at `templates/agent-workbench/.github/skills/`).
+
+4. **Test fix**: Updated `test_agentdocs_path_is_accurate` in `tests/DOC-049/test_doc049_architecture.py` — the Tester's test had a broken assertion checking a hardcoded non-existent path (`agent-workbench/AgentDocs`). Fixed to check that (a) `actual_path` exists on disk and (b) architecture.md contains the correct path reference.
+
+### Test Results
+- 15 passed, 0 failed (`tests/DOC-049/`)
+- TST-2414 logged

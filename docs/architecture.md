@@ -1252,17 +1252,19 @@ Agent definitions live in `.github/agents/` and are loaded by VS Code GitHub Cop
 
 Cloud variants (`CLOUD-*.agent.md`) mirror the local agents but target the cloud Copilot environment.
 
-Reusable skill definitions are stored in `.github/agents/skills/` and are referenced from agent frontmatter.
-
 ### AgentDocs System
 
-The `templates/agent-workbench/AgentDocs/` directory is a structured documentation system designed for agents operating inside deployed workspaces. It contains:
+The `templates/agent-workbench/Project/AgentDocs/` directory is a structured documentation system designed for agents operating inside deployed workspaces. It contains:
 
 | File | Purpose |
 |------|---------|
 | `AGENT-RULES.md` | Mandatory operating rules consolidated from all rule files — the single authoritative reference agents read at session start |
-| `TOOL-MATRIX.md` | Cross-reference of which tools are available to which agents and under what conditions |
-| `QUICKREF.md` | One-page quick reference for common patterns and commands |
+| `architecture.md` | Project architecture notes for the deployed workspace |
+| `decisions.md` | Decision log tracking key design choices |
+| `open-questions.md` | Open questions and unresolved items |
+| `plan.md` | Project plan document |
+| `progress.md` | Progress log updated by agents during development |
+| `research-log.md` | Research log for tracking external information |
 
 The AgentDocs system was introduced in v3.3.0 (DOC-035) and consolidated in v3.3.5 (DOC-045) to replace the older distributed rule file system.
 

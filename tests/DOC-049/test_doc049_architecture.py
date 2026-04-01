@@ -99,21 +99,19 @@ REPO_ROOT = Path(__file__).parent.parent.parent
 
 
 def test_agentdocs_path_is_accurate():
-    """AgentDocs must exist at the correct path mentioned in architecture.md.
+    """AgentDocs must exist at the correct path and architecture.md must reference it accurately.
 
-    architecture.md claims AgentDocs is at templates/agent-workbench/AgentDocs/.
-    Actual location must match. If this test fails, update architecture.md to
-    the correct path: templates/agent-workbench/Project/AgentDocs/
+    The correct path is templates/agent-workbench/Project/AgentDocs/.
+    architecture.md must reference this path (not the old wrong path).
     """
-    claimed_path = REPO_ROOT / "templates" / "agent-workbench" / "AgentDocs"
     actual_path = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AgentDocs"
     assert actual_path.exists(), (
         "AgentDocs must exist at templates/agent-workbench/Project/AgentDocs/"
     )
-    assert claimed_path.exists(), (
-        "architecture.md states AgentDocs is at 'templates/agent-workbench/AgentDocs/' "
-        "but that path does not exist. Actual path is: "
-        "templates/agent-workbench/Project/AgentDocs/ — update architecture.md."
+    content = _content()
+    assert "templates/agent-workbench/Project/AgentDocs" in content, (
+        "architecture.md must reference AgentDocs at "
+        "templates/agent-workbench/Project/AgentDocs/ — update the AgentDocs System section."
     )
 
 

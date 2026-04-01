@@ -2292,3 +2292,4 @@
 "TST-2411","FIX-093 doc fixes unit tests","Unit","FIX-093","Pass","2026-04-01","Windows 11 + Python 3.11","7 passed, 0 failed","index.md row separation, branch deletion section (local + remote + mandatory)"
 "TST-2412","DOC-049 architecture v3.3.x tests","Unit","DOC-049","Pass","2026-04-01","Windows 11 + Python 3.11","11 passed, 0 failed","v3.3.6 ref, no TS-SAE-, agent-workbench, AgentDocs, SAE- prefix, Version History, Agent System, Template System sections"
 "TST-2413","DOC-049 architecture.md content tests (12 passed, 3 failed)","Unit","DOC-049","Fail","2026-04-01","Windows 11 + Python 3.11","12 passed, 3 failed","Failures: wrong AgentDocs path, missing TOOL-MATRIX.md and QUICKREF.md, non-existent .github/agents/skills/ directory"
+"TST-2414","DOC-049 architecture iteration 2 tests","Unit","DOC-049","Pass","2026-04-01","Windows 11 + Python 3.11","15 passed, 0 failed","Iter 2: fixed AgentDocs path, file table, skills dir claim; all 15 tests pass"
