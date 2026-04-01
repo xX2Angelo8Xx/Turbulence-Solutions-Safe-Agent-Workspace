@@ -91,3 +91,72 @@ def test_contains_template_system_section():
     assert "## Template System" in content, (
         "architecture.md must contain a '## Template System' section"
     )
+
+
+# --- Edge-case tests (Tester additions) ---
+
+REPO_ROOT = Path(__file__).parent.parent.parent
+
+
+def test_agentdocs_path_is_accurate():
+    """AgentDocs must exist at the correct path mentioned in architecture.md.
+
+    architecture.md claims AgentDocs is at templates/agent-workbench/AgentDocs/.
+    Actual location must match. If this test fails, update architecture.md to
+    the correct path: templates/agent-workbench/Project/AgentDocs/
+    """
+    claimed_path = REPO_ROOT / "templates" / "agent-workbench" / "AgentDocs"
+    actual_path = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AgentDocs"
+    assert actual_path.exists(), (
+        "AgentDocs must exist at templates/agent-workbench/Project/AgentDocs/"
+    )
+    assert claimed_path.exists(), (
+        "architecture.md states AgentDocs is at 'templates/agent-workbench/AgentDocs/' "
+        "but that path does not exist. Actual path is: "
+        "templates/agent-workbench/Project/AgentDocs/ — update architecture.md."
+    )
+
+
+def test_agentdocs_agent_rules_file_exists():
+    """AGENT-RULES.md must exist inside the AgentDocs directory."""
+    agentdocs = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AgentDocs"
+    assert (agentdocs / "AGENT-RULES.md").exists(), (
+        "AGENT-RULES.md must exist in templates/agent-workbench/Project/AgentDocs/"
+    )
+
+
+def test_agentdocs_claimed_files_exist():
+    """All files mentioned in the AgentDocs table in architecture.md must exist.
+
+    architecture.md lists AGENT-RULES.md, TOOL-MATRIX.md, QUICKREF.md.
+    All three must be present. If this test fails, either create the missing
+    files or remove their entries from the architecture.md table.
+    """
+    content = _content()
+    # Both files are claimed in architecture.md — verify they actually exist
+    agentdocs = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AgentDocs"
+    missing = []
+    for filename in ["TOOL-MATRIX.md", "QUICKREF.md"]:
+        if filename in content:
+            if not (agentdocs / filename).exists():
+                missing.append(filename)
+    assert not missing, (
+        f"architecture.md claims these AgentDocs files exist but they do not: "
+        f"{missing}. Either create them or remove from architecture.md."
+    )
+
+
+def test_no_nonexistent_skills_subdir_claimed():
+    """architecture.md must not claim .github/agents/skills/ exists if it doesn't.
+
+    If architecture.md states 'skill definitions are stored in .github/agents/skills/',
+    that directory must actually exist in the repository.
+    """
+    content = _content()
+    skills_dir = REPO_ROOT / ".github" / "agents" / "skills"
+    if ".github/agents/skills/" in content:
+        assert skills_dir.exists(), (
+            "architecture.md references '.github/agents/skills/' but that "
+            "directory does not exist. Update architecture.md to reflect the "
+            "actual skills directory location."
+        )
