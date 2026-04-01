@@ -271,6 +271,54 @@
       "priority": "Info",
       "status": "Done",
       "resolved_by": "FIX-083"
+    },
+    {
+      "action_id": "ACT-034",
+      "source_log": "2026-04-01-maintenance.md",
+      "description": "Delete 3 stale merged local branches: DOC-034/orchestrator-release-docs, MNT-004/release-script, MNT-005/ci-version-validation",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "Maintenance commit 2026-04-01 (git branch -d x3)"
+    },
+    {
+      "action_id": "ACT-035",
+      "source_log": "2026-04-01-maintenance.md",
+      "description": "Resolve untracked file docs/bugs/User-Bug-Reports/AGENT_FEEDBACK_REPORT_v3.3.6.md - commit or add to .gitignore",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "Maintenance commit 38b7ec0"
+    },
+    {
+      "action_id": "ACT-036",
+      "source_log": "2026-04-01-maintenance.md",
+      "description": "Create FIX-NNN WP for BUG-167 (High): path-traversal bypass in create_project() -- currently Open with no assigned WP",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "SAF-064 created"
+    },
+    {
+      "action_id": "ACT-037",
+      "source_log": "2026-04-01-maintenance.md",
+      "description": "Update docs/architecture.md to reflect v3.3.x changes: AgentDocs system, SAE- prefix rename, agent-workbench template restructure, version history through 3.3.6",
+      "priority": "Warning",
+      "status": "Done",
+      "resolved_by": "DOC-049 created"
+    },
+    {
+      "action_id": "ACT-038",
+      "source_log": "2026-04-01-maintenance.md",
+      "description": "Fix formatting bug in docs/work-rules/index.md line 20 -- two table rows merged on one line",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "FIX-093 created"
+    },
+    {
+      "action_id": "ACT-039",
+      "source_log": "2026-04-01-maintenance.md",
+      "description": "Codify post-merge branch deletion as required step in work rules (5 consecutive cycles of stale branches)",
+      "priority": "Info",
+      "status": "Done",
+      "resolved_by": "FIX-093 created"
     }
   ]
 }
