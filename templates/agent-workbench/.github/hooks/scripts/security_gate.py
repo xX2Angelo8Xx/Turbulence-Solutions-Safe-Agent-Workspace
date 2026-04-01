@@ -125,7 +125,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "fdba4ecb9400a378702153debe9e017e5e822d28a1653d80bf41d93feff8b4ff"
+_KNOWN_GOOD_GATE_HASH: str = "a7efe52006a8ca6fdb826e725d37f0365b09010d3c45d31d6d44426b0a7f82e6"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -157,11 +157,13 @@ _STATE_FILE_NAME: str = ".hook_state.json"
 _OTEL_JSONL_NAME: str = "copilot-otel.jsonl"
 _COUNTER_CONFIG_NAME: str = "counter_config.json"
 
-# SAF-061: Parallel denial batching constants.
+# SAF-065: Increased from 100ms to 500ms — the original 100ms window was too tight,
+# causing the second batch of parallel denied calls to occasionally spill across two
+# blocks when OS scheduling delayed one hook invocation past the boundary.
+# 500ms is still conservative relative to the inter-response gap between separate user turns.
+_DENY_BATCH_WINDOW_MS: int = 500
 # Lock file used for cross-platform exclusive read-modify-write on state file.
 _LOCK_FILE_NAME: str = ".hook_state.lock"
-# Denials arriving within this window are treated as one parallel batch (one block).
-_DENY_BATCH_WINDOW_MS: int = 100
 # Lock acquisition: retry up to this many times before falling back to unlocked.
 _LOCK_ACQUIRE_RETRIES: int = 20
 # Seconds to sleep between lock acquisition retries.
