@@ -103,7 +103,7 @@ The following paths enforce permanent restrictions. No workpackage, exception, o
 | `list_dir` | Zone-checked | Allowed in project folder and workspace root; denied in `.github/`, `.vscode/`, `NoAgentZone/` |
 | `create_directory` | Zone-checked | Allowed in project folder only |
 | **Search Tools** | | |
-| `grep_search` | Zone-checked | Read-only; `includePattern` targeting `NoAgentZone/**` blocked; `includeIgnoredFiles: true` blocked |
+| `grep_search` | Zone-checked | Read-only; **`includePattern` is required** (searches without it are denied); `includePattern` targeting `NoAgentZone/**` blocked; `includeIgnoredFiles: true` blocked |
 | `file_search` | Zone-checked | Read-only; `query` targeting `NoAgentZone/**` blocked; `includeIgnoredFiles: true` blocked |
 | `semantic_search` | Allowed | Read-only; no zone restriction |
 | **Terminal** | Zone-checked | See [Terminal Rules](#4-terminal-rules) |
@@ -197,4 +197,5 @@ If you see `Block 1 of M`, stop and reassess — do not retry the same denied ac
 | Long-running commands time out | Use `isBackground=true` and poll with `get_terminal_output` |
 | `csv` module misparsing multi-line quoted fields | Use `csv.reader` with `quoting=csv.QUOTE_ALL` |
 | Temp files pollute workspace | Prefix with `tmp_`; delete in `finally` block or pytest fixture teardown |
-| `semantic_search` returns empty or stale results | Workspace may not be indexed yet — fall back to `grep_search` with a specific pattern |
+| `semantic_search` returns empty or stale results | Workspace may not be indexed yet — fall back to `grep_search` with a specific `includePattern` scoped to your project folder (e.g. `includePattern: "project/**"`) |
+| `grep_search` denied with "requires includePattern" | Always provide `includePattern` scoped to your project folder; bare queries without `includePattern` are denied by the security gate |

@@ -41,19 +41,19 @@ WS = "/workspace"
 
 
 # ===========================================================================
-# grep_search — no parameters (FIX-021: allow when no path)
+# grep_search — no parameters (SAF-066: deny when no includePattern)
 # ===========================================================================
 
 def test_grep_search_no_params_allow():
-    """grep_search with no includePattern and no filePath -> allow (FIX-021)."""
+    """grep_search with no includePattern and no filePath -> deny (SAF-066)."""
     data = {"tool_name": "grep_search", "query": "TODO"}
-    assert sg.decide(data, WS) == "allow"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_grep_search_no_params_via_validate():
-    """validate_grep_search with no path -> allow (FIX-021)."""
+    """validate_grep_search with no path -> deny (SAF-066)."""
     data = {"tool_name": "grep_search", "query": "hello world"}
-    assert sg.validate_grep_search(data, WS) == "allow"
+    assert sg.validate_grep_search(data, WS) == "deny"
 
 
 # ===========================================================================
@@ -61,20 +61,22 @@ def test_grep_search_no_params_via_validate():
 # ===========================================================================
 
 def test_grep_search_project_include_pattern_allow():
-    """grep_search without includeIgnoredFiles and with no filePath -> allow."""
+    """grep_search with project-scoped includePattern -> allow (SAF-066: pattern required)."""
     data = {
         "tool_name": "grep_search",
         "query": "def main",
+        "includePattern": "project/**",
     }
     assert sg.decide(data, WS) == "allow"
 
 
 def test_grep_search_nested_project_include_pattern_allow():
-    """grep_search in VS Code nested format with no flagged params -> allow."""
+    """grep_search in VS Code nested format with project includePattern -> allow."""
     data = {
         "tool_name": "grep_search",
         "tool_input": {
             "query": "import os",
+            "includePattern": "project/**",
         },
     }
     assert sg.decide(data, WS) == "allow"

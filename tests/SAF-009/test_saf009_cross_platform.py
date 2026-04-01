@@ -275,9 +275,9 @@ def test_tools_multi_replace_vscode():
 
 def test_tools_grep_safe_no_path():
     # TST-539 — grep_search with no includePattern and no filePath.
-    # FIX-021: VS Code search.exclude hides restricted content → allow.
+    # SAF-066: require includePattern → deny (supersedes FIX-021 allow).
     data = {"tool_name": "grep_search", "query": "TODO"}
-    assert sg.decide(data, WS) == "allow"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_tools_grep_blocked_include():
@@ -524,13 +524,13 @@ def test_nested_grep_include_github():
 
 
 def test_nested_grep_safe():
-    # TST-566 — VS Code nested format → grep_search with safe params.
-    # FIX-021: grep_search without a scoped path returns "allow".
+    # TST-566 — VS Code nested format → grep_search with no includePattern.
+    # SAF-066: require includePattern → deny (supersedes FIX-021 allow).
     data = {
         "tool_name": "grep_search",
         "tool_input": {"query": "def main"},
     }
-    assert sg.decide(data, WS) == "allow"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_nested_terminal_safe():

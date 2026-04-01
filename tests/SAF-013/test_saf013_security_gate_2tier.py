@@ -89,11 +89,11 @@ def test_sanitize_terminal_rm_rf_returns_deny(sg):
 # ---------------------------------------------------------------------------
 
 def test_grep_search_no_path_returns_deny(sg):
-    """grep_search with no includePattern and no path field returns allow (FIX-021)."""
+    """grep_search with no includePattern and no path field returns deny (SAF-066)."""
     data = {"tool_name": "grep_search", "query": "something"}
     result = sg.validate_grep_search(data, WS)
-    assert result == "allow", (
-        f"validate_grep_search returned {result!r} instead of 'allow' for no-path call"
+    assert result == "deny", (
+        f"validate_grep_search returned {result!r} instead of 'deny' for no-path call"
     )
 
 

@@ -125,7 +125,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "a7efe52006a8ca6fdb826e725d37f0365b09010d3c45d31d6d44426b0a7f82e6"
+_KNOWN_GOOD_GATE_HASH: str = "fe4fca231a60e6cbf52a2fef67ca741bc3b8b5158dfecad91b79aa1d843051d3"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -2472,7 +2472,12 @@ def validate_grep_search(data: dict, ws_root: str) -> str:
     # the payload (e.g. a filePath passed alongside the query).
     raw_path = extract_path(data)
     if raw_path is None:
-        # FIX-021: grep_search has no filePath — VS Code search.exclude hides restricted content
+        # SAF-066: Without an includePattern the search is unscoped and can
+        # reach denied zones (NoAgentZone, .github/, .vscode/). VS Code's
+        # search.exclude is a UI hint, not a hard security boundary.
+        # Fail closed — require an explicit, non-empty includePattern.
+        if not (isinstance(include_pattern, str) and include_pattern):
+            return "deny"
         return "allow"
     zone = zone_classifier.classify(raw_path, ws_root)
     if zone == "allow":

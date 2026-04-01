@@ -208,19 +208,19 @@ def test_include_pattern_brace_github_deny():
 # ===========================================================================
 
 def test_no_include_pattern_no_params_allow():
-    """grep_search with no includePattern and no other restricted params → allow.
+    """grep_search with no includePattern must be denied (SAF-066: fail-closed).
 
-    Denied zones are excluded by VS Code search.exclude — the gate must allow
-    the call rather than blanket-denying unfiltered searches.
+    SAF-066 supersedes the previous FIX-021 allow: VS Code search.exclude is
+    not a hard security boundary, so unscoped searches must be denied.
     """
     data = {"tool_name": "grep_search", "query": "def main"}
-    assert sg.validate_grep_search(data, WS) == "allow"
+    assert sg.validate_grep_search(data, WS) == "deny"
 
 
 def test_no_include_pattern_query_only_allow():
-    """grep_search with only a query (no includePattern) → allow."""
+    """grep_search with only a query (no includePattern) must be denied (SAF-066)."""
     data = {"tool_name": "grep_search", "query": "NoAgentZone"}
-    assert sg.validate_grep_search(data, WS) == "allow"
+    assert sg.validate_grep_search(data, WS) == "deny"
 
 
 # ===========================================================================
@@ -320,9 +320,9 @@ def test_decide_github_include_pattern_deny():
 
 
 def test_decide_no_include_pattern_allow():
-    """decide() with grep_search + no params → allow."""
+    """decide() with grep_search + no includePattern must be denied (SAF-066)."""
     data = {"tool_name": "grep_search", "query": "TODO"}
-    assert sg.decide(data, WS) == "allow"
+    assert sg.decide(data, WS) == "deny"
 
 
 # ===========================================================================

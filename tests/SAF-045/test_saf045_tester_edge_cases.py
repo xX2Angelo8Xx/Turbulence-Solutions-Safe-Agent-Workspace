@@ -139,9 +139,9 @@ def test_grep_search_brace_expansion_noagentzone_deny():
 # ===========================================================================
 
 def test_grep_search_empty_include_pattern_allow():
-    """Empty string includePattern is treated as absent and must be allowed."""
+    """Empty string includePattern is equivalent to absent — must be denied (SAF-066)."""
     data = {"tool_name": "grep_search", "query": "TODO", "includePattern": ""}
-    assert sg.validate_grep_search(data, WS) == "allow"
+    assert sg.validate_grep_search(data, WS) == "deny"
 
 
 # ===========================================================================
@@ -189,14 +189,14 @@ def test_grep_search_project_github_nested_allow():
 # ===========================================================================
 
 def test_grep_search_include_ignored_files_zero_allow():
-    """includeIgnoredFiles=0 is falsy — must be allowed."""
-    data = {"tool_name": "grep_search", "query": "test", "includeIgnoredFiles": 0}
+    """includeIgnoredFiles=0 with valid includePattern is falsy — must be allowed."""
+    data = {"tool_name": "grep_search", "query": "test", "includeIgnoredFiles": 0, "includePattern": "project/**"}
     assert sg.validate_grep_search(data, WS) == "allow"
 
 
 def test_grep_search_include_ignored_files_two_allow():
-    """includeIgnoredFiles=2 is not 1 — must be allowed."""
-    data = {"tool_name": "grep_search", "query": "test", "includeIgnoredFiles": 2}
+    """includeIgnoredFiles=2 with valid includePattern is not 1 — must be allowed."""
+    data = {"tool_name": "grep_search", "query": "test", "includeIgnoredFiles": 2, "includePattern": "project/**"}
     assert sg.validate_grep_search(data, WS) == "allow"
 
 
@@ -213,14 +213,14 @@ def test_grep_search_include_ignored_files_uppercase_deny():
 
 
 def test_grep_search_include_ignored_files_string_false_allow():
-    """includeIgnoredFiles='false' (string) must be allowed."""
-    data = {"tool_name": "grep_search", "query": "test", "includeIgnoredFiles": "false"}
+    """includeIgnoredFiles='false' (string) with valid includePattern must be allowed."""
+    data = {"tool_name": "grep_search", "query": "test", "includeIgnoredFiles": "false", "includePattern": "project/**"}
     assert sg.validate_grep_search(data, WS) == "allow"
 
 
 def test_grep_search_include_ignored_files_none_allow():
-    """includeIgnoredFiles=None must be allowed."""
-    data = {"tool_name": "grep_search", "query": "test", "includeIgnoredFiles": None}
+    """includeIgnoredFiles=None with valid includePattern must be allowed."""
+    data = {"tool_name": "grep_search", "query": "test", "includeIgnoredFiles": None, "includePattern": "project/**"}
     assert sg.validate_grep_search(data, WS) == "allow"
 
 
@@ -234,8 +234,9 @@ def test_grep_search_tool_input_non_dict_no_crash():
         "tool_name": "grep_search",
         "tool_input": "not-a-dict",
         "query": "TODO",
+        "includePattern": "project/**",
     }
-    # Should not raise; top-level has no restricted params → allow
+    # Should not raise; top-level has a safe includePattern → allow
     result = sg.validate_grep_search(data, WS)
     assert result == "allow"
 

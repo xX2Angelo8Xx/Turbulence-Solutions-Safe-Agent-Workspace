@@ -187,9 +187,9 @@ def test_validate_grep_search_include_ignored_files_string_true_denied():
 
 
 def test_validate_grep_search_no_params_no_path_asks():
-    # TST-290 — no special params, no filePath → allow (FIX-021: VS Code search.exclude hides restricted content)
+    # TST-290 — no special params, no filePath, no includePattern → deny (SAF-066: require includePattern)
     data = {"tool_name": "grep_search", "query": "hello"}
-    assert sg.validate_grep_search(data, WS) == "allow"
+    assert sg.validate_grep_search(data, WS) == "deny"
 
 
 def test_validate_grep_search_no_params_project_path_allowed():
@@ -213,14 +213,14 @@ def test_validate_grep_search_no_params_deny_path_denied():
 
 
 def test_validate_grep_search_include_ignored_false_not_denied():
-    # TST-293 — includeIgnoredFiles=False: no bypass attempt, no path → allow (FIX-021)
+    # TST-293 — includeIgnoredFiles=False with no includePattern: no filePath either → deny (SAF-066)
     data = {
         "tool_name": "grep_search",
         "query": "anything",
         "includeIgnoredFiles": False,
     }
     result = sg.validate_grep_search(data, WS)
-    assert result == "allow"
+    assert result == "deny"
 
 
 def test_validate_grep_search_tool_input_nested_format():

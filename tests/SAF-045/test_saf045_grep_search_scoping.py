@@ -210,15 +210,15 @@ def test_grep_search_include_ignored_via_decide_deny():
 # ===========================================================================
 
 def test_grep_search_no_params_allow():
-    """grep_search with no includePattern and no restricted params -> allow."""
+    """grep_search with no includePattern -> deny (SAF-066: includePattern required)."""
     data = {"tool_name": "grep_search", "query": "TODO"}
-    assert sg.validate_grep_search(data, WS) == "allow"
+    assert sg.validate_grep_search(data, WS) == "deny"
 
 
 def test_grep_search_query_only_allow():
-    """grep_search with only a query field (no includePattern) -> allow."""
+    """grep_search with only a query field (no includePattern) -> deny (SAF-066)."""
     data = {"tool_name": "grep_search", "query": "import os"}
-    assert sg.validate_grep_search(data, WS) == "allow"
+    assert sg.validate_grep_search(data, WS) == "deny"
 
 
 def test_grep_search_project_include_pattern_allow():
@@ -259,9 +259,9 @@ def test_grep_search_include_ignored_false_allow():
 # --- allow via decide() integration ---
 
 def test_grep_search_no_params_via_decide_allow():
-    """decide() with grep_search + no params -> allow."""
+    """decide() with grep_search + no includePattern -> deny (SAF-066)."""
     data = {"tool_name": "grep_search", "query": "TODO"}
-    assert sg.decide(data, WS) == "allow"
+    assert sg.decide(data, WS) == "deny"
 
 
 def test_grep_search_project_include_via_decide_allow():
