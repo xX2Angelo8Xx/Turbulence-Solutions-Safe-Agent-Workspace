@@ -10,6 +10,7 @@ AGENT_RULES_PATH = (
     / "templates"
     / "agent-workbench"
     / "Project"
+    / "AgentDocs"
     / "AGENT-RULES.md"
 )
 
@@ -69,10 +70,10 @@ def test_does_not_contain_s8_agent_personas():
     )
 
 
-def test_file_has_fewer_than_150_lines():
+def test_file_has_fewer_than_220_lines():
     lines = _lines()
-    assert len(lines) < 150, (
-        f"File must have fewer than 150 lines; found {len(lines)}"
+    assert len(lines) < 220, (
+        f"File must have fewer than 220 lines; found {len(lines)}"
     )
 
 

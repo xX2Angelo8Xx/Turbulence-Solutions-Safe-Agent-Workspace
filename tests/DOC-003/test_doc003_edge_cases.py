@@ -95,10 +95,10 @@ def test_vscode_reference_unchanged_in_default_project():
 # ---------------------------------------------------------------------------
 
 def test_placeholder_is_in_workspace_rules_section():
-    """The {{PROJECT_NAME}} placeholder must appear inside the Workspace Rules section body."""
+    """The {{PROJECT_NAME}} placeholder must appear inside the Workspace Layout section body."""
     content = _read(DEFAULT_PROJECT_FILE)
-    ws_rules_idx = content.find("## Workspace Rules")
-    assert ws_rules_idx != -1, "Workspace Rules section not found"
+    ws_rules_idx = content.find("## Workspace Layout")
+    assert ws_rules_idx != -1, "Workspace Layout section not found"
     # Extract section body: from the heading to the next ## heading (or EOF)
     next_section = re.search(r'^## ', content[ws_rules_idx + 1:], re.MULTILINE)
     ws_rules_end = ws_rules_idx + 1 + next_section.start() if next_section else len(content)
