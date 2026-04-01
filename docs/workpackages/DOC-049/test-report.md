@@ -1,11 +1,61 @@
 # DOC-049 Test Report — Update architecture.md for v3.3.x
 
-## Verdict: FAIL
+## Verdict: PASS (Iteration 2)
 
 **Date:** 2026-04-01  
 **Tester:** Tester Agent  
 **Branch:** `DOC-049/architecture-v33x`  
-**Test ID logged:** TST-2413
+**Test IDs logged:** TST-2413 (iter 1 — FAIL), TST-2415 (iter 2 — PASS)
+
+---
+
+# Iteration 2 Review
+
+## Summary
+
+All 3 iteration-1 failures have been correctly fixed. All 15 tests pass. Workspace validation clean.
+
+| Tests | Result |
+|-------|--------|
+| Developer tests (11) | 15 passed |
+| Tester edge-case tests (4) | 15 passed |
+| **Total** | **15 passed, 0 failed** |
+
+## Fix Verification
+
+### Fix 1: AgentDocs Path ✓ VERIFIED
+`docs/architecture.md` now reads `templates/agent-workbench/Project/AgentDocs/`.
+Path confirmed to exist on disk. Test `test_agentdocs_path_is_accurate` passes.
+
+### Fix 2: AgentDocs File Table ✓ VERIFIED
+Table now lists exactly the 7 files that exist on disk:
+`AGENT-RULES.md`, `architecture.md`, `decisions.md`, `open-questions.md`, `plan.md`, `progress.md`, `research-log.md`.
+No non-existent files claimed. Test `test_agentdocs_claimed_files_exist` passes.
+
+### Fix 3: Skills Directory Claim Removed ✓ VERIFIED
+No reference to `.github/agents/skills/` anywhere in `docs/architecture.md`.
+Test `test_no_nonexistent_skills_subdir_claimed` passes.
+
+## Observations
+
+**Minor historical inaccuracy (non-blocking):** The v3.3.0 version history entry states "AgentDocs folder created with AGENT-RULES, TOOL-MATRIX, QUICKREF (DOC-035)". DOC-035's dev-log shows those files were never created (actual created files: README.md, architecture.md, decisions.md, research-log.md, progress.md, open-questions.md). This is a pre-existing historical inaccuracy in the version history section — it does not affect the accuracy of the current documentation state and is not covered by the iteration-1 scope. Recommend correcting in a future DOC WP.
+
+## Checks
+
+| Check | Result |
+|-------|--------|
+| All 3 iter-1 fixes applied | ✓ PASS |
+| All 15 tests pass | ✓ PASS |
+| `validate_workspace.py --wp DOC-049` | ✓ PASS (clean) |
+| dev-log.md exists and is complete | ✓ PASS |
+| Test results logged (TST-2415) | ✓ PASS |
+| No stale `TS-SAE-` references | ✓ PASS |
+| No non-existent files claimed in current tables | ✓ PASS |
+| AgentDocs path matches filesystem | ✓ PASS |
+
+---
+
+# Iteration 1 Review (Original FAIL — archived below)
 
 ---
 
