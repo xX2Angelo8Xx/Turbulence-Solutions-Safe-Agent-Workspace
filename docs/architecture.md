@@ -42,6 +42,7 @@ Templates (bundled inside Launcher)
 │   ├── bugs/
 │   │   ├── User-Bug-Reports/
 │   │   │   ├── 2026-03-20-workspace-review.md
+│   │   │   ├── AGENT_FEEDBACK_REPORT.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.1.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.2.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.3.md
@@ -51,7 +52,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.3.6.md
 │   │   │   ├── AgentExperienceReport_v3.1.2.md
 │   │   │   ├── BUG_REPORT-MacOS-2.0.0.md
-│   │   │   └── SAE_macOS_Error_Report_v323.md
+│   │   │   ├── Minimal_Agent_Feedback-3.3.8.md
+│   │   │   ├── SAE_macOS_Error_Report_v323.md
+│   │   │   └── security-hook-report.md
 │   │   └── bugs.csv
 │   ├── maintenance/
 │   │   ├── .gitkeep
@@ -896,6 +899,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-066/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-068/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1237,6 +1243,7 @@ Templates (bundled inside Launcher)
 │   ├── SAF-063/
 │   ├── SAF-065/
 │   ├── SAF-066/
+│   ├── SAF-068/
 │   ├── shared/
 │   ├── __init__.py
 │   └── conftest.py
