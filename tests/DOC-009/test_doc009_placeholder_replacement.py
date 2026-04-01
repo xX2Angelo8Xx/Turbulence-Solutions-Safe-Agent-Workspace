@@ -19,7 +19,7 @@ from launcher.core.project_creator import replace_template_placeholders
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).parent.parent.parent
-AGENT_RULES_TEMPLATE = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
+AGENT_RULES_TEMPLATE = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
 
 
 # ---------------------------------------------------------------------------
@@ -27,10 +27,11 @@ AGENT_RULES_TEMPLATE = REPO_ROOT / "templates" / "agent-workbench" / "Project" /
 # ---------------------------------------------------------------------------
 
 def _setup_agent_rules(base_dir: Path, project_name: str) -> Path:
-    """Copy the real AGENT-RULES.md template into base_dir/<project_name>/AGENT-RULES.md."""
+    """Copy the real AGENT-RULES.md template into base_dir/<project_name>/AgentDocs/AGENT-RULES.md."""
     project_dir = base_dir / project_name
-    project_dir.mkdir(parents=True, exist_ok=True)
-    agent_rules_dest = project_dir / "AGENT-RULES.md"
+    agent_docs_dir = project_dir / "AgentDocs"
+    agent_docs_dir.mkdir(parents=True, exist_ok=True)
+    agent_rules_dest = agent_docs_dir / "AGENT-RULES.md"
     shutil.copy2(str(AGENT_RULES_TEMPLATE), str(agent_rules_dest))
     return agent_rules_dest
 

@@ -60,33 +60,17 @@ def test_directive_uses_project_name_placeholder():
             return
     raise AssertionError(
         "{{PROJECT_NAME}} and AGENT-RULES.md do not appear together on the same line. "
-        "The path reference should be '{{PROJECT_NAME}}/AGENT-RULES.md'."
+        "The path reference should be '{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md'."
     )
 
 
 def test_directive_is_near_top():
-    """The directive must appear within the first 10 lines or first section of the file."""
+    """The directive must appear within the first 20 lines of the file."""
     lines = _read_lines()
-    # Check first 10 lines for AGENT-RULES.md reference
-    first_ten = "\n".join(lines[:10])
-    if "AGENT-RULES.md" in first_ten:
-        return  # Directive is within first 10 lines — pass
-
-    # Fallback: check first section (up to first blank line after content starts)
-    # Find end of first content block
-    first_section_end = 0
-    content_started = False
-    for i, line in enumerate(lines):
-        if line.strip():
-            content_started = True
-        elif content_started and not line.strip() and i > 2:
-            first_section_end = i
-            break
-
-    first_section = "\n".join(lines[:first_section_end]) if first_section_end else "\n".join(lines[:20])
-    assert "AGENT-RULES.md" in first_section, (
-        f"Read-first directive (AGENT-RULES.md) not found within first 10 lines or first section. "
-        f"First 10 lines:\n{first_ten}"
+    first_twenty = "\n".join(lines[:20])
+    assert "AGENT-RULES.md" in first_twenty, (
+        f"Read-first directive (AGENT-RULES.md) not found within first 20 lines. "
+        f"First 20 lines:\n{first_twenty}"
     )
 
 
@@ -96,10 +80,8 @@ def test_existing_content_preserved():
     required_sections = [
         "Turbulence Solutions",
         "NoAgentZone",
-        "Workspace Rules",
+        "Workspace Layout",
         "Security",
-        "Coding Standards",
-        "Communication",
         "Known Tool Limitations",
     ]
     missing = [s for s in required_sections if s not in content]
