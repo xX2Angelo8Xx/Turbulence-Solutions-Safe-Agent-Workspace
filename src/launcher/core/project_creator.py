@@ -9,6 +9,7 @@ import json
 import os
 import shutil
 import stat
+import subprocess
 from pathlib import Path
 
 from launcher.config import VERSION
@@ -101,7 +102,39 @@ def create_project(
                     except FileNotFoundError:
                         pass
 
+    # INS-030: Initialise a git repository so agents can use git from the first session.
+    # Failure is non-fatal — if git is not installed or fails for any reason, the
+    # workspace is still usable; the user or agent can run git init manually.
+    _init_git_repository(target)
+
     return target
+
+
+def _init_git_repository(workspace: Path) -> bool:
+    """Initialise a git repository in *workspace* and make an initial commit.
+
+    INS-030: Newly created workspaces must have a .git directory so agents
+    can use git operations from the very first session without hitting
+    'fatal: not a git repository'.
+
+    Returns True if git init and the initial commit both succeeded, False
+    if git is unavailable or any step fails (non-fatal).
+    """
+    _GIT_TIMEOUT = 30  # seconds per git subprocess call
+    common = {"cwd": str(workspace), "capture_output": True, "timeout": _GIT_TIMEOUT}
+    try:
+        result = subprocess.run(["git", "init"], **common)
+        if result.returncode != 0:
+            return False
+        subprocess.run(["git", "add", "-A"], **common)
+        subprocess.run(
+            ["git", "commit", "-m", "Initial commit"],
+            **common,
+        )
+        return True
+    except (OSError, subprocess.TimeoutExpired):
+        # git not installed or timed out — workspace is still usable.
+        return False
 
 
 def replace_template_placeholders(
