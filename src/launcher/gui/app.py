@@ -443,9 +443,9 @@ class App:
             self.destination_error_label.configure(text=dest_error)
             return
 
-        if check_duplicate_folder(f"TS-SAE-{folder_name}", destination_str):
+        if check_duplicate_folder(f"SAE-{folder_name}", destination_str):
             self.project_name_error_label.configure(
-                text=f'A folder named "TS-SAE-{folder_name}" already exists at the destination.'
+                text=f'A folder named "SAE-{folder_name}" already exists at the destination.'
             )
             return
 
@@ -499,7 +499,7 @@ class App:
 
         messagebox.showinfo(
             "Project Created",
-            f'Project "TS-SAE-{folder_name}" created successfully at:\n{created_path}',
+            f'Project "SAE-{folder_name}" created successfully at:\n{created_path}',
         )
 
         # Open the new project in VS Code if the checkbox is checked (GUI-006).
