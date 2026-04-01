@@ -1745,7 +1745,8 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
     # "$env:" (case-insensitive) for ALL commands.  Scoped to "$env:"
     # specifically to avoid false positives on harmless strings like "$5".
     for tok in args:
-        if "$env:" in tok.lower():
+        tok_lower = tok.lower()
+        if "$env:" in tok_lower or "${env:" in tok_lower:
             return False
 
     # 4. Python -m module check

@@ -64,3 +64,29 @@ harmless strings like `$5`.
 
 ### Test Results
 All 7 tests pass. See `docs/test-results/test-results.csv`.
+
+---
+
+## Iteration 2 — Fix Tester Finding (2026-04-02)
+
+### Finding
+Tester T08 exposed a bypass: PowerShell brace syntax `${env:USERNAME}` does NOT contain
+the substring `$env:` (the `{` interrupts the match), so the guard missed it.
+
+### Fix Applied
+Extended the guard condition from:
+```python
+if "$env:" in tok.lower():
+```
+to:
+```python
+tok_lower = tok.lower()
+if "$env:" in tok_lower or "${env:" in tok_lower:
+```
+Both `$env:VAR` and `${env:VAR}` are now denied.
+
+**File changed:**
+- `templates/agent-workbench/.github/hooks/scripts/security_gate.py` — guard extended
+
+### Test Results
+All 13 tests pass (T01–T13 including T08 brace-syntax). See TST-2431 in test-results.csv.
