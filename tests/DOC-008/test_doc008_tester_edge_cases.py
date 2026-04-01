@@ -33,30 +33,43 @@ def _read_lines() -> list[str]:
 
 def test_directive_in_first_5_lines():
     """
-    The read-first directive must appear within the first 5 lines of the file.
-    Placing it later would force agents to scroll past header content before
-    seeing the instruction, defeating its purpose.
+    The read-first directive must appear within the first 20 lines of the file.
+    The slim copilot-instructions.md format places the directive in the
+    '## First Action' section, which appears after the Workspace Layout section.
     """
     lines = _read_lines()
-    first_five = "\n".join(lines[:5])
-    assert "AGENT-RULES.md" in first_five, (
-        "AGENT-RULES.md directive not found within the first 5 lines.\n"
-        f"First 5 lines:\n{first_five}"
+    first_twenty = "\n".join(lines[:20])
+    assert "AGENT-RULES.md" in first_twenty, (
+        "AGENT-RULES.md directive not found within the first 20 lines.\n"
+        f"First 20 lines:\n{first_twenty}"
     )
 
 
 def test_directive_is_very_first_content():
     """
-    The directive must be the very first non-empty content in the file.
-    Nothing should appear before it — not a heading, not a blank line with text,
-    not a comment.
+    The read-first directive must appear in a dedicated '## First Action' section
+    near the top of the file. The slim format uses a heading-based section
+    rather than a blockquote callout.
     """
-    lines = _read_lines()
-    # Skip leading blank lines (there should be none, but be lenient about that)
-    first_content_line = next((l for l in lines if l.strip()), "")
-    assert first_content_line.startswith(">"), (
-        f"First non-empty line of copilot-instructions.md does not start with '>'.\n"
-        f"Expected a blockquote directive, got: {first_content_line!r}"
+    content = _read_file()
+    assert "## First Action" in content, (
+        "Expected a '## First Action' section in copilot-instructions.md. "
+        "This section must contain the AGENT-RULES.md read directive."
+    )
+    # Verify the section contains the AGENT-RULES.md reference
+    lines = _read_file().splitlines()
+    in_first_action = False
+    found = False
+    for line in lines:
+        if line.strip() == "## First Action":
+            in_first_action = True
+        elif in_first_action and line.startswith("## "):
+            break
+        elif in_first_action and "AGENT-RULES.md" in line:
+            found = True
+            break
+    assert found, (
+        "'## First Action' section found but does not reference AGENT-RULES.md."
     )
 
 
@@ -66,17 +79,18 @@ def test_directive_is_very_first_content():
 
 def test_no_unexpected_placeholders():
     """
-    The only {{...}} placeholder allowed in the directive is {{PROJECT_NAME}}.
+    The only {{...}} placeholders allowed are {{PROJECT_NAME}} and {{WORKSPACE_NAME}}.
     This test catches accidental introduction of new or malformed placeholders
     (e.g. {{AGENT_NAME}}, {{project_name}}, {PROJECT_NAME}, etc.).
     """
     content = _read_file()
     # Find all double-brace placeholders
     all_placeholders = re.findall(r"\{\{[^}]+\}\}", content)
+    allowed = {"{{PROJECT_NAME}}", "{{WORKSPACE_NAME}}"}
     for placeholder in all_placeholders:
-        assert placeholder == "{{PROJECT_NAME}}", (
+        assert placeholder in allowed, (
             f"Unexpected placeholder found in copilot-instructions.md: {placeholder!r}. "
-            "Only {{PROJECT_NAME}} is expected in this template."
+            f"Only {allowed} are expected in this template."
         )
 
 
@@ -103,26 +117,14 @@ def test_no_single_brace_placeholder_leak():
 
 def test_important_callout_syntax():
     """
-    The directive must use the exact GitHub-Flavored Markdown IMPORTANT callout
-    syntax: '> [!IMPORTANT]' on its own line.
-    This is the standard GFM alert syntax supported by GitHub, GitLab, and VS Code.
+    The directive must use a dedicated '## First Action' section heading.
+    The slim copilot-instructions.md uses a Markdown section heading instead
+    of a GFM '[!IMPORTANT]' callout to highlight the first-action directive.
     """
-    lines = _read_lines()
-    # [!IMPORTANT] must appear as a standalone callout marker
-    callout_lines = [l for l in lines if "[!IMPORTANT]" in l]
-    assert callout_lines, (
-        "No '[!IMPORTANT]' callout marker found in copilot-instructions.md. "
-        "The directive should use '> [!IMPORTANT]' to render as a prominent callout."
-    )
-    # The callout line must start with '>' (blockquote prefix)
-    for line in callout_lines:
-        assert line.strip().startswith(">"), (
-            f"[!IMPORTANT] marker is not inside a blockquote ('>') in line: {line!r}"
-        )
-    # Syntax must be exactly '> [!IMPORTANT]' (case matters for GFM)
-    assert any(line.strip() == "> [!IMPORTANT]" for line in lines), (
-        f"Expected '> [!IMPORTANT]' as an exact line; found callout lines: {callout_lines}. "
-        "Check for typos or extra content on the [!IMPORTANT] line."
+    content = _read_file()
+    assert "## First Action" in content, (
+        "No '## First Action' section found in copilot-instructions.md. "
+        "The directive should use a dedicated section heading to highlight the first action."
     )
 
 
@@ -149,12 +151,12 @@ def test_directive_body_is_blockquote():
 
 def test_agent_rules_path_format():
     """
-    The path reference must be '{{PROJECT_NAME}}/AGENT-RULES.md' — using a
-    forward slash separator. A backslash or missing slash would produce an
+    The path reference must be '{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md' — using
+    forward slash separators. A backslash or missing slash would produce an
     invalid path on POSIX systems.
     """
     content = _read_file()
-    assert "{{PROJECT_NAME}}/AGENT-RULES.md" in content, (
-        "Expected path '{{PROJECT_NAME}}/AGENT-RULES.md' (forward slash) not found.\n"
+    assert "{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md" in content, (
+        "Expected path '{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md' (forward slash) not found.\n"
         "Check for backslash separators or missing slash in the directive."
     )
