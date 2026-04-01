@@ -2290,3 +2290,4 @@
 "TST-2409","DOC-048 full regression suite","Regression","DOC-048","Pass","2026-04-01","Windows 11 + Python 3.11","700 failed (pre-existing from GUI-033), 7384 passed, 37 skipped","Baseline on GUI-033 had 718 failures; DOC-048 fixed 18 tests net. All DOC-048 related failures are pre-existing template-file absences."
 "TST-2410","FIX-093 doc fixes tests","Unit","FIX-093","Pass","2026-04-01","Windows 11 + Python 3.11","7 passed, 0 failed","index.md formatting, commit-branch-rules.md branch deletion section"
 "TST-2411","FIX-093 doc fixes unit tests","Unit","FIX-093","Pass","2026-04-01","Windows 11 + Python 3.11","7 passed, 0 failed","index.md row separation, branch deletion section (local + remote + mandatory)"
+"TST-2412","DOC-049 architecture v3.3.x tests","Unit","DOC-049","Pass","2026-04-01","Windows 11 + Python 3.11","11 passed, 0 failed","v3.3.6 ref, no TS-SAE-, agent-workbench, AgentDocs, SAE- prefix, Version History, Agent System, Template System sections"
