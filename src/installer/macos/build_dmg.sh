@@ -15,7 +15,7 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 APP_NAME="Agent Environment Launcher"
 APP_BUNDLE_NAME="AgentEnvironmentLauncher"
-APP_VERSION="3.3.7"
+APP_VERSION="3.3.8"
 APP_ID="com.turbulencesolutions.agentlauncher"
 PUBLISHER="Turbulence Solutions"
 SPEC_FILE="launcher.spec"
