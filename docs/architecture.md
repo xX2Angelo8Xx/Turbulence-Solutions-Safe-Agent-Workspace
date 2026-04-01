@@ -48,6 +48,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.4.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.5.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.6.md
+│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.3.6.md
 │   │   │   ├── AgentExperienceReport_v3.1.2.md
 │   │   │   ├── BUG_REPORT-MacOS-2.0.0.md
 │   │   │   └── SAE_macOS_Error_Report_v323.md
@@ -63,6 +64,7 @@ Templates (bundled inside Launcher)
 │   │   ├── 2026-03-24-maintenance.md
 │   │   ├── 2026-03-25-maintenance.md
 │   │   ├── 2026-03-30-maintenance.md
+│   │   ├── 2026-04-01-maintenance.md
 │   │   └── action-tracker.json
 │   ├── plans/
 │   │   ├── plan-fixLegacyValidationErrors.md
@@ -523,6 +525,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-092/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-093/
+│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-001/
@@ -1094,6 +1100,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-090/
 │   ├── FIX-091/
 │   ├── FIX-092/
+│   ├── FIX-093/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
