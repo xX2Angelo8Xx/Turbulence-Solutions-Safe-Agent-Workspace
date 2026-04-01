@@ -116,7 +116,7 @@ def replace_template_placeholders(
 
     All .md files in the project tree are processed via rglob, including
     (but not limited to):
-      - <project_name>/AGENT-RULES.md
+      - <project_name>/AgentDocs/AGENT-RULES.md
       - <project_name>/README.md
       - .github/instructions/copilot-instructions.md
 

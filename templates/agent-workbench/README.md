@@ -18,5 +18,5 @@ Place your project files in `{{PROJECT_NAME}}/`. Open Copilot Chat and start a c
 
 ## AI Agent Rules
 
-Agents follow the rules defined in `{{PROJECT_NAME}}/AGENT-RULES.md`. You can edit that file to customise agent behaviour for your project.
+Agents follow the rules defined in `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md`. You can edit that file to customise agent behaviour for your project.
 
