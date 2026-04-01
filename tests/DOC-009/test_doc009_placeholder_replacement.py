@@ -1,4 +1,4 @@
-"""Tests for DOC-009: AGENT-RULES.md included in placeholder replacement.
+﻿"""Tests for DOC-009: AGENT-RULES.md included in placeholder replacement.
 
 Verifies that replace_template_placeholders() in project_creator.py processes
 AGENT-RULES.md and replaces all {{PROJECT_NAME}} and {{WORKSPACE_NAME}} tokens,
@@ -129,9 +129,9 @@ def test_actual_project_name_in_agent_rules(tmp_path):
 
 
 def test_actual_workspace_name_in_agent_rules(tmp_path):
-    """After replacement, the TS-SAE-prefixed workspace name appears in AGENT-RULES.md."""
+    """After replacement, the SAE-prefixed workspace name appears in AGENT-RULES.md."""
     project_name = "MatlabDemo"
-    expected_workspace = f"TS-SAE-{project_name}"
+    expected_workspace = f"SAE-{project_name}"
     agent_rules_dest = _setup_agent_rules(tmp_path, project_name)
 
     replace_template_placeholders(tmp_path, project_name)

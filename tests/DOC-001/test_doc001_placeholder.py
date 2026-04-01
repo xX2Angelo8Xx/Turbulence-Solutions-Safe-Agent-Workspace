@@ -1,4 +1,4 @@
-"""Tests for DOC-001: replace_template_placeholders in project_creator.py."""
+﻿"""Tests for DOC-001: replace_template_placeholders in project_creator.py."""
 
 from __future__ import annotations
 
@@ -35,12 +35,12 @@ class TestReplaceTemplatePlaceholders:
         assert "{{PROJECT_NAME}}" not in result
 
     def test_md_workspace_name_replaced(self, tmp_path):
-        """{{WORKSPACE_NAME}} in a .md file is replaced with TS-SAE-{project_name}."""
+        """{{WORKSPACE_NAME}} in a .md file is replaced with SAE-{project_name}."""
         md = tmp_path / "README.md"
         _write(md, "Workspace: {{WORKSPACE_NAME}}")
         replace_template_placeholders(tmp_path, "Alpha")
         result = md.read_text(encoding="utf-8")
-        assert "TS-SAE-Alpha" in result
+        assert "SAE-Alpha" in result
         assert "{{WORKSPACE_NAME}}" not in result
 
     def test_both_placeholders_replaced(self, tmp_path):
@@ -50,7 +50,7 @@ class TestReplaceTemplatePlaceholders:
         replace_template_placeholders(tmp_path, "Demo")
         result = md.read_text(encoding="utf-8")
         assert "Demo" in result
-        assert "TS-SAE-Demo" in result
+        assert "SAE-Demo" in result
         assert "{{PROJECT_NAME}}" not in result
         assert "{{WORKSPACE_NAME}}" not in result
 
@@ -122,7 +122,7 @@ class TestReplaceTemplatePlaceholders:
         result = md.read_text(encoding="utf-8")
         assert "{{PROJECT_NAME}}" not in result
         assert "{{WORKSPACE_NAME}}" not in result
-        assert "TS-SAE-" in result  # workspace name still has prefix
+        assert "SAE-" in result  # workspace name still has prefix
 
     def test_multiple_md_files_all_replaced(self, tmp_path):
         """All .md files in the tree are processed."""
@@ -137,7 +137,7 @@ class TestReplaceTemplatePlaceholders:
         for f in files:
             content = f.read_text(encoding="utf-8")
             assert "Multi" in content
-            assert "TS-SAE-Multi" in content
+            assert "SAE-Multi" in content
             assert "{{PROJECT_NAME}}" not in content
             assert "{{WORKSPACE_NAME}}" not in content
 
@@ -163,7 +163,7 @@ class TestCreateProjectIntegration:
         readme = result / "README.md"
         content = readme.read_text(encoding="utf-8")
         assert "IntTest" in content
-        assert "TS-SAE-IntTest" in content
+        assert "SAE-IntTest" in content
         assert "{{PROJECT_NAME}}" not in content
         assert "{{WORKSPACE_NAME}}" not in content
 
