@@ -1501,6 +1501,14 @@ def _tokenize_segment(segment: str) -> list[str]:
     Returns an empty list if the segment cannot be parsed (treat as deny).
     """
     try:
+        # SAF-068 / BUG-173: Normalize backslashes to forward slashes BEFORE
+        # shlex parsing.  shlex(posix=True) treats backslash as an escape
+        # character, silently consuming path separators in unquoted Windows
+        # paths (C:\Users\x -> C:Usersx).  Forward slashes are preserved by
+        # shlex and recognized by _is_path_like(), ensuring zone checks fire.
+        # The lookahead (?=\S) skips trailing backslashes so that a dangling
+        # backslash still causes a shlex ValueError (safe-fail deny).
+        segment = re.sub(r"\\(?=\S)", "/", segment)
         lex = shlex.shlex(segment, posix=True)
         lex.whitespace_split = True
         lex.whitespace = " \t"
