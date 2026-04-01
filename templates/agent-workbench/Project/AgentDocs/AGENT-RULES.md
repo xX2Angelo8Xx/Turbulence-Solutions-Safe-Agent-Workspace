@@ -155,6 +155,8 @@ Get-ChildItem {{PROJECT_NAME}}/ -Name
 
 ## 5. Git Rules
 
+> **Prerequisite:** Git operations require an initialised repository. A freshly created workspace already has a `.git` directory and an initial commit — run `git status` to verify. If for any reason the repository is missing, run `git init` followed by `git add -A` and `git commit -m "Initial commit"` once before using any of the commands below.
+
 ### Allowed Operations
 
 | Command | Purpose |
@@ -195,4 +197,4 @@ If you see `Block 1 of M`, stop and reassess — do not retry the same denied ac
 | Long-running commands time out | Use `isBackground=true` and poll with `get_terminal_output` |
 | `csv` module misparsing multi-line quoted fields | Use `csv.reader` with `quoting=csv.QUOTE_ALL` |
 | Temp files pollute workspace | Prefix with `tmp_`; delete in `finally` block or pytest fixture teardown |
-| `semantic_search` returns stale results | Fall back to `grep_search` with a specific pattern |
+| `semantic_search` returns empty or stale results | Workspace may not be indexed yet — fall back to `grep_search` with a specific pattern |

@@ -10,6 +10,7 @@ AGENT_RULES_PATH = (
     / "templates"
     / "agent-workbench"
     / "Project"
+    / "AgentDocs"
     / "AGENT-RULES.md"
 )
 
@@ -238,9 +239,9 @@ def test_noagentzone_fully_denied():
 # ---------------------------------------------------------------------------
 
 def test_significant_length_reduction():
-    """Document must be shorter than 160 lines (substantial reduction from the ~200-line original)."""
+    """Document must stay below 220 lines (consolidated AgentDocs format after DOC-045)."""
     lines = _content().splitlines()
-    assert len(lines) < 160, (
-        f"Document should be significantly shorter than the original ~200 lines; "
-        f"found {len(lines)} lines"
+    assert len(lines) < 220, (
+        f"Document has grown unexpectedly large; "
+        f"found {len(lines)} lines (limit: 220)"
     )

@@ -6,7 +6,8 @@ You work inside `{{PROJECT_NAME}}/` — one layer below the workspace root `{{WO
 
 - **Full access:** `{{PROJECT_NAME}}/` — read, create, edit, delete files, run terminal commands, git operations.
 - **Restricted:** Everything outside `{{PROJECT_NAME}}/` is denied unless specifically allowed.
-- **Off-limits:** `.github/`, `.vscode/`, `NoAgentZone/` — permanent deny. Do not access, do not retry.
+- **Partial read-only:** `.github/` — individual files inside `instructions/`, `skills/`, `agents/`, `prompts/` may be read. `list_dir` on `.github/` and all writes are denied. `hooks/` is fully denied.
+- **Off-limits:** `.vscode/`, `NoAgentZone/` — permanent deny. Do not access, do not retry.
 
 ## First Action
 
