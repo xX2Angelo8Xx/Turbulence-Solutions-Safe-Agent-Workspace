@@ -20,6 +20,7 @@ Tests:
   T11 - Write-Output normal_text is allowed (allow_arbitrary_paths, no $env:)
   T12 - $environment (no colon) is allowed (no false positive)
   T13 - Multiple args where only one has $env: is denied
+  T14 - echo ${ENV:USERNAME} (uppercase brace) is denied (case + brace combined)
   T07 - Get-Content $env:USERPROFILE\\file.txt is denied (double-covered)
 """
 from __future__ import annotations
@@ -214,4 +215,18 @@ def test_multi_arg_one_env_var_denied():
     )
     assert decision == "deny", (
         f"Expected deny when one of multiple args contains $env:, got {decision!r}; reason={reason!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# T14: Uppercase brace syntax ${ENV:USERNAME} must be denied (case-insensitive + brace)
+# ---------------------------------------------------------------------------
+
+def test_echo_brace_env_upper_case_denied():
+    """SAF-069/T14: echo ${ENV:USERNAME} — uppercase brace form must be denied (both fixes combined)."""
+    decision, reason = sg.sanitize_terminal_command(
+        "echo ${ENV:USERNAME}", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for echo ${{ENV:USERNAME}}, got {decision!r}; reason={reason!r}"
     )
