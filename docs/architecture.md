@@ -249,7 +249,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-049/
-│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-050/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-001/
@@ -689,6 +691,9 @@ Templates (bundled inside Launcher)
 │   │   ├── INS-029/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── INS-030/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── MNT-001/
 │   │   │   └── dev-log.md
 │   │   ├── MNT-002/
@@ -887,6 +892,13 @@ Templates (bundled inside Launcher)
 │   │   ├── SAF-063/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── SAF-065/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── SAF-066/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
 │   │   └── workpackages.csv
 │   ├── architecture.md
@@ -1012,6 +1024,7 @@ Templates (bundled inside Launcher)
 │   ├── DOC-047/
 │   ├── DOC-048/
 │   ├── DOC-049/
+│   ├── DOC-050/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
@@ -1155,6 +1168,7 @@ Templates (bundled inside Launcher)
 │   ├── INS-027/
 │   ├── INS-028/
 │   ├── INS-029/
+│   ├── INS-030/
 │   ├── MNT-001/
 │   ├── MNT-002/
 │   ├── MNT-003/
@@ -1221,6 +1235,8 @@ Templates (bundled inside Launcher)
 │   ├── SAF-061/
 │   ├── SAF-062/
 │   ├── SAF-063/
+│   ├── SAF-065/
+│   ├── SAF-066/
 │   ├── shared/
 │   ├── __init__.py
 │   └── conftest.py
