@@ -128,3 +128,97 @@ def test_unc_path_denied():
     assert decision == "deny", (
         f"Expected deny for UNC path, got {decision!r}; reason={reason!r}"
     )
+
+
+# ===========================================================================
+# Tester edge-case tests — SAF-068
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# T07: Trailing backslash — ls tests\ (FIX-022/023 safe-fail preserved)
+# ---------------------------------------------------------------------------
+
+def test_trailing_backslash_safe_fail_deny():
+    """Trailing backslash must NOT be normalized and must still safe-fail deny.
+
+    The fix uses (?=\\S) lookahead so trailing backslashes are NOT converted
+    to forward slashes. shlex should raise ValueError → empty token list →
+    safe-fail deny.
+    """
+    decision, reason = sg.sanitize_terminal_command(
+        r"ls tests\ ", WS  # Note: trailing backslash followed by space
+    )
+    # The result must be deny (either via shlex error or zone check)
+    # We do NOT mandate the specific reason — only that it does not allow.
+    assert decision == "deny", (
+        f"Expected deny for trailing-backslash command, got {decision!r}; reason={reason!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# T08: Mixed separators — C:\Users/angel/file.txt — must be denied
+# ---------------------------------------------------------------------------
+
+def test_mixed_separators_denied():
+    """Path mixing \\ and / separators must be denied (escapes outside project)."""
+    decision, reason = sg.sanitize_terminal_command(
+        r"Get-Content C:\Users/angel/file.txt", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for mixed-separator path, got {decision!r}; reason={reason!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# T09: Multiple consecutive backslashes — C:\\\\Users\\\\angel — must be denied
+# ---------------------------------------------------------------------------
+
+def test_multiple_backslashes_denied():
+    """Multiple consecutive backslashes (e.g. C:\\\\Users\\\\angel) must be denied."""
+    decision, reason = sg.sanitize_terminal_command(
+        "Get-Content C:\\\\Users\\\\angel", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for multi-backslash path, got {decision!r}; reason={reason!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# T10: Relative Windows path traversal — ..\\..\\.github\\hooks — must be denied
+# ---------------------------------------------------------------------------
+
+def test_relative_windows_traversal_denied():
+    """Relative Windows-style path traversal must be denied."""
+    decision, reason = sg.sanitize_terminal_command(
+        r"Get-Content ..\..\\.github\hooks", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for relative traversal path, got {decision!r}; reason={reason!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# T11: _tokenize_segment trailing backslash returns empty list (safe-fail)
+# ---------------------------------------------------------------------------
+
+def test_tokenize_segment_trailing_backslash_returns_empty():
+    """Trailing backslash (unmatched escape) must cause shlex ValueError → empty list."""
+    # A lone trailing backslash at end of segment triggers shlex ValueError in posix mode
+    result = sg._tokenize_segment("ls tests\\")
+    assert result == [], (
+        f"Expected empty list for trailing-backslash segment (safe-fail), got {result!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# T12: Drive-letter-only path is denied (e.g. just "C:\\")
+# ---------------------------------------------------------------------------
+
+def test_drive_root_path_denied():
+    """Get-ChildItem C:\\ must be denied — drive root is outside workspace."""
+    decision, reason = sg.sanitize_terminal_command(
+        "Get-ChildItem C:\\", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for drive-root path, got {decision!r}; reason={reason!r}"
+    )
