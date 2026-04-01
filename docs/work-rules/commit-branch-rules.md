@@ -103,3 +103,26 @@ git push origin --delete <branch-name>
 - Delete the feature branch (local + remote) immediately after merge — see Post-Merge Cleanup above.
 - Keep commits focused and atomic — each commit should represent a logical unit of change.
 - Do not amend or force-push commits that have already been pushed without explicit approval.
+
+---
+
+## Branch Deletion (Mandatory)
+
+After any feature branch is merged into `main`, it **MUST** be deleted immediately — both locally and remotely. This is non-negotiable.
+
+```bash
+# Delete local branch
+git branch -d <branch-name>
+
+# Delete remote branch
+git push origin --delete <branch-name>
+```
+
+**Why this is enforced:**
+- Stale merged branches create confusion about what is in-progress vs. complete.
+- Accumulation of stale branches has recurred in 5 consecutive maintenance cycles (ACT-038, ACT-039).
+- `scripts/finalize_wp.py` handles this automatically — use it whenever available.
+
+**If `finalize_wp.py` is unavailable**, the agent or developer responsible for the merge MUST perform the deletion steps above manually before any other work begins.
+
+Failure to delete merged branches is a workflow violation and will be flagged in the next maintenance audit.
