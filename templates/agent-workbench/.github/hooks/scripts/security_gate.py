@@ -1738,6 +1738,16 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
     # FIX-023: Track arg indices already validated by step 4 so step 5 skips them
     _step4_validated_indices: set[int] = set()
 
+    # SAF-069 / BUG-174: Universal $env: exfiltration guard.
+    # Commands with allow_arbitrary_paths=True (echo, write-output, etc.)
+    # skip the step-5 dollar-sign check.  But $env:VARNAME can leak
+    # credentials regardless of command type.  Deny any token containing
+    # "$env:" (case-insensitive) for ALL commands.  Scoped to "$env:"
+    # specifically to avoid false positives on harmless strings like "$5".
+    for tok in args:
+        if "$env:" in tok.lower():
+            return False
+
     # 4. Python -m module check
     if verb in ("python", "python3", "py"):
         # Walk args; if -m is found, the next token must be an approved module
