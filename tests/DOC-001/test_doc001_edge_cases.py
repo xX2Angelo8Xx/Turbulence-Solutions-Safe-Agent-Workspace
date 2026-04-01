@@ -1,4 +1,4 @@
-"""DOC-001 Tester edge-case tests: placeholder replacement system."""
+﻿"""DOC-001 Tester edge-case tests: placeholder replacement system."""
 
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ class TestNameWithHyphens:
         _write(md, "WS: {{WORKSPACE_NAME}}")
         replace_template_placeholders(tmp_path, "My-Cool-Project")
         result = md.read_text(encoding="utf-8")
-        assert "TS-SAE-My-Cool-Project" in result
+        assert "SAE-My-Cool-Project" in result
         assert "{{WORKSPACE_NAME}}" not in result
 
     def test_name_with_leading_hyphen(self, tmp_path):
@@ -78,13 +78,13 @@ class TestMaxLengthName:
         assert "{{PROJECT_NAME}}" not in result
 
     def test_long_name_replaced_workspace(self, tmp_path):
-        """A 200-character name produces the correct TS-SAE-{name} workspace token."""
+        """A 200-character name produces the correct SAE-{name} workspace token."""
         long_name = "B" * 200
         md = tmp_path / "README.md"
         _write(md, "WS: {{WORKSPACE_NAME}}")
         replace_template_placeholders(tmp_path, long_name)
         result = md.read_text(encoding="utf-8")
-        assert f"TS-SAE-{long_name}" in result
+        assert f"SAE-{long_name}" in result
         assert "{{WORKSPACE_NAME}}" not in result
 
     def test_long_name_multiple_occurrences(self, tmp_path):
@@ -127,7 +127,7 @@ class TestDeeplyNestedMd:
         for p in paths:
             content = p.read_text(encoding="utf-8")
             assert "DeepMulti" in content
-            assert "TS-SAE-DeepMulti" in content
+            assert "SAE-DeepMulti" in content
             assert "{{PROJECT_NAME}}" not in content
             assert "{{WORKSPACE_NAME}}" not in content
 
@@ -201,7 +201,7 @@ class TestSinglePlaceholderOnly:
         _write(md, "WS: {{WORKSPACE_NAME}}\nNo project name here.")
         replace_template_placeholders(tmp_path, "Solo")
         result = md.read_text(encoding="utf-8")
-        assert "TS-SAE-Solo" in result
+        assert "SAE-Solo" in result
         assert "{{WORKSPACE_NAME}}" not in result
         assert "{{PROJECT_NAME}}" not in result  # was never present
 
@@ -238,8 +238,8 @@ class TestMixedPlaceholdersMultipleFiles:
         c = file_c.read_text(encoding="utf-8")
 
         assert a == "Mixed"
-        assert b == "TS-SAE-Mixed"
-        assert "Mixed" in c and "TS-SAE-Mixed" in c
+        assert b == "SAE-Mixed"
+        assert "Mixed" in c and "SAE-Mixed" in c
         assert "{{PROJECT_NAME}}" not in c
         assert "{{WORKSPACE_NAME}}" not in c
 
@@ -253,7 +253,7 @@ class TestMixedPlaceholdersMultipleFiles:
         x = file_x.read_text(encoding="utf-8")
         y = file_y.read_text(encoding="utf-8")
         assert x == "Only X: CrossCheck"
-        assert y == "Only Y: TS-SAE-CrossCheck"
+        assert y == "Only Y: SAE-CrossCheck"
 
     def test_some_files_no_placeholder(self, tmp_path):
         """Files without placeholders remain untouched while neighboring files are updated."""

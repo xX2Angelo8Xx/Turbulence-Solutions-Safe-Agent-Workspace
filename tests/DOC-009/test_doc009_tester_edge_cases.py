@@ -1,4 +1,4 @@
-"""Tester edge-case tests for DOC-009: AGENT-RULES.md placeholder replacement.
+﻿"""Tester edge-case tests for DOC-009: AGENT-RULES.md placeholder replacement.
 
 Tests the three edge cases not covered by the developer's test suite:
   1. AGENT-RULES.md containing ONLY placeholder tokens is fully replaced.
@@ -43,7 +43,7 @@ def test_agent_rules_only_placeholders_fully_replaced(tmp_path):
     assert "{{WORKSPACE_NAME}}" not in result, (
         "{{WORKSPACE_NAME}} still present after replacement of all-placeholder file"
     )
-    expected_workspace = f"TS-SAE-{project_name}"
+    expected_workspace = f"SAE-{project_name}"
     assert project_name in result, (
         f"Expected '{project_name}' not found in replaced content"
     )

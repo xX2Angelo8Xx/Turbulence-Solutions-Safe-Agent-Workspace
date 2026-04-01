@@ -1,4 +1,4 @@
-"""Tests for FIX-044: PermissionError on read-only template .md with placeholders.
+﻿"""Tests for FIX-044: PermissionError on read-only template .md with placeholders.
 
 Regression tests verifying that replace_template_placeholders() silently skips
 read-only .md files instead of raising PermissionError (BUG-052).
@@ -82,7 +82,7 @@ class TestReadOnlyPlaceholder:
         replace_template_placeholders(tmp_path, "MyDemo")
         result = md.read_text(encoding="utf-8")
         assert "MyDemo" in result
-        assert "TS-SAE-MyDemo" in result
+        assert "SAE-MyDemo" in result
         assert "{{PROJECT_NAME}}" not in result
         assert "{{WORKSPACE_NAME}}" not in result
 

@@ -1,11 +1,11 @@
-"""Edge-case tests for GUI-017 — Update UI Labels and Validation for New Naming Convention.
+﻿"""Edge-case tests for GUI-017 — Update UI Labels and Validation for New Naming Convention.
 
 Tester-added tests covering:
-1. Empty/whitespace project name — validation fires, no TS-SAE prefix involved.
+1. Empty/whitespace project name — validation fires, no SAE prefix involved.
 2. Special characters in project name — validation fires before duplicate check.
 3. Old naming artifacts — no "my-project" string surfaces in any message.
 4. Whitespace-only name — treated identically to empty name after strip().
-5. TS-SAE prefix not double-applied when name already starts with "TS-SAE-".
+5. SAE prefix not double-applied when name already starts with "SAE-".
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ def _make_app(
 
 
 # ---------------------------------------------------------------------------
-# Edge Case 1: Empty name — validation catches it, no TS-SAE prefix in error
+# Edge Case 1: Empty name — validation catches it, no SAE prefix in error
 # ---------------------------------------------------------------------------
 
 class TestEmptyNameHandling:
@@ -108,8 +108,8 @@ class TestSpecialCharacterNames:
         mock_val.assert_called_once_with(bad_name.strip())
         mock_dup.assert_not_called()
 
-    def test_special_char_error_label_does_not_contain_ts_sae(self, tmp_path: Path) -> None:
-        """Validation error for special chars must not mention TS-SAE (no prefix was attempted)."""
+    def test_special_char_error_label_does_not_contain_sae(self, tmp_path: Path) -> None:
+        """Validation error for special chars must not mention SAE (no prefix was attempted)."""
         app = _make_app(project_name="Invalid@Name", destination=str(tmp_path))
 
         with patch("launcher.gui.app.validate_folder_name", return_value=(False, "Invalid characters in project name.")):
@@ -117,9 +117,9 @@ class TestSpecialCharacterNames:
 
         configure_calls = app.project_name_error_label.configure.call_args_list
         error_texts = [c.kwargs.get("text", "") for c in configure_calls if c.kwargs.get("text")]
-        # The validation error message should NOT say "TS-SAE-Invalid@Name"
-        assert not any("TS-SAE-" in t for t in error_texts), (
-            f"TS-SAE prefix should not appear in a name-validation error. Got: {error_texts!r}"
+        # The validation error message should NOT say "SAE-Invalid@Name"
+        assert not any("SAE-" in t for t in error_texts), (
+            f"SAE prefix should not appear in a name-validation error. Got: {error_texts!r}"
         )
 
 
@@ -131,7 +131,7 @@ class TestNoOldNamingArtifacts:
     def test_success_message_does_not_contain_my_project_placeholder(self, tmp_path: Path) -> None:
         """The old placeholder string 'my-project' must never appear in a success message."""
         app = _make_app(project_name="my-project", destination=str(tmp_path))
-        created = tmp_path / "TS-SAE-my-project"
+        created = tmp_path / "SAE-my-project"
         created.mkdir()
 
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
@@ -143,13 +143,13 @@ class TestNoOldNamingArtifacts:
             app._on_create_project()
 
         _, msg = mock_mb.showinfo.call_args.args
-        # Whatever the message says, it must say "TS-SAE-my-project", not bare "my-project"
-        assert "TS-SAE-my-project" in msg, (
-            f"Expected 'TS-SAE-my-project' in success message. Got: {msg!r}"
+        # Whatever the message says, it must say "SAE-my-project", not bare "my-project"
+        assert "SAE-my-project" in msg, (
+            f"Expected 'SAE-my-project' in success message. Got: {msg!r}"
         )
 
     def test_duplicate_error_does_not_use_old_bare_name_format(self, tmp_path: Path) -> None:
-        """Duplicate error must reference 'TS-SAE-{name}'; bare old format must not appear."""
+        """Duplicate error must reference 'SAE-{name}'; bare old format must not appear."""
         app = _make_app(project_name="OldProject", destination=str(tmp_path))
 
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
@@ -160,8 +160,8 @@ class TestNoOldNamingArtifacts:
         configure_calls = app.project_name_error_label.configure.call_args_list
         error_texts = [c.kwargs.get("text", "") for c in configure_calls if c.kwargs.get("text")]
         assert error_texts, "Expected at least one non-empty error label text."
-        assert all("TS-SAE-OldProject" in t for t in error_texts), (
-            f"Duplicate error must include full TS-SAE- prefixed name. Got: {error_texts!r}"
+        assert all("SAE-OldProject" in t for t in error_texts), (
+            f"Duplicate error must include full SAE- prefixed name. Got: {error_texts!r}"
         )
         # The old format would be just 'A folder named "OldProject" already exists'
         assert not any(t.startswith('A folder named "OldProject"') for t in error_texts), (
@@ -170,25 +170,25 @@ class TestNoOldNamingArtifacts:
 
 
 # ---------------------------------------------------------------------------
-# Edge Case 4: TS-SAE prefix not double-applied if name starts with "TS-SAE-"
+# Edge Case 4: SAE prefix not double-applied if name starts with "SAE-"
 # ---------------------------------------------------------------------------
 
 class TestNoPrefixDoubling:
-    def test_name_starting_with_ts_sae_gets_double_prefix_in_duplicate_check(self, tmp_path: Path) -> None:
-        """If user types 'TS-SAE-Foo', duplicate check will use 'TS-SAE-TS-SAE-Foo'.
+    def test_name_starting_with_sae_gets_double_prefix_in_duplicate_check(self, tmp_path: Path) -> None:
+        """If user types 'SAE-Foo', duplicate check will use 'SAE-SAE-Foo'.
         This is intentional (users should not type the prefix), but the behaviour
         must be documented and consistent — no silent stripping of a typed prefix.
         """
-        app = _make_app(project_name="TS-SAE-Foo", destination=str(tmp_path))
+        app = _make_app(project_name="SAE-Foo", destination=str(tmp_path))
 
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=True) as mock_dup:
             app._on_create_project()
 
-        # The code should call check_duplicate_folder with "TS-SAE-TS-SAE-Foo"
+        # The code should call check_duplicate_folder with "SAE-SAE-Foo"
         # (prefix always added regardless of what user typed — consistent behaviour).
         actual_arg = mock_dup.call_args.args[0]
-        assert actual_arg == "TS-SAE-TS-SAE-Foo", (
-            f"Expected 'TS-SAE-TS-SAE-Foo' (consistent prefix addition). Got: {actual_arg!r}"
+        assert actual_arg == "SAE-SAE-Foo", (
+            f"Expected 'SAE-SAE-Foo' (consistent prefix addition). Got: {actual_arg!r}"
         )

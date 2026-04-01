@@ -1,4 +1,4 @@
-"""
+﻿"""
 DOC-040 — Tests for .github/version file in agent-workbench template.
 
 Verifies:
@@ -158,5 +158,5 @@ def test_replace_placeholders_all_tokens():
         assert "{{WORKSPACE_NAME}}" not in result
         assert "{{VERSION}}" not in result
         assert "Demo" in result
-        assert "TS-SAE-Demo" in result
+        assert "SAE-Demo" in result
         assert VERSION in result
