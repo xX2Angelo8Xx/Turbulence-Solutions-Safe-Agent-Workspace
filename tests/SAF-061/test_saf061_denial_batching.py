@@ -97,8 +97,8 @@ class TestIncrementDenyCounter(unittest.TestCase):
 
     def test_two_spaced_denies_get_separate_blocks(self):
         """A deny with a timestamp older than the batch window increments normally."""
-        # Simulate a prior deny that happened 200ms ago (> 100ms window)
-        state = _state_with_count(1, _ts_ago(200))
+        # Simulate a prior deny that happened beyond the batch window
+        state = _state_with_count(1, _ts_ago(sg._DENY_BATCH_WINDOW_MS + 100))
         count, locked = sg._increment_deny_counter(state, _SESSION, 20)
         self.assertEqual(count, 2, "Deny after batch window should get a new block")
         self.assertFalse(locked)
@@ -106,7 +106,7 @@ class TestIncrementDenyCounter(unittest.TestCase):
     def test_counter_reaches_threshold_locks_session(self):
         """When count reaches threshold the session is marked locked."""
         threshold = 5
-        state = _state_with_count(threshold - 1, _ts_ago(200))
+        state = _state_with_count(threshold - 1, _ts_ago(sg._DENY_BATCH_WINDOW_MS + 100))
         count, locked = sg._increment_deny_counter(state, _SESSION, threshold)
         self.assertEqual(count, threshold)
         self.assertTrue(locked)
