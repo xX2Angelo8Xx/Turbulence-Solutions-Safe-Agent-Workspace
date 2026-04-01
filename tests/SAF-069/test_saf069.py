@@ -13,6 +13,13 @@ Tests:
   T04 - echo "hello world" is allowed (no $env:)
   T05 - echo price is $5 is allowed ($ present but not $env:)
   T06 - write-output $ENV:SECRET is denied (case-insensitive)
+  T07 - Get-Content $env:USERPROFILE\file.txt is denied (double-covered)
+  T08 - echo ${env:USERNAME} (alternate PS syntax) is denied
+  T09 - echo "$env:HOME/path" (embedded in quoted string) is denied
+  T10 - echo hello is allowed (baseline safe command)
+  T11 - Write-Output normal_text is allowed (allow_arbitrary_paths, no $env:)
+  T12 - $environment (no colon) is allowed (no false positive)
+  T13 - Multiple args where only one has $env: is denied
   T07 - Get-Content $env:USERPROFILE\\file.txt is denied (double-covered)
 """
 from __future__ import annotations
@@ -139,4 +146,72 @@ def test_get_content_env_userprofile_denied():
     )
     assert decision == "deny", (
         f"Expected deny for Get-Content $env:USERPROFILE..., got {decision!r}; reason={reason!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Tester edge cases (T08–T13)
+# ---------------------------------------------------------------------------
+
+# T08: Alternate PowerShell syntax ${env:USERNAME} must be denied
+def test_echo_brace_env_syntax_denied():
+    """SAF-069/T08: echo ${env:USERNAME} — alternate PS brace syntax must be denied."""
+    decision, reason = sg.sanitize_terminal_command(
+        "echo ${env:USERNAME}", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for echo ${{env:USERNAME}}, got {decision!r}; reason={reason!r}"
+    )
+
+
+# T09: $env: embedded inside a quoted string must be denied
+def test_echo_env_embedded_in_string_denied():
+    """SAF-069/T09: echo \"$env:HOME/path\" — $env: embedded in string token must be denied."""
+    decision, reason = sg.sanitize_terminal_command(
+        'echo "$env:HOME/path"', WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for echo \"$env:HOME/path\", got {decision!r}; reason={reason!r}"
+    )
+
+
+# T10: echo hello (pure safe baseline) must be allowed
+def test_echo_hello_allowed():
+    """SAF-069/T10: echo hello — completely safe command must be allowed."""
+    decision, reason = sg.sanitize_terminal_command("echo hello", WS)
+    assert decision != "deny", (
+        f"Expected allow for 'echo hello', got {decision!r}; reason={reason!r}"
+    )
+
+
+# T11: Write-Output with plain text (allow_arbitrary_paths command) must be allowed
+def test_write_output_plain_text_allowed():
+    """SAF-069/T11: Write-Output normal_text — allow_arbitrary_paths command with no $env: must pass."""
+    decision, reason = sg.sanitize_terminal_command(
+        "Write-Output normal_text", WS
+    )
+    assert decision != "deny", (
+        f"Expected allow for Write-Output normal_text, got {decision!r}; reason={reason!r}"
+    )
+
+
+# T12: $environment (dollar-sign but no colon) must NOT be caught — avoid false positive
+def test_echo_dollar_environment_no_colon_allowed():
+    """SAF-069/T12: echo $environment — no colon means it is not an env-var token; must be allowed."""
+    decision, reason = sg.sanitize_terminal_command(
+        "echo $environment", WS
+    )
+    assert decision != "deny", (
+        f"Expected allow for 'echo $environment' (no colon), got {decision!r}; reason={reason!r}"
+    )
+
+
+# T13: Multiple args where only one contains $env: must be denied
+def test_multi_arg_one_env_var_denied():
+    """SAF-069/T13: echo safe_word $env:SECRET another_word — deny when any single arg is $env:."""
+    decision, reason = sg.sanitize_terminal_command(
+        "echo safe_word $env:SECRET another_word", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny when one of multiple args contains $env:, got {decision!r}; reason={reason!r}"
     )
