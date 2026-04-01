@@ -31,11 +31,19 @@ import zone_classifier
 # ---------------------------------------------------------------------------
 
 _ALWAYS_ALLOW_TOOLS: frozenset = frozenset({
-    "vscode_ask_questions", "ask_questions",
+    # SAF-063: include both camelCase (actual VS Code name) and snake_case (backward compat)
+    "vscode_askQuestions", "vscode_ask_questions", "ask_questions",
     "TodoWrite", "TodoRead", "todo_write", "manage_todo_list",
     # SAF-044: search_subagent removed — validated by validate_search_subagent() in decide()
     "runSubagent", "Agent", "agent",
     # SAF-058: get_changed_files removed — validated by validate_get_changed_files() in decide()
+    # SAF-063: read-only terminal introspection tools — no filesystem writes
+    "get_terminal_output", "terminal_last_command", "terminal_selection",
+    # SAF-063: meta/VS Code-managed tools with no filesystem access
+    "test_failure", "tool_search", "get_vscode_api", "switch_agent",
+    "copilot_getNotebookSummary", "get_search_view_results", "install_extension",
+    # SAF-063: task runner tools — VS Code manages task IDs internally, no path bypass
+    "create_and_run_task", "get_task_output", "runTests",
 })
 
 _TERMINAL_TOOLS: frozenset = frozenset({
@@ -56,6 +64,11 @@ _EXEMPT_TOOLS: frozenset = frozenset({
     # FIX-035: VS Code/Copilot deferred development tools — safe to allow;
     # handled early in decide() before the path-check block.
     "install_python_packages", "configure_python_environment", "fetch_webpage",
+    # SAF-063: VS Code's actual name for the edit tool — write-like, zone-checked
+    "insert_edit_into_file",
+    # SAF-063: read-only file viewers and notebook tools — path-checked
+    "view_image", "edit_notebook_file", "create_new_jupyter_notebook",
+    "read_notebook_cell_output", "run_notebook_cell",
 })
 
 # SAF-007: Tool names that perform file write operations.
@@ -64,6 +77,10 @@ _WRITE_TOOLS: frozenset = frozenset({
     "create_file", "write_file", "Write",
     "edit_file", "Edit",
     "replace_string_in_file", "multi_replace_string_in_file",
+    # SAF-063: VS Code's actual name for the edit tool — performs in-place file edits
+    "insert_edit_into_file",
+    # SAF-063: notebook write tools — zone-restricted to project folder
+    "edit_notebook_file", "create_new_jupyter_notebook",
 })
 
 # SAF-055: Read-only tool names that may access whitelisted .github/ subdirectories.
@@ -108,7 +125,7 @@ _KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c0224
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "b33715daefbfd62d5c9068ec308b6e036351e4f4c32a755f65c2462a2e4c62f0"
+_KNOWN_GOOD_GATE_HASH: str = "fdba4ecb9400a378702153debe9e017e5e822d28a1653d80bf41d93feff8b4ff"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -3188,6 +3205,10 @@ def decide(data: dict, ws_root: str) -> str:
     # each entry has its own filePath; all must be inside Project/.
     if tool_name == "multi_replace_string_in_file":
         return validate_multi_replace_tool(data, ws_root)
+    # SAF-063: insert_edit_into_file is VS Code's actual name for the edit tool;
+    # route to validate_write_tool() same as edit_file.
+    if tool_name == "insert_edit_into_file":
+        return validate_write_tool(data, ws_root)
     if tool_name in _WRITE_TOOLS:
         return validate_write_tool(data, ws_root)
 

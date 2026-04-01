@@ -389,11 +389,13 @@ def test_integration_write_tool_intercepted_before_exempt_check():
     assert sg.decide(data, WS) == "deny"
 
 
-def test_integration_edit_notebook_file_not_in_write_tools_asks():
-    # TST-416 — edit_notebook_file is NOT in _WRITE_TOOLS and NOT in _EXEMPT_TOOLS;
-    # decide() categorises it as a non-exempt unknown tool → "deny" in 2-tier model (SAF-013)
+def test_integration_edit_notebook_file_in_write_tools_project_allowed():
+    # TST-416 — SAF-063: edit_notebook_file is now in _WRITE_TOOLS;
+    # a project-zone path must be allowed; a path outside project must be denied.
     data = {"tool_name": "edit_notebook_file", "filePath": f"{WS}/project/nb.ipynb"}
-    assert sg.decide(data, WS) == "deny"
+    assert sg.decide(data, WS) == "allow"
+    data_outside = {"tool_name": "edit_notebook_file", "filePath": f"{WS}/docs/nb.ipynb"}
+    assert sg.decide(data_outside, WS) == "deny"
 
 
 def test_integration_write_tools_frozenset_contains_expected_tools():

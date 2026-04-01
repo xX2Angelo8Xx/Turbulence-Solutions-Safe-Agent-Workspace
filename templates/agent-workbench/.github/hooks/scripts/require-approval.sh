@@ -114,7 +114,7 @@ TOOL=$(echo "$INPUT" | grep -oE '"tool_name" *: *"[^"]*"' | head -1 | sed 's/"to
 #  - runSubagent/search_subagent/Agent: launch subagents (security enforced
 #    inside the subagent via the same hook; blocking here stalls the parent)
 # ---------------------------------------------------------------------------
-if echo "$TOOL" | grep -qiE '^(vscode_ask_questions|ask_questions|TodoWrite|TodoRead|todo_write|manage_todo_list|runSubagent|search_subagent|Agent|agent)$'; then
+if echo "$TOOL" | grep -qiE '^(vscode_askQuestions|vscode_ask_questions|ask_questions|TodoWrite|TodoRead|todo_write|manage_todo_list|runSubagent|search_subagent|Agent|agent|get_terminal_output|terminal_last_command|terminal_selection|test_failure|tool_search|get_vscode_api|switch_agent|copilot_getNotebookSummary|get_search_view_results|install_extension|create_and_run_task|get_task_output|runTests)$'; then
   printf '%s\n' "$ALLOW"
   exit 0
 fi
