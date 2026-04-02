@@ -2320,3 +2320,4 @@
 "TST-2439","SAF-036 BUG-179 Retest","Regression","SAF-072","Pass","2026-04-02","Windows 11 + Python 3.13","1/1 passed — test_disabled_counter_no_state_file_written PASSED. BUG-179 fix confirmed.",""
 "TST-2440","SAF-072 Developer + Edge-Case Tests","Unit","SAF-072","Pass","2026-04-02","Windows 11 + Python 3.13","23/23 passed — all SAF-072 developer and edge-case tests pass after BUG-179 fix.",""
 "TST-2441","SAF Full Regression (post BUG-179 fix)","Regression","SAF-072","Pass","2026-04-02","Windows 11 + Python 3.13","2679+ passed, 30 pre-existing failures (SAF-008/010/025/047/049/052/056). No new regressions introduced.","SAF-008/025/052: hash mismatch (SAF-071 pending). SAF-010: python cmd. SAF-047/049/056: pre-existing doc issues."
+"TST-2442","SAF-071 Hash Integrity Verification","Unit","SAF-071","Pass","2026-04-02","Windows/Python 3.13","4/4 passed","verify_file_integrity() returns True; settings hash, gate self-hash, and hex format all verified"
