@@ -264,3 +264,76 @@ def test_t15_get_content_relative_path_allowed():
         f"Expected allow for Get-Content on project-relative path, "
         f"got {decision!r}; reason={reason!r}"
     )
+
+
+# ===========================================================================
+# Tester Edge Cases — additional scenarios not covered by the Developer
+# ===========================================================================
+
+def test_t16_mixed_case_path_denied():
+    """T16: get-content C:\\USERS\\ANGEL\\secret.txt (mixed-case command + uppercase path) must be denied.
+
+    Case-insensitive command matching must still catch paths regardless of
+    the character case used in the drive or directory names.
+    """
+    decision, reason = sg.sanitize_terminal_command(
+        r"get-content C:\USERS\ANGEL\secret.txt", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for mixed-case unquoted Windows path, got {decision!r}; reason={reason!r}"
+    )
+
+
+def test_t17_double_backslash_path_denied():
+    """T17: type C:\\\\Users\\\\angel\\\\file.txt (double-backslash escape) must be denied.
+
+    After backslash normalization, C:\\\\Users... collapses to C:\\Users...
+    (a valid absolute path) and must be denied.
+    """
+    decision, reason = sg.sanitize_terminal_command(
+        "type C:\\\\Users\\\\angel\\\\file.txt", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for double-backslash Windows path, got {decision!r}; reason={reason!r}"
+    )
+
+
+def test_t18_unc_path_denied():
+    """T18: type \\\\\\\\server\\\\share\\\\file.txt (UNC path) must be denied.
+
+    UNC paths are absolute network paths outside the workspace and must be
+    blocked by zone checking (validated by SAF-068 T06 pattern).
+    """
+    decision, reason = sg.sanitize_terminal_command(
+        r"type \\server\share\file.txt", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for UNC path, got {decision!r}; reason={reason!r}"
+    )
+
+
+def test_t19_quoted_path_with_spaces_denied():
+    """T19: Get-Content "C:\\Program Files\\secret.txt" (quoted path with spaces) must be denied.
+
+    Quoted paths with spaces must still be caught — quoting is not a bypass.
+    """
+    decision, reason = sg.sanitize_terminal_command(
+        r'Get-Content "C:\Program Files\secret.txt"', WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for quoted path with spaces, got {decision!r}; reason={reason!r}"
+    )
+
+
+def test_t20_chained_env_and_path_denied():
+    """T20: Write-Output $env:USERNAME; Get-Content C:\\Users\\file.txt (chained) must be denied.
+
+    A command chain combining env-var exfiltration and a path read outside
+    the workspace must be denied — either violation is sufficient.
+    """
+    decision, reason = sg.sanitize_terminal_command(
+        r"Write-Output $env:USERNAME; Get-Content C:\Users\file.txt", WS
+    )
+    assert decision == "deny", (
+        f"Expected deny for chained env+path command, got {decision!r}; reason={reason!r}"
+    )
