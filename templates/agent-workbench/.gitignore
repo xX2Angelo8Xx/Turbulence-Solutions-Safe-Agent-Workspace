@@ -19,3 +19,5 @@ ehthumbs.db
 # SAF-035: Security hook runtime files (generated, not committed)
 .github/hooks/scripts/copilot-otel.jsonl
 .github/hooks/scripts/.hook_state.json
+# SAF-072: Deny-event audit log (runtime file, not committed)
+.github/hooks/scripts/audit.jsonl

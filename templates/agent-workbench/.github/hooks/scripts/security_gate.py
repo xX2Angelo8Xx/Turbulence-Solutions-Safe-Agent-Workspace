@@ -1091,6 +1091,45 @@ def _load_counter_config(scripts_dir: str) -> dict:
         return dict(defaults)
 
 
+# ---------------------------------------------------------------------------
+# SAF-072: Deny-event audit logging
+# ---------------------------------------------------------------------------
+
+def _audit_deny(tool_name: str, reason: str, target: str) -> None:
+    """SAF-072: Append a deny-event JSON line to audit.jsonl.
+
+    Fail-safe — never raises.  All errors are silently suppressed so that
+    audit write failures cannot crash the gate or alter the deny/allow decision.
+    """
+    try:
+        scripts_dir = Path(__file__).parent
+        # Resolve the active session ID read-only (no state mutations).
+        sid = "unknown"
+        try:
+            otel_sid = _read_otel_session_id(str(scripts_dir))
+            if otel_sid:
+                sid = otel_sid
+            else:
+                _state = _load_state(str(scripts_dir / _STATE_FILE_NAME))
+                _fb = _state.get("_fallback_session_id")
+                if isinstance(_fb, str) and _fb:
+                    sid = _fb
+        except Exception:
+            pass
+        record = {
+            "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "sid": sid,
+            "tool": tool_name,
+            "decision": "deny",
+            "reason": reason,
+            "target": target,
+        }
+        with open(scripts_dir / "audit.jsonl", "a", encoding="utf-8") as _fh:
+            _fh.write(json.dumps(record) + "\n")
+    except Exception:
+        pass
+
+
 def _save_state(state_path: str, state: dict) -> None:
     """Save hook state using an atomic write (temp file → rename)."""
     dir_path = os.path.dirname(state_path)
@@ -2085,6 +2124,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
         # Stage 2 — normalize whitespace
         normalized = _normalize_terminal_command(command)
         if not normalized:
+            _audit_deny("run_in_terminal", "restricted_command", "unknown")
             return ("deny", "Empty command after normalization.")
 
         # FIX-034: Early venv activation pass — runs BEFORE Stage 3 obfuscation
@@ -2095,6 +2135,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
         # allowlist.  Validated venv segments are excluded from Stage 3 and 4.
         all_segments = _split_segments(normalized)
         if not all_segments:
+            _audit_deny("run_in_terminal", "restricted_command", normalized.split()[0] if normalized else "unknown")
             return ("deny", "No executable segments found.")
 
         _venv_seg_indices: set[int] = set()
@@ -2110,6 +2151,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                 elif _try_project_fallback(_norm_venv, ws_root):
                     _venv_seg_indices.add(_vi)
                 else:
+                    _audit_deny("run_in_terminal", "zone_violation", _venv_path.replace("\\", "/").split("/")[-1])
                     return ("deny", f"Venv activation outside allowed zone: {_DENY_REASON}")
 
         # All segments are validated venv activations — allow immediately
@@ -2159,6 +2201,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                 else non_allowlisted_lowered
             )
             if pattern.search(target):
+                _audit_deny("run_in_terminal", "obfuscation_detected", normalized.split()[0] if normalized else "unknown")
                 return ("deny", f"Command blocked by obfuscation pre-scan: {_DENY_REASON}")
 
         # Stage 4 — split into segments; evaluate each non-venv segment independently
@@ -2179,6 +2222,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
             tokens = _tokenize_segment(segment)
             if not tokens:
                 # Could not tokenize — fail closed
+                _audit_deny("run_in_terminal", "restricted_command", segment.split()[0] if segment else "unknown")
                 return ("deny", f"Command could not be parsed: {_DENY_REASON}")
 
             verb = _extract_verb(tokens)
@@ -2196,10 +2240,12 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                         continue  # value is explicitly inside project folder
                     if _try_project_fallback(norm_env_val, ws_root):
                         continue  # value resolves to project folder via fallback
+                _audit_deny("run_in_terminal", "env_exfiltration", "$env")
                 return ("deny", f"$env: assignment value is outside allowed zone: {_DENY_REASON}")
 
             # Stage 4 — deny variable-substitution primary verbs
             if verb.startswith("$") or "${" in verb or "$(" in verb:
+                _audit_deny("run_in_terminal", "restricted_command", "$var")
                 return ("deny", f"Dynamic primary verb blocked: {_DENY_REASON}")
 
             # Stage 4 — normalize version aliases before allowlist lookup
@@ -2231,6 +2277,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                 if _check_workspace_path_arg(_norm_venv, ws_root) or _try_project_fallback(_norm_venv, ws_root):
                     verb_lower = _exe_base
                 else:
+                    _audit_deny("run_in_terminal", "zone_violation", verb.replace("\\", "/").split("/")[-1])
                     return ("deny", f"Venv executable outside allowed zone: {_DENY_REASON}")
 
             # FIX-022: venv activation scripts (.venv/Scripts/Activate.ps1 etc.)
@@ -2240,6 +2287,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                 norm_act = posixpath.normpath(verb.replace("\\", "/"))
                 if _try_project_fallback(norm_act, ws_root):
                     continue  # Activation script inside project folder
+                _audit_deny("run_in_terminal", "zone_violation", verb.replace("\\", "/").split("/")[-1])
                 return ("deny", f"Activation script outside project folder: {_DENY_REASON}")
 
             # Lowercase the ls -R flag variant: ls -R vs ls -r both denied
@@ -2269,6 +2317,7 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                     # Residual checks still apply (Section 12.4)
                     for pat in _OBFUSCATION_PATTERNS:
                         if pat.search(all_non_venv_lowered):
+                            _audit_deny("run_in_terminal", "obfuscation_detected", verb)
                             return ("deny", f"Exception-listed command blocked by obfuscation pre-scan: {_DENY_REASON}")
                     # Zone-check path args in the segment
                     for tok in tokens[1:]:
@@ -2276,33 +2325,40 @@ def sanitize_terminal_command(command: str, ws_root: str = "") -> tuple[str, Opt
                         if stripped.startswith("-"):
                             continue
                         if "$" in stripped:
+                            _audit_deny("run_in_terminal", "env_exfiltration", verb)
                             return ("deny", f"Exception-listed command has variable path arg: {_DENY_REASON}")
                         # SAF-020: Wildcard bypass prevention for exception-listed commands
                         if ("*" in stripped or "?" in stripped or "[" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
+                            _audit_deny("run_in_terminal", "zone_violation", verb)
                             return ("deny", f"Exception-listed command has wildcard targeting restricted zone: {_DENY_REASON}")
                         if _is_path_like(stripped):
                             zone = zone_classifier.classify(stripped, ws_root)
                             if zone == "deny":
+                                _audit_deny("run_in_terminal", "zone_violation", verb)
                                 return ("deny", f"Exception-listed command targets restricted zone: {_DENY_REASON}")
                     continue  # this segment passes exception check; proceed to next segment
 
+                _audit_deny("run_in_terminal", "restricted_command", verb)
                 return ("deny", f"Command '{verb}' is not on the approved allowlist. {_DENY_REASON}")
 
             # Stage 5 — argument validation
             # For ls, handle -R (capital) by lowercasing tokens
             lowered_tokens = [verb_lower] + [t.lower() for t in tokens[1:]]
             if not _validate_args(rule, verb_lower, lowered_tokens, ws_root):
+                _audit_deny("run_in_terminal", "zone_violation", verb_lower)
                 return ("deny", f"Command '{verb}' argument validation failed. {_DENY_REASON}")
 
             # Stage 5 fallback — explicit deny patterns
             for pat in _EXPLICIT_DENY_PATTERNS:
                 if pat.search(lowered_segment):
+                    _audit_deny("run_in_terminal", "restricted_command", verb_lower)
                     return ("deny", f"Command blocked by destructive-pattern check: {_DENY_REASON}")
 
         return ("allow", None)
 
     except Exception:
         # Any unexpected error → fail closed
+        _audit_deny("run_in_terminal", "restricted_command", "unknown")
         return ("deny", _DENY_REASON)
 
 
@@ -3171,6 +3227,7 @@ def decide(data: dict, ws_root: str) -> str:
         command = tool_input.get("command") or data.get("command") or ""
         if not isinstance(command, str) or not command.strip():
             # No command field, or empty command → fail closed
+            _audit_deny(tool_name, "restricted_command", "unknown")
             return "deny"
         decision, _reason = sanitize_terminal_command(command, ws_root)
         return decision
@@ -3179,45 +3236,81 @@ def decide(data: dict, ws_root: str) -> str:
     # _EXEMPT_TOOLS block so that includePattern / includeIgnoredFiles are
     # inspected even though both tools appear in _EXEMPT_TOOLS.
     if tool_name == "semantic_search":
-        return validate_semantic_search(data, ws_root)
+        _dec = validate_semantic_search(data, ws_root)
+        if _dec == "deny":
+            _audit_deny(tool_name, "zone_violation", "search_query")
+        return _dec
     if tool_name == "grep_search":
-        return validate_grep_search(data, ws_root)
+        _dec = validate_grep_search(data, ws_root)
+        if _dec == "deny":
+            _ap = extract_path(data)
+            _audit_deny(tool_name, "zone_violation", _ap.replace("\\", "/").split("/")[-1] if _ap else "search_query")
+        return _dec
     # SAF-044: search_subagent — scope query to project folder.
     if tool_name == "search_subagent":
-        return validate_search_subagent(data, ws_root)
+        _dec = validate_search_subagent(data, ws_root)
+        if _dec == "deny":
+            _audit_deny(tool_name, "zone_violation", "search_query")
+        return _dec
 
     # SAF-058: get_changed_files — conditional .git/ placement check.
     if tool_name == "get_changed_files":
-        return validate_get_changed_files(ws_root)
+        _dec = validate_get_changed_files(ws_root)
+        if _dec == "deny":
+            _audit_deny(tool_name, "zone_violation", "repo_root")
+        return _dec
 
     # SAF-023: get_errors carries an optional filePaths array; each path must
     # be zone-checked.  Handled before the _EXEMPT_TOOLS fallback so the array
     # field is inspected rather than a single filePath.
     if tool_name == "get_errors":
-        return validate_get_errors(data, ws_root)
+        _dec = validate_get_errors(data, ws_root)
+        if _dec == "deny":
+            _ap = extract_path(data)
+            _audit_deny(tool_name, "zone_violation", _ap.replace("\\", "/").split("/")[-1] if _ap else "unknown")
+        return _dec
 
     # SAF-038: memory tool — filePath must be inside the project folder.
     # Handled before the _EXEMPT_TOOLS fallback to ensure explicit path extraction.
     if tool_name == "memory":
-        return validate_memory(data, ws_root)
+        _dec = validate_memory(data, ws_root)
+        if _dec == "deny":
+            _ap = extract_path(data)
+            _audit_deny(tool_name, "zone_violation", _ap.replace("\\", "/").split("/")[-1] if _ap else "unknown")
+        return _dec
 
     # SAF-038: create_directory tool — dirPath must be inside the project folder.
     # Handled before the _EXEMPT_TOOLS fallback because dirPath is not in
     # _PATH_FIELDS and would not be found by the generic extract_path() helper.
     if tool_name == "create_directory":
-        return validate_create_directory(data, ws_root)
+        _dec = validate_create_directory(data, ws_root)
+        if _dec == "deny":
+            _ap = extract_path(data)
+            _audit_deny(tool_name, "zone_violation", _ap.replace("\\", "/").split("/")[-1] if _ap else "unknown")
+        return _dec
 
     # SAF-039: vscode_listCodeUsages — filePath/uri must be inside project folder.
     if tool_name == "vscode_listCodeUsages":
-        return validate_vscode_list_code_usages(data, ws_root)
+        _dec = validate_vscode_list_code_usages(data, ws_root)
+        if _dec == "deny":
+            _ap = extract_path(data)
+            _audit_deny(tool_name, "zone_violation", _ap.replace("\\", "/").split("/")[-1] if _ap else "unknown")
+        return _dec
 
     # SAF-039: vscode_renameSymbol — write-like; filePath/uri must be inside project folder.
     if tool_name == "vscode_renameSymbol":
-        return validate_vscode_rename_symbol(data, ws_root)
+        _dec = validate_vscode_rename_symbol(data, ws_root)
+        if _dec == "deny":
+            _ap = extract_path(data)
+            _audit_deny(tool_name, "zone_violation", _ap.replace("\\", "/").split("/")[-1] if _ap else "unknown")
+        return _dec
 
     # SAF-043: file_search — scope query to project folder.
     if tool_name == "file_search":
-        return validate_file_search(data, ws_root)
+        _dec = validate_file_search(data, ws_root)
+        if _dec == "deny":
+            _audit_deny(tool_name, "zone_violation", "search_query")
+        return _dec
 
     # FIX-035: Deferred development tools — safe to allow unconditionally.
     # These VS Code/Copilot tools carry no file-system path argument and do not
@@ -3230,23 +3323,37 @@ def decide(data: dict, ws_root: str) -> str:
     # SAF-018: multi_replace_string_in_file carries an array of replacements —
     # each entry has its own filePath; all must be inside Project/.
     if tool_name == "multi_replace_string_in_file":
-        return validate_multi_replace_tool(data, ws_root)
+        _dec = validate_multi_replace_tool(data, ws_root)
+        if _dec == "deny":
+            _ap = extract_path(data)
+            _audit_deny(tool_name, "zone_violation", _ap.replace("\\", "/").split("/")[-1] if _ap else "unknown")
+        return _dec
     # SAF-063: insert_edit_into_file is VS Code's actual name for the edit tool;
     # route to validate_write_tool() same as edit_file.
     if tool_name == "insert_edit_into_file":
-        return validate_write_tool(data, ws_root)
+        _dec = validate_write_tool(data, ws_root)
+        if _dec == "deny":
+            _ap = extract_path(data)
+            _audit_deny(tool_name, "zone_violation", _ap.replace("\\", "/").split("/")[-1] if _ap else "unknown")
+        return _dec
     if tool_name in _WRITE_TOOLS:
-        return validate_write_tool(data, ws_root)
+        _dec = validate_write_tool(data, ws_root)
+        if _dec == "deny":
+            _ap = extract_path(data)
+            _audit_deny(tool_name, "zone_violation", _ap.replace("\\", "/").split("/")[-1] if _ap else "unknown")
+        return _dec
 
     # Non-exempt tools (non-empty name not in exempt set): deny.
     # In the 2-tier model, agents must only use approved tools.
     if tool_name and tool_name not in _EXEMPT_TOOLS:
+        _audit_deny(tool_name, "restricted_tool", tool_name)
         return "deny"
 
     # Exempt tool or unknown tool name: resolve path and check zone.
     raw_path = extract_path(data)
     if raw_path is None:
         # No path — cannot verify zone; fail closed.
+        _audit_deny(tool_name, "zone_violation", "unknown")
         return "deny"
 
     # SAF-002: zone_classifier.classify() handles normalization and
@@ -3257,6 +3364,7 @@ def decide(data: dict, ws_root: str) -> str:
         # path is inside the project folder (allow zone).  Covers read_file,
         # list_dir, edit_notebook_file, and any other exempt tool.
         if zone_classifier.is_git_internals(raw_path):
+            _audit_deny(tool_name, "zone_violation", raw_path.replace("\\", "/").split("/")[-1])
             return "deny"
         return "allow"
     # SAF-046: Allow read-only access to the workspace root itself and its
@@ -3265,6 +3373,7 @@ def decide(data: dict, ws_root: str) -> str:
     # only allows the project folder, so workspace root remains write-denied.
     if zone_classifier.is_workspace_root_readable(raw_path, ws_root):
         if zone_classifier.is_git_internals(raw_path):
+            _audit_deny(tool_name, "zone_violation", raw_path.replace("\\", "/").split("/")[-1])
             return "deny"
         return "allow"
     # SAF-055: Allow read-only access to agent-facing .github/ subdirectories.
@@ -3275,6 +3384,7 @@ def decide(data: dict, ws_root: str) -> str:
         norm_path = normalize_path(raw_path)
         if _GITHUB_READ_ALLOWED_RE.search(norm_path):
             return "allow"
+    _audit_deny(tool_name, "zone_violation", raw_path.replace("\\", "/").split("/")[-1])
     return "deny"
 
 
