@@ -129,7 +129,38 @@ fi
 if echo "$TOOL" | grep -qiE '^(run_in_terminal|terminal|run_command)$'; then
   # Normalize entire input for matching (unescape, lowercase)
   INPUT_NORM=$(echo "$INPUT" | sed 's/\\\\/\//g; s/\\/\//g' | tr '[:upper:]' '[:lower:]')
+  # Blocked folders check
   if echo "$INPUT_NORM" | grep -qiE '\.github|\.vscode|noagentzone'; then
+    printf '%s\n' "$DENY"
+    exit 0
+  fi
+  # SAF-073: Environment variable exfiltration — PowerShell $env: / ${env:
+  if echo "$INPUT_NORM" | grep -qE '\$\{?env:'; then
+    printf '%s\n' "$DENY"
+    exit 0
+  fi
+  # SAF-073: Environment variable exfiltration — known sensitive Unix/shell vars
+  if echo "$INPUT_NORM" | grep -qiE '\$(home|path|user|username|secret|password|github_token|api_key|token|aws_|azure_)'; then
+    printf '%s\n' "$DENY"
+    exit 0
+  fi
+  # SAF-073: Command substitution — dollar-paren $(...)
+  if echo "$INPUT_NORM" | grep -qE '\$\('; then
+    printf '%s\n' "$DENY"
+    exit 0
+  fi
+  # SAF-073: Command substitution — backtick `cmd`
+  if echo "$INPUT_NORM" | grep -qP '`\w'; then
+    printf '%s\n' "$DENY"
+    exit 0
+  fi
+  # SAF-073: Obfuscation — eval, base64 decode, hex escapes
+  if echo "$INPUT_NORM" | grep -qiE '\beval[[:space:](]|base64.*decode|\\x[0-9a-f]{2}'; then
+    printf '%s\n' "$DENY"
+    exit 0
+  fi
+  # SAF-073: Sensitive system paths
+  if echo "$INPUT_NORM" | grep -qiE '/(etc|home|root|tmp|var|opt|proc|sys)/|c:/(users|windows|program)'; then
     printf '%s\n' "$DENY"
     exit 0
   fi
