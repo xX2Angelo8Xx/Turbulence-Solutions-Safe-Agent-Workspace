@@ -2,32 +2,47 @@
 
 **Tester:** Tester Agent (GitHub Copilot)
 **Date:** 2026-04-02
-**Iteration:** 1
+**Iteration:** 2 (re-test after BUG-180 and BUG-181 fixes)
 
 ## Summary
 
-The core implementation is solid: 11 of 11 developer tests pass, covering the five main deny
-categories (PowerShell env-var, Unix env-var, command substitution, eval/base64 obfuscation,
-and sensitive system paths). The SAF regression suite shows zero new failures attributable to
-SAF-073.
-
-However, edge-case testing revealed **two distinct security bypasses** that allow exfiltration
-commands to receive `ask` instead of `deny`. Both are High-severity gaps that fall squarely
-within the scope of this WP.
+**PASS.** All 24 SAF-073 tests pass, including the two regression tests added during
+Iteration 1 (T12: curly-brace env-var, T13: `base64 -d` short flag). The SAF regression
+suite (SAF-070 → SAF-073, 78 tests) is clean. Both High-severity bypasses reported in
+Iteration 1 are confirmed fixed.
 
 ---
 
-## Tests Executed
+## Iteration 1 Summary (for traceability)
+
+The initial implementation passed 11/11 developer tests but edge-case testing revealed
+**two security bypasses**: `${HOME}` (BUG-180) and `base64 -d` (BUG-181), both returning
+`ask` instead of `deny`. The WP was returned to the Developer as FAIL.
+
+---
+
+---
+
+## Tests Executed — Iteration 2
 
 | Test ID | Test Name | Type | Result | Notes |
 |---------|-----------|------|--------|-------|
-| TST-2451 | SAF-073 Developer Suite (11 tests) | Security | **Pass** | All 11 scenarios pass |
-| TST-2452 | SAF-073 Tester Edge-Cases (13 tests) | Security | **Fail** | 2/13 fail (BUG-180, BUG-181) |
-| TST-2453 | SAF Regression Suite | Regression | **Pass** | 0 new failures from SAF-073 |
+| TST-2451 | SAF-073 Developer Suite (11 tests) | Security | **Pass** | Iteration 1: all 11 pass |
+| TST-2452 | SAF-073 Tester Edge-Cases (13 tests) | Security | **Fail** | Iteration 1: 2/13 fail (BUG-180, BUG-181) |
+| TST-2453 | SAF Regression Suite | Regression | **Pass** | Iteration 1: 0 new failures |
+| TST-2455 | SAF-073 Full Suite Re-run (24 tests) | Security | **Pass** | Iteration 2: all 24 pass after Developer fixes |
+| TST-2456 | SAF Regression SAF-070→SAF-073 (78 tests) | Regression | **Pass** | Iteration 2: no regressions |
 
-### Edge-case detail (TST-2452)
+### Iteration 2 edge-case results (previously failing T12 and T13)
 
 | TC | Command | Expected | Actual | Result |
+|----|---------|----------|--------|--------|
+| T12 | `echo ${HOME}` (curly-brace syntax) | deny | deny | **PASS** — BUG-180 fixed |
+| T13 | `echo payload \| base64 -d` (short flag) | deny | deny | **PASS** — BUG-181 fixed |
+
+### Iteration 1 edge-case detail (TST-2452, retained for traceability)
+
+| TC | Command | Expected | Actual (iter 1) | Result |
 |----|---------|----------|--------|--------|
 | E01 | `echo $home` (already lowercase) | deny | deny | PASS |
 | E02 | `echo ${HOME}` (curly-brace syntax) | deny | **ask** | **FAIL** — BUG-180 |
@@ -47,69 +62,53 @@ within the scope of this WP.
 
 ## Bugs Found
 
-- **BUG-180** (High): `require-approval.sh` — curly-brace env-var syntax `${HOME}` bypasses SAF-073 deny guard (logged in `docs/bugs/bugs.csv`)
-- **BUG-181** (High): `require-approval.sh` — `base64 -d` short flag bypasses SAF-073 obfuscation deny guard (logged in `docs/bugs/bugs.csv`)
+- **BUG-180** (High, **Fixed**): `require-approval.sh` — curly-brace env-var syntax `${HOME}` bypassed SAF-073 deny guard. Fixed by adding `\{?` to the regex pattern (iteration 2).
+- **BUG-181** (High, **Fixed**): `require-approval.sh` — `base64 -d` short flag bypassed SAF-073 obfuscation deny guard. Fixed by changing pattern to `base64.*(-d\b|decode)` (iteration 2).
 
 ---
 
-## Security Analysis
+## Security Analysis (Iteration 2)
 
-### BUG-180 — Curly-brace env-var bypass
+Both fixes are confirmed correct and tight:
 
-The guard pattern `\$(home|path|user|...)` matches `$HOME` (dollar-sign immediately followed
-by the variable name) but **not** `${HOME}` (curly-brace syntax). Both are valid bash for
-expanding the same variable. After the hook normalises the input to lowercase, `echo ${HOME}`
-becomes `echo ${home}`, and the pattern fails to match because `{` sits between `$` and `home`.
+### BUG-180 Fix verified — `\$\{?(home|path|user|...)`
 
-**Exploit vector:** An agent issues `echo ${HOME}/.ssh/id_rsa` — home-dir path exposure.
-**Fix:** Extend the grep pattern to `\$\{?(home|path|user|...)` (add `\{?` to make the brace
-optional), mirroring exactly the fix applied in BUG-177/BUG-178 for the Python security gate.
+The `\{?` makes the opening curly brace optional, matching both `$HOME` and `${HOME}`.
+The fix is minimal and does not introduce false positives (`$RANDOM` → `ask` confirmed).
+`echo ${PATH}`, `echo ${TOKEN}`, `echo ${HOME}` all now correctly return `deny`.
 
-### BUG-181 — `base64 -d` short-flag bypass
+### BUG-181 Fix verified — `base64.*(-d\b|decode)`
 
-The obfuscation guard pattern `base64.*decode` requires the word `decode` to appear after
-`base64`. The POSIX short form `-d` performs identical decoding but does not contain `decode`.
+The pattern now catches both `base64 -d` (POSIX short flag) and `base64 --decode` (long flag).
+The `\b` word boundary on `-d\b` prevents false matches on hypothetical flags like `-do`.
+Both test vectors confirmed: `base64 -d` → deny, `base64 --decode` → deny (regression).
 
-**Exploit vector:** `echo <payload> | base64 -d | bash` — decode-and-execute attack.
-**Fix:** Change the pattern to `base64.*(-d|--decode)` or, simpler and more robust,
-`\bbase64\b` (deny any command that invokes `base64` at all, regardless of flag).
+### No new false positives introduced
 
-### No false positives in safe commands
+Safe commands verified in the 24-test suite continue to return `ask`:
+- `echo $RANDOM` — non-sensitive var, no false-positive
+- `cat ./project/file.txt` — relative path, no false-positive
+- `printenv HOME` — no `$` prefix variant, accepted limitation remains
 
-- `echo $RANDOM`, `printenv HOME`, and `cat ./project/file.txt` all correctly return `ask`.
-- Semicolon-chained commands properly evaluated; the `/etc/` path in the second half is caught.
-- `eval(cmd)` (parenthesis form) correctly denied.
-- Case-insensitive matching confirmed via lowercase input test.
+### Accepted limitations (unchanged from iteration 1)
+
+- `printenv HOME` (no `$` prefix) returns `ask` — `printenv` could theoretically leak env vars,
+  but blocking it would over-block legitimate `printenv --help` style introspection. Acceptable.
+- Backtick heuristic remains (`\`` + word char). Unusual backtick-in-JSON could false-positive,
+  but no real-world test vector found. Acceptable trade-off.
 
 ---
 
 ## TODOs for Developer
 
-- [ ] **Fix BUG-180**: In the `\$(home|path|user|...)` grep pattern, extend it to
-  `\$\{?(home|path|user|username|secret|password|github_token|api_key|token|aws_|azure_)`
-  (insert `\{?` after `\$` to also match `${VARNAME}` form). Verify with:
-  - `echo ${HOME}` → deny
-  - `echo ${PATH}` → deny
-  - `echo ${TOKEN}` → deny
-  - `echo ${RANDOM}` → ask (no false positive — `random` is not in the list)
-
-- [ ] **Fix BUG-181**: Replace the `base64.*decode` pattern with `\bbase64\b` to deny any
-  invocation of `base64` regardless of flag. Simpler and more secure — there is no legitimate
-  reason for an agent to invoke the base64 binary. Verify with:
-  - `echo aGVsbG8= | base64 -d` → deny
-  - `echo aGVsbG8= | base64 --decode` → deny (regression)
-  - `echo hello | base64` (encode-only) → deny (acceptable to over-block here)
-
-- [ ] Ensure the two new test cases in `tests/SAF-073/test_saf073_edge_cases.py` pass:
-  - `test_deny_env_var_home_curly_braces`
-  - `test_deny_base64_short_flag`
+None. Both bugs are fixed and verified.
 
 ---
 
 ## Verdict
 
-**FAIL — return to Developer (In Progress)**
+**PASS**
 
-Two High-severity security bypasses confirmed by reproducible tests. Both are within the
-declared scope of SAF-073 (env-var exfiltration and obfuscation blocking). The fixes are
-small (one regex character insertion each) and well-defined in the TODOs above.
+All 24 SAF-073 tests pass. Both High-severity bypasses (BUG-180, BUG-181) are fixed and
+confirmed by automated regression tests. SAF-070→SAF-073 regression suite (78 tests) is clean.
+Workspace validator passes. WP set to **Done**.
