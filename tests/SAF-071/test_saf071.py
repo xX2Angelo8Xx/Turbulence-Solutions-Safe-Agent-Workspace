@@ -89,3 +89,69 @@ def test_hash_constants_are_64_char_hex():
         f"_KNOWN_GOOD_GATE_HASH is not a valid 64-char hex string: "
         f"{mod._KNOWN_GOOD_GATE_HASH!r}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Edge-case tests (Tester Agent addition)
+# ---------------------------------------------------------------------------
+
+def test_two_hash_constants_are_distinct():
+    """_KNOWN_GOOD_SETTINGS_HASH and _KNOWN_GOOD_GATE_HASH protect different
+    files and must never collide; a collision would indicate one file was not
+    properly hashed."""
+    mod = _load_security_gate()
+    assert mod._KNOWN_GOOD_SETTINGS_HASH != mod._KNOWN_GOOD_GATE_HASH, (
+        "Both hash constants are identical — at least one was not updated correctly."
+    )
+
+
+def test_verify_file_integrity_idempotent():
+    """Calling verify_file_integrity() twice in succession must return True
+    both times (no side effects that corrupt state between calls)."""
+    mod = _load_security_gate()
+    assert mod.verify_file_integrity() is True
+    assert mod.verify_file_integrity() is True
+
+
+def test_gate_hash_constant_is_not_placeholder():
+    """_KNOWN_GOOD_GATE_HASH must not be the all-zeros placeholder that
+    update_hashes.py uses during the canonical-hash computation step."""
+    mod = _load_security_gate()
+    assert mod._KNOWN_GOOD_GATE_HASH != "0" * 64, (
+        "_KNOWN_GOOD_GATE_HASH is still the zeros placeholder — update_hashes.py "
+        "did not write back the real hash."
+    )
+
+
+def test_settings_hash_constant_is_not_placeholder():
+    """_KNOWN_GOOD_SETTINGS_HASH must not be the old stub value (all-zeros or
+    all-same-digit) that would indicate an incomplete hash update."""
+    mod = _load_security_gate()
+    # All-zeros is the canonical placeholder; all-same-char is a degenerate case
+    assert mod._KNOWN_GOOD_SETTINGS_HASH != "0" * 64
+    assert len(set(mod._KNOWN_GOOD_SETTINGS_HASH)) > 4, (
+        "_KNOWN_GOOD_SETTINGS_HASH looks like a stub/placeholder — too few unique "
+        f"hex digits: {mod._KNOWN_GOOD_SETTINGS_HASH!r}"
+    )
+
+
+def test_canonical_hash_computation_is_stable():
+    """Running _canonical_gate_hash on the current gate file twice should
+    produce the same digest (deterministic, no hidden I/O or randomness)."""
+    gate_bytes = GATE_PATH.read_bytes()
+    h1 = _canonical_gate_hash(gate_bytes)
+    h2 = _canonical_gate_hash(gate_bytes)
+    assert h1 == h2, "Canonical hash is not deterministic."
+
+
+def test_settings_json_file_exists():
+    """settings.json must exist at the path expected by security_gate.py.
+    If it is missing the hash can never match and the gate will always deny."""
+    assert SETTINGS_PATH.exists(), (
+        f"settings.json not found at {SETTINGS_PATH}; integrity check will always fail."
+    )
+
+
+def test_gate_file_exists():
+    """security_gate.py itself must be present for the self-hash to work."""
+    assert GATE_PATH.exists(), f"security_gate.py not found at {GATE_PATH}"
