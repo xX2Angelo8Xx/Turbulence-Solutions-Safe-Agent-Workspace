@@ -140,7 +140,7 @@ if echo "$TOOL" | grep -qiE '^(run_in_terminal|terminal|run_command)$'; then
     exit 0
   fi
   # SAF-073: Environment variable exfiltration — known sensitive Unix/shell vars
-  if echo "$INPUT_NORM" | grep -qiE '\$(home|path|user|username|secret|password|github_token|api_key|token|aws_|azure_)'; then
+  if echo "$INPUT_NORM" | grep -qiE '\$\{?(home|path|user|username|secret|password|github_token|api_key|token|aws_|azure_)'; then
     printf '%s\n' "$DENY"
     exit 0
   fi
@@ -155,7 +155,7 @@ if echo "$TOOL" | grep -qiE '^(run_in_terminal|terminal|run_command)$'; then
     exit 0
   fi
   # SAF-073: Obfuscation — eval, base64 decode, hex escapes
-  if echo "$INPUT_NORM" | grep -qiE '\beval[[:space:](]|base64.*decode|\\x[0-9a-f]{2}'; then
+  if echo "$INPUT_NORM" | grep -qiE '\beval[[:space:](]|base64.*(-d\b|decode)|\\x[0-9a-f]{2}'; then
     printf '%s\n' "$DENY"
     exit 0
   fi

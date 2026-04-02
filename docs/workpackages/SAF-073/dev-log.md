@@ -54,3 +54,20 @@ Fixed \s→[[:space:]] in grep -E pattern (POSIX compliance for eval detection).
 - Backtick detection uses a simple heuristic (`\`` followed by word char); very
   unusual backtick usage in JSON strings could produce false positives, but this
   is an acceptable trade-off for security.
+
+---
+
+## Iteration 2 — Tester Findings Fix (2026-04-02)
+
+### Bugs Addressed
+- **BUG-180** (High): Curly-brace variable bypass — `${HOME}` was not matched by `\$(home|...)`.
+  **Fix:** Changed to `\$\{?(home|...)` to make the opening brace optional.
+- **BUG-181** (High): `base64 -d` short flag bypass — `base64.*decode` only matched `--decode`.
+  **Fix:** Changed to `base64.*(-d\b|decode)` to catch both short and long flags.
+
+### Files Changed
+- `templates/agent-workbench/.github/hooks/scripts/require-approval.sh` (two regex updates in terminal handler)
+
+### Tests
+- `tests/SAF-073/test_saf073_edge_cases.py` — T12 (`test_deny_env_var_home_curly_braces`) and T13 (`test_deny_base64_short_flag`) now pass.
+- All 24 SAF-073 tests pass. SAF regression (SAF-070 → SAF-073): 78 passed.
