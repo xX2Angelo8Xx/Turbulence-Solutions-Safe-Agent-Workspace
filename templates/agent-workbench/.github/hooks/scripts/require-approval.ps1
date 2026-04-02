@@ -99,10 +99,41 @@ if ($TOOL -match '^(vscode_askQuestions|vscode_ask_questions|ask_questions|TodoW
 if ($TOOL -match '^(run_in_terminal|terminal|run_command)$') {
     $norm = ($INPUT_JSON -replace '\\\\', '/' -replace '\\', '/').ToLowerInvariant()
     if ($norm -match '\.github|\.vscode|noagentzone') {
-        Write-Output $DENY
-    } else {
-        Write-Output $ASK
+        Write-Output $DENY; exit 0
     }
+    # SAF-074: PowerShell env vars
+    if ($norm -match '\$\{?env:') {
+        Write-Output $DENY; exit 0
+    }
+    # SAF-074: Sensitive environment variables (curly-brace aware)
+    if ($norm -match '\$\{?(home|path|user|username|secret|password|github_token|api_key|token|aws_|azure_|userprofile|appdata|programfiles)') {
+        Write-Output $DENY; exit 0
+    }
+    # SAF-074: Invoke-Expression, iex, and dynamic execution
+    if ($norm -match '\b(invoke-expression|iex|invoke-command|icm)\b') {
+        Write-Output $DENY; exit 0
+    }
+    # SAF-074: Dollar-paren command substitution
+    if ($norm -match '\$\(') {
+        Write-Output $DENY; exit 0
+    }
+    # SAF-074: .NET type accelerators for file I/O
+    if ($norm -match '\[(system\.)?io\.(file|directory|path|streamreader|streamwriter)\]') {
+        Write-Output $DENY; exit 0
+    }
+    # SAF-074: .NET reflection / code generation
+    if ($norm -match '\[(system\.)?reflection\.|add-type\b') {
+        Write-Output $DENY; exit 0
+    }
+    # SAF-074: eval, base64, and hex obfuscation
+    if ($norm -match '\beval[\s(]|base64.*(-d\b|decode)|\\x[0-9a-f]{2}') {
+        Write-Output $DENY; exit 0
+    }
+    # SAF-074: Sensitive system paths
+    if ($norm -match '/(etc|home|root|tmp|var|opt|proc|sys)/|c:/(users|windows|program)') {
+        Write-Output $DENY; exit 0
+    }
+    Write-Output $ASK
     exit 0
 }
 
