@@ -67,3 +67,23 @@ On every deny decision in `decide()` and `sanitize_terminal_command()`, append a
 - `update_hashes.py` was NOT run — that is SAF-071's responsibility.
 - `_audit_deny` is placed before `_save_state` so helper ordering does not affect functionality.
 - The function is fail-safe by design: any I/O or logic error is silently swallowed.
+
+---
+
+## Iteration 2 — BUG-179 Fix
+
+**Tester Finding:** `_audit_deny()` called `_load_state()` for fallback SID resolution even when  
+the denial counter is disabled, violating the SAF-036 invariant  
+(`TestDisabledCounter::test_disabled_counter_no_state_file_written`).
+
+**Fix applied:**
+- Removed the `_load_state` fallback branch from `_audit_deny()` in  
+  `templates/agent-workbench/.github/hooks/scripts/security_gate.py`.  
+  When OTel SID is unavailable the `sid` field now falls back to `"unknown"`.
+
+**Test update:**
+- `tests/SAF-072/test_saf072_edge_cases.py::test_audit_deny_calls_load_state_for_fallback_sid`  
+  was updated to assert the corrected behavior: `_load_state` is NOT called and  
+  `sid == "unknown"` is written to the audit record.
+
+**Test results:** 53 passed (SAF-036 + SAF-072), 0 failed (TST-2438).

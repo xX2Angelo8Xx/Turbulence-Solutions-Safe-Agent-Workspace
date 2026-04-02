@@ -180,26 +180,27 @@ def test_all_audit_lines_valid_json(tmp_path, monkeypatch):
 # ---------------------------------------------------------------------------
 
 def test_audit_deny_calls_load_state_for_fallback_sid(tmp_path, monkeypatch):
-    """SAF-072/EC-06: When OTel SID is unavailable _audit_deny reads _load_state.
+    """SAF-072/EC-06 (BUG-179 fix): When OTel SID is unavailable _audit_deny
+    must NOT call _load_state — it must fall back to 'unknown'.
 
-    This test DOCUMENTS the regression in SAF-036:
-    test_disabled_counter_no_state_file_written previously asserted that
-    _load_state is never called when the counter is disabled.  SAF-072's
-    _audit_deny calls _load_state for fallback-SID resolution even when the
-    counter is disabled.  This violates the SAF-036 contract.
-
-    This test should be marked xfail until the developer removes the
-    _load_state call from _audit_deny (use OTel-only or literal 'unknown').
+    Removing the _load_state fallback restores the SAF-036 invariant:
+    test_disabled_counter_no_state_file_written asserts the state file is
+    never written/read when the counter is disabled.
     """
     monkeypatch.setattr(sg, "__file__", str(tmp_path / "security_gate.py"))
 
     with patch.object(sg, "_read_otel_session_id", return_value=None):
         with patch.object(sg, "_load_state", return_value={}) as mock_load:
             sg._audit_deny("test_tool", "zone_violation", "target")
-            # SAF-072 _audit_deny calls _load_state when OTel is unavailable
-            assert mock_load.call_count >= 1, (
-                "Expected _load_state to be called for fallback SID resolution"
+            assert mock_load.call_count == 0, (
+                "_load_state must not be called from _audit_deny (SAF-036 invariant)"
             )
+
+    # The audit record must still be written with sid == "unknown"
+    audit_file = tmp_path / "audit.jsonl"
+    assert audit_file.exists(), "audit.jsonl was not created"
+    record = json.loads(audit_file.read_text(encoding="utf-8").strip())
+    assert record["sid"] == "unknown", f"Expected sid='unknown', got {record['sid']!r}"
 
 
 # ---------------------------------------------------------------------------

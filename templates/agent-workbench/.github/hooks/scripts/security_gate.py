@@ -1109,11 +1109,6 @@ def _audit_deny(tool_name: str, reason: str, target: str) -> None:
             otel_sid = _read_otel_session_id(str(scripts_dir))
             if otel_sid:
                 sid = otel_sid
-            else:
-                _state = _load_state(str(scripts_dir / _STATE_FILE_NAME))
-                _fb = _state.get("_fallback_session_id")
-                if isinstance(_fb, str) and _fb:
-                    sid = _fb
         except Exception:
             pass
         record = {
