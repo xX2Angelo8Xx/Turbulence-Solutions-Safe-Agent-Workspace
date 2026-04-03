@@ -3,21 +3,31 @@
 **Tester:** Tester Agent  
 **Date:** 2026-04-03  
 **Branch:** SAF-075/fix-platform-hashes  
-**Verdict:** FAIL — 8 pre-existing tests broken by hash algorithm change
+**Iteration:** 2  
+**Verdict:** PASS
 
 ---
 
-## Summary
+## Iteration 1 Report (FAIL)
 
-The SAF-075 implementation is logically correct — all 8 dedicated SAF-075 tests
-pass, the CRLF normalization is applied in the right place in both
-`security_gate.py` and `update_hashes.py`, and the embedded hash constants
-reflect the new normalized (LF-based) algorithm. However, the implementation
-introduced **8 regressions** in existing test suites (SAF-022, SAF-025,
-SAF-052) that were NOT in the regression baseline. These suites verify hash
-consistency using the old algorithm (SHA256 of raw bytes, no CRLF
-normalization). After SAF-075, the embedded hashes are SHA256 of LF-normalized
-content, so the old raw-byte tests now disagree.
+See git history: commit `1623eb2` contains the original FAIL test report.
+
+---
+
+## Summary (Iteration 2 — PASS)
+
+All 8 regressions identified in the iteration 1 review have been resolved.
+All 132 tests in the combined target suite (SAF-022, SAF-025, SAF-052, SAF-075,
+SAF-008, SAF-011, snapshots) pass. No new regressions found against the
+baseline of 680 known failures. The CRLF normalization is correct, the embedded
+hash constants are verified, and all template files have LF line endings on disk.
+
+## Summary (Iteration 1 — archived)
+
+The SAF-075 implementation was logically correct — all 8 dedicated SAF-075
+tests passed, the CRLF normalization was applied in the right place. However
+template files still had CRLF on disk and `git add --renormalize` was not run,
+causing 8 hash-sync regressions in SAF-022, SAF-025, SAF-052.
 
 ---
 
@@ -195,14 +205,68 @@ test modules. Log a follow-up WP if desired. Not a blocker for SAF-075.
 
 - **BUG-186** — SAF-022/025/052 hash-sync tests broken after SAF-075: files
   still have CRLF on disk after `.gitattributes` update; working-tree
-  renormalization was not performed.
+  renormalization was not performed. **→ Closed (Fixed In WP = SAF-075)**
 
 ---
 
-## Verdict
+## Iteration 2 Verification (2026-04-03)
 
-**FAIL** — Setting WP back to `In Progress`.
+### TST-2463 — Tester re-run (132 tests)
 
-The SAF-075 implementation logic is sound, but the working-tree files were not
-LF-converted and as a result 7 pre-existing hash-sync tests now fail. These are
-NOT in the regression baseline and cannot be waived.
+```
+.venv\Scripts\python.exe -m pytest tests/SAF-022/ tests/SAF-025/ tests/SAF-052/ tests/SAF-075/ tests/SAF-008/ tests/SAF-011/ tests/snapshots/ -v --tb=short
+```
+
+**132 passed, 0 failed.**
+
+| Suite | Count | Result |
+|-------|-------|--------|
+| SAF-022 | 26 | PASS |
+| SAF-025 | 14 | PASS |
+| SAF-052 | 25 | PASS |
+| SAF-075 | 8 | PASS |
+| SAF-008 | 22 | PASS |
+| SAF-011 | 27 | PASS |
+| snapshots | 10 | PASS |
+
+### Full regression sweep
+
+627 failures in full sweep — within baseline of 680 known failures. No new regressions.
+
+### Hash constants verified
+
+| Constant | Embedded | Computed | Match |
+|----------|----------|----------|-------|
+| `_KNOWN_GOOD_SETTINGS_HASH` | `c9cd0834…` | `c9cd0834…` | ✓ |
+| `_KNOWN_GOOD_GATE_HASH` | `4a2a8128…` | `4a2a8128…` | ✓ |
+
+### Template file line endings verified
+
+All 7 security-critical template files show CRLF=0 (pure LF).
+
+### Acceptance Criteria (Iteration 2)
+
+| Criterion | Status |
+|-----------|--------|
+| `_compute_file_hash()` normalizes CRLF | PASS |
+| `_compute_gate_canonical_hash()` normalizes CRLF | PASS |
+| `_sha256_file()` (update_hashes) normalizes CRLF | PASS |
+| `_compute_canonical_gate_hash()` (update_hashes) normalizes CRLF | PASS |
+| `.gitattributes` LF enforcement covers all security template files | PASS |
+| Template security files have LF on disk | PASS |
+| SAF-022/025/052 hash-sync tests pass | PASS |
+| SAF-008/011/snapshots regression tests pass | PASS |
+| SAF-075 dedicated tests pass | PASS |
+| BUG-185 and BUG-186 closed | PASS |
+| `validate_workspace.py --wp SAF-075` clean (exit 0) | PASS |
+
+---
+
+## Verdict (Iteration 1)
+
+**FAIL** — 8 regressions. WP returned to `In Progress`.
+
+## Verdict (Iteration 2)
+
+**PASS** — All 132 tests pass, no new regressions, all acceptance criteria met.
+
