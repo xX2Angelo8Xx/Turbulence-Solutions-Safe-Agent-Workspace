@@ -2,7 +2,7 @@
 ; Generated for INS-005 — wraps PyInstaller --onedir output
 
 #define MyAppName "Agent Environment Launcher"
-#define MyAppVersion "3.3.9"
+#define MyAppVersion "3.3.10"
 #define MyAppPublisher "Turbulence Solutions"
 #define MyAppExeName "launcher.exe"
 
