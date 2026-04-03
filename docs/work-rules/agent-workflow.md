@@ -164,6 +164,14 @@ The Developer creates `docs/workpackages/<WP-ID>/dev-log.md`:
 
 ## Known Limitations
 - <any caveats, deferred work, edge cases not covered>
+
+## Behavior Changes
+<!-- Include this section ONLY when one or more snapshot files were updated with
+     --update-snapshots.  The snapshot IS the documentation — this section is the
+     mandatory paper trail for every intentional security-decision change. -->
+- **<snapshot-file>.json** — `<old-decision>` → `<new-decision>`
+  Reason: <why the decision changed — policy change, bug fix, new rule, etc.>
+  Authorised by: WP <WP-ID> / ADR-<N> (delete as applicable)
 ```
 
 For subsequent iterations (after Tester feedback), append a new section:

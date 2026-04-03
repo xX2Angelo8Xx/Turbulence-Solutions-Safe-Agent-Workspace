@@ -87,26 +87,76 @@ FAILED  tests/snapshots/security_gate/test_snapshots.py::test_security_gate_snap
 
 ## How to Update Snapshots
 
-**Snapshots must only be updated when a decision change is intentional** — i.e. it is
-required by a workpackage, justified by the WP's acceptance criteria, and approved by the
-Tester. Unilateral snapshot updates are not permitted.
+> **The snapshot IS the documentation.**
+> When you update a snapshot you are declaring: "this new decision is now the
+> intended, authorised behaviour for this scenario."  Every update therefore
+> requires the same level of justification as a code change.
 
-Procedure for an intentional update:
+**Snapshots must only be updated when a decision change is intentional** — i.e.
+it is required by a workpackage, justified by the WP's acceptance criteria, and
+approved by the Tester. Unilateral snapshot updates are not permitted.
 
-1. Run the snapshot suite to identify which tests fail:
+### Prerequisites
+
+Before updating any snapshot, you MUST be able to answer:
+
+1. Why did the security decision change?
+2. Which workpackage authorises the change?
+3. What is the new intended behaviour?
+
+If you cannot answer all three, **do not update the snapshot**.  Investigate the
+root cause of the decision change instead.
+
+### Procedure — using `--update-snapshots`
+
+1. Run the snapshot suite to see which tests fail and what the new decisions are:
+
    ```powershell
    .venv\Scripts\python.exe -m pytest tests/snapshots/ -v
    ```
-2. For each failing snapshot, open the `.json` file and change `expected_decision` to
-   match the new authorised decision.
-3. Re-run the suite and confirm all tests pass.
-4. Document the change in the WP's `dev-log.md`:
-   - Which snapshot(s) were updated.
-   - Why the decision changed (policy change, bug fix, new rule, etc.).
-   - Reference the ADR or WP that justifies the change.
-5. Commit the updated snapshot files together with the code change that caused them.
 
-There is no `--update-snapshots` flag — updates are always manual and deliberate.
+2. If the failing tests correspond to **intentional** changes authorised by
+   your workpackage, re-run with the flag to update the snapshot files
+   in-place:
+
+   ```powershell
+   .venv\Scripts\python.exe -m pytest tests/snapshots/ -v --update-snapshots
+   ```
+
+   Each snapshot whose `expected_decision` no longer matches the actual result
+   will have its JSON file rewritten automatically.  The test run will pass.
+
+3. Verify the rewritten files look correct:
+
+   ```powershell
+   git diff tests/snapshots/
+   ```
+
+4. **Document every updated snapshot in your WP's `dev-log.md`** under a
+   required `## Behavior Changes` section (see the dev-log template in
+   `docs/work-rules/agent-workflow.md`).  Include:
+
+   - Snapshot file name
+   - Old decision → new decision
+   - Reason for the change and the WP/ADR that authorises it
+
+5. Re-run **without** the flag to confirm everything is clean:
+
+   ```powershell
+   .venv\Scripts\python.exe -m pytest tests/snapshots/ -v
+   ```
+
+6. Commit the updated snapshot files together with the code change that caused
+   them and the updated `dev-log.md`.
+
+### When NOT to use `--update-snapshots`
+
+| Situation | Correct Action |
+|-----------|----------------|
+| Snapshot fails **without** any intentional code change | **Bug** — investigate, do not update snapshots |
+| Snapshot fails on one platform only | Platform inconsistency — fix the code |
+| All snapshots fail simultaneously | Import error — fix the import, not the snapshots |
+| You are unsure if the change was intentional | Stop — ask, do not update snapshots |
 
 ---
 
