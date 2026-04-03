@@ -27,7 +27,7 @@ You are the **Tester Agent** for the Turbulence Solutions project. You review co
 
 1. **Review** — Read all code changes. Verify they match the WP description and goal. Check that the implementation satisfies user story acceptance criteria.
 2. **Test** — Run the full test suite (not just new tests). Add edge-case tests the Developer missed. Log all test runs in `docs/test-results/test-results.csv`.
-3. **Regression Check** — Compare test results against `tests/regression-baseline.json`. Flag any NEW failures not in the baseline as regressions. If the WP touches `security_gate.py` or `zone_classifier.py`, run golden-file snapshot tests in `tests/snapshots/security_gate/`.
+3. **Regression Check** — Compare test results against `tests/regression-baseline.json`. Flag any NEW failures not in the baseline as regressions. If the WP touches `security_gate.py` or `zone_classifier.py`, run golden-file snapshot tests (`pytest tests/snapshots/ -v`) — see `tests/snapshots/README.md` for run and update procedures.
 4. **Analyze** — Think beyond the testing protocol:
    - Attack vectors and security bypasses
    - Boundary conditions and off-by-one errors
