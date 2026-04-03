@@ -157,13 +157,13 @@ def update_architecture(dry_run: bool = False) -> bool:
 
     if match.group(0) == new_block:
         print("architecture.md is already up to date")
-        return False
+        return True
 
     if dry_run:
         print("[DRY RUN] Would update Repository Structure in architecture.md")
         print(f"  Old: {len(match.group(2).splitlines())} lines")
         print(f"  New: {len(new_tree.splitlines())} lines")
-        return False
+        return True
 
     new_content = content[:match.start()] + new_block + content[match.end():]
     ARCH_PATH.write_text(new_content, encoding="utf-8")
@@ -178,8 +178,8 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="Show changes without writing")
 
     args = parser.parse_args()
-    update_architecture(args.dry_run)
-    return 0
+    result = update_architecture(args.dry_run)
+    return 0 if result else 1
 
 
 if __name__ == "__main__":

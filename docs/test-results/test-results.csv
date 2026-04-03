@@ -2366,3 +2366,4 @@
 "TST-2485","DOC-051: targeted suite","Unit","DOC-051","Pass","2026-04-04","Windows 11 + Python 3.11","32 passed in 5.43s",""
 "TST-2486","MNT-011: targeted suite","Unit","MNT-011","Pass","2026-04-04","Windows 11 + Python 3.11","5 passed in 0.72s",""
 "TST-2487","MNT-011: targeted suite","Unit","MNT-011","Pass","2026-04-04","Windows 11 + Python 3.11","5 passed in 0.24s","5 tests: stale path removed, correct path present, action-tracker step, 12-point description, no 9-point"
+"TST-2488","FIX-095: targeted suite","Unit","FIX-095","Pass","2026-04-04","Windows 11 + Python 3.11","5 passed in 0.30s",""
