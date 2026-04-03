@@ -138,18 +138,17 @@ def test_assertion_error_wraps_decision_values_in_single_quotes():
 # ---------------------------------------------------------------------------
 
 def test_conftest_update_snapshots_fixture_default_is_false():
-    """The update_snapshots fixture returns False by default (flag off without CLI arg)."""
-    import importlib.util
+    """The update_snapshots fixture returns False by default (flag off without CLI arg).
 
-    conftest_path = SNAPSHOTS_DIR / "conftest.py"
-    spec = importlib.util.spec_from_file_location("_sg_conftest", conftest_path)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-
-    # The default= in addoption must be False
-    content = conftest_path.read_text(encoding="utf-8")
+    SAF-078 registers pytest_addoption in tests/snapshots/conftest.py (parent level)
+    so the flag works both from tests/snapshots/ and tests/snapshots/security_gate/.
+    """
+    # The registration lives in the parent conftest, not the security_gate one.
+    parent_conftest = REPO_ROOT / "tests" / "snapshots" / "conftest.py"
+    content = parent_conftest.read_text(encoding="utf-8")
     assert "default=False" in content, (
-        "pytest_addoption for --update-snapshots must default to False"
+        "pytest_addoption for --update-snapshots must default to False in "
+        "tests/snapshots/conftest.py"
     )
 
 
@@ -157,17 +156,16 @@ def test_conftest_update_snapshots_fixture_default_is_false():
 # README procedure correctness
 # ---------------------------------------------------------------------------
 
-def test_readme_procedure_uses_security_gate_subdirectory_for_update_command():
-    """The README update procedure must point to security_gate/ (not just tests/snapshots/).
+def test_readme_procedure_update_command_is_valid():
+    """The README update procedure must contain a valid pytest --update-snapshots command.
 
-    Running `pytest tests/snapshots/ --update-snapshots` would fail with
-    'unrecognized arguments' because pytest_addoption is only registered in
-    the security_gate/conftest.py — the option is not available at the parent scope.
-    The README must document the correct command scope.
+    SAF-078 registers pytest_addoption in tests/snapshots/conftest.py (parent level),
+    so both 'pytest tests/snapshots/' and 'pytest tests/snapshots/security_gate/'
+    accept --update-snapshots without 'unrecognized arguments' errors.
+    The README documents whichever valid form it chooses.
     """
     content = SNAPSHOTS_README.read_text(encoding="utf-8")
 
-    # Find lines containing --update-snapshots
     lines_with_flag = [
         line.strip()
         for line in content.splitlines()
@@ -177,11 +175,7 @@ def test_readme_procedure_uses_security_gate_subdirectory_for_update_command():
     assert lines_with_flag, "README must contain at least one pytest command with --update-snapshots"
 
     for cmd_line in lines_with_flag:
-        # The command must target the security_gate/ subdirectory, not just tests/snapshots/
-        # Running `pytest tests/snapshots/ --update-snapshots` fails because
-        # pytest_addoption is only registered in the security_gate conftest.
-        assert "security_gate" in cmd_line, (
-            f"README command '{cmd_line}' targets tests/snapshots/ at the parent level "
-            f"which fails with 'unrecognized arguments: --update-snapshots'. "
-            f"The command must specify tests/snapshots/security_gate/ explicitly."
+        # Command must target the snapshots tree (broad or specific scope is both fine)
+        assert "tests/snapshots" in cmd_line, (
+            f"README command '{cmd_line}' must target tests/snapshots or a subdirectory"
         )

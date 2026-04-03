@@ -245,12 +245,12 @@ def test_devlog_template_behavior_changes_mentions_update_snapshots():
 
 
 def test_conftest_registers_update_snapshots_option():
-    """tests/snapshots/security_gate/conftest.py must register --update-snapshots."""
-    conftest_path = SNAPSHOTS_DIR / "conftest.py"
-    content = conftest_path.read_text(encoding="utf-8")
+    """tests/snapshots/conftest.py must register --update-snapshots via pytest_addoption."""
+    parent_conftest = REPO_ROOT / "tests" / "snapshots" / "conftest.py"
+    content = parent_conftest.read_text(encoding="utf-8")
     assert "--update-snapshots" in content, (
-        "conftest.py must register --update-snapshots via pytest_addoption"
+        "tests/snapshots/conftest.py must register --update-snapshots via pytest_addoption"
     )
     assert "pytest_addoption" in content, (
-        "conftest.py must define pytest_addoption to register the flag"
+        "tests/snapshots/conftest.py must define pytest_addoption to register the flag"
     )

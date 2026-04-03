@@ -64,3 +64,27 @@ session-scoped `update_snapshots` fixture that exposes the flag value to tests.
 - `--update-snapshots` rewrites only `expected_decision`. It does not update
   `expected_reason` if that field exists in the snapshot (out of scope for SAF-078).
 - The update mode does not add new snapshot files — it only modifies existing ones.
+
+---
+
+## Iteration 1 — 2026-04-04
+
+### Tester Feedback Addressed
+- **BUG-187** — README Step 2 documented `pytest tests/snapshots/ -v --update-snapshots`
+  which failed with "unrecognized arguments" because `pytest_addoption` was only
+  registered in the child `tests/snapshots/security_gate/conftest.py`.
+  **Fix:** Created `tests/snapshots/conftest.py` (parent level) that owns
+  `pytest_addoption` and the `update_snapshots` fixture. Removed both from the
+  child conftest. Now both `pytest tests/snapshots/ --update-snapshots` and
+  `pytest tests/snapshots/security_gate/ --update-snapshots` work correctly.
+
+### Additional Changes
+- `tests/snapshots/conftest.py` — new; owns `pytest_addoption` + `update_snapshots` fixture
+- `tests/snapshots/security_gate/conftest.py` — removed `pytest_addoption` and fixture
+- `tests/SAF-078/test_saf078_tester_edge_cases.py` — two Tester tests updated to match
+  actual implementation (parent conftest, not child; broad scope command is now valid)
+- `docs/bugs/bugs.csv` — BUG-187 marked Fixed, Fixed In WP = SAF-078
+
+### Tests Added/Updated
+- `test_conftest_update_snapshots_fixture_default_is_false` — now checks parent conftest
+- `test_readme_procedure_update_command_is_valid` — renamed/updated; accepts broad scope
