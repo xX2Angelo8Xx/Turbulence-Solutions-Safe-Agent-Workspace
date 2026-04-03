@@ -723,6 +723,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── MNT-007/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-008/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1222,6 +1225,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-004/
 │   ├── MNT-005/
 │   ├── MNT-007/
+│   ├── MNT-008/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
