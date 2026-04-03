@@ -100,8 +100,29 @@ jobs:
           echo "  - src/installer/macos/build_dmg.sh"
           echo "  - src/installer/linux/build_appimage.sh"
 
-  windows-build:
+  run-tests:
     needs: [validate-version]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run test suite
+        run: python -m pytest tests/ -v --tb=short
+
+  windows-build:
+    needs: [validate-version, run-tests]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -142,7 +163,7 @@ jobs:
           path: src/installer/windows/Output/AgentEnvironmentLauncher-Setup.exe
 
   macos-arm-build:
-    needs: [validate-version]
+    needs: [validate-version, run-tests]
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -193,7 +214,7 @@ jobs:
           path: dist/*.dmg
 
   linux-build:
-    needs: [validate-version]
+    needs: [validate-version, run-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -247,9 +268,10 @@ jobs:
         with:
           path: release-assets
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release (Draft)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           files: release-assets/**/*
           generate_release_notes: true
+          draft: true

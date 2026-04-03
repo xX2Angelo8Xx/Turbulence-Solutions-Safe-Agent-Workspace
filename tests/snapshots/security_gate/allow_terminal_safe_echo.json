@@ -1,0 +1,9 @@
+{
+  "description": "run_in_terminal with a benign echo command must be allowed",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "run_in_terminal",
+    "command": "echo hello world"
+  },
+  "expected_decision": "allow"
+}

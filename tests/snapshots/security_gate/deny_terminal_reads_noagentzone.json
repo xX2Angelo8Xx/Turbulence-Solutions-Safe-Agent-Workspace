@@ -1,0 +1,9 @@
+{
+  "description": "run_in_terminal targeting a NoAgentZone path must be denied (SAF-005)",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "run_in_terminal",
+    "command": "cat /workspace/NoAgentZone/secrets.env"
+  },
+  "expected_decision": "deny"
+}

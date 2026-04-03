@@ -1,0 +1,9 @@
+{
+  "description": "read_file on .git/config (git internals) must be denied even inside project (SAF-032)",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "read_file",
+    "filePath": "/workspace/project/.git/config"
+  },
+  "expected_decision": "deny"
+}

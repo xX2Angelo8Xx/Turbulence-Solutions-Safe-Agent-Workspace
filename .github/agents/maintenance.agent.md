@@ -16,8 +16,12 @@ You are the **Maintenance Agent** for the Turbulence Solutions project. You audi
 
 ## Workflow
 
-1. Execute every item on the 9-point maintenance checklist from `maintenance-protocol.md`.
-2. For each check, record: **Pass**, **Warning**, or **Fail** with specific findings.
+1. Execute every item on the maintenance checklist from `maintenance-protocol.md`.
+2. Additionally check:
+   - **ADR Consistency**: Verify no Done WPs reference superseded ADRs in `docs/decisions/index.csv`.
+   - **Template Manifest**: If `templates/agent-workbench/MANIFEST.json` exists, verify it matches actual template file hashes.
+   - **Regression Baseline**: Verify `tests/regression-baseline.json` reflects current known failures (no stale entries for fixed bugs).
+3. For each check, record: **Pass**, **Warning**, or **Fail** with specific findings.
 3. Create a timestamped maintenance log at `docs/maintenance/YYYY-MM-DD-maintenance.md` following the log format in the protocol.
 4. Classify proposed actions by priority: **Critical**, **Warning**, **Info**.
 5. Present the log to the user for review.

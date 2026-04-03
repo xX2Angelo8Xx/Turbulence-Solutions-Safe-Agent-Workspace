@@ -1,0 +1,10 @@
+{
+  "description": "grep_search with includePattern scoped inside project must be allowed (SAF-003)",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "grep_search",
+    "query": "TODO",
+    "includePattern": "/workspace/project/src/**"
+  },
+  "expected_decision": "allow"
+}

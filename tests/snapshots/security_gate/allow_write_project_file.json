@@ -1,0 +1,9 @@
+{
+  "description": "create_file (write tool) on a file inside Project/ must be allowed",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "create_file",
+    "filePath": "/workspace/project/src/new_module.py"
+  },
+  "expected_decision": "allow"
+}

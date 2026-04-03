@@ -1,0 +1,9 @@
+{
+  "description": "read_file on a file inside Project/ must be allowed",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "read_file",
+    "filePath": "/workspace/project/src/main.py"
+  },
+  "expected_decision": "allow"
+}

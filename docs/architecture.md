@@ -21,11 +21,6 @@ Templates (bundled inside Launcher)
 ```
 ├── .github/
 │   ├── agents/
-│   │   ├── CLOUD-developer.agent.md
-│   │   ├── CLOUD-maintenance.agent.md
-│   │   ├── CLOUD-orchestrator.agent.md
-│   │   ├── CLOUD-story-writer.agent.md
-│   │   ├── CLOUD-tester.agent.md
 │   │   ├── developer.agent.md
 │   │   ├── maintenance.agent.md
 │   │   ├── orchestrator.agent.md
@@ -37,7 +32,9 @@ Templates (bundled inside Launcher)
 │   │   └── status-report.prompt.md
 │   └── workflows/
 │       ├── macos-source-test.yml
-│       └── release.yml
+│       ├── release.yml
+│       ├── staging-test.yml
+│       └── test.yml
 ├── docs/
 │   ├── bugs/
 │   │   ├── User-Bug-Reports/
@@ -56,6 +53,15 @@ Templates (bundled inside Launcher)
 │   │   │   ├── SAE_macOS_Error_Report_v323.md
 │   │   │   └── security-hook-report.md
 │   │   └── bugs.csv
+│   ├── decisions/
+│   │   ├── ADR-001-draft-releases.md
+│   │   ├── ADR-002-ci-test-gate.md
+│   │   ├── ADR-003-workspace-upgrade.md
+│   │   ├── ADR-004-architecture-decision-records.md
+│   │   ├── ADR-005-no-rollback-ui.md
+│   │   ├── ADR-006-defer-code-signing.md
+│   │   ├── ADR-TEMPLATE.md
+│   │   └── index.csv
 │   ├── maintenance/
 │   │   ├── .gitkeep
 │   │   ├── 2026-03-11-maintenance.md
@@ -68,7 +74,8 @@ Templates (bundled inside Launcher)
 │   │   ├── 2026-03-25-maintenance.md
 │   │   ├── 2026-03-30-maintenance.md
 │   │   ├── 2026-04-01-maintenance.md
-│   │   └── action-tracker.json
+│   │   ├── action-tracker.json
+│   │   └── orchestrator-runs.csv
 │   ├── plans/
 │   │   ├── plan-fixLegacyValidationErrors.md
 │   │   ├── plan-project-status-next-steps.md
@@ -924,6 +931,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── SAF-075/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
 │   │   └── workpackages.csv
 │   ├── architecture.md
@@ -943,6 +954,7 @@ Templates (bundled inside Launcher)
 │   ├── csv_utils.py
 │   ├── dedup_test_ids.py
 │   ├── finalize_wp.py
+│   ├── generate_manifest.py
 │   ├── install-macos.sh
 │   ├── install_hooks.py
 │   ├── README.md
@@ -980,7 +992,8 @@ Templates (bundled inside Launcher)
 │       │   ├── shim_config.py
 │       │   ├── updater.py
 │       │   ├── user_settings.py
-│       │   └── vscode.py
+│       │   ├── vscode.py
+│       │   └── workspace_upgrader.py
 │       ├── gui/
 │       │   ├── __init__.py
 │       │   ├── app.py
@@ -996,6 +1009,7 @@ Templates (bundled inside Launcher)
 │   │   ├── NoAgentZone/
 │   │   ├── Project/
 │   │   ├── .gitignore
+│   │   ├── MANIFEST.json
 │   │   └── README.md
 │   └── certification-pipeline/
 │       └── README.md
@@ -1269,9 +1283,12 @@ Templates (bundled inside Launcher)
 │   ├── SAF-072/
 │   ├── SAF-073/
 │   ├── SAF-074/
+│   ├── SAF-075/
 │   ├── shared/
+│   ├── snapshots/
 │   ├── __init__.py
-│   └── conftest.py
+│   ├── conftest.py
+│   └── regression-baseline.json
 ├── launcher.spec
 ├── Makefile
 ├── pyproject.toml

@@ -1,0 +1,132 @@
+name: Staging Smoke Tests
+
+on:
+  # Run manually after a draft release is created
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to test (e.g. v3.3.10)'
+        required: true
+        default: 'v3.3.10'
+
+jobs:
+  smoke-test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run full test suite (pre-release gate)
+        run: python -m pytest tests/ -v --tb=short
+
+      - name: Verify version consistency
+        shell: python
+        run: |
+          import re, sys
+          from pathlib import Path
+          
+          tag = "${{ github.event.inputs.release_tag }}"
+          expected = tag.lstrip("v")
+          
+          checks = {
+              "src/launcher/config.py": r'VERSION\s*:\s*str\s*=\s*"([^"]+)"',
+              "pyproject.toml": r'^version\s*=\s*"([^"]+)"',
+          }
+          
+          errors = []
+          for fpath, pattern in checks.items():
+              content = Path(fpath).read_text()
+              match = re.search(pattern, content, re.MULTILINE)
+              if not match:
+                  errors.append(f"{fpath}: pattern not found")
+              elif match.group(1) != expected:
+                  errors.append(f"{fpath}: expected {expected}, found {match.group(1)}")
+          
+          if errors:
+              for e in errors:
+                  print(f"ERROR: {e}")
+              sys.exit(1)
+          print(f"All version files match {expected}")
+
+      - name: Verify template manifest
+        shell: python
+        run: |
+          import hashlib, json, sys
+          from pathlib import Path
+          
+          manifest_path = Path("templates/agent-workbench/MANIFEST.json")
+          template_dir = Path("templates/agent-workbench")
+          
+          if not manifest_path.exists():
+              print("SKIP: No MANIFEST.json yet")
+              sys.exit(0)
+          
+          manifest = json.loads(manifest_path.read_text())
+          errors = []
+          for rel_path, entry in manifest.get("files", {}).items():
+              full_path = template_dir / rel_path
+              if not full_path.exists():
+                  errors.append(f"MISSING: {rel_path}")
+                  continue
+              h = hashlib.sha256(full_path.read_bytes()).hexdigest()
+              if h != entry.get("sha256"):
+                  errors.append(f"HASH MISMATCH: {rel_path}")
+          
+          if errors:
+              for e in errors:
+                  print(e)
+              sys.exit(1)
+          print("Template manifest verified")
+
+  smoke-test-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run full test suite
+        run: python -m pytest tests/ -v --tb=short
+
+  smoke-test-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run full test suite
+        run: python -m pytest tests/ -v --tb=short
+
+  staging-summary:
+    needs: [smoke-test-windows, smoke-test-ubuntu, smoke-test-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Staging verification complete
+        run: |
+          echo "All staging smoke tests passed for ${{ github.event.inputs.release_tag }}"
+          echo ""
+          echo "Next steps:"
+          echo "1. Download draft release artifacts from GitHub"
+          echo "2. Test installer on a real machine"
+          echo "3. Create a test workspace and verify security files"
+          echo "4. Publish the draft release on GitHub to make it available to users"

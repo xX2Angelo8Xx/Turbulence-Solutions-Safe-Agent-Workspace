@@ -1,0 +1,10 @@
+{
+  "description": "grep_search with includePattern targeting NoAgentZone must be denied (SAF-003)",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "grep_search",
+    "query": "password",
+    "includePattern": "/workspace/NoAgentZone/**"
+  },
+  "expected_decision": "deny"
+}

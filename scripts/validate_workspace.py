@@ -383,6 +383,88 @@ def apply_fixes() -> int:
     return fixes
 
 
+def _check_dependency_ordering(result: ValidationResult) -> None:
+    """Check that WP dependencies are satisfied (dependent WPs are Done before dependents start)."""
+    _, rows = read_csv(WP_CSV)
+    wp_status = {}
+    wp_deps = {}
+    for row in rows:
+        wp_id = row.get("ID", "").strip()
+        status = row.get("Status", "").strip()
+        depends_on = row.get("Depends On", "").strip()
+        if wp_id:
+            wp_status[wp_id] = status
+            if depends_on:
+                wp_deps[wp_id] = [d.strip() for d in depends_on.split(",") if d.strip()]
+
+    for wp_id, deps in wp_deps.items():
+        status = wp_status.get(wp_id, "")
+        if status in ("In Progress", "Review", "Done"):
+            for dep in deps:
+                dep_status = wp_status.get(dep, "")
+                if dep_status and dep_status not in ("Done",):
+                    result.warning(
+                        f"{wp_id} (status={status}) depends on {dep} (status={dep_status}) "
+                        f"which is not Done yet"
+                    )
+                elif not dep_status:
+                    result.warning(f"{wp_id} depends on {dep} which does not exist in workpackages.csv")
+
+    # Check for circular dependencies
+    def _has_cycle(wp_id: str, visited: set, stack: set) -> bool:
+        visited.add(wp_id)
+        stack.add(wp_id)
+        for dep in wp_deps.get(wp_id, []):
+            if dep not in visited:
+                if _has_cycle(dep, visited, stack):
+                    return True
+            elif dep in stack:
+                result.error(f"Circular dependency detected involving {wp_id} and {dep}")
+                return True
+        stack.discard(wp_id)
+        return False
+
+    visited: set[str] = set()
+    for wp_id in wp_deps:
+        if wp_id not in visited:
+            _has_cycle(wp_id, visited, set())
+
+
+def _check_adr_consistency(result: ValidationResult) -> None:
+    """Check ADR index for superseded decisions referenced by Done WPs."""
+    adr_index = REPO_ROOT / "docs" / "decisions" / "index.csv"
+    if not adr_index.exists():
+        return  # ADR system not yet set up
+
+    _, adr_rows = read_csv(adr_index)
+    superseded_adrs = {}
+    for row in adr_rows:
+        adr_id = row.get("ADR-ID", "").strip()
+        status = row.get("Status", "").strip()
+        superseded_by = row.get("Superseded By", "").strip()
+        if status == "Superseded" and adr_id:
+            superseded_adrs[adr_id] = superseded_by
+
+    if not superseded_adrs:
+        return
+
+    _, wp_rows = read_csv(WP_CSV)
+    for row in wp_rows:
+        wp_id = row.get("ID", "").strip()
+        status = row.get("Status", "").strip()
+        if status != "Done":
+            continue
+        comments = row.get("Comments", "")
+        description = row.get("Description", "")
+        combined = f"{comments} {description}"
+        for adr_id, replaced_by in superseded_adrs.items():
+            if adr_id in combined:
+                result.warning(
+                    f"{wp_id} references superseded {adr_id} "
+                    f"(superseded by {replaced_by or 'unknown'})"
+                )
+
+
 def validate_full(result: ValidationResult) -> None:
     """Run all validation checks."""
     exceptions = _load_exceptions()
@@ -422,6 +504,12 @@ def validate_full(result: ValidationResult) -> None:
 
     # Stale merged branches
     _check_stale_branches(result)
+
+    # Dependency ordering and circular dependency detection
+    _check_dependency_ordering(result)
+
+    # ADR consistency (superseded decisions referenced by Done WPs)
+    _check_adr_consistency(result)
 
 
 def validate_wp(wp_id: str, result: ValidationResult) -> None:

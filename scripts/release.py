@@ -126,6 +126,11 @@ def main() -> None:
         action="store_true",
         help="Print what would be done without making any changes.",
     )
+    parser.add_argument(
+        "--rc",
+        action="store_true",
+        help="Create a release candidate. Reminds you that the GitHub Release will be a draft.",
+    )
     args = parser.parse_args()
 
     version = args.version
@@ -227,6 +232,23 @@ def main() -> None:
 
     print()
     print(f"Release {tag} complete.")
+
+    if args.rc:
+        print()
+        print("=" * 60)
+        print("RELEASE CANDIDATE — Draft Release Workflow")
+        print("=" * 60)
+        print(f"1. CI/CD will build artifacts and create a DRAFT release for {tag}")
+        print("2. Draft releases are NOT visible to the auto-updater")
+        print("3. Run staging smoke tests: Actions → 'Staging Smoke Tests' → Run workflow")
+        print("4. Download and test artifacts manually on your machine")
+        print("5. When satisfied, publish the draft on GitHub Releases page")
+        print("=" * 60)
+    else:
+        print()
+        print("NOTE: GitHub Release will be created as a DRAFT.")
+        print("You must manually publish it on the GitHub Releases page")
+        print("after verifying staging smoke tests pass.")
 
 
 if __name__ == "__main__":

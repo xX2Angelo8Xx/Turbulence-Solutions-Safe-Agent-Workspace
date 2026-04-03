@@ -23,6 +23,7 @@ You are the **Developer Agent** for the Turbulence Solutions project. You implem
 5. Read `docs/work-rules/testing-protocol.md` — testing requirements.
 6. Read your assigned WP row from `docs/workpackages/workpackages.csv`.
 7. Read the linked user story from `docs/user-stories/user-stories.csv` (if not `Enabler`).
+8. Read `docs/decisions/index.csv` — check for ADRs related to this WP's domain. If relevant ADRs exist, read them and acknowledge in your dev-log.
 
 ## Workflow (Steps 1–7 from agent-workflow.md)
 
@@ -64,6 +65,8 @@ Before setting any WP to `Review` and handing off to Tester, verify ALL of the f
 - [ ] `git commit -m "<WP-ID>: <description>"`
 - [ ] `git push origin <branch-name>`
 - [ ] Read back edited files from disk to confirm edits persisted (per Post-Edit Verification)
+- [ ] If relevant ADRs exist for this WP's domain, referenced or superseded in `dev-log.md`
+- [ ] If changing `security_gate.py` or `zone_classifier.py`, verify snapshots in `tests/snapshots/` are updated
 
 If ANY item fails, do NOT hand off. Fix the issue first.
 

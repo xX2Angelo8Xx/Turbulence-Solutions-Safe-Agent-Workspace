@@ -1,0 +1,7 @@
+"ADR-ID","Title","Status","Date","Related WPs","Superseded By"
+"ADR-001","Use Draft GitHub Releases for Pre-Release Testing","Active","2026-04-03","",""
+"ADR-002","Mandatory CI Test Gate Before Release Builds","Active","2026-04-03","",""
+"ADR-003","Template Manifest and Workspace Upgrade System","Active","2026-04-03","",""
+"ADR-004","Adopt Architecture Decision Records (ADRs)","Active","2026-04-03","",""
+"ADR-005","No Rollback UI — Use GitHub Releases","Active","2026-04-03","",""
+"ADR-006","Defer Code Signing","Active","2026-04-03","",""

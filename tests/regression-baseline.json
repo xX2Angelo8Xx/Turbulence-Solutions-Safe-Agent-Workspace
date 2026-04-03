@@ -1,0 +1,2047 @@
+{
+  "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
+  "_count": 680,
+  "_updated": "2025-07-15",
+  "known_failures": {
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_both_readmes_are_identical": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_default_readme_contains_project_name_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_default_readme_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_default_readme_h1_uses_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_default_readme_no_hardcoded_project_heading": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_replace_placeholder_produces_correct_heading": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_replace_placeholder_substitutes_project_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_replace_placeholder_works_with_hyphenated_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_template_readme_contains_project_name_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_template_readme_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_template_readme_h1_uses_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_project_readme_placeholders.test_template_readme_no_hardcoded_project_heading": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_default_readme_first_nonempty_line_is_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_default_readme_has_exactly_one_h1": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_default_readme_no_german_content": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_default_readme_placeholder_is_standalone_line": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_replacement_produces_standalone_heading": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_replacement_removes_all_non_template_content": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_template_readme_first_nonempty_line_is_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_template_readme_has_exactly_one_h1": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_template_readme_no_german_content": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-004.test_doc004_tester_edge_cases.test_template_readme_placeholder_is_standalone_line": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-010.test_doc010_tester_edge_cases.TestSourceCodeUnmodified.test_src_directory_not_modified_by_wp": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_agents_directory.test_agent_rules_has_available_agents_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_agents_directory.test_agent_rules_lists_all_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_agents_directory.test_agents_readme_contains_customization_instructions": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_agents_directory.test_agents_readme_mentions_all_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_tester_edge_cases.test_agent_rules_denied_zones_still_intact": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_tester_edge_cases.test_agent_rules_section8_has_when_to_use_guidance": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_tester_edge_cases.test_agent_rules_section8_references_agents_readme": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_tester_edge_cases.test_copilot_instructions_references_readme_file": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_tester_edge_cases.test_readme_exact_agent_count": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_tester_edge_cases.test_readme_has_invoke_pattern_examples": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_tester_edge_cases.test_readme_has_yaml_frontmatter_example": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-018.test_doc018_tester_edge_cases.test_readme_references_agent_rules": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-020.test_doc020_brainstormer_agent.test_frontmatter_forbidden_tools_absent": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-020.test_doc020_tester_edge_cases.test_frontmatter_no_edit_tool": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_agent.test_frontmatter_no_edit_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_body_has_required_section[## Persona]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_body_has_required_section[## Role]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_description_mentions_read_only": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_model_is_correct": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_tools_list_is_exact": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_what_you_do_not_do_no_terminal_claim": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_what_you_do_not_do_references_agent[@brainstormer]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_what_you_do_not_do_references_agent[@criticist]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_what_you_do_not_do_references_agent[@planner]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_what_you_do_not_do_references_agent[@programmer]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-022.test_doc022_researcher_edge_cases.test_what_you_do_not_do_references_agent[@tester]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_body_contains_zone_restrictions": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_body_is_non_trivial": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_body_mentions_scientist_role": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_body_uses_project_name_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_file_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_file_is_not_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_file_starts_with_frontmatter_delimiter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_frontmatter_description_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_frontmatter_is_parseable": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_frontmatter_model_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_frontmatter_name_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_frontmatter_required_tools_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_agent.test_frontmatter_tools_is_list": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestAgentRulesReference.test_agent_rules_referenced": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestConsistencyWithOtherAgents.test_body_uses_bold_agent_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestConsistencyWithOtherAgents.test_file_ends_with_newline": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestConsistencyWithOtherAgents.test_first_body_line_mentions_agent_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestConsistencyWithOtherAgents.test_how_you_work_has_numbered_steps": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestConsistencyWithOtherAgents.test_what_you_do_not_do_has_bullet_points": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestCrossReferences.test_agent_reference_present[@brainstormer]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestCrossReferences.test_agent_reference_present[@criticist]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestCrossReferences.test_agent_reference_present[@planner]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestCrossReferences.test_agent_reference_present[@programmer]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestCrossReferences.test_agent_reference_present[@tester]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestCrossReferences.test_all_cross_references_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestEncoding.test_file_is_valid_utf8": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestEncoding.test_no_bom": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestFrontmatterDelimiters.test_closing_frontmatter_delimiter_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestFrontmatterDelimiters.test_frontmatter_block_is_between_two_delimiters": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestFrontmatterExactValues.test_description_has_no_leading_trailing_whitespace": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestFrontmatterExactValues.test_model_has_no_leading_trailing_whitespace": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestFrontmatterExactValues.test_model_is_correct": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestFrontmatterExactValues.test_name_has_no_leading_trailing_whitespace": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestFrontmatterExactValues.test_name_is_exactly_scientist": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestPersonaContent.test_description_reflects_persona": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestPersonaContent.test_persona_keyword_present[analytical]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestPersonaContent.test_persona_keyword_present[data]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestPersonaContent.test_persona_keyword_present[evidence]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestPersonaContent.test_persona_keyword_present[experiment]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestPersonaContent.test_persona_keyword_present[hypothesis]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestProjectNamePlaceholder.test_placeholder_appears_at_least_twice": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestProjectNamePlaceholder.test_placeholder_not_misspelled": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestStandardSections.test_all_five_sections_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestStandardSections.test_section_present[## How You Work]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestStandardSections.test_section_present[## Persona]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestStandardSections.test_section_present[## Role]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestStandardSections.test_section_present[## What You Do Not Do]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestStandardSections.test_section_present[## Zone Restrictions]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestToolsList.test_no_duplicate_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestToolsList.test_tools_are_strings": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestToolsList.test_tools_count_matches": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestToolsList.test_tools_list_contains_all_required": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestZoneRestrictions.test_all_three_denied_paths_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestZoneRestrictions.test_denied_path_in_table[.github/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestZoneRestrictions.test_denied_path_in_table[.vscode/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestZoneRestrictions.test_denied_path_in_table[NoAgentZone/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-023.test_doc023_scientist_edge_cases.TestZoneRestrictions.test_zone_table_has_header": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_body_contains_project_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_body_contains_zone_restrictions": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_body_emphasizes_no_fixing": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_body_is_non_trivial": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_body_mentions_criticist_role": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_file_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_file_is_not_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_file_starts_with_frontmatter_delimiter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_frontmatter_description_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_frontmatter_forbidden_tools_absent": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_frontmatter_is_parseable": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_frontmatter_model_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_frontmatter_name_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_frontmatter_required_tools_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_agent.test_frontmatter_tools_is_list": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestAgentRulesReference.test_agent_rules_referenced": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestConsistencyWithOtherAgents.test_body_uses_bold_agent_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestConsistencyWithOtherAgents.test_file_ends_with_newline": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestConsistencyWithOtherAgents.test_first_body_line_mentions_agent_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestConsistencyWithOtherAgents.test_how_you_work_has_numbered_steps": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestConsistencyWithOtherAgents.test_model_matches_brainstormer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestConsistencyWithOtherAgents.test_tools_match_brainstormer_pattern": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestConsistencyWithOtherAgents.test_what_you_do_not_do_has_bullet_points": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestCrossReferences.test_brainstormer_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestCrossReferences.test_fixer_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestCrossReferences.test_planner_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestCrossReferences.test_programmer_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestCrossReferences.test_tester_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestEncoding.test_file_is_valid_utf8": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestEncoding.test_no_bom": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestFrontmatterDelimiters.test_closing_frontmatter_delimiter_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestFrontmatterDelimiters.test_frontmatter_block_is_between_two_delimiters": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestFrontmatterExactValues.test_description_has_no_leading_trailing_whitespace": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestFrontmatterExactValues.test_model_has_no_leading_trailing_whitespace": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestFrontmatterExactValues.test_model_is_correct": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestFrontmatterExactValues.test_name_has_no_leading_trailing_whitespace": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestFrontmatterExactValues.test_name_is_exactly_criticist": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestProjectNamePlaceholder.test_placeholder_appears_at_least_twice": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestProjectNamePlaceholder.test_placeholder_not_misspelled": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestReadOnlyPersona.test_body_emphasizes_identify": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestReadOnlyPersona.test_body_says_does_not_edit": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestReadOnlyPersona.test_body_says_does_not_fix": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestReadOnlyPersona.test_description_emphasizes_review_not_fix": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestReadOnlyPersona.test_role_section_mentions_no_fixing": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestStandardSections.test_all_five_sections_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestStandardSections.test_section_present[## How You Work]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestStandardSections.test_section_present[## Persona]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestStandardSections.test_section_present[## Role]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestStandardSections.test_section_present[## What You Do Not Do]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestStandardSections.test_section_present[## Zone Restrictions]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_forbidden_tool_absent[ask]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_forbidden_tool_absent[create_directory]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_forbidden_tool_absent[create_new_jupyter_notebook]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_forbidden_tool_absent[edit]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_forbidden_tool_absent[edit_notebook_file]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_forbidden_tool_absent[execute]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_forbidden_tool_absent[fetch_webpage]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_forbidden_tool_absent[run_notebook_cell]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_no_duplicate_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_tools_are_strings": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_tools_count_is_exactly_two": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_tools_exactly_match_required_set": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestToolsList.test_tools_list_contains_all_required": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestZoneRestrictions.test_all_three_denied_paths_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestZoneRestrictions.test_denied_path_in_table[.github/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestZoneRestrictions.test_denied_path_in_table[.vscode/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestZoneRestrictions.test_denied_path_in_table[NoAgentZone/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-024.test_doc024_criticist_edge_cases.TestZoneRestrictions.test_zone_table_has_header": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_agent.test_frontmatter_required_tools_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestConsistencyWithOtherAgents.test_model_matches_brainstormer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestConsistencyWithOtherAgents.test_tools_include_brainstormer_subset": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestCrossReferences.test_brainstormer_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestCrossReferences.test_criticist_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestCrossReferences.test_programmer_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestCrossReferences.test_tester_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestPlanningOnlyPersona.test_body_says_does_not_write_code": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestPlanningOnlyPersona.test_role_section_mentions_no_implementation": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestStandardSections.test_all_five_sections_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestStandardSections.test_section_present[## Persona]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestStandardSections.test_section_present[## Role]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestToolsList.test_tools_count_is_exactly_four": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestToolsList.test_tools_exactly_match_required_set": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-025.test_doc025_planner_edge_cases.TestToolsList.test_tools_list_contains_all_required": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_body_is_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_body_mentions_fixer_role": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_body_mentions_root_cause": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_body_references_agent_rules": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_body_uses_project_name_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_file_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_file_is_not_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_file_starts_with_frontmatter_delimiter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_frontmatter_description_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_frontmatter_is_parseable": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_frontmatter_model_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_frontmatter_name_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_frontmatter_required_tools_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_agent.test_frontmatter_tools_is_list": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestAgentCrossReferences.test_individual_agent_ref[@brainstormer]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestAgentCrossReferences.test_individual_agent_ref[@criticist]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestAgentCrossReferences.test_individual_agent_ref[@planner]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestAgentCrossReferences.test_individual_agent_ref[@programmer]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestAgentCrossReferences.test_individual_agent_ref[@tester]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestAgentCrossReferences.test_what_you_do_not_do_has_agent_refs": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestAgentRulesReference.test_agent_rules_referenced": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestAgentRulesReference.test_agent_rules_with_project_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestBodySections.test_all_five_sections_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestBodySections.test_no_extra_h2_sections": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestBodySections.test_section_present[## How You Work]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestBodySections.test_section_present[## Persona]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestBodySections.test_section_present[## Role]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestBodySections.test_section_present[## What You Do Not Do]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestBodySections.test_section_present[## Zone Restrictions]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestConsistencyWithProgrammer.test_same_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestConsistencyWithProgrammer.test_same_section_headings": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestConsistencyWithProgrammer.test_same_tool_set": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestConsistencyWithProgrammer.test_same_zone_restrictions": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestDebuggingLanguage.test_debug_mentioned": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestDebuggingLanguage.test_fix_mentioned": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestDebuggingLanguage.test_multiple_debug_terms_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestDebuggingLanguage.test_root_cause_mentioned": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestDebuggingLanguage.test_trace_mentioned": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestFrontmatterExactValues.test_description_mentions_debug_or_root_cause": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestFrontmatterExactValues.test_model_is_correct": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestFrontmatterExactValues.test_name_is_exactly_fixer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestFrontmatterExactValues.test_no_forbidden_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestFrontmatterExactValues.test_tools_count_is_exactly_4": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestFrontmatterExactValues.test_tools_exact_set": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestNoStaleContent.test_body_does_not_claim_to_build_features": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestNoStaleContent.test_frontmatter_no_extra_fields": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestNoStaleContent.test_no_duplicate_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestNoStaleContent.test_no_scientist_references_in_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestNoStaleContent.test_no_tester_references_in_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestProjectNamePlaceholder.test_no_hardcoded_project_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestProjectNamePlaceholder.test_placeholder_in_body_at_least_twice": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestZoneRestrictions.test_all_three_denied_paths": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestZoneRestrictions.test_denied_path_present[.github/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestZoneRestrictions.test_denied_path_present[.vscode/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-026.test_doc026_fixer_edge_cases.TestZoneRestrictions.test_denied_path_present[NoAgentZone/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_body_contains_project_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_body_contains_zone_restrictions": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_body_is_non_trivial": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_body_mentions_documentation_types": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_body_mentions_writer_role": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_body_references_agent_rules": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_file_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_file_is_not_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_file_starts_with_frontmatter_delimiter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_frontmatter_description_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_frontmatter_forbidden_tools_absent": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_frontmatter_is_parseable": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_frontmatter_model_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_frontmatter_name_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_frontmatter_required_tools_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_agent.test_frontmatter_tools_is_list": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestAgentCrossReferences.test_references_brainstormer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestAgentCrossReferences.test_references_fixer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestAgentCrossReferences.test_references_planner": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestAgentCrossReferences.test_references_programmer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestAgentCrossReferences.test_references_tester": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestAgentRulesReference.test_agent_rules_in_zone_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestAgentRulesReference.test_agent_rules_referenced": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestBodySections.test_all_five_sections": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestBodySections.test_section_present[How You Work]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestBodySections.test_section_present[Persona]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestBodySections.test_section_present[Role]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestBodySections.test_section_present[What You Do Not Do]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestBodySections.test_section_present[Zone Restrictions]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestDocumentationLanguage.test_doc_keyword_present[api]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestDocumentationLanguage.test_doc_keyword_present[changelog]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestDocumentationLanguage.test_doc_keyword_present[comment]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestDocumentationLanguage.test_doc_keyword_present[documentation]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestDocumentationLanguage.test_doc_keyword_present[readme]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestFrontmatterExactValues.test_frontmatter_has_exactly_four_keys": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestFrontmatterExactValues.test_model_is_correct": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestFrontmatterExactValues.test_model_no_leading_trailing_whitespace": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestFrontmatterExactValues.test_name_is_writer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestFrontmatterExactValues.test_name_no_leading_trailing_whitespace": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestNoTerminalLanguage.test_does_not_claim_execution": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestProjectPlaceholder.test_placeholder_count_gte_2": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestStructuralQuality.test_body_line_count": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestStructuralQuality.test_description_is_meaningful": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestStructuralQuality.test_file_encoding_utf8": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestStructuralQuality.test_frontmatter_closes_properly": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestStructuralQuality.test_no_empty_frontmatter_values": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestToolList.test_all_tools_are_strings": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestToolList.test_exact_tool_set": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestToolList.test_no_duplicate_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestToolList.test_no_execute_tool": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestToolList.test_no_fetch_webpage": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestToolList.test_no_notebook_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestToolList.test_tool_count_is_three": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestZoneRestrictions.test_three_zones_total": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestZoneRestrictions.test_zone_mentioned[.github/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestZoneRestrictions.test_zone_mentioned[.vscode/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-027.test_doc027_writer_edge_cases.TestZoneRestrictions.test_zone_mentioned[NoAgentZone/]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_body_contains_project_name_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_body_contains_zone_restrictions": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_body_is_non_trivial": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_body_mentions_prototyper_role": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_body_mentions_speed_or_mvp": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_body_references_agent_rules": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_file_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_file_is_not_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_file_starts_with_frontmatter_delimiter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_frontmatter_description_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_frontmatter_is_parseable": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_frontmatter_model_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_frontmatter_name_present_and_non_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_frontmatter_no_forbidden_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_frontmatter_required_tools_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_agent.test_frontmatter_tools_is_list": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestAgentCrossReferences.test_references_criticist": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestAgentCrossReferences.test_references_planner": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestAgentCrossReferences.test_references_programmer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestAgentCrossReferences.test_references_tester": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestContentQuality.test_body_does_not_contain_raw_html": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestContentQuality.test_file_encoding_is_utf8": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestContentQuality.test_frontmatter_closed_properly": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestContentQuality.test_no_todo_or_placeholder_text": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestContentQuality.test_no_trailing_whitespace_in_frontmatter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestExactFrontmatterValues.test_exactly_four_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestExactFrontmatterValues.test_frontmatter_has_only_four_keys": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestExactFrontmatterValues.test_model_is_correct": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestExactFrontmatterValues.test_name_is_exactly_prototyper": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestExactFrontmatterValues.test_no_duplicate_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestExactFrontmatterValues.test_no_extra_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestPersonaKeywords.test_contains_mvp": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestPersonaKeywords.test_contains_poc_or_proof_of_concept": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestPersonaKeywords.test_contains_prototype": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestPersonaKeywords.test_contains_quick_or_quickly": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestPersonaKeywords.test_contains_speed": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestPersonaKeywords.test_contains_validate": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestPlaceholdersAndReferences.test_agent_rules_referenced": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestPlaceholdersAndReferences.test_description_is_meaningful": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestPlaceholdersAndReferences.test_project_name_placeholder_at_least_two": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestSectionStructure.test_at_least_five_h2_sections": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestSectionStructure.test_section_exists[## How You Work]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestSectionStructure.test_section_exists[## Persona]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestSectionStructure.test_section_exists[## Role]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestSectionStructure.test_section_exists[## What You Do Not Do]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestSectionStructure.test_section_exists[## Zone Restrictions]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestToolSetConsistency.test_same_model_as_peer[programmer]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestToolSetConsistency.test_same_tools_as_peer[programmer]": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestZoneRestrictions.test_github_restricted": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestZoneRestrictions.test_noagentzone_restricted": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestZoneRestrictions.test_vscode_restricted": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestZoneRestrictions.test_zone_table_has_denied_path_header": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-028.test_doc028_prototyper_edge_cases.TestZoneRestrictions.test_zone_table_has_reason_column": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_coordinator_agent.TestCoordinatorAgents.test_all_10_specialist_agents_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_coordinator_agent.TestCoordinatorModel.test_model_value": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_coordinator_agent.TestCoordinatorTools.test_all_expected_tools_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_coordinator_agent.TestReadmeUpdated.test_readme_has_11_agent_rows": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestAgentsListExactCount.test_agents_count_exactly_10": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestAgentsListExactCount.test_all_expected_agents_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestAgentsListExactCount.test_no_unexpected_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestAtSyntaxCrossReferences.test_at_syntax_present_for_all_10_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestAtSyntaxCrossReferences.test_at_syntax_used_for_criticist": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestAtSyntaxCrossReferences.test_at_syntax_used_for_fixer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestModelConsistency.test_model_exact_value": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestModelConsistency.test_model_matches_other_agent_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestReadmeTableIntegrity.test_readme_coordinator_description_mentions_delegation": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestReadmeTableIntegrity.test_readme_exactly_11_rows": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestReadmeTableIntegrity.test_readme_no_duplicate_coordinator_entry": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestToolsExactSet.test_no_unexpected_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-029.test_doc029_edge_cases.TestToolsExactSet.test_tools_count_exactly_7": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_coordinator_casing.TestBodyAtReferenceCasing.test_all_10_at_refs_present_in_body": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_coordinator_casing.TestDelegationTable.test_delegation_table_all_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_coordinator_casing.TestDelegationTable.test_delegation_table_no_lowercase_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_coordinator_casing.TestFrontmatterAgentsCasing.test_frontmatter_all_10_agents_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_coordinator_casing.TestPersonaSection.test_persona_criticist_pascal": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_coordinator_casing.TestPersonaSection.test_persona_planner_pascal": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_coordinator_casing.TestPersonaSection.test_persona_tester_pascal": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_coordinator_casing.TestWhatYouDoNotDo.test_what_you_do_not_do_brainstormer": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_edge_cases.TestFrontmatterAgentListIntegrity.test_frontmatter_agents_match_expected_set": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_edge_cases.TestFrontmatterAgentListIntegrity.test_frontmatter_exactly_10_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_edge_cases.TestHowYouWorkSection.test_how_you_work_all_10_backtick_refs": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_edge_cases.TestHowYouWorkSection.test_how_you_work_no_lowercase_backtick_refs": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-030.test_doc030_edge_cases.TestHowYouWorkSection.test_how_you_work_section_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-033.test_doc033_edge_cases.test_agent_md_files_still_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-033.test_doc033_edge_cases.test_agents_dir_contains_only_agent_md_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-033.test_doc033_readme_management.test_agents_readme_deleted": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_orchestrator_release_docs.test_both_files_contain_dry_run_documentation": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_orchestrator_release_docs.test_both_files_contain_release_script_reference": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_orchestrator_release_docs.test_both_files_have_fallback_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_orchestrator_release_docs.test_both_files_mention_validate_version_ci_job": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_orchestrator_release_docs.test_cicd_pipeline_trigger_section_exists_in_both_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_orchestrator_release_docs.test_cicd_section_content_is_identical_in_both_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_orchestrator_release_docs.test_neither_file_uses_old_manual_tag_creation_as_primary": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_tester_edge_cases.test_agent_files_have_valid_yaml_frontmatter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_tester_edge_cases.test_all_structural_headings_present_in_both_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_tester_edge_cases.test_cicd_section_names_all_five_version_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_tester_edge_cases.test_cicd_section_uses_venv_scripts_python_path": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_tester_edge_cases.test_git_tag_a_only_in_fallback_not_primary": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_tester_edge_cases.test_no_deprecated_manual_version_edit_instructions": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-034.test_doc034_tester_edge_cases.test_primary_method_heading_is_release_script": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentDocsFilesExist.test_readme_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentDocsReadmeContent.test_has_five_pillars": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentDocsReadmeContent.test_has_philosophy_heading": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentDocsReadmeContent.test_has_rules_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentDocsReadmeContent.test_has_standard_documents_table": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentDocsReadmeContent.test_mentions_progress_md": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentRulesUpdated.test_has_agentdocs_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentRulesUpdated.test_mentions_agent_roles": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentRulesUpdated.test_mentions_progress_at_session_start": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentRulesUpdated.test_section_1a_before_section_2": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestAgentRulesUpdated.test_section_1a_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestCopilotInstructionsUpdated.test_agentdocs_bullet_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-035.test_doc035_agentdocs.TestCopilotInstructionsUpdated.test_agentdocs_readme_referenced": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-036.test_doc036_agent_personas.test_researcher_has_fetch_tool": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-039.test_doc039_tidyup.test_agent_rules_includes_tidyup": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-039.test_doc039_tidyup.test_coordinator_includes_tidyup": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-039.test_doc039_tidyup.test_tidyup_agent_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-039.test_doc039_tidyup.test_tidyup_has_audit_checks": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-039.test_doc039_tidyup.test_tidyup_has_frontmatter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_agent_settings.test_coordinator_lists_all_specialist_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_agent_settings.test_no_sonnet_agent_uses_opus": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_agent_settings.test_sonnet_agents_use_sonnet_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_agent_settings.test_tidyup_file_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_agent_settings.test_tidyup_has_argument_hint": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_agent_settings.test_tidyup_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_edge_cases.test_all_agents_have_required_yaml_keys": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_edge_cases.test_all_files_have_closing_yaml_delimiter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_edge_cases.test_all_files_start_with_yaml_delimiter": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_edge_cases.test_no_agent_has_empty_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_edge_cases.test_no_agent_has_empty_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_edge_cases.test_no_agent_has_empty_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_edge_cases.test_planner_is_only_opus_agent": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_edge_cases.test_tidyup_frontmatter_is_valid_yaml": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-042.test_doc042_edge_cases.test_tidyup_has_project_name_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_agent_rules_and_readme_consistent_plan_exception": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_agent_rules_has_project_name_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_agent_rules_section_1a_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_agent_rules_section_1a_lists_all_six_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_planner_and_readme_use_consistent_naming": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_readme_rules_section_has_exception_for_plan_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_readme_standard_documents_table_has_plan_row": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_tidyup_has_project_name_placeholder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_agent_rules_coordinator_references_plan": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_agent_rules_maps_planner_to_plan_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_agent_rules_tidyup_includes_plan_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_readme_allows_plan_file_creation": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_readme_has_plan_file_row": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_tidyup_checks_plan_completion": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_tidyup_has_plan_file_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-044.test_doc044_edge_cases.test_agent_rules_workspace_cleaner_in_doc_mapping": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-044.test_doc044_workspace_cleaner_rename.test_agent_rules_does_not_reference_tidyup": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.DOC-044.test_doc044_workspace_cleaner_rename.test_agent_rules_references_workspace_cleaner": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-007.test_fix007_mock_pattern.TestGUI012WindowHeight.test_app_window_height_is_590": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-007.test_fix007_mock_pattern.TestGUI012WindowHeight.test_window_height_assertion_matches_app": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-009.test_fix009_edge_cases.test_tst_ids_sequential_no_gaps_in_renumbered_range": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-009.test_fix009_required_fields.test_required_fields_not_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-009.test_fix009_tst_id_format.test_tst_id_format": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-019.test_fix019_edge_cases.TestVersionOrdering.test_new_version_major_incremented_by_one": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-028.test_fix028_codesign.test_app_bundle_quoted_in_codesign": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-028.test_fix028_codesign.test_app_bundle_variable_used_in_codesign": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-028.test_fix028_codesign.test_deep_flag_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-028.test_fix028_codesign.test_find_dylib_signing_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-028.test_fix028_codesign.test_find_so_signing_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-028.test_fix028_codesign.test_python_framework_signing_uses_deep": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-028.test_fix028_codesign.test_verify_uses_deep_strict": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_contains_codesign_verify": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_full_command": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyStepSafeguards.test_step_run_contains_strict_flag": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-031.test_fix031_bottomup_codesign.test_app_bundle_sign_no_deep": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-031.test_fix031_bottomup_codesign.test_dylib_so_signed_before_app_bundle": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-031.test_fix031_bottomup_codesign.test_find_dylib_command_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-031.test_fix031_bottomup_codesign.test_find_so_command_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-031.test_fix031_bottomup_codesign.test_main_launcher_signed": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-031.test_fix031_bottomup_codesign.test_python_framework_signed_with_deep": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-031.test_fix031_bottomup_codesign.test_signing_order_bottom_up": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-031.test_fix031_bottomup_codesign.test_verify_deep_strict_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-036.test_fix036_version_consistency.test_architecture_md_references_new_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-037.test_fix037_dist_info_cleanup.test_codesign_steps_still_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-038.test_fix038_component_codesign.test_dylib_signing_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-038.test_fix038_component_codesign.test_explanatory_comment_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-038.test_fix038_component_codesign.test_main_executable_signing_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-038.test_fix038_component_codesign.test_so_signing_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-038.test_fix038_edge_cases.test_explanatory_comment_mentions_non_code_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-038.test_fix038_edge_cases.test_explanatory_comment_mentions_pyinstaller": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-038.test_fix038_edge_cases.test_signing_order_dylib_before_so": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-038.test_fix038_edge_cases.test_signing_order_framework_before_launcher": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-038.test_fix038_edge_cases.test_signing_order_so_before_framework": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_edge_cases.test_build_dmg_launcher_verify_before_framework_verify": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_edge_cases.test_build_dmg_verify_before_hdiutil": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_edge_cases.test_build_dmg_verify_uses_dist_dir_variable": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_edge_cases.test_release_yml_verify_step_no_app_path": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_edge_cases.test_release_yml_verify_step_uses_pre_bundle_launcher": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_no_verify_launcher_in_bundle": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_still_signs_dylib": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_still_signs_python_framework": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_still_signs_so": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_verify_pre_bundle_binary": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_skip_launcher_resign.test_regression_release_yml_old_verify_gone": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_skip_launcher_resign.test_release_yml_no_verify_launcher_in_bundle": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-039.test_fix039_skip_launcher_resign.test_release_yml_verifies_pre_bundle_binary": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-049.test_fix049_version_utils.TestDynamicVersionSurvivesBump.test_all_affected_files_use_dynamic_expression": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-070.test_fix070_version_bump.test_current_version_is_3_2_3": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_brainstormer_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_brainstormer_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_criticist_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_criticist_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_fetch_webpage_not_in_any_agent": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_fixer_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_fixer_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_no_old_tool_names_in_any_agent": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_planner_has_ask_tool": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_planner_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_programmer_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_programmer_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_prototyper_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_prototyper_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_readme_example_uses_category_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_readme_example_uses_correct_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_researcher_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_researcher_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_scientist_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_scientist_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_tester_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_tester_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_writer_model": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_agent_frontmatter.test_writer_tools": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_edge_cases.test_all_agent_files_exist": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_edge_cases.test_all_tool_values_are_non_empty_strings": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_edge_cases.test_fetch_webpage_not_in_any_agent_body": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_edge_cases.test_frontmatter_has_exactly_four_keys": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_edge_cases.test_model_is_list_in_all_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_edge_cases.test_no_agent_has_empty_tools_list": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_edge_cases.test_old_model_not_in_any_file_content": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-073.test_fix073_edge_cases.test_tools_is_list_in_all_agents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-077.test_fix077_version_322.test_all_version_files_agree": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-077.test_fix077_version_322.test_build_appimage_sh_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-077.test_fix077_version_322.test_build_dmg_sh_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-077.test_fix077_version_322.test_config_py_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-077.test_fix077_version_322.test_get_display_version_returns_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-077.test_fix077_version_322.test_pyproject_toml_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-077.test_fix077_version_322.test_setup_iss_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-077.test_fix077_version_322.test_shared_version_utils_current_version_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-078.test_fix078_edge_cases.test_get_display_version_fallback_returns_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-078.test_fix078_edge_cases.test_version_imported_from_config_module": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-078.test_fix078_version_323.test_all_version_files_agree": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-078.test_fix078_version_323.test_build_appimage_sh_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-078.test_fix078_version_323.test_build_dmg_sh_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-078.test_fix078_version_323.test_config_py_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-078.test_fix078_version_323.test_pyproject_toml_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-078.test_fix078_version_323.test_setup_iss_is_323": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_readme.TestTemplateReadmeExists.test_readme_mentions_security_gate": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestPlaceholderUsage.test_placeholder_appears_in_exempt_tools_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestPlaceholderUsage.test_placeholder_appears_in_tier1_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestPlaceholderUsage.test_placeholder_appears_in_tier2_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestReadmeEncoding.test_readme_agent_rules_reference_is_in_early_content": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestReadmeEncoding.test_readme_title_is_agent_workbench_specific": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestReadmeSecurityZoneDescriptions.test_readme_exempt_tools_list_is_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestReadmeSecurityZoneDescriptions.test_readme_has_tier1_auto_allow": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestReadmeSecurityZoneDescriptions.test_readme_has_tier2_force_ask": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestReadmeSecurityZoneDescriptions.test_readme_has_tier3_hard_block": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestReadmeSecurityZoneDescriptions.test_readme_mentions_pretooluse_hook": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-086.test_fix086_tester_edge_cases.TestWorkspaceCreationEdgeCases.test_readme_tier1_section_has_project_name_replaced": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-088.test_fix088_edge_cases.test_get_display_version_fallback_returns_326": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-088.test_fix088_edge_cases.test_version_importable_and_correct": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-088.test_fix088_version_bump.test_all_versions_consistent": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-088.test_fix088_version_bump.test_build_dmg_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-088.test_fix088_version_bump.test_config_py_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-088.test_fix088_version_bump.test_pyproject_toml_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-088.test_fix088_version_bump.test_setup_iss_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_edge_cases.test_all_five_files_have_same_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_edge_cases.test_config_py_version_appears_at_most_once": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_edge_cases.test_config_py_version_format": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_edge_cases.test_no_future_version_in_files": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_edge_cases.test_pyproject_version_defined_once": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_edge_cases.test_pyproject_version_format": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_version_bump.test_build_appimage_sh_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_version_bump.test_build_dmg_sh_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_version_bump.test_config_py_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_version_bump.test_pyproject_toml_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-090.test_fix090_version_bump.test_setup_iss_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-091.test_fix091_edge_cases.test_agent_rules_is_regular_file": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-091.test_fix091_edge_cases.test_project_dir_exact_contents": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-091.test_fix091_edge_cases.test_readme_is_regular_file": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-091.test_fix091_template_files.test_agent_rules_still_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.FIX-091.test_fix091_template_files.test_readme_still_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-005.test_gui005_project_creation.TestCreateProjectCoreFunction.test_existing_target_directory_raises_error": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-005.test_gui005_project_creation.TestCreateProjectCoreFunction.test_returns_correct_target_path": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-007.test_gui007_tester_additions.TestOnCreateProjectAdditionalIntegration.test_duplicate_folder_check_uses_stripped_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-007.test_gui007_validation.TestOnCreateProjectDuplicate.test_duplicate_folder_shows_name_error_label": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-007.test_gui007_validation.TestOnCreateProjectDuplicate.test_duplicate_message_mentions_folder_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectPrefix.test_creates_ts_sae_prefixed_folder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectPrefix.test_different_folder_names_all_get_prefix": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectPrefix.test_folder_physically_created_on_disk": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectPrefix.test_returned_path_equals_ts_sae_path": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectTraversalGuard.test_normal_name_is_not_rejected": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_rename_root_folder.TestDuplicateFolderCheck.test_on_create_project_duplicate_guard_uses_prefix": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestCasePreservation.test_all_lowercase_not_capitalised": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestCasePreservation.test_all_uppercase_preserved": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestCasePreservation.test_mixed_case_preserved": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestEmptyFolderName.test_empty_name_creates_prefix_only_folder": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_digits_in_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_dot_in_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_hyphen_in_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_prefix_is_exactly_ts_sae_uppercase_hyphen": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_underscore_in_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestUnicodeNames.test_cjk_unicode_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestUnicodeNames.test_latin_extended_unicode": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-015.test_gui015_tester_edge_cases.TestVeryLongFolderName.test_100_char_name_receives_prefix": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-016.test_gui016_rename_project_folder.TestRenameProjectFolder.test_root_folder_still_ts_sae_prefixed": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-020.test_gui020_create_project_integration.TestCreateProjectWritesCounterConfig.test_workspace_folder_prefixed_with_ts_sae": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-022.test_gui022_include_readmes_checkbox.TestCreateProjectStubParam.test_create_project_accepts_include_readmes_false": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.GUI-022.test_gui022_include_readmes_checkbox.TestCreateProjectStubParam.test_create_project_accepts_include_readmes_true": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-004.test_ins004_template_bundling.test_coding_project_app_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-004.test_ins004_template_bundling.test_coding_project_readme_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-004.test_ins004_template_bundling.test_coding_project_requirements_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-004.test_ins004_template_bundling.test_coding_prompts_review_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-004.test_ins004_template_bundling.test_coding_skill_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-004.test_ins004_template_bundling.test_template_discoverable_and_copyable": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-013.test_ins013_tester_edge_cases.test_no_duplicate_job_names": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-014.test_ins014_windows_build_job.test_windows_build_job_has_7_steps": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_has_5_steps": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-017.test_ins017_release_job.test_release_job_has_3_steps": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_bom_causes_fail_closed": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_crlf_stripped": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_embedded_newline_safe": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_traversal_returned_as_is": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_unicode_path": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_very_long_path": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_verify_shim_traversal_path_returns_false": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_write_python_path_overwrites_existing": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_shims.test_get_python_path_config": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_none_empty": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_none_missing": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_none_whitespace_only": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_path": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_shims.test_verify_shim_ok": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_shims.test_write_python_path_creates_file": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-019.test_ins019_shims.test_write_python_path_creates_parent_dirs": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-029.test_ins029_version_bump.test_all_version_files_agree": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-029.test_ins029_version_bump.test_build_appimage_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-029.test_ins029_version_bump.test_build_dmg_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-029.test_ins029_version_bump.test_config_py_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-029.test_ins029_version_bump.test_pyproject_toml_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-029.test_ins029_version_bump.test_setup_iss_version": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.INS-029.test_ins029_version_bump.test_version_import_from_config": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.MNT-002.test_mnt002_action_tracker.test_initial_action_count": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-010.test_saf010_hook_config.test_command_uses_python": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-010.test_saf010_hook_config.test_windows_command_uses_python": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-025.test_saf025_hash_sync.test_no_pycache_in_templates_coding": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-047.test_saf047_tester_edge_cases.test_venv_double_backslash_python_allowed": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-047.test_saf047_tester_edge_cases.test_venv_single_backslash_python_denied": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_file_search_documents_include_ignored_files_restriction": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_file_search_documents_include_pattern_restriction": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_file_search_no_longer_says_no_zone_restriction": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_file_search_permission_is_zone_checked": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_file_search_still_allowed_for_general_use": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_file_search_uses_query_parameter_not_only_include_pattern": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_grep_search_blocked_appears_for_both_restrictions": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_grep_search_documents_include_ignored_files_restriction": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_grep_search_documents_include_pattern_restriction": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_grep_search_mentions_noagentzone_example": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_grep_search_no_longer_says_no_zone_restriction": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_grep_search_permission_is_zone_checked": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_grep_search_still_allowed_for_general_use": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_search_tools_section_header_present": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-049.test_saf049_agent_rules_doc.test_semantic_search_unchanged": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_agent_rules.test_agent_rules_exists": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_agent_rules.test_agent_rules_section4_has_python_examples": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_agent_rules.test_agent_rules_system_python_acceptable": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_agent_rules.test_agent_rules_venv_preferred": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_edge_cases.test_agent_rules_denial_counter_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_edge_cases.test_agent_rules_denied_zones_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_edge_cases.test_agent_rules_fallback_uses_word_acceptable": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_edge_cases.test_agent_rules_git_rules_section": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_edge_cases.test_agent_rules_placeholder_project_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_edge_cases.test_agent_rules_placeholder_workspace_name": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_edge_cases.test_agent_rules_valid_utf8": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-056.test_saf056_edge_cases.test_agent_rules_venv_label_not_lost": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    },
+    "tests.SAF-061.test_saf061_tester_edge_cases.TestThreeConcurrentThreadsLock.test_three_concurrent_threads_no_deadlock_and_lock_cleaned_up": {
+      "reason": "pre-existing failure \u2014 see baseline init commit"
+    }
+  }
+}

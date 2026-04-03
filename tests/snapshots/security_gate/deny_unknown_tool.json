@@ -1,0 +1,9 @@
+{
+  "description": "An unrecognised / unapproved tool name must be denied (restricted_tool rule)",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "some_unapproved_custom_tool",
+    "filePath": "/workspace/project/x.py"
+  },
+  "expected_decision": "deny"
+}

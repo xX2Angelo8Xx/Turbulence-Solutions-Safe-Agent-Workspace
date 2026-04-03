@@ -18,7 +18,8 @@ You are the **Orchestrator Agent** for the Turbulence Solutions project. You del
 ## Core Workflow
 
 1. Identify the workpackage(s) the user wants implemented.
-2. **Assess WP size** — before assigning, verify each WP follows the smallest-possible-unit rule in `workpackage-rules.md`. If a WP is too broad, spawn a Developer subagent tasked with **splitting it** into smaller WPs first (see WP Splitting below).
+2. **Prior Art Check** — read `docs/decisions/index.csv` and check for ADRs related to the WP domains. Flag any potential conflicts with existing decisions before assigning work.
+3. **Assess WP size** — before assigning, verify each WP follows the smallest-possible-unit rule in `workpackage-rules.md`. If a WP is too broad, spawn a Developer subagent tasked with **splitting it** into smaller WPs first (see WP Splitting below).
 3. For **each** WP ready for implementation, spawn exactly **one** Developer subagent with:
    - The workpackage ID
    - A clear task description referencing the WP row
@@ -53,16 +54,26 @@ When a Tester marks a WP as `Done`:
 
 After completing a development phase and all WPs are finalized on main:
 
-### Primary Method — Release Script
-1. **Run the release script**: `.venv\Scripts\python scripts/release.py <version>` (e.g., `scripts/release.py 3.2.7`)
+### Primary Method — Release Script (Draft → Test → Publish)
+1. **Run the release script**: `.venv\Scripts\python scripts/release.py <version> --rc` (e.g., `scripts/release.py 3.3.10 --rc`)
    - The script bumps all 5 version files (config.py, pyproject.toml, setup.iss, build_dmg.sh, build_appimage.sh)
    - Validates all files were updated correctly
    - Creates a release commit and annotated tag
    - Pushes both to origin
-2. Use `--dry-run` to preview changes: `.venv\Scripts\python scripts/release.py 3.2.7 --dry-run`
-3. The CI/CD pipeline (`.github/workflows/release.yml`) triggers automatically on the tag push. A `validate-version` job runs before all builds to catch any version mismatch.
-4. **Log the CI/CD trigger** in your session context, noting the tag name and commit hash.
-5. Inform the user that the CI/CD pipeline has been triggered and they can monitor progress on GitHub Actions.
+2. Use `--dry-run` to preview changes: `.venv\Scripts\python scripts/release.py 3.3.10 --dry-run`
+3. The CI/CD pipeline (`.github/workflows/release.yml`) triggers automatically on the tag push:
+   - **Test gate**: Full test suite runs on Windows/macOS/Linux — builds are blocked until tests pass
+   - **Build**: Platform-specific artifacts are built in parallel
+   - **Draft Release**: A **draft** GitHub Release is created (NOT visible to the auto-updater)
+4. **Run staging smoke tests**: Trigger `.github/workflows/staging-test.yml` manually on GitHub Actions.
+5. **Manual verification**: Download draft artifacts and test on your machine.
+6. **Publish**: Once satisfied, go to GitHub Releases and publish the draft to make it available to users.
+7. **Log the release** in your session context, noting the tag name, commit hash, and publish status.
+
+### Post-Release Checklist
+- Verify `tests/regression-baseline.json` is up to date (remove entries for fixed bugs)
+- If template files changed, verify `MANIFEST.json` was regenerated before release
+- Inform the user that the release is published and the auto-updater will pick it up
 
 ### Fallback — Manual Re-tagging
 If a tag needs to be recreated after a post-tag fix:

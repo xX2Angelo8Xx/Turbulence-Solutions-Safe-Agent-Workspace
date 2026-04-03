@@ -1,0 +1,9 @@
+{
+  "description": "create_file (write tool) targeting NoAgentZone must be denied (SAF-007)",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "create_file",
+    "filePath": "/workspace/NoAgentZone/credentials.txt"
+  },
+  "expected_decision": "deny"
+}

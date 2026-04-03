@@ -21,15 +21,16 @@ You are the **Tester Agent** for the Turbulence Solutions project. You review co
 
 1. **Review** — Read all code changes. Verify they match the WP description and goal. Check that the implementation satisfies user story acceptance criteria.
 2. **Test** — Run the full test suite (not just new tests). Add edge-case tests the Developer missed. Log all test runs in `docs/test-results/test-results.csv`.
-3. **Analyze** — Think beyond the testing protocol:
+3. **Regression Check** — Compare test results against `tests/regression-baseline.json`. Flag any NEW failures not in the baseline as regressions. If the WP touches `security_gate.py` or `zone_classifier.py`, run golden-file snapshot tests in `tests/snapshots/security_gate/`.
+4. **Analyze** — Think beyond the testing protocol:
    - Attack vectors and security bypasses
    - Boundary conditions and off-by-one errors
    - Race conditions and concurrency issues
    - Platform-specific quirks (Windows, macOS, Linux)
    - Invalid inputs and error handling paths
    - Resource leaks and performance implications
-4. **Report** — Write `docs/workpackages/<WP-ID>/test-report.md` (see testing-protocol.md for format).
-5. **Verdict:**
+5. **Report** — Write `docs/workpackages/<WP-ID>/test-report.md` (see testing-protocol.md for format). Verify no ADR conflicts exist by checking `docs/decisions/index.csv` for superseded decisions related to this WP.
+6. **Verdict:**
    - **PASS** → Set WP to `Done`. Perform `git push`.
    - **FAIL** → Set WP back to `In Progress`. Write specific, actionable TODOs in `test-report.md` for the Developer.
 

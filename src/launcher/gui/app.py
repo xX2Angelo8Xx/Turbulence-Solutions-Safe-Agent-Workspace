@@ -19,6 +19,7 @@ from launcher.core.updater import check_for_update
 from launcher.core.downloader import download_update
 from launcher.core.applier import apply_update
 from launcher.core.project_creator import create_project, is_template_ready, list_templates
+from launcher.core.workspace_upgrader import check_workspace, upgrade_workspace
 from launcher.core.shim_config import read_python_path, verify_ts_python, write_python_path, ensure_python_path_valid
 from launcher.core.user_settings import get_setting, set_setting
 from launcher.core.vscode import find_vscode, open_in_vscode
@@ -316,7 +317,22 @@ class App:
             border_width=0,
         )
         self.check_updates_button.grid(
-            row=11, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="e"
+            row=11, column=0, columnspan=2, padx=20, pady=(0, 4), sticky="w"
+        )
+
+        # Check Workspace Health button -- surfaces security-critical file drift (Phase 1).
+        self.workspace_health_button = ctk.CTkButton(
+            self._window,
+            text="Check Workspace Health",
+            command=self._on_check_workspace_health,
+            fg_color="transparent",
+            hover_color=COLOR_PRIMARY,
+            text_color=COLOR_SECONDARY,
+            height=24,
+            border_width=0,
+        )
+        self.workspace_health_button.grid(
+            row=11, column=2, padx=(0, 20), pady=(0, 4), sticky="e"
         )
 
         # Update notification banner (GUI-009) -- hidden until an update is detected.
@@ -588,6 +604,64 @@ class App:
         )
         messagebox.showerror("Update Failed", message)
 
+    def _on_check_workspace_health(self) -> None:
+        """Browse to a workspace folder and check its security-critical files."""
+        folder = filedialog.askdirectory(title="Select Workspace Folder to Check")
+        if not folder:
+            return
+        workspace = Path(folder)
+        self.workspace_health_button.configure(state="disabled", text="Checking...")
+        try:
+            report = check_workspace(workspace)
+        except Exception as exc:
+            messagebox.showerror("Health Check Failed", str(exc))
+            self.workspace_health_button.configure(state="normal", text="Check Workspace Health")
+            return
+        finally:
+            self.workspace_health_button.configure(state="normal", text="Check Workspace Health")
+
+        if report.errors:
+            messagebox.showerror(
+                "Workspace Health Check",
+                "Could not complete the check:\n\n" + "\n".join(report.errors),
+            )
+            return
+
+        if report.up_to_date:
+            messagebox.showinfo(
+                "Workspace Health Check",
+                f"All security-critical files are up to date.\n(workspace v{report.workspace_version})",
+            )
+            return
+
+        lines = []
+        if report.outdated_files:
+            lines.append("Outdated files:")
+            lines.extend(f"  • {f}" for f in report.outdated_files)
+        if report.missing_files:
+            lines.append("Missing files:")
+            lines.extend(f"  • {f}" for f in report.missing_files)
+        lines.append("")
+        lines.append(f"Workspace: v{report.workspace_version}  →  Launcher: v{report.launcher_version}")
+        lines.append("\nUpgrade now? (Only security-critical files will be updated)")
+
+        if messagebox.askyesno("Workspace Needs Update", "\n".join(lines)):
+            try:
+                result = upgrade_workspace(workspace)
+            except Exception as exc:
+                messagebox.showerror("Upgrade Failed", str(exc))
+                return
+            if result.errors:
+                messagebox.showerror(
+                    "Upgrade Partially Failed",
+                    "Some files could not be updated:\n\n" + "\n".join(result.errors),
+                )
+            else:
+                messagebox.showinfo(
+                    "Upgrade Complete",
+                    f"Updated {len(result.upgraded_files)} file(s) to v{result.launcher_version}.",
+                )
+
     def _open_settings_dialog(self) -> None:
         """Open the Settings dialog (GUI-018)."""
         SettingsDialog(self._window)
@@ -795,6 +869,29 @@ class SettingsDialog:
         if folder:
             self.workspace_entry.delete(0, "end")
             self.workspace_entry.insert(0, folder)
+            # Auto health check on workspace selection.
+            threading.Thread(
+                target=self._auto_health_check,
+                args=(Path(folder),),
+                daemon=True,
+            ).start()
+
+    def _auto_health_check(self, workspace: Path) -> None:
+        """Run workspace health check in background and warn if outdated."""
+        try:
+            report = check_workspace(workspace)
+        except Exception:
+            return  # Silently skip — manual button still available.
+        if report.errors or report.up_to_date:
+            return
+        # Workspace has outdated/missing security files — warn on main thread.
+        count = len(report.outdated_files) + len(report.missing_files)
+        self.after(0, lambda: messagebox.showwarning(
+            "Workspace Security Files Outdated",
+            f"This workspace has {count} outdated or missing security-critical file(s).\n\n"
+            f"Workspace: v{report.workspace_version}  \u2192  Launcher: v{report.launcher_version}\n\n"
+            "Use 'Check Workspace Health' to review and upgrade.",
+        ))
 
     def _on_reset_agent_blocks(self) -> None:
         """Handle Reset Agent Blocks button click (GUI-021).

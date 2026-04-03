@@ -1,0 +1,9 @@
+{
+  "description": "Always-allow tool (manage_todo_list) must be permitted regardless of path or zone",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "manage_todo_list",
+    "filePath": "/workspace/.github/secret"
+  },
+  "expected_decision": "allow"
+}

@@ -1,0 +1,142 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: ['3.11']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run test suite
+        run: python -m pytest tests/ -v --tb=short --junitxml=test-results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: test-results.xml
+
+      - name: Check regression baseline
+        if: always()
+        shell: python
+        run: |
+          import json, sys, xml.etree.ElementTree as ET
+          from pathlib import Path
+          
+          baseline_path = Path("tests/regression-baseline.json")
+          results_path = Path("test-results.xml")
+          
+          if not results_path.exists():
+              print("ERROR: test-results.xml not found")
+              sys.exit(1)
+          
+          # Parse JUnit XML for failures
+          tree = ET.parse(results_path)
+          root = tree.getroot()
+          actual_failures = set()
+          for tc in root.iter("testcase"):
+              if tc.find("failure") is not None or tc.find("error") is not None:
+                  test_id = f"{tc.get('classname', '')}.{tc.get('name', '')}"
+                  actual_failures.add(test_id)
+          
+          # Load known baseline failures
+          known_failures = set()
+          if baseline_path.exists():
+              data = json.loads(baseline_path.read_text())
+              known_failures = set(data.get("known_failures", {}).keys())
+          
+          new_failures = actual_failures - known_failures
+          fixed_tests = known_failures - actual_failures
+          
+          print(f"Total failures: {len(actual_failures)}")
+          print(f"Known failures (baseline): {len(known_failures)}")
+          print(f"New failures: {len(new_failures)}")
+          print(f"Fixed tests (no longer failing): {len(fixed_tests)}")
+          
+          if new_failures:
+              print("\n--- NEW FAILURES (not in baseline) ---")
+              for f in sorted(new_failures):
+                  print(f"  REGRESSION: {f}")
+              print(f"\n{len(new_failures)} new regression(s) detected!")
+              sys.exit(1)
+          
+          if fixed_tests:
+              print("\n--- FIXED TESTS (update baseline) ---")
+              for f in sorted(fixed_tests):
+                  print(f"  FIXED: {f}")
+              print("\nConsider updating tests/regression-baseline.json")
+          
+          print("\nNo new regressions detected.")
+
+  manifest-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify template manifest is up to date
+        shell: python
+        run: |
+          import hashlib, json, sys
+          from pathlib import Path
+          
+          manifest_path = Path("templates/agent-workbench/MANIFEST.json")
+          template_dir = Path("templates/agent-workbench")
+          
+          if not manifest_path.exists():
+              print("WARNING: MANIFEST.json not found — skipping manifest check")
+              sys.exit(0)
+          
+          manifest = json.loads(manifest_path.read_text())
+          files_section = manifest.get("files", {})
+          
+          # Compute current hashes
+          mismatches = []
+          for rel_path, entry in files_section.items():
+              full_path = template_dir / rel_path
+              if not full_path.exists():
+                  mismatches.append(f"MISSING: {rel_path}")
+                  continue
+              current_hash = hashlib.sha256(full_path.read_bytes()).hexdigest()
+              if current_hash != entry.get("sha256"):
+                  mismatches.append(f"CHANGED: {rel_path}")
+          
+          # Check for untracked files
+          for f in sorted(template_dir.rglob("*")):
+              if f.is_file() and f.name != "MANIFEST.json":
+                  rel = str(f.relative_to(template_dir)).replace("\\", "/")
+                  if rel not in files_section:
+                      mismatches.append(f"UNTRACKED: {rel}")
+          
+          if mismatches:
+              print("Template manifest is out of date:")
+              for m in mismatches:
+                  print(f"  {m}")
+              print("\nRun: python scripts/generate_manifest.py")
+              sys.exit(1)
+          
+          print("Template manifest is up to date.")

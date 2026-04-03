@@ -17,10 +17,11 @@ Onboarding checklist and standard execution protocol for all AI agents working i
 
 Every agent follows this exact workflow when implementing a workpackage. No steps may be skipped.
 
-### Phase 1 — Developer (Steps 1–7)
+### Phase 1 — Developer (Steps 0–7)
 
 | Step | Action | Details |
 |------|--------|---------|
+| 0 | **Prior Art Check** | Read `docs/decisions/index.csv`. Search for ADRs related to this WP's domain. If relevant ADRs exist, acknowledge them in `dev-log.md` or propose supersession. This prevents contradicting prior architectural decisions. |
 | 1 | **Read** | Read the WP row from `docs/workpackages/workpackages.csv`. Read the linked user story. Read `coding-standards.md`, `security-rules.md`, `testing-protocol.md`. |
 | 2 | **Claim** | Set WP status to `In Progress`. Fill in `Assigned To`. |
 | 3 | **Prepare** | Create the WP folder: `docs/workpackages/<WP-ID>/`. Create `dev-log.md` inside it (see format below). |
