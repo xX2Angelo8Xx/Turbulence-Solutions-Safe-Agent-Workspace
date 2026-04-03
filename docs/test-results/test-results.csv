@@ -2373,3 +2373,4 @@
 "TST-2492","FIX-096: targeted suite","Unit","FIX-096","Pass","2026-04-04","Windows 11 + Python 3.11","6 passed in 0.26s",""
 "TST-2493","DOC-052: targeted suite","Unit","DOC-052","Pass","2026-04-04","Windows 11 + Python 3.11","9 passed in 0.29s",""
 "TST-2494","DOC-052: full regression suite","Unit","DOC-052","Fail","2026-04-04","Windows 11 + Python 3.11","7970 passed, 37 skipped, 5 xfailed, 4 warnings, 50 errors in 170.97s (0:02:50)",""
+"TST-2495","SAF-077: targeted suite","Unit","SAF-077","Pass","2026-04-04","Windows 11 + Python 3.11","31 passed in 1.95s",""
