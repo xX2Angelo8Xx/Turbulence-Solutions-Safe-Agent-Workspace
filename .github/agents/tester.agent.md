@@ -67,6 +67,22 @@ Before marking any WP as `Done`, verify ALL of the following:
 
 If ANY item is missing, do NOT mark the WP as Done. Fix it first or return to Developer.
 
+## Post-Done Finalization (No Orchestrator)
+
+If no Orchestrator is active in this session (e.g., direct User→Developer→Tester flow), the Tester runs finalization after marking Done.
+
+Per `docs/work-rules/agent-workflow.md` (Post-Done Finalization section): "After the Tester marks a WP as Done, the Orchestrator (or the Tester if no Orchestrator is active) runs the finalization script."
+
+Run:
+
+```powershell
+.venv\Scripts\python scripts/finalize_wp.py <WP-ID>
+```
+
+Use `--dry-run` to preview without executing: `.venv\Scripts\python scripts/finalize_wp.py <WP-ID> --dry-run`
+
+If an Orchestrator IS active in this session, finalization is the **Orchestrator's responsibility** — do not run the script yourself.
+
 ## Constraints
 
 - **DO NOT** edit application source code — only test files and tracking CSVs.
