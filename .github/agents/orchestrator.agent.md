@@ -54,26 +54,58 @@ When a Tester marks a WP as `Done`:
 
 After completing a development phase and all WPs are finalized on main:
 
-### Primary Method — Release Script (Draft → Test → Publish)
-1. **Run the release script**: `.venv\Scripts\python scripts/release.py <version> --rc` (e.g., `scripts/release.py 3.3.10 --rc`)
+### Primary Method — Release Script (Draft → Human Approval → Publish)
+
+#### Step 1 — Create Draft Release
+
+1. **Run the release script**: `.venv\Scripts\python scripts/release.py <version> --rc` (e.g., `.venv\Scripts\python scripts/release.py 3.3.10 --rc`)
+   - The `--rc` flag is **cosmetic** — it marks the commit message as a release candidate but does not affect the draft/publish behaviour
    - The script bumps all 5 version files (config.py, pyproject.toml, setup.iss, build_dmg.sh, build_appimage.sh)
    - Validates all files were updated correctly
    - Creates a release commit and annotated tag
    - Pushes both to origin
 2. Use `--dry-run` to preview changes: `.venv\Scripts\python scripts/release.py 3.3.10 --dry-run`
 3. The CI/CD pipeline (`.github/workflows/release.yml`) triggers automatically on the tag push:
+   - **validate-version job**: Verifies all version files match the tag — build is blocked if there is a mismatch
    - **Test gate**: Full test suite runs on Windows/macOS/Linux — builds are blocked until tests pass
    - **Build**: Platform-specific artifacts are built in parallel
-   - **Draft Release**: A **draft** GitHub Release is created (NOT visible to the auto-updater)
-4. **Run staging smoke tests**: Trigger `.github/workflows/staging-test.yml` manually on GitHub Actions.
-5. **Manual verification**: Download draft artifacts and test on your machine.
-6. **Publish**: Once satisfied, go to GitHub Releases and publish the draft to make it available to users.
-7. **Log the release** in your session context, noting the tag name, commit hash, and publish status.
+   - **Draft Release**: A **draft** GitHub Release is created (NOT visible to the auto-updater or end users)
 
-### Post-Release Checklist
-- Verify `tests/regression-baseline.json` is up to date (remove entries for fixed bugs)
-- If template files changed, verify `MANIFEST.json` was regenerated before release
-- Inform the user that the release is published and the auto-updater will pick it up
+#### Step 2 — Human Approval Gate (MANDATORY STOP)
+
+**STOP execution here.** After the draft release is created, the Orchestrator MUST pause and report to the user:
+
+> "Draft release **vX.Y.Z** has been created on GitHub. Please:
+> 1. Download the draft artifacts from GitHub Releases (the draft is not yet public)
+> 2. Test the installer on your target platform
+> 3. Verify update parity (the auto-updater should not yet see this version)
+> 4. Reply with **'approved'** or **'rejected: \<feedback\>'**."
+
+**Do NOT publish the release automatically.** Do NOT proceed past this step without an explicit user verdict.
+
+#### Step 3a — On Approval
+
+When the user replies with **'approved'**:
+1. Instruct the user to go to **GitHub Releases** and click **Publish release** on the draft (GitHub UI access is required; the Orchestrator cannot publish directly).
+2. Once the user confirms publication, log the release in your session context: tag name, commit hash, publish status, and date.
+3. Verify `tests/regression-baseline.json` is up to date (remove entries for fixed bugs merged in this release).
+4. If template files changed, verify `MANIFEST.json` was regenerated before release.
+5. Inform the user: "Release vX.Y.Z is now published. The auto-updater will pick it up on the next check."
+
+#### Step 3b — On Rejection
+
+When the user replies with **'rejected: \<feedback\>'**:
+1. Parse the feedback and identify each distinct failure.
+2. For each failure, create a FIX workpackage using `scripts/add_workpackage.py`:
+   ```powershell
+   .venv\Scripts\python scripts/add_workpackage.py `
+       --category FIX --name "<short failure description>" `
+       --description "<detailed failure from user feedback>" `
+       --goal "<acceptance criterion>"
+   ```
+3. Spawn one Developer subagent per FIX workpackage following the normal WP workflow.
+4. After all FIX WPs reach `Done` and are merged to main, **bump the patch version** and return to **Step 1** with the new version number.
+5. **Do NOT reuse the rejected version tag** — always increment for a new draft.
 
 ### Fallback — Manual Re-tagging
 If a tag needs to be recreated after a post-tag fix:
