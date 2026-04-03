@@ -26,7 +26,7 @@ Every agent follows this exact workflow when implementing a workpackage. No step
 | 2 | **Claim** | Set WP status to `In Progress`. Fill in `Assigned To`. |
 | 3 | **Prepare** | Create the WP folder: `docs/workpackages/<WP-ID>/`. Create `dev-log.md` inside it (see format below). |
 | 4 | **Implement** | Write code following `coding-standards.md` and `security-rules.md`. Stay within WP scope. |
-| 5 | **Test** | Create `tests/<WP-ID>/` folder if it doesn't exist. Write and run tests per `testing-protocol.md`. All tests must pass. Log results using `scripts/add_test_result.py` (mandatory — direct CSV editing is prohibited). |
+| 5 | **Test** | Create `tests/<WP-ID>/` folder if it doesn't exist. Write and run tests per `testing-protocol.md`. All tests must pass. **Run the final pre-handoff test suite via `scripts/run_tests.py`** (mandatory — this executes pytest and atomically logs results to the CSV). `scripts/add_test_result.py` is a manual fallback only for cases where `run_tests.py` cannot be used; direct CSV editing is always prohibited. |
 | 6 | **Document** | Update `dev-log.md` with implementation summary, decisions made, tests written, and known limitations. |
 | 7 | **Handoff** | Set WP status to `Review`. Commit per `commit-branch-rules.md`. Hand off to Tester Agent. Include the list of changed files (output of `git diff --cached --name-only`) in the handoff message. |
 

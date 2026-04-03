@@ -56,8 +56,8 @@ Before setting any WP to `Review` and handing off to Tester, verify ALL of the f
 
 - [ ] `docs/workpackages/<WP-ID>/dev-log.md` has been created and filled in
 - [ ] All test files exist in `tests/<WP-ID>/`
-- [ ] All tests pass: `.venv\Scripts\python -m pytest tests/ -v`
-- [ ] Test results logged via `scripts/add_test_result.py` (mandatory — never edit test-results.csv directly)
+- [ ] All tests pass: run via `scripts/run_tests.py --wp <WP-ID> --type Unit --env "Windows 11 + Python 3.13"` (mandatory — this also logs results atomically)
+- [ ] If `run_tests.py` was not used (e.g. tests were run manually), log results via `scripts/add_test_result.py` as fallback (never edit test-results.csv directly)
 - [ ] `scripts/validate_workspace.py --wp <WP-ID>` returns clean (exit code 0)
 - [ ] `git add -A` — all new and modified files are staged
 - [ ] `git status` — confirms no unstaged changes remain
