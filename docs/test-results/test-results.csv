@@ -2371,3 +2371,4 @@
 "TST-2490","FIX-095: tester suite (15 passed)","Unit","FIX-095","Pass","2026-04-04","Windows 11 + Python 3.11","15 passed in 0.55s","5 developer tests + 10 tester edge cases: regression sentinel, direct fn return values, content integrity, dry-run no-write"
 "TST-2491","FIX-096: targeted suite","Unit","FIX-096","Pass","2026-04-04","Windows 11 + Python 3.11","6 passed in 0.31s",""
 "TST-2492","FIX-096: targeted suite","Unit","FIX-096","Pass","2026-04-04","Windows 11 + Python 3.11","6 passed in 0.26s",""
+"TST-2493","DOC-052: targeted suite","Unit","DOC-052","Pass","2026-04-04","Windows 11 + Python 3.11","9 passed in 0.29s",""

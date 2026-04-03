@@ -210,6 +210,7 @@ The following operations **MUST** be performed via helper scripts. Direct manual
 | Install Git hooks | `scripts/install_hooks.py` | Setup (once after clone) |
 | Archive old test results | `scripts/archive_test_results.py` | Maintenance |
 | Update bug status | `scripts/update_bug_status.py` | Tester, Maintenance |
+| Regenerate template manifest | `scripts/generate_manifest.py` | Developer |
 | Update regression baseline | Direct JSON edit of `tests/regression-baseline.json` (no script — update `_count` and `_updated` manually) | Developer (after bug fix), Orchestrator (at release) |
 
 See `scripts/README.md` for full usage documentation.
