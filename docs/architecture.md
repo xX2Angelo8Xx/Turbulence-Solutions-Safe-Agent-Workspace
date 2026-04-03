@@ -264,6 +264,10 @@ Templates (bundled inside Launcher)
 │   │   ├── DOC-050/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── DOC-051/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── FIX-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -953,7 +957,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── SAF-076/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
@@ -1085,6 +1088,7 @@ Templates (bundled inside Launcher)
 │   ├── DOC-048/
 │   ├── DOC-049/
 │   ├── DOC-050/
+│   ├── DOC-051/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
