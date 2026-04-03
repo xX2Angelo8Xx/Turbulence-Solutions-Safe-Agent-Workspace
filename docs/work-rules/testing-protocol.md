@@ -281,3 +281,85 @@ which is the single source of truth. This means:
 - Future version bumps only need to update the 5 source files (config.py, pyproject.toml, setup.iss, build_dmg.sh, build_appimage.sh).
 - No test files outside `tests/shared/` ever need updating for a version bump.
 - **Allowed to remain hardcoded:** historical version strings such as `OLD_VERSION`, `PREVIOUS_VERSION`, `SKIP_ONE_VERSION`, `STALE_VERSIONS` — these are correct fixed values that should never change.
+
+---
+
+## Regression Baseline
+
+`tests/regression-baseline.json` tracks known-failing tests so that CI does not flag them as new regressions. Any test listed in the baseline is expected to fail; only failures **not** present in the baseline are treated as regressions and block the build.
+
+### Purpose
+
+The file exists because some tests document real bugs that have not yet been fixed. Without the baseline, CI would fail continuously on known issues, making it impossible to detect genuinely new failures. The baseline creates a stable signal-to-noise boundary: new regressions are immediately visible; known failures are acknowledged but do not block work.
+
+### File Location
+
+```
+tests/regression-baseline.json
+```
+
+### JSON Schema
+
+The file has the following top-level structure:
+
+```json
+{
+  "_comment": "Human-readable description of the file's purpose.",
+  "_count": 680,
+  "_updated": "2025-07-15",
+  "known_failures": {
+    "<test.module.path.test_function_name>": {
+      "reason": "<brief explanation — reference the bug ID if one exists>"
+    }
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `_comment` | string | Free-text description. Do not remove. |
+| `_count` | integer | Total number of entries in `known_failures`. **Must be updated** whenever entries are added or removed. |
+| `_updated` | string | ISO 8601 date (`YYYY-MM-DD`) of the last modification. **Must be updated** whenever entries are added or removed. |
+| `known_failures` | object | Map of fully-qualified pytest node IDs to reason objects. |
+
+**Key format for `known_failures`:** Use the dot-separated Python module path of the test function, as reported by pytest when using `--collect-only`. Example:
+
+```
+tests.DOC-004.test_doc004_project_readme_placeholders.test_both_readmes_are_identical
+```
+
+**Value format:** A JSON object with a single `"reason"` string field. The reason should identify the root cause (e.g., `"BUG-042: open_in_vscode returns wrong type"` or `"pre-existing failure — see baseline init commit"`).
+
+### When to Update
+
+| Trigger | Action |
+|---------|--------|
+| A bug-fix WP is completed and the referenced test now passes | **Remove** the entry from `known_failures` |
+| A new bug is found whose test is expected to fail until fixed | **Add** an entry with `reason` referencing the bug ID |
+| Intentional behaviour change makes an existing test permanently obsolete | **Remove** the entry (and update or delete the test itself) |
+| Release preparation (Orchestrator release sweep) | **Review all entries**, remove any whose bugs are marked `Closed` in `bugs.csv` |
+
+### Who Updates
+
+| Role | Responsibility |
+|------|----------------|
+| **Developer** | Removes an entry **after** implementing the bug fix and confirming the test passes. This is part of the WP pre-handoff checklist for all FIX WPs. |
+| **Tester** | Verifies that the baseline is current: no entry should remain for a bug whose `Fixed In WP` field is populated. If stale entries are found, return the WP to the Developer or log a new maintenance WP. |
+| **Orchestrator** | Reviews the baseline at release time. Removes all entries whose associated bugs are `Closed`. Commits and pushes the cleaned baseline before tagging the release. |
+
+### How to Update
+
+No dedicated script exists. Edit the file directly:
+
+1. Open `tests/regression-baseline.json` in a text editor.
+2. Add or remove the relevant entry from `known_failures`.
+3. Update `_count` to reflect the new total number of entries.
+4. Update `_updated` to today's date in `YYYY-MM-DD` format.
+5. Commit the change in the same commit as the bug fix or the new test.
+
+**Validation:** After editing, confirm the file is valid JSON:
+```powershell
+.venv\Scripts\python -c "import json, pathlib; json.loads(pathlib.Path('tests/regression-baseline.json').read_text())"
+```
+
+**Never leave a stale entry.** An entry for a fixed bug masks future regressions in the same test. Removing it promptly is a quality gate, not an optional cleanup step.

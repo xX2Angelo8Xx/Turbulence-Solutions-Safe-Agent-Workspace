@@ -40,6 +40,7 @@ Before setting a WP to `Review`, the Developer MUST verify:
 5. Run `scripts/validate_workspace.py --wp <WP-ID>` — must return exit code 0.
 6. All changes are staged and committed.
 7. All bugs referenced in `dev-log.md` have `Fixed In WP` populated with this WP-ID.
+8. **If this WP is a bug fix (FIX-xxx):** remove the corresponding entry from `tests/regression-baseline.json`, update `_count` and `_updated`, and include the file in the commit. See the "Regression Baseline" section of `testing-protocol.md` for the exact procedure.
 
 ### Git Operations for Handoff (Step 7)
 
@@ -209,6 +210,7 @@ The following operations **MUST** be performed via helper scripts. Direct manual
 | Install Git hooks | `scripts/install_hooks.py` | Setup (once after clone) |
 | Archive old test results | `scripts/archive_test_results.py` | Maintenance |
 | Update bug status | `scripts/update_bug_status.py` | Tester, Maintenance |
+| Update regression baseline | Direct JSON edit of `tests/regression-baseline.json` (no script — update `_count` and `_updated` manually) | Developer (after bug fix), Orchestrator (at release) |
 
 See `scripts/README.md` for full usage documentation.
 

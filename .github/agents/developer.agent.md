@@ -67,6 +67,7 @@ Before setting any WP to `Review` and handing off to Tester, verify ALL of the f
 - [ ] Read back edited files from disk to confirm edits persisted (per Post-Edit Verification)
 - [ ] If relevant ADRs exist for this WP's domain, referenced or superseded in `dev-log.md`
 - [ ] If changing `security_gate.py` or `zone_classifier.py`, verify snapshots in `tests/snapshots/` are updated (see `tests/snapshots/README.md` for run/update procedures)
+- [ ] If this WP is a bug fix (FIX-xxx): remove the corresponding entry from `tests/regression-baseline.json`, update `_count` and `_updated`, and include the file in the commit (see "Regression Baseline" section of `docs/work-rules/testing-protocol.md`)
 
 If ANY item fails, do NOT hand off. Fix the issue first.
 
