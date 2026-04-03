@@ -2382,3 +2382,7 @@
 "TST-2501","SAF-078: targeted suite","Unit","SAF-078","Fail","2026-04-04","Windows 11 + Python 3.11","17 passed in 0.39s",""
 "TST-2502","SAF-078: snapshot suite (10 existing snapshots)","Security","SAF-078","Pass","2026-04-04","Windows 11 + Python 3.11","10 passed, 0 failed","All 10 existing golden-file snapshots pass after SAF-078 changes; no regressions in snapshot suite"
 "TST-2503","SAF-078: targeted suite","Unit","SAF-078","Pass","2026-04-04","Windows 11 + Python 3.11","18 passed in 0.33s",""
+"TST-2504","SAF-078: full regression suite","Regression","SAF-078","Fail","2026-04-04","Windows 11 + Python 3.11","8026 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 141.29s (0:02:21)",""
+"TST-2505","SAF-078: targeted suite","Unit","SAF-078","Pass","2026-04-04","Windows 11 + Python 3.11","18 passed in 0.32s",""
+"TST-2506","SAF-078: targeted suite","Unit","SAF-078","Pass","2026-04-04","Windows 11 + Python 3.11","18 passed in 0.36s",""
+"TST-2507","SAF-078: golden-file snapshot tests (10 passed)","Security","SAF-078","Pass","2026-04-04","Windows 11 + Python 3.11","All 10 existing snapshot tests pass; --update-snapshots works at both scope levels","BUG-187 fix verified: pytest tests/snapshots/ -v --update-snapshots and pytest tests/snapshots/security_gate/ -v --update-snapshots both work without unrecognized arguments error"

@@ -97,3 +97,51 @@ Added `tests/SAF-078/test_saf078_tester_edge_cases.py` with 6 additional tests:
 **FAIL** — Return to Developer (Iteration 1).
 
 The core locking mechanism is correct and well-tested. One specific fix is required: the README documents a `--update-snapshots` pytest command that fails with "unrecognized arguments" when run at the `tests/snapshots/` parent level. Any agent or developer following the documented procedure would encounter an error at step 2. See BUG-187 and TODO above.
+
+---
+
+# Iteration 1 Re-Review — 2026-04-04
+
+**Tester:** Tester Agent
+
+## Verdict: PASS
+
+## Changes Verified
+
+The Developer implemented Fix Option B (the cleaner solution): created `tests/snapshots/conftest.py` at the parent level, moved `pytest_addoption` and the `update_snapshots` fixture there, and cleaned up the child conftest. Both collection scopes now accept `--update-snapshots` without errors.
+
+## Test Results
+
+| TST-ID | Suite | Type | Result |
+|--------|-------|------|--------|
+| TST-2505 | SAF-078 targeted suite | Unit | 18 passed, 0 failed |
+| TST-2506 | SAF-078 targeted suite (repeat) | Unit | 18 passed, 0 failed |
+| TST-2507 | Golden-file snapshot suite (10 tests) | Security | 10 passed, 0 failed |
+| TST-2504 | Full regression suite | Regression | 8026 passed — all failures in baseline |
+
+## BUG-187 Verification
+
+- `pytest tests/snapshots/ -v --update-snapshots` → 10 passed, no "unrecognized arguments" ✅
+- `pytest tests/snapshots/security_gate/ -v --update-snapshots` → 10 passed ✅
+- `tests/snapshots/conftest.py` contains `default=False` ✅
+- BUG-187 status → Closed ✅
+
+## Acceptance Criteria — Final Status
+
+| Criterion | Status |
+|-----------|--------|
+| Snapshot tests fail on any decision change (canonical message) | ✅ PASS |
+| `--update-snapshots` rewrites snapshot JSON in-place | ✅ PASS |
+| `pytest tests/snapshots/ -v --update-snapshots` works | ✅ PASS — BUG-187 fixed |
+| `pytest tests/snapshots/security_gate/ -v --update-snapshots` works | ✅ PASS |
+| README documents flag, dev-log requirement, "snapshot IS the documentation" | ✅ PASS |
+| `agent-workflow.md` dev-log template includes `## Behavior Changes` | ✅ PASS |
+| All 10 existing snapshot tests pass | ✅ PASS |
+| All 18 SAF-078 tests pass | ✅ PASS |
+| BUG-187 Fixed + Closed | ✅ PASS |
+
+## Regression Check
+
+No new regressions. All 635 failures in the full suite are in `tests/regression-baseline.json`.
+
+## No New Bugs Found
