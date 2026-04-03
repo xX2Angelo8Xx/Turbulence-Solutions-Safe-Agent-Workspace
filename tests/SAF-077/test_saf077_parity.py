@@ -437,3 +437,148 @@ def test_verify_parity_has_main():
 def test_verify_parity_has_verify_parity():
     """verify_parity module must expose a verify_parity() callable."""
     assert callable(vp.verify_parity)
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case additions (SAF-077)
+# ---------------------------------------------------------------------------
+
+def test_ensure_src_on_path_idempotent():
+    """_ensure_src_on_path() called twice must not add more entries to sys.path.
+
+    Note: conftest.py and the editable install may already have placed src in
+    sys.path before this test runs. The property we verify is that calling
+    _ensure_src_on_path() N times produces the same count as calling it once —
+    i.e., it is idempotent relative to the starting state, not that the
+    absolute count is exactly 1.
+    """
+    src_dir = str(vp._REPO_ROOT / "src")
+    count_before = sys.path.count(src_dir)
+    vp._ensure_src_on_path()
+    count_after_first = sys.path.count(src_dir)
+    vp._ensure_src_on_path()
+    count_after_second = sys.path.count(src_dir)
+    assert count_after_first == count_after_second, (
+        f"Second call to _ensure_src_on_path() added a duplicate entry: "
+        f"count went from {count_after_first} to {count_after_second}."
+    )
+    # Also verify that if src_dir was absent, it was added at least once
+    assert count_after_first >= max(1, count_before), (
+        "_ensure_src_on_path() must ensure src_dir is in sys.path."
+    )
+
+
+def test_compare_workspaces_verbose_does_not_change_results(tmp_path):
+    """compare_workspaces() verbose=True must return the same mismatches as verbose=False."""
+    fresh = tmp_path / "fresh"
+    upgraded = tmp_path / "upgraded"
+    _write_file(fresh / "a.py", b"same")
+    _write_file(upgraded / "a.py", b"same")
+    _write_file(fresh / "b.py", b"different_fresh")
+    _write_file(upgraded / "b.py", b"different_upgraded")
+
+    silent_result = vp.compare_workspaces(fresh, upgraded, ["a.py", "b.py"], verbose=False)
+    verbose_result = vp.compare_workspaces(fresh, upgraded, ["a.py", "b.py"], verbose=True)
+    assert silent_result == verbose_result, (
+        "verbose mode must not change the returned mismatch list."
+    )
+
+
+def test_compare_workspaces_path_traversal_both_absent_not_a_mismatch(tmp_path):
+    """SECURITY: A path-traversal entry absent from both sides is NOT flagged as a mismatch.
+
+    This test verifies that even if MANIFEST.json contained a traversal path
+    (e.g. '../../etc/passwd'), the script doesn't erroneously open OS-level files
+    when they are absent under both workspace roots.
+    """
+    fresh = tmp_path / "fresh"
+    upgraded = tmp_path / "upgraded"
+    fresh.mkdir()
+    upgraded.mkdir()
+    # A traversal path that cannot exist under the workspace subdirectories
+    traversal_path = "../../../nonexistent_target_file.sentinel"
+    mismatches = vp.compare_workspaces(fresh, upgraded, [traversal_path])
+    assert mismatches == [], (
+        "A file absent under both workspace roots must not be a mismatch, "
+        "including traversal paths."
+    )
+
+
+def test_create_upgraded_workspace_raises_on_copy_error(tmp_path):
+    """create_upgraded_workspace() must raise RuntimeError when upgrade_workspace() has copy errors."""
+    _ensure_src_on_path_via_import = vp._ensure_src_on_path
+    _ensure_src_on_path_via_import()
+
+    template_dir = tmp_path / "template"
+    template_dir.mkdir()
+    security_files = ["gate.py"]
+
+    mock_report = MagicMock()
+    mock_report.errors = ["Failed to copy gate.py from template"]  # copy error, not verification error
+
+    with patch("launcher.core.workspace_upgrader.upgrade_workspace", return_value=mock_report):
+        with pytest.raises(RuntimeError, match="failed to copy files"):
+            vp.create_upgraded_workspace(template_dir, tmp_path / "dest", security_files)
+
+
+def test_create_upgraded_workspace_ignores_post_upgrade_verification_errors(tmp_path):
+    """create_upgraded_workspace() must NOT raise for 'Post-upgrade verification' errors."""
+    vp._ensure_src_on_path()
+
+    template_dir = vp._TEMPLATES_DIR / "agent-workbench"
+    security_files = []  # empty → no sentinel writes
+
+    mock_report = MagicMock()
+    mock_report.errors = ["Post-upgrade verification failed for audit.jsonl (stale hash)"]
+
+    with patch("launcher.core.workspace_upgrader.upgrade_workspace", return_value=mock_report):
+        # Should not raise — post-upgrade verification errors are intentionally filtered
+        result = vp.create_upgraded_workspace(template_dir, tmp_path, security_files)
+    assert result == tmp_path / "upgraded_workspace"
+
+
+def test_verify_parity_exits_one_on_runtime_error():
+    """CLI must exit with code 1 when create_upgraded_workspace() raises RuntimeError."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        script = Path(tmpdir) / "run_runtime_error_test.py"
+        script.write_text(
+            f"import sys\n"
+            f"sys.path.insert(0, r'{SCRIPTS_DIR!s}')\n"
+            f"import verify_parity as vp\n"
+            f"from unittest.mock import patch\n"
+            f"with patch.object(vp, 'create_upgraded_workspace', "
+            f"side_effect=RuntimeError('simulated copy failure')):\n"
+            f"    vp.main()\n",
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(script)],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    assert result.returncode == 1
+    assert "ERROR" in result.stderr
+
+
+def test_sha256_reads_file_in_binary_chunks(tmp_path):
+    """_sha256 must produce correct digest for a file larger than one 8192-byte chunk."""
+    large_content = b"A" * 20_000  # 20 KB — spans multiple 8192-byte read chunks
+    f = _write_file(tmp_path / "large.bin", large_content)
+    expected = hashlib.sha256(large_content).hexdigest()
+    assert vp._sha256(f) == expected, "Multi-chunk SHA-256 must match single-pass hashlib result"
+
+
+def test_get_security_critical_files_missing_key(tmp_path):
+    """Files without 'security_critical' key must not appear in the result."""
+    manifest = {
+        "files": {
+            "with_key.py": {"sha256": "aaa", "security_critical": True},
+            "without_key.py": {"sha256": "bbb"},  # key absent entirely
+        }
+    }
+    result = vp.get_security_critical_files(manifest)
+    assert "with_key.py" in result
+    assert "without_key.py" not in result, (
+        "Files where 'security_critical' key is absent must not appear in the result."
+    )
