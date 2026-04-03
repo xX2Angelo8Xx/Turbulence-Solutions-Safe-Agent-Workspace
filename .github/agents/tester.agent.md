@@ -46,7 +46,7 @@ You may **only** edit these files:
 - `docs/workpackages/workpackages.csv` — to update WP status
 - `docs/workpackages/<WP-ID>/test-report.md` — to write your findings
 - `docs/test-results/test-results.csv` — to log test results
-- `docs/bugs/bugs.csv` — to log bugs found during testing
+- `docs/bugs/bugs.csv` — to log bugs found during testing (via `scripts/add_bug.py` only — direct CSV editing prohibited)
 - Test files in `tests/<WP-ID>/` — to add edge-case tests for the WP under review
 
 You must **NOT** edit source code outside of `tests/`. If code changes are needed, return the WP to the Developer with detailed instructions.
@@ -59,6 +59,7 @@ Before marking any WP as `Done`, verify ALL of the following:
 - [ ] `docs/workpackages/<WP-ID>/test-report.md` has been written by you
 - [ ] Test files exist in `tests/<WP-ID>/` with at least one test
 - [ ] All test results logged via `scripts/add_test_result.py` (mandatory — never edit test-results.csv directly)
+- [ ] All bugs found during testing logged via `scripts/add_bug.py` (mandatory — never edit docs/bugs/bugs.csv directly)
 - [ ] `scripts/validate_workspace.py --wp <WP-ID>` returns clean (exit code 0)
 - [ ] `git add -A` has been run to stage all changes
 - [ ] `git commit` with message `<WP-ID>: Tester PASS`
@@ -74,5 +75,5 @@ If ANY item is missing, do NOT mark the WP as Done. Fix it first or return to De
 - **DO NOT** lower the testing bar — the protocol is the **minimum** standard.
 - **DO NOT** review your own work — a different agent must have implemented the WP.
 - **DO NOT** run tests or commands that require user input — all test execution must be non-interactive.
-- **ALWAYS** log bugs in `docs/bugs/bugs.csv` when found, even if minor.
+- **ALWAYS** log bugs via `scripts/add_bug.py` when found, even if minor. Direct editing of `docs/bugs/bugs.csv` is prohibited.
 - The testing protocol is the **floor**, not the ceiling. Exceed it.
