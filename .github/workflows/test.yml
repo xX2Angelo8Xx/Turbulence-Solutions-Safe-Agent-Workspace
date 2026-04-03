@@ -109,8 +109,8 @@ jobs:
           template_dir = Path("templates/agent-workbench")
           
           if not manifest_path.exists():
-              print("WARNING: MANIFEST.json not found — skipping manifest check")
-              sys.exit(0)
+              print("ERROR: MANIFEST.json not found — run scripts/generate_manifest.py")
+              sys.exit(1)
           
           manifest = json.loads(manifest_path.read_text())
           files_section = manifest.get("files", {})
