@@ -2377,3 +2377,7 @@
 "TST-2496","SAF-077: full regression suite","Regression","SAF-077","Fail","2026-04-04","Windows 11 + Python 3.11","8001 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 201.02s (0:03:21)",""
 "TST-2497","SAF-077: Tester edge-case additions (8 tests, 39 total)","Security","SAF-077","Pass","2026-04-04","Windows 11 + Python 3.11","39 passed, 0 failed","Tester added 8 edge-case tests: verbose mode parity, path traversal safety, RuntimeError propagation, multi-chunk SHA-256, missing security_critical key, idempotency, copy-error filtering"
 "TST-2498","SAF-078: targeted suite","Unit","SAF-078","Pass","2026-04-04","Windows 11 + Python 3.11","12 passed in 0.29s",""
+"TST-2499","SAF-078: full regression suite","Regression","SAF-078","Fail","2026-04-04","Windows 11 + Python 3.11","8022 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 135.92s (0:02:15)",""
+"TST-2500","SAF-078: full regression suite","Regression","SAF-078","Fail","2026-04-04","Windows 11 + Python 3.11","8021 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 128.71s (0:02:08)",""
+"TST-2501","SAF-078: targeted suite","Unit","SAF-078","Fail","2026-04-04","Windows 11 + Python 3.11","17 passed in 0.39s",""
+"TST-2502","SAF-078: snapshot suite (10 existing snapshots)","Security","SAF-078","Pass","2026-04-04","Windows 11 + Python 3.11","10 passed, 0 failed","All 10 existing golden-file snapshots pass after SAF-078 changes; no regressions in snapshot suite"
