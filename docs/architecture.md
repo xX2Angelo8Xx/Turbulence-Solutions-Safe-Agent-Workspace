@@ -952,6 +952,10 @@ Templates (bundled inside Launcher)
 │   │   ├── SAF-075/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── SAF-076/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
 │   │   └── workpackages.csv
 │   ├── architecture.md
@@ -1306,6 +1310,7 @@ Templates (bundled inside Launcher)
 │   ├── SAF-073/
 │   ├── SAF-074/
 │   ├── SAF-075/
+│   ├── SAF-076/
 │   ├── shared/
 │   ├── snapshots/
 │   ├── __init__.py
