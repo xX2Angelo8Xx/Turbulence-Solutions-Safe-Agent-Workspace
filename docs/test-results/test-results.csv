@@ -2362,3 +2362,5 @@
 "TST-2481","SAF-076: full regression suite","Regression","SAF-076","Fail","2026-04-03","Windows 11 + Python 3.11","7865 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 119.75s (0:01:59)",""
 "TST-2482","SAF-076: targeted suite","Unit","SAF-076","Pass","2026-04-03","Windows 11 + Python 3.11","55 passed in 0.41s",""
 "TST-2483","DOC-051: targeted suite","Unit","DOC-051","Pass","2026-04-04","Windows 11 + Python 3.11","26 passed in 0.31s",""
+"TST-2484","DOC-051: full regression suite","Regression","DOC-051","Fail","2026-04-04","Windows 11 + Python 3.11","7928 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 129.01s (0:02:09)",""
+"TST-2485","DOC-051: targeted suite","Unit","DOC-051","Pass","2026-04-04","Windows 11 + Python 3.11","32 passed in 5.43s",""

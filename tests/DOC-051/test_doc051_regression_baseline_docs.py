@@ -10,6 +10,7 @@ Validates that:
 
 import json
 import pathlib
+import re
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
@@ -244,3 +245,63 @@ def test_regression_baseline_each_entry_has_reason():
             f"Entry '{key}' reason must be a string"
         )
         assert value["reason"].strip(), f"Entry '{key}' reason must not be empty"
+
+
+# ---------------------------------------------------------------------------
+# Edge-case tests added by Tester (DOC-051)
+# ---------------------------------------------------------------------------
+
+
+def test_regression_baseline_updated_field_is_iso8601_date():
+    """_updated must be a valid ISO 8601 date (YYYY-MM-DD), not an arbitrary string."""
+    data = json.loads(REGRESSION_BASELINE.read_text(encoding="utf-8"))
+    updated = data["_updated"]
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", updated), (
+        f"regression-baseline.json '_updated' must be YYYY-MM-DD, got: {updated!r}"
+    )
+
+
+def test_regression_baseline_count_is_non_negative():
+    """_count must be a non-negative integer (empty baseline is allowed, negative is not)."""
+    data = json.loads(REGRESSION_BASELINE.read_text(encoding="utf-8"))
+    assert data["_count"] >= 0, (
+        f"regression-baseline.json '_count' must be >= 0, got: {data['_count']}"
+    )
+
+
+def test_testing_protocol_baseline_section_requires_count_update():
+    """Documentation must explicitly say _count must be updated when editing the file."""
+    content = TESTING_PROTOCOL.read_text(encoding="utf-8")
+    baseline_idx = content.index("## Regression Baseline")
+    section = content[baseline_idx:]
+    assert "_count" in section and ("update" in section.lower() or "must" in section.lower()), (
+        "Regression Baseline section must instruct editors to update _count"
+    )
+
+
+def test_testing_protocol_baseline_section_requires_updated_date_update():
+    """Documentation must explicitly say _updated must be set when editing the file."""
+    content = TESTING_PROTOCOL.read_text(encoding="utf-8")
+    baseline_idx = content.index("## Regression Baseline")
+    section = content[baseline_idx:]
+    assert "_updated" in section and "date" in section.lower(), (
+        "Regression Baseline section must instruct editors to update _updated date"
+    )
+
+
+def test_agent_workflow_fix_wp_checklist_references_count_and_updated():
+    """The dev pre-handoff checklist item for FIX WPs must mention _count and _updated."""
+    content = AGENT_WORKFLOW.read_text(encoding="utf-8")
+    assert "_count" in content and "_updated" in content, (
+        "agent-workflow.md FIX WP checklist item must mention _count and _updated"
+    )
+
+
+def test_testing_protocol_baseline_mentions_validation_command():
+    """The How-to-Update procedure should include a JSON validation command."""
+    content = TESTING_PROTOCOL.read_text(encoding="utf-8")
+    baseline_idx = content.index("## Regression Baseline")
+    section = content[baseline_idx:]
+    assert "json" in section.lower() and ("valid" in section.lower() or "python" in section.lower()), (
+        "Regression Baseline 'How to Update' should mention JSON validation"
+    )
