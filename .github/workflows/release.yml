@@ -115,18 +115,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install system dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-tk
-
-      - name: Install system dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          # macOS Python from actions/setup-python includes tkinter
-          python -c "import tkinter" || echo "tkinter not available"
-
       - name: Install dependencies
         run: pip install -e ".[dev]"
 

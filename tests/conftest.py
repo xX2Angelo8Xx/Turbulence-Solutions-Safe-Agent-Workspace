@@ -11,9 +11,22 @@ import os
 import shutil
 import subprocess
 import sys
-import tkinter.filedialog
-import tkinter.messagebox
 from unittest.mock import MagicMock, patch
+
+try:
+    import tkinter.filedialog
+    import tkinter.messagebox
+    _HAS_TK = True
+except ImportError:
+    import types
+    _tk_mock = MagicMock()
+    tkinter = types.ModuleType("tkinter")
+    tkinter.filedialog = MagicMock()
+    tkinter.messagebox = MagicMock()
+    sys.modules.setdefault("tkinter", _tk_mock)
+    sys.modules["tkinter.filedialog"] = tkinter.filedialog
+    sys.modules["tkinter.messagebox"] = tkinter.messagebox
+    _HAS_TK = False
 
 import pytest
 
