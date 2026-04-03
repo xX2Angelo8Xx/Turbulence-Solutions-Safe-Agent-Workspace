@@ -2370,3 +2370,4 @@
 "TST-2489","FIX-095: full regression suite","Regression","FIX-095","Fail","2026-04-04","Windows 11 + Python 3.11","7945 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 145.49s (0:02:25)",""
 "TST-2490","FIX-095: tester suite (15 passed)","Unit","FIX-095","Pass","2026-04-04","Windows 11 + Python 3.11","15 passed in 0.55s","5 developer tests + 10 tester edge cases: regression sentinel, direct fn return values, content integrity, dry-run no-write"
 "TST-2491","FIX-096: targeted suite","Unit","FIX-096","Pass","2026-04-04","Windows 11 + Python 3.11","6 passed in 0.31s",""
+"TST-2492","FIX-096: targeted suite","Unit","FIX-096","Pass","2026-04-04","Windows 11 + Python 3.11","6 passed in 0.26s",""
