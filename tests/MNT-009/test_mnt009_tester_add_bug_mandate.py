@@ -104,3 +104,31 @@ def test_add_bug_py_appears_in_multiple_sections():
     assert count >= 3, (
         f"scripts/add_bug.py should appear in at least 3 places in tester.agent.md, found {count}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case additions — full script path must be used everywhere
+# ---------------------------------------------------------------------------
+
+def test_edit_permissions_uses_full_script_path():
+    """Bare 'add_bug.py' is not actionable — must include the 'scripts/' prefix."""
+    section = _section(_content(), "Edit Permissions")
+    assert "scripts/add_bug.py" in section, (
+        "Edit Permissions must reference 'scripts/add_bug.py' (full path), not just 'add_bug.py'"
+    )
+
+
+def test_pre_done_checklist_uses_full_script_path():
+    """Bare 'add_bug.py' is not actionable — must include the 'scripts/' prefix."""
+    section = _section(_content(), "Pre-Done Checklist")
+    assert "scripts/add_bug.py" in section, (
+        "Pre-Done Checklist must reference 'scripts/add_bug.py' (full path), not just 'add_bug.py'"
+    )
+
+
+def test_constraints_uses_full_script_path():
+    """Bare 'add_bug.py' is not actionable — must include the 'scripts/' prefix."""
+    section = _section(_content(), "Constraints")
+    assert "scripts/add_bug.py" in section, (
+        "Constraints must reference 'scripts/add_bug.py' (full path), not just 'add_bug.py'"
+    )

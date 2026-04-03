@@ -2353,3 +2353,5 @@
 "TST-2472","MNT-008: targeted suite","Unit","MNT-008","Pass","2026-04-03","Windows 11 + Python 3.11","15 passed in 0.31s","Tester-added edge cases: YAML parse, prompt ref to 3-failures, label field, agent cross-check"
 "TST-2473","MNT-008: full regression suite","Regression","MNT-008","Fail","2026-04-03","Windows 11 + Python 3.11","7819 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 122.19s (0:02:02)","Full regression suite after MNT-008"
 "TST-2474","MNT-009: targeted suite","Unit","MNT-009","Pass","2026-04-03","Windows 11 + Python 3.11","9 passed in 0.23s",""
+"TST-2475","MNT-009: full regression suite","Regression","MNT-009","Fail","2026-04-03","Windows 11 + Python 3.11","7832 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 133.02s (0:02:13)",""
+"TST-2476","MNT-009: targeted suite","Unit","MNT-009","Pass","2026-04-03","Windows 11 + Python 3.11","12 passed in 0.28s",""
