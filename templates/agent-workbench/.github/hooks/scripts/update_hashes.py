@@ -36,12 +36,11 @@ def _resolve_paths() -> tuple[Path, Path]:
 # ---------------------------------------------------------------------------
 
 def _sha256_file(path: Path) -> str:
-    """Return the lowercase SHA256 hex digest of a file's raw bytes."""
-    h = hashlib.sha256()
-    with path.open("rb") as fh:
-        for chunk in iter(lambda: fh.read(65536), b""):
-            h.update(chunk)
-    return h.hexdigest()
+    """Return the lowercase SHA256 hex digest of a file's raw bytes, normalized."""
+    content = path.read_bytes()
+    # Normalize CRLF -> LF so the hash is platform-independent.
+    content = content.replace(b"\r\n", b"\n")
+    return hashlib.sha256(content).hexdigest()
 
 
 def _compute_canonical_gate_hash(content_bytes: bytes) -> str:
@@ -51,6 +50,8 @@ def _compute_canonical_gate_hash(content_bytes: bytes) -> str:
     zeros before hashing.  This mirrors the algorithm used by
     security_gate._compute_gate_canonical_hash().
     """
+    # Normalize CRLF -> LF so the hash is platform-independent.
+    content_bytes = content_bytes.replace(b"\r\n", b"\n")
     canonical = re.sub(
         rb'(?<=_KNOWN_GOOD_GATE_HASH: str = ")[0-9a-fA-F]{64}',
         b"0" * 64,

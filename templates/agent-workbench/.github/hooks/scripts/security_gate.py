@@ -118,14 +118,14 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # Known-good SHA256 of templates/coding/.vscode/settings.json.
 # Updated by running .github/hooks/scripts/update_hashes.py after any
 # intentional admin change to settings.json.
-_KNOWN_GOOD_SETTINGS_HASH: str = "1786325dfd2a3e007112c63e0e82c50fe76e1e4e8c022439a6d3597bc2248447"
+_KNOWN_GOOD_SETTINGS_HASH: str = "c9cd0834dd2e3f0e4061904d4015cc41777e766b94476c32aa3feef58c6aca5f"
 
 # Known-good SHA256 of security_gate.py in canonical form.
 # Canonical form: the file content with the value portion of this constant
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "2c00b8c487d4ea9af55149d5f7510dcf9ff3c17cc86544a25ad3cbc72fe5aacc"
+_KNOWN_GOOD_GATE_HASH: str = "4a2a81289cc113b033946c069699b6dea3fe9dc2f74bd604b5ee4e924fde437c"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. A safety-critical file "
@@ -1272,11 +1272,11 @@ def _increment_deny_counter(
 def _compute_file_hash(path: str) -> "Optional[str]":
     """Compute the SHA256 hex digest of a file.  Returns None on any error."""
     try:
-        h = hashlib.sha256()
         with open(path, "rb") as fh:
-            for chunk in iter(lambda: fh.read(65536), b""):
-                h.update(chunk)
-        return h.hexdigest()
+            content = fh.read()
+        # Normalize CRLF -> LF so the hash is platform-independent.
+        content = content.replace(b"\r\n", b"\n")
+        return hashlib.sha256(content).hexdigest()
     except OSError:
         return None
 
@@ -1291,6 +1291,8 @@ def _compute_gate_canonical_hash(gate_path: str) -> "Optional[str]":
     try:
         with open(gate_path, "rb") as fh:
             content_bytes = fh.read()
+        # Normalize CRLF -> LF so the hash is platform-independent.
+        content_bytes = content_bytes.replace(b"\r\n", b"\n")
         canonical = re.sub(
             rb'(?<=_KNOWN_GOOD_GATE_HASH: str = ")[0-9a-fA-F]{64}',
             b"0" * 64,

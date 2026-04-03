@@ -5,3 +5,9 @@
 # ts-python shim files - enforce correct line endings per platform
 src/installer/shims/ts-python text eol=lf
 src/installer/shims/ts-python.cmd text eol=crlf
+
+# Template security files — enforce LF for cross-platform hash consistency
+templates/agent-workbench/.github/hooks/scripts/*.py text eol=lf
+templates/agent-workbench/.github/hooks/scripts/*.json text eol=lf
+templates/agent-workbench/.github/hooks/*.json text eol=lf
+templates/agent-workbench/.vscode/settings.json text eol=lf
