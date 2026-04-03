@@ -269,7 +269,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-052/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-001/
@@ -972,6 +971,10 @@ Templates (bundled inside Launcher)
 │   │   ├── SAF-076/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── SAF-077/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
 │   │   └── workpackages.csv
 │   ├── architecture.md
@@ -999,7 +1002,8 @@ Templates (bundled inside Launcher)
 │   ├── run_tests.py
 │   ├── update_architecture.py
 │   ├── update_bug_status.py
-│   └── validate_workspace.py
+│   ├── validate_workspace.py
+│   └── verify_parity.py
 ├── src/
 │   ├── installer/
 │   │   ├── linux/
@@ -1332,6 +1336,7 @@ Templates (bundled inside Launcher)
 │   ├── SAF-074/
 │   ├── SAF-075/
 │   ├── SAF-076/
+│   ├── SAF-077/
 │   ├── shared/
 │   ├── snapshots/
 │   ├── __init__.py
