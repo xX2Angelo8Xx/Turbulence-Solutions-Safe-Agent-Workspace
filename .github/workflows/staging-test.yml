@@ -38,6 +38,9 @@ jobs:
           checks = {
               "src/launcher/config.py": r'VERSION\s*:\s*str\s*=\s*"([^"]+)"',
               "pyproject.toml": r'^version\s*=\s*"([^"]+)"',
+              "src/installer/windows/setup.iss": r'#define MyAppVersion "([^"]+)"',
+              "src/installer/macos/build_dmg.sh": r'APP_VERSION="([^"]+)"',
+              "src/installer/linux/build_appimage.sh": r'APP_VERSION="([^"]+)"',
           }
           
           errors = []
@@ -53,7 +56,7 @@ jobs:
               for e in errors:
                   print(f"ERROR: {e}")
               sys.exit(1)
-          print(f"All version files match {expected}")
+          print(f"All 5 version files match {expected}")
 
       - name: Verify template manifest
         shell: python
