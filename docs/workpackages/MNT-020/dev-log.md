@@ -58,3 +58,20 @@ All 9 files were updated to:
 
 - `scripts/csv_utils.py` still exists (will be deleted in MNT-022 per the plan). Its existence does not affect test outcomes since we test documentation, not scripts.
 - Historical mentions of `.csv` in ADR titles or description prose (e.g., "Migrated from CSV to JSONL") are intentionally preserved as audit trail.
+
+---
+
+## Iteration 2 — 2026-04-04
+
+**Trigger:** Tester returned WP with FAIL verdict (Iteration 1 test-report.md).
+
+**Defect Fixed:**
+- `docs/work-rules/maintenance-protocol.md` line 101: `CSV Integrity` → `JSONL Integrity` in the embedded maintenance log template table.
+- Root cause: The Developer's Iteration 1 tests only checked the section heading (`### 3. JSONL Integrity`) but missed the duplicate reference in the Results table template below it.
+
+**Tests:**
+- All 33 tests pass (18 original + 15 Tester edge cases) — logged as TST-2567.
+- `scripts/validate_workspace.py --wp MNT-020` returns clean (exit 0).
+
+**Files changed:**
+- `docs/work-rules/maintenance-protocol.md` (1-line fix)

@@ -98,7 +98,7 @@ docs/maintenance/YYYY-MM-DD-maintenance.md
 |---|-------|--------|---------|
 | 1 | Git Hygiene | Pass/Warning/Fail | <findings> |
 | 2 | WP–US Consistency | Pass/Warning/Fail | <findings> |
-| 3 | CSV Integrity | Pass/Warning/Fail | <findings> |
+| 3 | JSONL Integrity | Pass/Warning/Fail | <findings> |
 | 4 | Documentation Freshness | Pass/Warning/Fail | <findings> |
 | 5 | WP Folder Integrity | Pass/Warning/Fail | <findings> |
 | 6 | Orphan Detection | Pass/Warning/Fail | <findings> |
