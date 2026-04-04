@@ -98,6 +98,7 @@ Templates (bundled inside Launcher)
 │   │   └── user-stories.csv
 │   ├── work-rules/
 │   │   ├── agent-workflow.md
+│   │   ├── branch-protection.md
 │   │   ├── bug-tracking-rules.md
 │   │   ├── coding-standards.md
 │   │   ├── commit-branch-rules.md
@@ -272,6 +273,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-053/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-054/
+│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-001/
@@ -576,7 +581,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-100/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── GUI-001/
@@ -1129,6 +1133,7 @@ Templates (bundled inside Launcher)
 │   ├── DOC-051/
 │   ├── DOC-052/
 │   ├── DOC-053/
+│   ├── DOC-054/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
