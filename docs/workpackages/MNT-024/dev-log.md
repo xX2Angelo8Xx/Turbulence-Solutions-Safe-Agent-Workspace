@@ -166,3 +166,25 @@ Tests verify:
 
 - Temp files created during analysis (`tmp_*.py`, `tmp_*.txt`) are deleted before commit.
 - ADR-008 directly authorises and motivates this WP — acknowledged in implementation.
+
+---
+
+## Iteration 2 (Tester Feedback — 2026-04-05)
+
+### Changes Made
+
+Tester identified 2 intermittently-failing tests not covered by the baseline:
+
+1. **`tests.INS-019.test_ins019_edge_cases.test_verify_shim_existence_only_check`**
+   - Same sys.path mutation pattern as the 16 other INS-019 entries already in baseline.
+   - Added with the same reason string: flaky due to sys.path mutation by other test modules.
+
+2. **`tests.MNT-015.test_mnt015_tester_edge_cases.test_locked_next_id_concurrent_threads`**
+   - Threading race condition, same pattern as SAF-072.
+   - Added with concurrency-flaky reason referencing SAF-072.
+
+### Baseline Updates
+
+- `_count`: 72 → 74
+- `_updated`: "2026-06-05" → "2026-04-05"
+- 2 new entries added to `known_failures`
