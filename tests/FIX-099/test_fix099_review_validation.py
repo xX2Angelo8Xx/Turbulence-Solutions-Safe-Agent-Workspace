@@ -144,3 +144,42 @@ def test_in_progress_wp_not_checked(tmp_path, monkeypatch):
     result = ValidationResult()
     _check_wp_artifacts("TST-000", "In Progress", "", result, {})
     assert result.ok, f"In Progress WP should not trigger errors, got: {result.errors}"
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case additions
+# ---------------------------------------------------------------------------
+
+def test_review_wp_decomposed_comment_skipped(tmp_path, monkeypatch):
+    """A Review WP whose comments contain 'decomposed' is skipped entirely."""
+    # No artifact files created — if the check ran it would error
+    monkeypatch.setattr(vw, "REPO_ROOT", tmp_path)
+    result = ValidationResult()
+    _check_wp_artifacts("TST-000", "Review", "decomposed into sub-WPs", result, {})
+    assert result.ok, f"Decomposed Review WP should be skipped, got: {result.errors}"
+
+
+def test_review_wp_tmp_file_raises_error(tmp_path, monkeypatch):
+    """A Review WP with a tmp_ file in tests/ must trigger an ERROR."""
+    _make_wp_tree(tmp_path, has_devlog=True, has_tests=True, has_test_report=False)
+    (tmp_path / "tests" / "TST-000" / "tmp_scratch.py").write_text("", encoding="utf-8")
+    monkeypatch.setattr(vw, "REPO_ROOT", tmp_path)
+    result = ValidationResult()
+    _check_wp_artifacts("TST-000", "Review", "", result, {})
+    assert any("tmp_" in e for e in result.errors), (
+        f"Expected leftover tmp_ error, got errors={result.errors}"
+    )
+
+
+def test_review_wp_exception_skip_test_folder(tmp_path, monkeypatch):
+    """A Review WP with skip_checks=[test-folder] must not error on missing tests/."""
+    _make_wp_tree(tmp_path, has_devlog=True, has_tests=False, has_test_report=False)
+    import shutil
+    shutil.rmtree(tmp_path / "tests" / "TST-000")
+    monkeypatch.setattr(vw, "REPO_ROOT", tmp_path)
+    result = ValidationResult()
+    exceptions = {"TST-000": {"skip_checks": ["test-folder"]}}
+    _check_wp_artifacts("TST-000", "Review", "", result, exceptions)
+    assert not any("tests/" in e for e in result.errors), (
+        f"Excepted test-folder check should be skipped, got: {result.errors}"
+    )
