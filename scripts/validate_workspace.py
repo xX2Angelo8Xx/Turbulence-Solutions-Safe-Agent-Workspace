@@ -23,6 +23,8 @@ WP_JSONL = REPO_ROOT / "docs" / "workpackages" / "workpackages.jsonl"
 US_JSONL = REPO_ROOT / "docs" / "user-stories" / "user-stories.jsonl"
 BUG_JSONL = REPO_ROOT / "docs" / "bugs" / "bugs.jsonl"
 TST_JSONL = REPO_ROOT / "docs" / "test-results" / "test-results.jsonl"
+DECISIONS_JSONL = REPO_ROOT / "docs" / "decisions" / "index.jsonl"
+MAINT_RUNS_JSONL = REPO_ROOT / "docs" / "maintenance" / "orchestrator-runs.jsonl"
 EXCEPTIONS_JSON = REPO_ROOT / "docs" / "workpackages" / "validation-exceptions.json"
 
 
@@ -250,24 +252,39 @@ def _check_tst_coverage(result: ValidationResult, exceptions: dict | None = None
 
 
 def _check_jsonl_structural(result: ValidationResult) -> None:
-    """Verify all 4 JSONL files parse cleanly with valid enum values."""
+    """Verify all 6 JSONL files parse cleanly with required fields and valid enum values."""
     # Enum definitions for status fields
     VALID_WP_STATUS = {"Open", "In Progress", "Review", "Done"}
     VALID_BUG_STATUS = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
     VALID_TST_STATUS = {"Pass", "Fail", "Blocked", "Skipped", "XFail"}
     VALID_US_STATUS = {"Open", "In Progress", "Done", "Closed"}
+    VALID_ADR_STATUS = {"Active", "Superseded", "Draft"}
 
+    # (path, id_field, status_field, valid_status_values, label, required_fields)
     jsonl_configs = [
-        (WP_JSONL, "Status", VALID_WP_STATUS, "WP"),
-        (BUG_JSONL, "Status", VALID_BUG_STATUS, "Bug"),
-        (TST_JSONL, "Status", VALID_TST_STATUS, "Test"),
-        (US_JSONL, "Status", VALID_US_STATUS, "US"),
+        (WP_JSONL,        "ID",     "Status", VALID_WP_STATUS,  "WP",      ["ID", "Status", "Name"]),
+        (BUG_JSONL,       "ID",     "Status", VALID_BUG_STATUS, "Bug",     ["ID", "Status", "Title"]),
+        (TST_JSONL,       "ID",     "Status", VALID_TST_STATUS, "Test",    ["ID", "Status", "Test Name"]),
+        (US_JSONL,        "ID",     "Status", VALID_US_STATUS,  "US",      ["ID", "Status", "Title"]),
+        (DECISIONS_JSONL, "ADR-ID", "Status", VALID_ADR_STATUS, "ADR",     ["ADR-ID", "Status", "Title"]),
+        (MAINT_RUNS_JSONL, "ID",   "Status", set(),            "MaintRun", []),
     ]
 
-    for jsonl_path, status_col, valid_values, label in jsonl_configs:
+    for jsonl_path, id_field, status_col, valid_values, label, required_fields in jsonl_configs:
         if not jsonl_path.exists():
-            result.warning(f"{label} JSONL not found (pre-MNT-018): {jsonl_path.name}")
+            result.warning(f"{label} JSONL not found: {jsonl_path.name}")
             continue
+
+        # Empty-line-in-middle detection — blank lines between records violate JSONL spec
+        raw_lines = jsonl_path.read_text(encoding="utf-8").splitlines()
+        for line_num, raw_line in enumerate(raw_lines, start=1):
+            if raw_line.strip() == "":
+                # A blank line is only acceptable as the final line (trailing newline)
+                if line_num < len(raw_lines):
+                    result.error(
+                        f"{label} JSONL ({jsonl_path.name}) has an empty line at "
+                        f"line {line_num} — empty lines between records are not allowed"
+                    )
 
         # Structural parse check — each line must be valid JSON
         try:
@@ -276,17 +293,27 @@ def _check_jsonl_structural(result: ValidationResult) -> None:
             result.error(f"{label} JSONL structural error: {e}")
             continue
 
-        # Enum validation (warnings — pre-existing data may have non-standard values)
         for row in rows:
-            row_id = row.get("ID", "<no ID>")
-            status = row.get(status_col, "")
-            if isinstance(status, str):
-                status = status.strip()
-            if status and status not in valid_values:
-                result.warning(
-                    f"{row_id}: invalid {label} Status '{status}' — "
-                    f"expected one of {sorted(valid_values)}"
-                )
+            row_id = row.get(id_field, "<no ID>")
+
+            # Required-field check
+            for field in required_fields:
+                if field not in row or str(row.get(field, "")).strip() == "":
+                    result.error(
+                        f"{label} JSONL ({jsonl_path.name}): row {row_id!r} "
+                        f"is missing required field '{field}'"
+                    )
+
+            # Enum validation (warnings — pre-existing data may have non-standard values)
+            if valid_values:
+                status = row.get(status_col, "")
+                if isinstance(status, str):
+                    status = status.strip()
+                if status and status not in valid_values:
+                    result.warning(
+                        f"{row_id}: invalid {label} Status '{status}' — "
+                        f"expected one of {sorted(valid_values)}"
+                    )
 
 
 VALID_BUG_STATUSES = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
@@ -510,6 +537,7 @@ def validate_full(result: ValidationResult) -> None:
     _check_duplicate_ids(WP_JSONL, "ID", result)
     _check_duplicate_ids(BUG_JSONL, "ID", result)
     _check_duplicate_ids(US_JSONL, "ID", result)
+    _check_duplicate_ids(DECISIONS_JSONL, "ADR-ID", result)
 
     # WP artifact checks for all Done and Review WPs
     if WP_JSONL.exists():
@@ -533,7 +561,7 @@ def validate_full(result: ValidationResult) -> None:
     # Branch naming
     _check_branch_naming(result)
 
-    # CSV structural integrity
+    # JSONL structural integrity
     _check_jsonl_structural(result)
 
     # Orphaned finalization state files
