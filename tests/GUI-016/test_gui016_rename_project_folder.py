@@ -1,4 +1,4 @@
-"""Tests for GUI-016 — Rename Internal Project Folder to User's Name.
+﻿"""Tests for GUI-016 — Rename Internal Project Folder to User's Name.
 
 Verifies that create_project() renames the copied "Project/" subfolder
 to the user's project name after shutil.copytree().
@@ -75,9 +75,9 @@ class TestRenameProjectFolder:
     def test_root_folder_still_ts_sae_prefixed(
         self, tmp_template_with_project: Path, tmp_dest: Path
     ) -> None:
-        """Root folder must remain TS-SAE-{name}; only the internal folder is renamed."""
+        """Root folder must remain SAE-{name}; only the internal folder is renamed."""
         result = create_project(tmp_template_with_project, tmp_dest, "MyProject")
-        assert result.name == "TS-SAE-MyProject"
+        assert result.name == "SAE-MyProject"
 
     def test_no_project_folder_does_not_raise(
         self, tmp_template_without_project: Path, tmp_dest: Path

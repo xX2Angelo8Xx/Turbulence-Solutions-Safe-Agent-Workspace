@@ -1,4 +1,4 @@
-"""Tests for GUI-020 — create_project() integration with counter config.
+﻿"""Tests for GUI-020 — create_project() integration with counter config.
 
 Covers:
   1. create_project() writes counter_config.json into created workspace
@@ -167,11 +167,11 @@ class TestCreateProjectWritesCounterConfig:
             assert (workspace / ".github" / "hooks" / "scripts" / "security_gate.py").is_file()
 
     def test_workspace_folder_prefixed_with_ts_sae(self) -> None:
-        """create_project must prefix the folder name with 'TS-SAE-'."""
+        """create_project must prefix the folder name with 'SAE-'."""
         with tempfile.TemporaryDirectory() as tmp:
             tmp_dir = Path(tmp)
             tpl = _make_template(tmp_dir)
             dest = tmp_dir / "dest"
             dest.mkdir()
             workspace = _create(tpl, dest, "TestProj")
-        assert workspace.name == "TS-SAE-TestProj"
+        assert workspace.name == "SAE-TestProj"

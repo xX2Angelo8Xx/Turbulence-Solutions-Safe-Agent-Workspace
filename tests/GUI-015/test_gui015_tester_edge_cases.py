@@ -1,13 +1,13 @@
-"""Tester edge-case additions for GUI-015 — Rename Root Folder to TS-SAE-{ProjectName}.
+﻿"""Tester edge-case additions for GUI-015 — Rename Root Folder to SAE-{ProjectName}.
 
 Tests beyond the developer's baseline, covering:
   - Special characters in folder name (hyphen, underscore, dot, numeric)
-  - Exact prefix verification ('TS-SAE-', uppercase, hyphen-separated)
-  - Empty folder name creates 'TS-SAE-' only
+  - Exact prefix verification ('SAE-', uppercase, hyphen-separated)
+  - Empty folder name creates 'SAE-' only
   - Very long name (100 chars) still receives prefix
   - Unicode names (Latin extended, CJK)
   - Case preservation (no normalisation applied)
-  - Two-level traversal boundary — absorbed by the TS-SAE- prefix component,
+  - Two-level traversal boundary — absorbed by the SAE- prefix component,
     so the result stays inside destination and no ValueError is raised
 """
 
@@ -51,40 +51,40 @@ class TestSpecialCharactersInName:
     def test_hyphen_in_name(self, tmp_template: Path, tmp_dest: Path) -> None:
         """Hyphens in folder_name are preserved verbatim in the prefixed folder name."""
         result = create_project(tmp_template, tmp_dest, "My-Project")
-        assert result.name == "TS-SAE-My-Project"
+        assert result.name == "SAE-My-Project"
         assert result.is_dir()
 
     def test_underscore_in_name(self, tmp_template: Path, tmp_dest: Path) -> None:
         """Underscores in folder_name are preserved verbatim in the prefixed folder name."""
         result = create_project(tmp_template, tmp_dest, "My_Project")
-        assert result.name == "TS-SAE-My_Project"
+        assert result.name == "SAE-My_Project"
         assert result.is_dir()
 
     def test_dot_in_name(self, tmp_template: Path, tmp_dest: Path) -> None:
         """Dots embedded in folder_name are preserved (e.g. version strings like v1.0.0)."""
         result = create_project(tmp_template, tmp_dest, "v1.0.0")
-        assert result.name == "TS-SAE-v1.0.0"
+        assert result.name == "SAE-v1.0.0"
         assert result.is_dir()
 
     def test_digits_in_name(self, tmp_template: Path, tmp_dest: Path) -> None:
-        """Digit characters in folder_name receive the TS-SAE- prefix correctly."""
+        """Digit characters in folder_name receive the SAE- prefix correctly."""
         result = create_project(tmp_template, tmp_dest, "Project2025")
-        assert result.name == "TS-SAE-Project2025"
+        assert result.name == "SAE-Project2025"
         assert result.is_dir()
 
     def test_prefix_is_exactly_ts_sae_uppercase_hyphen(
         self, tmp_template: Path, tmp_dest: Path
     ) -> None:
-        """The hardcoded prefix must be exactly 'TS-SAE-' — uppercase, hyphen-separated.
+        """The hardcoded prefix must be exactly 'SAE-' — uppercase, hyphen-separated.
 
-        Variations such as 'ts-sae-', 'TS_SAE_', or 'TSSAE' are NOT acceptable.
+        Variations such as 'SAE-', 'TS_SAE_', or 'TSSAE' are NOT acceptable.
         This test guards against accidental edits to the prefix constant.
         """
         result = create_project(tmp_template, tmp_dest, "CheckPrefix")
-        assert result.name.startswith("TS-SAE-"), (
-            f"Prefix must be exactly 'TS-SAE-' but got: {result.name!r}"
+        assert result.name.startswith("SAE-"), (
+            f"Prefix must be exactly 'SAE-' but got: {result.name!r}"
         )
-        assert result.name == "TS-SAE-CheckPrefix"
+        assert result.name == "SAE-CheckPrefix"
 
 
 # ---------------------------------------------------------------------------
@@ -95,14 +95,14 @@ class TestEmptyFolderName:
     def test_empty_name_creates_prefix_only_folder(
         self, tmp_template: Path, tmp_dest: Path
     ) -> None:
-        """An empty folder_name creates a folder named 'TS-SAE-' (prefix only).
+        """An empty folder_name creates a folder named 'SAE-' (prefix only).
 
         This edge case is only reachable via direct API usage — the GUI rejects
         empty names through validate_folder_name().  The function must not raise;
         it should create the directory on disk.
         """
         result = create_project(tmp_template, tmp_dest, "")
-        assert result.name == "TS-SAE-"
+        assert result.name == "SAE-"
         assert result.is_dir()
 
 
@@ -116,13 +116,13 @@ class TestVeryLongFolderName:
     ) -> None:
         """A 100-character name is within OS path limits and must receive the prefix.
 
-        With 'TS-SAE-' (7 chars) prepended the total folder name becomes 107 chars,
+        With 'SAE-' (7 chars) prepended the total folder name becomes 107 chars,
         well within the 255-char POSIX filename limit and leaves enough room under
         the Windows MAX_PATH (260) for a typical pytest tmp_path prefix.
         """
         long_name = "X" * 100
         result = create_project(tmp_template, tmp_dest, long_name)
-        assert result.name == f"TS-SAE-{long_name}"
+        assert result.name == f"SAE-{long_name}"
         assert result.is_dir()
 
 
@@ -134,7 +134,7 @@ class TestUnicodeNames:
     def test_latin_extended_unicode(self, tmp_template: Path, tmp_dest: Path) -> None:
         """Latin-extended Unicode (accented characters) in folder_name is supported."""
         result = create_project(tmp_template, tmp_dest, "Café")
-        assert result.name == "TS-SAE-Café"
+        assert result.name == "SAE-Café"
         assert result.is_dir()
 
     def test_cjk_unicode_name(self, tmp_template: Path, tmp_dest: Path) -> None:
@@ -143,7 +143,7 @@ class TestUnicodeNames:
         Modern Windows, macOS, and Linux filesystems all support Unicode file names.
         """
         result = create_project(tmp_template, tmp_dest, "プロジェクト")
-        assert result.name == "TS-SAE-プロジェクト"
+        assert result.name == "SAE-プロジェクト"
         assert result.is_dir()
 
 
@@ -152,33 +152,33 @@ class TestUnicodeNames:
 # ---------------------------------------------------------------------------
 
 class TestCasePreservation:
-    """The TS-SAE- prefix is always uppercase; the user-supplied name is never
+    """The SAE- prefix is always uppercase; the user-supplied name is never
     normalised — case is preserved exactly as provided by the caller."""
 
     def test_mixed_case_preserved(self, tmp_template: Path, tmp_dest: Path) -> None:
         """Mixed-case folder_name is stored exactly as provided."""
         result = create_project(tmp_template, tmp_dest, "MixedCASEname")
-        assert result.name == "TS-SAE-MixedCASEname"
+        assert result.name == "SAE-MixedCASEname"
 
     def test_all_lowercase_not_capitalised(self, tmp_template: Path, tmp_dest: Path) -> None:
         """Fully lowercase folder_name is NOT capitalised by create_project."""
         result = create_project(tmp_template, tmp_dest, "alllowercase")
-        assert result.name == "TS-SAE-alllowercase"
+        assert result.name == "SAE-alllowercase"
 
     def test_all_uppercase_preserved(self, tmp_template: Path, tmp_dest: Path) -> None:
         """Fully uppercase folder_name is NOT lowercased by create_project."""
         result = create_project(tmp_template, tmp_dest, "ALLUPPERCASE")
-        assert result.name == "TS-SAE-ALLUPPERCASE"
+        assert result.name == "SAE-ALLUPPERCASE"
 
 
 # ---------------------------------------------------------------------------
-# Path-traversal 2-level boundary (TS-SAE- absorb effect)
+# Path-traversal 2-level boundary (SAE- absorb effect)
 # ---------------------------------------------------------------------------
 
 class TestTwoLevelTraversalBoundary:
-    """The TS-SAE- prefix introduces one extra path component.
+    """The SAE- prefix introduces one extra path component.
 
-    When path normalization resolves the prefixed name the 'TS-SAE-..' component
+    When path normalization resolves the prefixed name the 'SAE-..' component
     is treated as a literal directory name.  A subsequent '..' pops only that
     component, returning to destination.  Therefore a 2-level traversal attempt
     ('../../x') resolves to dest/x — still inside the destination — and does NOT

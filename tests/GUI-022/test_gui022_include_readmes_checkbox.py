@@ -1,4 +1,4 @@
-"""Tests for GUI-022 — Include README files checkbox in the launcher.
+﻿"""Tests for GUI-022 — Include README files checkbox in the launcher.
 
 Covers:
 1. include_readmes_checkbox attribute exists on App after _build_ui
@@ -182,7 +182,7 @@ class TestCreateProjectReceivesIncludeReadmes:
             destination=str(tmp_path),
             template="Agent Workbench",
         )
-        created = tmp_path / "TS-SAE-DemoProject"
+        created = tmp_path / "SAE-DemoProject"
 
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
@@ -208,7 +208,7 @@ class TestCreateProjectReceivesIncludeReadmes:
             destination=str(tmp_path),
             template="Agent Workbench",
         )
-        created = tmp_path / "TS-SAE-DemoProject"
+        created = tmp_path / "SAE-DemoProject"
 
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
@@ -244,7 +244,7 @@ class TestCreateProjectStubParam:
         result = create_project(
             template_dir, dest_dir, "MyProject", include_readmes=True
         )
-        assert result.name == "TS-SAE-MyProject"
+        assert result.name == "SAE-MyProject"
 
     def test_create_project_accepts_include_readmes_false(self, tmp_path: Path) -> None:
         """create_project() must accept include_readmes=False without raising."""
@@ -259,7 +259,7 @@ class TestCreateProjectStubParam:
         result = create_project(
             template_dir, dest_dir, "MyProject2", include_readmes=False
         )
-        assert result.name == "TS-SAE-MyProject2"
+        assert result.name == "SAE-MyProject2"
 
     def test_create_project_include_readmes_default_is_true(self, tmp_path: Path) -> None:
         """create_project() default for include_readmes must be True."""

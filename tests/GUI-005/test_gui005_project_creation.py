@@ -1,4 +1,4 @@
-"""Tests for GUI-005: Project Creation Logic.
+﻿"""Tests for GUI-005: Project Creation Logic.
 
 Tests cover the _on_create_project() handler in App, verifying:
 - Inline validation errors are shown for invalid inputs.
@@ -389,7 +389,7 @@ class TestCreateProjectCoreFunction:
         dest = tmp_path / "dest"
         dest.mkdir()
         result = create_project(template, dest, "my-project")
-        assert result == dest / "TS-SAE-my-project"
+        assert result == dest / "SAE-my-project"
 
     def test_files_are_actually_copied(self, tmp_path):
         from launcher.core.project_creator import create_project
@@ -433,7 +433,7 @@ class TestCreateProjectCoreFunction:
         template.mkdir()
         dest = tmp_path / "dest"
         dest.mkdir()
-        # With the TS-SAE- prefix, 3 levels are needed to escape dest.
+        # With the SAE- prefix, 3 levels are needed to escape dest.
         with pytest.raises(ValueError, match="path traversal"):
             create_project(template, dest, "../../../etc")
 
@@ -443,7 +443,7 @@ class TestCreateProjectCoreFunction:
         template.mkdir()
         dest = tmp_path / "dest"
         dest.mkdir()
-        # With the TS-SAE- prefix, 3 levels are needed to escape dest.
+        # With the SAE- prefix, 3 levels are needed to escape dest.
         with pytest.raises(ValueError, match="path traversal"):
             create_project(template, dest, "../../../sibling")
 
@@ -456,7 +456,7 @@ class TestCreateProjectCoreFunction:
         (template / "a.txt").write_text("x")
         dest = tmp_path / "dest"
         dest.mkdir()
-        (dest / "TS-SAE-proj").mkdir()  # pre-create target → copytree fails
+        (dest / "SAE-proj").mkdir()  # pre-create target → copytree fails
         with pytest.raises(Exception):
             create_project(template, dest, "proj")
 

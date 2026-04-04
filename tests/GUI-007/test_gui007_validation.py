@@ -1,4 +1,4 @@
-"""Tests for GUI-007: Input Validation & Error UX.
+﻿"""Tests for GUI-007: Input Validation & Error UX.
 
 Verifies that all user-input validation scenarios produce the correct outcome
 and that the App inline error labels behave correctly.
@@ -372,7 +372,7 @@ class TestOnCreateProjectDestinationErrors:
 
 class TestOnCreateProjectDuplicate:
     def test_duplicate_folder_shows_name_error_label(self, tmp_path: Path):
-        (tmp_path / "TS-SAE-myproject").mkdir()
+        (tmp_path / "SAE-myproject").mkdir()
         app = _make_app(project_name="myproject", destination=str(tmp_path))
         app._on_create_project()
         calls_with_error = [
@@ -383,7 +383,7 @@ class TestOnCreateProjectDuplicate:
 
     def test_duplicate_message_mentions_folder_name(self, tmp_path: Path):
         folder_name = "uniquefolderxyz"
-        (tmp_path / f"TS-SAE-{folder_name}").mkdir()
+        (tmp_path / f"SAE-{folder_name}").mkdir()
         app = _make_app(project_name=folder_name, destination=str(tmp_path))
         app._on_create_project()
         error_texts = [
@@ -391,7 +391,7 @@ class TestOnCreateProjectDuplicate:
             for c in app.project_name_error_label.configure.call_args_list
             if c[1].get("text", "") not in ("", None)
         ]
-        assert any(f"TS-SAE-{folder_name}" in t for t in error_texts)
+        assert any(f"SAE-{folder_name}" in t for t in error_texts)
 
 
 class TestOnCreateProjectErrorClearing:

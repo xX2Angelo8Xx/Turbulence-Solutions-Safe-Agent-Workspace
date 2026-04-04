@@ -1,4 +1,4 @@
-"""Tester Agent additions for GUI-007: Input Validation & Error UX.
+﻿"""Tester Agent additions for GUI-007: Input Validation & Error UX.
 
 Additional edge cases beyond the developer tests and prior edge-case coverage.
 
@@ -368,9 +368,9 @@ class TestOnCreateProjectAdditionalIntegration:
 
     def test_duplicate_folder_check_uses_stripped_name(self, tmp_path: Path):
         """The app strips the name before passing it to check_duplicate_folder;
-        a folder named 'TS-SAE-myproject' must still be detected when the user
+        a folder named 'SAE-myproject' must still be detected when the user
         types ' myproject ' (with surrounding spaces)."""
-        (tmp_path / "TS-SAE-myproject").mkdir()
+        (tmp_path / "SAE-myproject").mkdir()
         # The app strips input — so ' myproject ' becomes 'myproject', then prefixed
         app = _make_app(project_name=" myproject ", destination=str(tmp_path))
         app._on_create_project()

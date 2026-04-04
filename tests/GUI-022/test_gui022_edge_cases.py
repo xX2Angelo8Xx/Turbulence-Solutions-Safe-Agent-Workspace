@@ -187,7 +187,7 @@ class TestCreateProjectValueIntegrity:
         app.counter_threshold_var = MagicMock()
         app.counter_threshold_var.get.return_value = "20"
 
-        created = tmp_path / "TS-SAE-EdgeCaseProject"
+        created = tmp_path / "SAE-EdgeCaseProject"
 
         with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \

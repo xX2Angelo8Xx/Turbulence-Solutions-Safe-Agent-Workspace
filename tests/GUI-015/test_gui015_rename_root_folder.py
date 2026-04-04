@@ -1,6 +1,6 @@
-"""Tests for GUI-015 — Rename Root Folder to TS-SAE-{ProjectName}.
+﻿"""Tests for GUI-015 — Rename Root Folder to SAE-{ProjectName}.
 
-Verifies that create_project() prepends the TS-SAE- prefix to the folder
+Verifies that create_project() prepends the SAE- prefix to the folder
 name and that the duplicate-folder check in _on_create_project() looks for
 the prefixed name at the destination.
 """
@@ -43,9 +43,9 @@ def tmp_dest(tmp_path: Path) -> Path:
 
 class TestCreateProjectPrefix:
     def test_creates_ts_sae_prefixed_folder(self, tmp_template: Path, tmp_dest: Path) -> None:
-        """Root folder name must be TS-SAE-{folder_name}."""
+        """Root folder name must be SAE-{folder_name}."""
         result = create_project(tmp_template, tmp_dest, "MatlabDemo")
-        assert result.name == "TS-SAE-MatlabDemo"
+        assert result.name == "SAE-MatlabDemo"
 
     def test_returned_path_is_under_destination(self, tmp_template: Path, tmp_dest: Path) -> None:
         """create_project() returns a path inside the destination directory."""
@@ -53,10 +53,10 @@ class TestCreateProjectPrefix:
         assert result.parent.resolve() == tmp_dest.resolve()
 
     def test_folder_physically_created_on_disk(self, tmp_template: Path, tmp_dest: Path) -> None:
-        """The TS-SAE- prefixed folder must exist on disk after creation."""
+        """The SAE- prefixed folder must exist on disk after creation."""
         result = create_project(tmp_template, tmp_dest, "TestProject")
         assert result.is_dir()
-        assert (tmp_dest / "TS-SAE-TestProject").is_dir()
+        assert (tmp_dest / "SAE-TestProject").is_dir()
 
     def test_raw_name_folder_not_created(self, tmp_template: Path, tmp_dest: Path) -> None:
         """A folder with only the raw (unprefixed) name must NOT be created."""
@@ -73,12 +73,12 @@ class TestCreateProjectPrefix:
         names = ["Alpha", "Beta123", "My_Project"]
         for name in names:
             result = create_project(tmp_template, tmp_dest, name)
-            assert result.name == f"TS-SAE-{name}", f"Expected TS-SAE-{name}, got {result.name}"
+            assert result.name == f"SAE-{name}", f"Expected SAE-{name}, got {result.name}"
 
     def test_returned_path_equals_ts_sae_path(self, tmp_template: Path, tmp_dest: Path) -> None:
-        """The return value resolves to destination/TS-SAE-{folder_name}."""
+        """The return value resolves to destination/SAE-{folder_name}."""
         result = create_project(tmp_template, tmp_dest, "Widget")
-        expected = (tmp_dest / "TS-SAE-Widget").resolve()
+        expected = (tmp_dest / "SAE-Widget").resolve()
         assert result.resolve() == expected
 
 
@@ -90,8 +90,8 @@ class TestCreateProjectTraversalGuard:
     def test_path_traversal_still_rejected(self, tmp_template: Path, tmp_dest: Path) -> None:
         """Path-traversal attempt in folder_name must still raise ValueError.
 
-        Note: with the TS-SAE- prefix, 'TS-SAE-' + '../../escape' creates a path
-        where the first '..' only cancels the 'TS-SAE-..' component (back to dest).
+        Note: with the SAE- prefix, 'SAE-' + '../../escape' creates a path
+        where the first '..' only cancels the 'SAE-..' component (back to dest).
         A 3-level traversal '../../../escape' does escape dest and must be blocked.
         """
         with pytest.raises(ValueError, match="path traversal"):
@@ -100,7 +100,7 @@ class TestCreateProjectTraversalGuard:
     def test_normal_name_is_not_rejected(self, tmp_template: Path, tmp_dest: Path) -> None:
         """A benign folder name must not trigger the traversal guard."""
         result = create_project(tmp_template, tmp_dest, "SafeName")
-        assert result.name == "TS-SAE-SafeName"
+        assert result.name == "SAE-SafeName"
 
 
 # ---------------------------------------------------------------------------
@@ -131,20 +131,20 @@ class TestCreateProjectErrors:
 
 class TestDuplicateFolderCheck:
     def test_duplicate_check_uses_ts_sae_prefix(self, tmp_dest: Path) -> None:
-        """check_duplicate_folder('TS-SAE-X', dest) returns True if TS-SAE-X exists."""
+        """check_duplicate_folder('SAE-X', dest) returns True if SAE-X exists."""
         from launcher.gui.validation import check_duplicate_folder
 
-        prefixed = tmp_dest / "TS-SAE-Existing"
+        prefixed = tmp_dest / "SAE-Existing"
         prefixed.mkdir()
 
         # The prefixed name check must find the folder.
-        assert check_duplicate_folder("TS-SAE-Existing", str(tmp_dest)) is True
+        assert check_duplicate_folder("SAE-Existing", str(tmp_dest)) is True
 
     def test_duplicate_check_raw_name_does_not_collide(self, tmp_dest: Path) -> None:
-        """Raw folder name alone should NOT trigger duplicate when only TS-SAE- exists."""
+        """Raw folder name alone should NOT trigger duplicate when only SAE- exists."""
         from launcher.gui.validation import check_duplicate_folder
 
-        prefixed = tmp_dest / "TS-SAE-NoDupe"
+        prefixed = tmp_dest / "SAE-NoDupe"
         prefixed.mkdir()
 
         # The unprefixed name doesn't exist, so no collision.
@@ -153,11 +153,11 @@ class TestDuplicateFolderCheck:
     def test_on_create_project_duplicate_guard_uses_prefix(
         self, tmp_template: Path, tmp_dest: Path
     ) -> None:
-        """_on_create_project must show an error when TS-SAE-{name} already exists."""
+        """_on_create_project must show an error when SAE-{name} already exists."""
         from unittest.mock import MagicMock, patch
 
         # Pre-create the prefixed folder so the duplicate check triggers.
-        (tmp_dest / "TS-SAE-AlreadyHere").mkdir()
+        (tmp_dest / "SAE-AlreadyHere").mkdir()
 
         with (
             patch("launcher.gui.app.TEMPLATES_DIR", tmp_template.parent),
@@ -186,4 +186,4 @@ class TestDuplicateFolderCheck:
             app.project_name_error_label.configure.assert_called()
             call_kwargs = app.project_name_error_label.configure.call_args
             error_text = call_kwargs[1].get("text") or call_kwargs[0][0]
-            assert "TS-SAE-AlreadyHere" in error_text
+            assert "SAE-AlreadyHere" in error_text

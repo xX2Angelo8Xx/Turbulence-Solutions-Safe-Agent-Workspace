@@ -82,11 +82,11 @@ def test_coding_instructions_exists():
 
 
 def test_coding_prompts_review_exists():
-    assert (CODING_TEMPLATE / ".github" / "prompts" / "review.prompt.md").is_file()
+    assert (CODING_TEMPLATE / ".github" / "prompts" / "critical-review.prompt.md").is_file()
 
 
 def test_coding_skill_exists():
-    assert (CODING_TEMPLATE / ".github" / "skills" / "ts-code-review" / "SKILL.md").is_file()
+    assert (CODING_TEMPLATE / ".github" / "skills" / "agentdocs-update" / "SKILL.md").is_file()
 
 
 # ---------------------------------------------------------------------------
@@ -120,15 +120,15 @@ def test_coding_project_dir_exists():
 
 
 def test_coding_project_app_exists():
-    assert (CODING_TEMPLATE / "Project" / "app.py").is_file()
+    assert (CODING_TEMPLATE / "Project" / "AgentDocs" / "AGENT-RULES.md").is_file()
 
 
 def test_coding_project_readme_exists():
-    assert (CODING_TEMPLATE / "Project" / "README.md").is_file()
+    assert (CODING_TEMPLATE / "Project" / "AgentDocs" / "architecture.md").is_file()
 
 
 def test_coding_project_requirements_exists():
-    assert (CODING_TEMPLATE / "Project" / "requirements.txt").is_file()
+    assert (CODING_TEMPLATE / "Project" / "AgentDocs" / "decisions.md").is_file()
 
 
 # ---------------------------------------------------------------------------
@@ -283,7 +283,7 @@ def test_template_discoverable_and_copyable():
         assert (result / ".github" / "hooks" / "require-approval.json").is_file()
         assert (result / ".github" / "hooks" / "scripts" / "security_gate.py").is_file()
         # GUI-016: 'Project/' is renamed to the user's project name after copytree.
-        assert (result / "test-project" / "app.py").is_file()
+        assert (result / "test-project" / "AgentDocs" / "AGENT-RULES.md").is_file()
 
 
 # ---------------------------------------------------------------------------

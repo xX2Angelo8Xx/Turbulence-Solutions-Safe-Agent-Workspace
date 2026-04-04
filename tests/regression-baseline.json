@@ -1,7 +1,7 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 643,
-  "_updated": "2026-04-04",
+  "_count": 610,
+  "_updated": "2026-04-07",
   "known_failures": {
     "tests.DOC-004.test_doc004_project_readme_placeholders.test_both_readmes_are_identical": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
@@ -1576,105 +1576,6 @@
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.FIX-091.test_fix091_template_files.test_readme_still_exists": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-005.test_gui005_project_creation.TestCreateProjectCoreFunction.test_existing_target_directory_raises_error": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-005.test_gui005_project_creation.TestCreateProjectCoreFunction.test_returns_correct_target_path": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-007.test_gui007_tester_additions.TestOnCreateProjectAdditionalIntegration.test_duplicate_folder_check_uses_stripped_name": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-007.test_gui007_validation.TestOnCreateProjectDuplicate.test_duplicate_folder_shows_name_error_label": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-007.test_gui007_validation.TestOnCreateProjectDuplicate.test_duplicate_message_mentions_folder_name": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectPrefix.test_creates_ts_sae_prefixed_folder": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectPrefix.test_different_folder_names_all_get_prefix": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectPrefix.test_folder_physically_created_on_disk": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectPrefix.test_returned_path_equals_ts_sae_path": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_rename_root_folder.TestCreateProjectTraversalGuard.test_normal_name_is_not_rejected": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_rename_root_folder.TestDuplicateFolderCheck.test_on_create_project_duplicate_guard_uses_prefix": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestCasePreservation.test_all_lowercase_not_capitalised": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestCasePreservation.test_all_uppercase_preserved": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestCasePreservation.test_mixed_case_preserved": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestEmptyFolderName.test_empty_name_creates_prefix_only_folder": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_digits_in_name": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_dot_in_name": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_hyphen_in_name": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_prefix_is_exactly_ts_sae_uppercase_hyphen": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestSpecialCharactersInName.test_underscore_in_name": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestUnicodeNames.test_cjk_unicode_name": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestUnicodeNames.test_latin_extended_unicode": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-015.test_gui015_tester_edge_cases.TestVeryLongFolderName.test_100_char_name_receives_prefix": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-016.test_gui016_rename_project_folder.TestRenameProjectFolder.test_root_folder_still_ts_sae_prefixed": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-020.test_gui020_create_project_integration.TestCreateProjectWritesCounterConfig.test_workspace_folder_prefixed_with_ts_sae": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-022.test_gui022_include_readmes_checkbox.TestCreateProjectStubParam.test_create_project_accepts_include_readmes_false": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.GUI-022.test_gui022_include_readmes_checkbox.TestCreateProjectStubParam.test_create_project_accepts_include_readmes_true": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-004.test_ins004_template_bundling.test_coding_project_app_exists": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-004.test_ins004_template_bundling.test_coding_project_readme_exists": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-004.test_ins004_template_bundling.test_coding_project_requirements_exists": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-004.test_ins004_template_bundling.test_coding_prompts_review_exists": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-004.test_ins004_template_bundling.test_coding_skill_exists": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-004.test_ins004_template_bundling.test_template_discoverable_and_copyable": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.INS-006.test_ins006_edge_cases.TestLineEndings.test_no_bare_cr": {

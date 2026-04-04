@@ -217,7 +217,7 @@ class TestReadonlyReadme:
             # The README.md should be gone or (if skipped) it may still exist
         except PermissionError as exc:
             # Restore permission so pytest cleanup works
-            readme_in_dest = dest / "TS-SAE-EdgeTest" / "README.md"
+            readme_in_dest = dest / "SAE-EdgeTest" / "README.md"
             if readme_in_dest.exists():
                 readme_in_dest.chmod(stat.S_IREAD | stat.S_IWRITE)
             pytest.fail(
@@ -228,7 +228,7 @@ class TestReadonlyReadme:
         finally:
             # Always restore write permission for pytest cleanup
             readme_in_tpl.chmod(stat.S_IREAD | stat.S_IWRITE)
-            readme_in_dest = dest / "TS-SAE-EdgeTest" / "README.md"
+            readme_in_dest = dest / "SAE-EdgeTest" / "README.md"
             if readme_in_dest.exists():
                 readme_in_dest.chmod(stat.S_IREAD | stat.S_IWRITE)
 
