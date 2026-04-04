@@ -126,3 +126,11 @@ git push origin --delete <branch-name>
 **If `finalize_wp.py` is unavailable**, the agent or developer responsible for the merge MUST perform the deletion steps above manually before any other work begins.
 
 Failure to delete merged branches is a workflow violation and will be flagged in the next maintenance audit.
+
+---
+
+## GitHub Branch Protection
+
+The `main` branch must have GitHub branch protection rules configured to enforce PR reviews and CI checks. These rules cannot be set by code — a repository admin must apply them manually.
+
+See [branch-protection.md](branch-protection.md) for the full step-by-step configuration guide.

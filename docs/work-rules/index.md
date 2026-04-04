@@ -11,6 +11,7 @@ Central hub for all project rules, workflows, and protocols. Every rule in this 
 | Work on a workpackage | [workpackage-rules.md](workpackage-rules.md) |
 | Understand or create user stories | [user-story-rules.md](user-story-rules.md) |
 | Commit code or create a branch | [commit-branch-rules.md](commit-branch-rules.md) |
+| Configure GitHub branch protection | [branch-protection.md](branch-protection.md) |
 | Write or review code | [coding-standards.md](coding-standards.md) |
 | Understand security requirements | [security-rules.md](security-rules.md) |
 | Log or fix a bug | [bug-tracking-rules.md](bug-tracking-rules.md) |
