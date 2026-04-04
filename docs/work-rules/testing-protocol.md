@@ -199,6 +199,59 @@ The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages
 <PASS — mark WP as Done> OR <FAIL — return to Developer with details above>
 ```
 
+---
+
+## Test Maintenance During Refactors
+
+Keeping tests green is a **joint responsibility** of the developer who changes the code and the developer who merges the change. The following rules are mandatory and must be followed without exception.
+
+### The Rule
+
+**Any code change that alters externally-asserted behavior MUST update all affected test assertions in the same commit or PR.**
+
+"Externally-asserted behavior" includes, but is not limited to:
+- **File paths and directory names** (e.g., renaming `templates/coding/` to `templates/agent-workbench/`)
+- **Identifiers and prefixes** (e.g., renaming `TS-SAE-` to `SAE-` in WP IDs or test IDs)
+- **Version strings** (e.g., changing `3.2.x` to `3.3.x` in source files that tests read)
+- **Data formats and schemas** (e.g., migrating from CSV to JSONL)
+- **Agent file content, names, or structure** (e.g., rewriting `.agent.md` files that tests assert against)
+- **Any key, field, or constant that a test imports, reads, or string-matches**
+
+### What "Permanent" Means
+
+The rule "Test scripts are permanent" (see [Test Script Preservation](#test-script-preservation)) means tests are **never deleted** — but it does **not** mean test assertions are frozen. Assertions must track the current codebase state at all times.
+
+| Rule | Meaning |
+|------|---------|
+| Tests are permanent | The test file survives in `tests/<WP-ID>/` forever. |
+| Assertions track code | When the code changes, the assertions change with it — in the same commit. |
+
+### Developer Checklist for Refactors
+
+Before opening a PR that renames, moves, or reformats anything, the Developer MUST:
+
+1. **grep the test suite** for the old name/path/format:
+   ```powershell
+   # Example: renaming a directory
+   grep -r "templates/coding" tests/
+
+   # Example: renaming a prefix
+   grep -r "TS-SAE-" tests/
+   ```
+2. **Update every matching assertion** — no exceptions, no deferrals.
+3. **Run the full test suite** via `scripts/run_tests.py` and confirm all existing tests still pass.
+4. **Include the test updates in the same commit as the refactor** — they are not separate work.
+
+Failure to do so is a process violation. The Tester and CI gate are the backstop, not the primary defense.
+
+### Root Cause Warning — Learning from History
+
+Between 2025 and 2026, five waves of codebase evolution each broke a batch of tests without updating them. The cumulative drift (~688 known failures + ~400 uncovered) blocked multiple CI releases and required a dedicated multi-WP remediation (FIX-103 through FIX-107, MNT-024, DOC-059). See **ADR-008** (`docs/decisions/ADR-008-tests-track-code.md`) for the full root cause analysis.
+
+**Do not let drift accumulate.** Fix test assertions at the point of change — never later.
+
+---
+
 ## Minimum Standards
 
 - **No workpackage moves to `Done` without logged test results** in both the JSONL file and the WP's test-report.md.

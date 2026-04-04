@@ -5,3 +5,4 @@
 {"ADR-ID": "ADR-005", "Title": "No Rollback UI — Use GitHub Releases", "Status": "Active", "Date": "2026-04-03", "Related WPs": ["DOC-053"], "Superseded By": ""}
 {"ADR-ID": "ADR-006", "Title": "Defer Code Signing", "Status": "Active", "Date": "2026-04-03", "Related WPs": ["DOC-053"], "Superseded By": ""}
 {"ADR-ID": "ADR-007", "Title": "Migrate from CSV to JSONL for All Data Files", "Status": "Active", "Date": "2026-04-04", "Related WPs": ["MNT-014", "MNT-015", "MNT-016", "MNT-017", "MNT-018", "MNT-019", "MNT-020", "MNT-021", "MNT-022", "MNT-023"], "Superseded By": ""}
+{"ADR-ID": "ADR-008", "Title": "Tests Must Track Current Codebase State", "Status": "Active", "Date": "2026-04-04", "Related WPs": ["FIX-103", "FIX-104", "FIX-105", "FIX-106", "FIX-107", "MNT-024", "DOC-059"], "Superseded By": ""}
