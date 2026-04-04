@@ -20,7 +20,7 @@ Central hub for all project rules, workflows, and protocols. Every rule in this 
 | Recover from failures | [recovery.md](recovery.md) |
 | Review or create architecture decisions | [../decisions/ADR-TEMPLATE.md](../decisions/ADR-TEMPLATE.md) and [../decisions/index.csv](../decisions/index.csv) |
 | Onboard as an AI agent | [agent-workflow.md](agent-workflow.md) |
-| Use a helper script | [../scripts/README.md](../../scripts/README.md) |
+| Use a helper script | [scripts/README.md](../../scripts/README.md) |
 ---
 
 ## Key Project Files

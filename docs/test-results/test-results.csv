@@ -2413,3 +2413,4 @@
 "TST-2532","MNT-012: targeted suite","Unit","MNT-012","Pass","2026-04-04","Windows 11 + Python 3.11","9 passed in 0.24s",""
 "TST-2533","MNT-012: full regression suite","Regression","MNT-012","Fail","2026-04-04","Windows 11 + Python 3.11","8180 passed, 37 skipped, 5 xfailed, 2 warnings, 50 errors in 130.52s (0:02:10)",""
 "TST-2534","MNT-012: targeted suite","Regression","MNT-012","Pass","2026-04-04","Windows 11 + Python 3.11","9 passed in 0.24s",""
+"TST-2535","DOC-055: targeted suite","Unit","DOC-055","Pass","2026-04-04","Windows 11 + Python 3.11","6 passed in 0.23s",""
