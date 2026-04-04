@@ -1,8 +1,8 @@
 # FIX-106 Test Report — Fix CI, codesign, and security test assertions
 
 **Tester**: Tester Agent  
-**Date**: 2026-04-04  
-**Verdict**: FAIL  
+**Date**: 2026-04-04 (Iteration 1) / 2026-04-07 (Iteration 2)  
+**Verdict**: PASS (Iteration 2)  
 
 ---
 
@@ -129,7 +129,7 @@ All checks passed.
 
 ---
 
-## Verdict: FAIL
+## Verdict: FAIL (Iteration 1)
 
 ### Required TODOs for Developer
 
@@ -146,3 +146,64 @@ All checks passed.
 Update `_count` from 577 → 578 and `_updated` to today's date.
 
 **Note**: This is the only blocking item. All 249 targeted tests pass. Production code changes are functionally correct.
+
+---
+
+## Iteration 2 — Tester Re-Review (2026-04-07)
+
+### Verified Fixes
+
+**TODO-1 Resolution**: ✅ DOC-010 entry correctly added to `tests/regression-baseline.json`:
+- Entry present with correct `reason`, `bug_id: "BUG-189"`, `wp_id: "FIX-106"`.
+- `_count` updated to 578 — matches actual 578 entries (verified programmatically). ✅
+- `_updated` set to `2026-04-07`. ✅
+
+### Iteration 2 Test Results
+
+**FIX-106 Targeted Suite (249 tests):**
+
+| Test Suite | Passed | Skipped | Failed |
+|------------|--------|---------|--------|
+| tests/FIX-028/ | ✅ | - | 0 |
+| tests/FIX-029/ | ✅ | - | 0 |
+| tests/FIX-031/ | ✅ | - | 0 |
+| tests/FIX-037/ | ✅ | - | 0 |
+| tests/FIX-038/ | ✅ | - | 0 |
+| tests/FIX-039/ | ✅ | - | 0 |
+| tests/INS-013/ | ✅ | - | 0 |
+| tests/INS-014/ | ✅ | - | 0 |
+| tests/INS-015/ | ✅ | - | 0 |
+| tests/INS-017/ | ✅ | - | 0 |
+| tests/FIX-106/ | ✅ (10) | - | 0 |
+| **Total** | **249 passed** | **22 skipped** | **0** |
+
+**Full Regression Suite:**
+
+| Metric | Value |
+|--------|-------|
+| Total passing | 8,644 |
+| Total failing | 521 |
+| In regression baseline | 521 |
+| **New regressions** | **0** |
+| Skipped | 39 |
+| Errors | 50 |
+
+New-regression check performed by parsing JUnit XML against `tests/regression-baseline.json` — 0 failures outside baseline. ✅
+
+**Logged**: TST-2594 (Iteration 2 full suite — Pass)
+
+### `validate_workspace.py`
+
+```
+python scripts/validate_workspace.py --wp FIX-106
+Passed with 1 warning(s).
+[WARN] BUG-189 referenced in FIX-106 dev-log/test-report but Fixed In WP is empty or doesn't match
+```
+
+Warning is expected: BUG-189 tracks the fragile DOC-010 test design issue — it is not "fixed" by FIX-106, only acknowledged in the baseline. This is correct behaviour.
+
+---
+
+## Verdict: PASS (Iteration 2)
+
+All blocking issues resolved. Zero new regressions. FIX-106 is approved for `Done`.
