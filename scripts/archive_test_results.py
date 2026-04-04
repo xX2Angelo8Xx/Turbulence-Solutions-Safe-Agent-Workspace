@@ -14,20 +14,20 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import REPO_ROOT, FileLock, read_csv, write_csv
+from jsonl_utils import REPO_ROOT, FileLock, read_jsonl, write_jsonl
 
-TST_CSV = REPO_ROOT / "docs" / "test-results" / "test-results.csv"
-ARCHIVE_CSV = REPO_ROOT / "docs" / "test-results" / "archived-test-results.csv"
-WP_CSV = REPO_ROOT / "docs" / "workpackages" / "workpackages.csv"
+TST_JSONL = REPO_ROOT / "docs" / "test-results" / "test-results.jsonl"
+ARCHIVE_JSONL = REPO_ROOT / "docs" / "test-results" / "archived-test-results.jsonl"
+WP_JSONL = REPO_ROOT / "docs" / "workpackages" / "workpackages.jsonl"
 
 
 def archive(dry_run: bool) -> int:
     # Get all Done WP IDs
-    _, wp_rows = read_csv(WP_CSV)
+    _, wp_rows = read_jsonl(WP_JSONL)
     done_wps = {r["ID"] for r in wp_rows if r.get("Status") == "Done"}
 
-    with FileLock(TST_CSV):
-        fieldnames, rows = read_csv(TST_CSV)
+    with FileLock(TST_JSONL):
+        fieldnames, rows = read_jsonl(TST_JSONL)
 
         keep = []
         to_archive = []
@@ -51,19 +51,19 @@ def archive(dry_run: bool) -> int:
             return 0
 
         # Append to archive file (create if needed)
-        if ARCHIVE_CSV.exists():
-            archive_fields, archive_rows = read_csv(ARCHIVE_CSV)
+        if ARCHIVE_JSONL.exists():
+            archive_fields, archive_rows = read_jsonl(ARCHIVE_JSONL)
         else:
             archive_fields = fieldnames
             archive_rows = []
 
         archive_rows.extend(to_archive)
-        write_csv(ARCHIVE_CSV, archive_fields, archive_rows)
+        write_jsonl(ARCHIVE_JSONL, archive_fields, archive_rows)
 
         # Rewrite active file with only non-archived rows
-        write_csv(TST_CSV, fieldnames, keep)
+        write_jsonl(TST_JSONL, fieldnames, keep)
 
-    print(f"Archived {len(to_archive)} rows to {ARCHIVE_CSV.name}")
+    print(f"Archived {len(to_archive)} rows to {ARCHIVE_JSONL.name}")
     print(f"Active file now has {len(keep)} rows")
     return 0
 

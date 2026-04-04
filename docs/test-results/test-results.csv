@@ -2432,3 +2432,6 @@
 "TST-2551","MNT-016: targeted suite","Unit","MNT-016","Pass","2026-04-04","Windows 11 + Python 3.11","26 passed in 0.49s",""
 "TST-2552","MNT-016: full regression suite","Regression","MNT-016","Fail","2026-04-04","Windows 11 + Python 3.11","8309 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 128.05s (0:02:08)",""
 "TST-2553","MNT-016: targeted suite","Unit","MNT-016","Pass","2026-04-04","Windows 11 + Python 3.11","43 passed in 0.67s",""
+"TST-2554","MNT-017: script migration tests","Unit","MNT-017","Pass","2026-04-04","Windows 11 + Python 3.11","41 passed, 0 failed","Import sanity, path constants, retired scripts, jsonl_structural, dedup, archive, update_bug_status, cascade handler tests"
+"TST-2555","MNT-017: full regression suite (Tester)","Regression","MNT-017","Fail","2026-04-04","Windows 11 + Python 3.11","8264 passed 721 failed 50 errors (all failures pre-existing in baseline + pre-baseline)","No new regressions from MNT-017"
+"TST-2556","MNT-017: targeted suite (Tester + edge cases)","Unit","MNT-017","Pass","2026-04-04","Windows 11 + Python 3.11","58 passed in 0.64s","41 dev tests + 17 tester edge-case tests: dedup, archive, duplicate IDs, ADR consistency, REPO_ROOT, US linked WPs append, empty file, corrupt JSONL"

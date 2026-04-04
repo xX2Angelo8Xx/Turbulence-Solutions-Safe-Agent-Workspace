@@ -19,9 +19,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import REPO_ROOT, locked_next_id_and_append
+from jsonl_utils import REPO_ROOT, locked_next_id_and_append
 
-CSV_PATH = REPO_ROOT / "docs" / "bugs" / "bugs.csv"
+JSONL_PATH = REPO_ROOT / "docs" / "bugs" / "bugs.jsonl"
 
 VALID_SEVERITIES = {"Critical", "High", "Medium", "Low"}
 
@@ -59,7 +59,7 @@ def main() -> int:
     }
 
     assigned_id = locked_next_id_and_append(
-        path=CSV_PATH,
+        path=JSONL_PATH,
         prefix="BUG",
         row_template=row,
         id_column="ID",

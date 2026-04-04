@@ -19,9 +19,9 @@ from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import REPO_ROOT, locked_next_id_and_append
+from jsonl_utils import REPO_ROOT, locked_next_id_and_append
 
-TST_CSV = REPO_ROOT / "docs" / "test-results" / "test-results.csv"
+TST_JSONL = REPO_ROOT / "docs" / "test-results" / "test-results.jsonl"
 TESTS_DIR = REPO_ROOT / "tests"
 
 VALID_TYPES = {"Unit", "Integration", "Security", "Regression", "Cross-platform"}
@@ -141,7 +141,7 @@ def main() -> int:
     }
 
     assigned_id = locked_next_id_and_append(
-        path=TST_CSV,
+        path=TST_JSONL,
         prefix="TST",
         row_template=row,
         id_column="ID",

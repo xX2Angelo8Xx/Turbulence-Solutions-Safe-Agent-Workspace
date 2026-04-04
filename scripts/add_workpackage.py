@@ -19,16 +19,16 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import (
+from jsonl_utils import (
     REPO_ROOT,
     FileLock,
     locked_next_id_and_append,
-    read_csv,
-    write_csv,
+    read_jsonl,
+    write_jsonl,
 )
 
-WP_CSV = REPO_ROOT / "docs" / "workpackages" / "workpackages.csv"
-US_CSV = REPO_ROOT / "docs" / "user-stories" / "user-stories.csv"
+WP_JSONL = REPO_ROOT / "docs" / "workpackages" / "workpackages.jsonl"
+US_JSONL = REPO_ROOT / "docs" / "user-stories" / "user-stories.jsonl"
 
 VALID_CATEGORIES = {"INS", "SAF", "GUI", "DOC", "FIX", "MNT"}
 
@@ -37,18 +37,21 @@ def _update_us_linked_wps(us_id: str, wp_id: str) -> None:
     """Add wp_id to the User Story's Linked WPs column."""
     if us_id == "Enabler":
         return
-    with FileLock(US_CSV):
-        fieldnames, rows = read_csv(US_CSV)
+    with FileLock(US_JSONL):
+        fieldnames, rows = read_jsonl(US_JSONL)
         for row in rows:
             if row.get("ID") == us_id:
-                existing = row.get("Linked WPs", "").strip()
-                wp_list = [w.strip() for w in existing.split(",") if w.strip()]
+                existing = row.get("Linked WPs", [])
+                if isinstance(existing, list):
+                    wp_list = existing[:]
+                else:
+                    wp_list = [w.strip() for w in existing.split(",") if w.strip()]
                 if wp_id not in wp_list:
                     wp_list.append(wp_id)
-                    row["Linked WPs"] = ", ".join(wp_list)
-                    write_csv(US_CSV, fieldnames, rows)
+                    row["Linked WPs"] = wp_list
+                    write_jsonl(US_JSONL, fieldnames, rows)
                 return
-        raise KeyError(f"User Story {us_id} not found in {US_CSV}")
+        raise KeyError(f"User Story {us_id} not found in {US_JSONL}")
 
 
 def main() -> int:
@@ -85,9 +88,9 @@ def main() -> int:
 
     # Validate US exists (unless Enabler)
     if args.user_story != "Enabler":
-        _, us_rows = read_csv(US_CSV)
+        _, us_rows = read_jsonl(US_JSONL)
         if not any(r.get("ID") == args.user_story for r in us_rows):
-            print(f"Error: User Story {args.user_story} not found in {US_CSV}")
+            print(f"Error: User Story {args.user_story} not found in {US_JSONL}")
             return 1
 
     row = {
@@ -104,7 +107,7 @@ def main() -> int:
     }
 
     assigned_id = locked_next_id_and_append(
-        path=WP_CSV,
+        path=WP_JSONL,
         prefix=category,
         row_template=row,
         id_column="ID",

@@ -3,15 +3,15 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import read_csv, write_csv, REPO_ROOT
+from jsonl_utils import read_jsonl, write_jsonl, REPO_ROOT
 
-WP_CSV = REPO_ROOT / "docs" / "workpackages" / "workpackages.csv"
-US_CSV = REPO_ROOT / "docs" / "user-stories" / "user-stories.csv"
+WP_JSONL = REPO_ROOT / "docs" / "workpackages" / "workpackages.jsonl"
+US_JSONL = REPO_ROOT / "docs" / "user-stories" / "user-stories.jsonl"
 
 
 def main():
     # Read current workpackages
-    wp_fields, wp_rows = read_csv(WP_CSV, strict=False)
+    wp_fields, wp_rows = read_jsonl(WP_JSONL)
 
     # Find next IDs for each category
     def next_id(prefix, rows):
@@ -153,11 +153,11 @@ def main():
         added.append(wp["ID"])
 
     # Write workpackages
-    write_csv(WP_CSV, wp_fields, wp_rows)
+    write_jsonl(WP_JSONL, wp_fields, wp_rows)
     print(f"\nAdded {len(added)} workpackages: {added}")
 
     # --- Update User Stories' Linked WPs ---
-    us_fields, us_rows = read_csv(US_CSV, strict=False)
+    us_fields, us_rows = read_jsonl(US_JSONL)
 
     # Build mapping: US-ID -> list of new WP IDs
     us_to_wps: dict[str, list[str]] = {}
@@ -169,14 +169,17 @@ def main():
     for row in us_rows:
         us_id = row.get("ID", "")
         if us_id in us_to_wps:
-            existing = row.get("Linked WPs", "").strip()
-            wp_list = [w.strip() for w in existing.split(",") if w.strip()]
+            existing = row.get("Linked WPs", [])
+            if isinstance(existing, list):
+                wp_list = existing[:]
+            else:
+                wp_list = [w.strip() for w in existing.split(",") if w.strip()]
             for new_wp in us_to_wps[us_id]:
                 if new_wp not in wp_list:
                     wp_list.append(new_wp)
-            row["Linked WPs"] = ", ".join(wp_list)
+            row["Linked WPs"] = wp_list
 
-    write_csv(US_CSV, us_fields, us_rows)
+    write_jsonl(US_JSONL, us_fields, us_rows)
     print("Updated User Story cross-references.")
     print("Done!")
 

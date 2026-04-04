@@ -10,9 +10,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import REPO_ROOT, read_csv, update_cell
+from jsonl_utils import REPO_ROOT, read_jsonl, update_cell
 
-CSV_PATH = REPO_ROOT / "docs" / "bugs" / "bugs.csv"
+JSONL_PATH = REPO_ROOT / "docs" / "bugs" / "bugs.jsonl"
 
 VALID_STATUSES = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
 
@@ -33,14 +33,14 @@ def main() -> int:
     bug_id = args.bug_id.strip()
     new_status = args.status.strip()
 
-    _, rows = read_csv(CSV_PATH)
+    _, rows = read_jsonl(JSONL_PATH)
     bug = next((r for r in rows if r.get("ID", "").strip() == bug_id), None)
     if bug is None:
-        print(f"ERROR: Bug ID '{bug_id}' not found in bugs.csv", file=sys.stderr)
+        print(f"ERROR: Bug ID '{bug_id}' not found in bugs.jsonl", file=sys.stderr)
         return 1
 
     old_status = bug.get("Status", "").strip()
-    update_cell(CSV_PATH, "ID", bug_id, "Status", new_status)
+    update_cell(JSONL_PATH, "ID", bug_id, "Status", new_status)
     print(f"{bug_id}: {old_status} → {new_status}")
     return 0
 

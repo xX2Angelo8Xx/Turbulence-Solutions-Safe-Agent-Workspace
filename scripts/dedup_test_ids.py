@@ -16,14 +16,14 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import REPO_ROOT, FileLock, read_csv, write_csv
+from jsonl_utils import REPO_ROOT, FileLock, read_jsonl, write_jsonl
 
-TST_CSV = REPO_ROOT / "docs" / "test-results" / "test-results.csv"
+TST_JSONL = REPO_ROOT / "docs" / "test-results" / "test-results.jsonl"
 
 
 def dedup(dry_run: bool) -> int:
-    with FileLock(TST_CSV):
-        fieldnames, rows = read_csv(TST_CSV)
+    with FileLock(TST_JSONL):
+        fieldnames, rows = read_jsonl(TST_JSONL)
 
         # Find max existing numeric ID
         pattern = re.compile(r"^TST-(\d+)$")
@@ -58,15 +58,15 @@ def dedup(dry_run: bool) -> int:
             print(f"  {old} → {new}")
 
         if not dry_run:
-            write_csv(TST_CSV, fieldnames, rows)
-            print(f"\nRewrote {TST_CSV.name} with {len(renames)} ID(s) renumbered.")
+            write_jsonl(TST_JSONL, fieldnames, rows)
+            print(f"\nRewrote {TST_JSONL.name} with {len(renames)} ID(s) renumbered.")
 
     return 0
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Deduplicate TST-IDs in test-results.csv."
+        description="Deduplicate TST-IDs in test-results.jsonl."
     )
     parser.add_argument(
         "--dry-run", action="store_true",
