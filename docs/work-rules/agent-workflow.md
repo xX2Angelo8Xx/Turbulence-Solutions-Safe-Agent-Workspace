@@ -194,7 +194,16 @@ For subsequent iterations (after Tester feedback), append a new section:
 ## Rules for All Agents
 
 - **One agent per workpackage.** Never work on multiple WPs simultaneously.
-- **Restricted zones:** Never access `.github/`, `.vscode/`, or `NoAgentZone/` in `templates/agent-workbench/` unless the WP explicitly requires it.
+- **Restricted Zones:** The following paths are restricted. Access is prohibited unless the WP explicitly requires it.
+
+  All paths below are relative to the **repository root**.
+
+  | Path | Scope | Access Rule |
+  |------|-------|-------------|
+  | `.github/` | Repo root | No access unless WP explicitly requires it |
+  | `.vscode/` | Repo root | No access unless WP explicitly requires it |
+  | `templates/agent-workbench/NoAgentZone/` | Repo root | No access unless WP explicitly requires it |
+
 - **When uncertain:** Stop and ask — do not guess.
 - **Context discipline:** Read only what you need. Do not preemptively load all documentation.
 - **No self-review:** The agent who implements a WP must NOT be the one who reviews it.

@@ -2415,3 +2415,4 @@
 "TST-2534","MNT-012: targeted suite","Regression","MNT-012","Pass","2026-04-04","Windows 11 + Python 3.11","9 passed in 0.24s",""
 "TST-2535","DOC-055: targeted suite","Unit","DOC-055","Pass","2026-04-04","Windows 11 + Python 3.11","6 passed in 0.23s",""
 "TST-2536","DOC-055: targeted suite","Unit","DOC-055","Pass","2026-04-04","Windows 11 + Python 3.11","6 passed in 0.22s",""
+"TST-2537","DOC-056: targeted suite","Unit","DOC-056","Pass","2026-04-04","Windows 11 + Python 3.11","9 passed in 0.24s",""
