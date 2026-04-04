@@ -2,7 +2,8 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-04-04  
-**Verdict:** ❌ FAIL — Return to Developer  
+**Iteration 1 Verdict:** ❌ FAIL — Returned to Developer  
+**Iteration 2 Verdict:** ✅ PASS — Done  
 **Branch:** MNT-019/update-agent-defs-jsonl
 
 ---
@@ -108,3 +109,40 @@ This WP only modifies documentation/instruction files. No security-relevant code
 3. Re-run `scripts/validate_workspace.py --wp MNT-019` and confirm exit code 0.
 
 4. Commit the fix and push. Hand off back to Tester.
+
+---
+
+## Iteration 2 — Tester Re-Review (2026-04-04)
+
+### Fix Verified
+
+`.github/agents/planner.agent.md` line 15 now reads:
+```
+You never write code, edit JSONL data files, or create workpackages.
+```
+The word "CSVs" is gone. `test_planner_no_generic_csv_word` passes.
+
+### Full MNT-019 Test Suite — Iteration 2
+
+**Command:** `pytest tests/MNT-019/ -v`  
+**Result:** 25 passed, 0 failed  
+**Test Run ID:** TST-2562
+
+All tests pass:
+- 14 Developer path-reference tests ✅
+- 11 Tester edge-case tests (including `test_planner_no_generic_csv_word`) ✅
+
+### DEF-001 Resolution
+
+DEF-001 (BUG-188) is confirmed resolved:
+- Fix verified in source file ✅
+- Regression test passes ✅
+- BUG-188 status updated: Open → Fixed → Closed ✅
+
+### workspace validation
+
+`scripts/validate_workspace.py --wp MNT-019` — Passed with 1 warning (BUG-188 Fixed In WP now set, warning resolved after update).
+
+### Security & Regression
+
+No security-relevant code changes. No new failures against regression baseline.
