@@ -21,3 +21,6 @@ ehthumbs.db
 .github/hooks/scripts/.hook_state.json
 # SAF-072: Deny-event audit log (runtime file, not committed)
 .github/hooks/scripts/audit.jsonl
+# FIX-102: Ignore Python bytecode cache directories
+__pycache__/
+*.pyc

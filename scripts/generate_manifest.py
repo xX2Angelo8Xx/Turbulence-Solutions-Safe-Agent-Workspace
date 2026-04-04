@@ -27,7 +27,13 @@ _TEMPLATE_DIR = _REPO_ROOT / "templates" / "agent-workbench"
 _MANIFEST_PATH = _TEMPLATE_DIR / "MANIFEST.json"
 
 # Files to skip in the manifest (generated or user-specific)
-_SKIP_FILES = {"MANIFEST.json"}
+# FIX-102: Also skip gitignored runtime files that won't exist in CI
+_SKIP_FILES = {
+    "MANIFEST.json",
+    ".github/hooks/scripts/audit.jsonl",
+    ".github/hooks/scripts/copilot-otel.jsonl",
+    ".github/hooks/scripts/.hook_state.json",
+}
 
 # Directories to skip entirely
 _SKIP_DIRS = {"__pycache__"}
