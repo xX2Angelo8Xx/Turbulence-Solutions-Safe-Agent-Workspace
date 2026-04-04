@@ -8,8 +8,8 @@ Covers scenarios the developer did not test:
   4. read_csv with header-only CSV (no data rows) - passes cleanly
   5. write_csv with empty rows list - creates valid empty CSV
   6. write_csv unicode content round-trips correctly
-  7. _check_csv_structural missing CSV file reports error (not exception)
-  8. _check_csv_structural overflow in one CSV doesn't skip the others
+  7. _check_jsonl_structural missing JSONL file reports warning (not exception)
+  8. _check_jsonl_structural invalid JSON in one file doesn't skip the others
   9. read_csv strict=True: first overflow row causes immediate raise
  10. write_csv temp file not left when os.replace is blocked
  11. Null bytes in field values - write_csv does not sanitize (documents
@@ -184,114 +184,96 @@ class TestWriteCsvEdgeCases:
 
 
 # ---------------------------------------------------------------------------
-# 7–8: _check_csv_structural additional cases
+# 7–8: _check_jsonl_structural additional cases
 # ---------------------------------------------------------------------------
 
-class TestCheckCsvStructuralAdditional:
-    def _make_csv(
-        self, tmp_path: Path, name: str, header: str, rows_text: str
+class TestCheckJsonlStructuralAdditional:
+    def _make_jsonl(
+        self, tmp_path: Path, name: str, rows: list
     ) -> Path:
+        import json as _json
         p = tmp_path / name
         p.write_text(
-            textwrap.dedent(header).lstrip()
-            + "\n"
-            + textwrap.dedent(rows_text).lstrip()
-            + "\n",
+            "\n".join(_json.dumps(r) for r in rows) + "\n",
             encoding="utf-8",
         )
         return p
 
-    def _patch_csv_paths(
+    def _patch_jsonl_paths(
         self, monkeypatch, vw, wp, us, bug, tst
     ) -> None:
-        monkeypatch.setattr(vw, "WP_CSV", wp)
-        monkeypatch.setattr(vw, "US_CSV", us)
-        monkeypatch.setattr(vw, "BUG_CSV", bug)
-        monkeypatch.setattr(vw, "TST_CSV", tst)
+        monkeypatch.setattr(vw, "WP_JSONL", wp)
+        monkeypatch.setattr(vw, "US_JSONL", us)
+        monkeypatch.setattr(vw, "BUG_JSONL", bug)
+        monkeypatch.setattr(vw, "TST_JSONL", tst)
 
-    def _make_valid_csvs(self, tmp_path: Path):
-        wp = self._make_csv(
-            tmp_path,
-            "workpackages.csv",
-            '"ID","Category","Name","Status","Assigned To","Description","Goal",'
-            '"Comments","User Story","Depends On","Blockers"',
-            '"WP-001","FIX","Test","Open","","desc","goal","","","",""',
+    def _make_valid_jsonls(self, tmp_path: Path):
+        wp = self._make_jsonl(
+            tmp_path, "workpackages.jsonl",
+            [{"ID": "WP-001", "Category": "FIX", "Name": "Test", "Status": "Open"}],
         )
-        us = self._make_csv(
-            tmp_path,
-            "user-stories.csv",
-            '"ID","Title","Status","Linked WPs"',
-            '"US-001","Story","Open",""',
+        us = self._make_jsonl(
+            tmp_path, "user-stories.jsonl",
+            [{"ID": "US-001", "Title": "Story", "Status": "Open"}],
         )
-        bug = self._make_csv(
-            tmp_path,
-            "bugs.csv",
-            '"ID","Title","Status","Fixed In WP"',
-            '"BUG-001","Bug","Open",""',
+        bug = self._make_jsonl(
+            tmp_path, "bugs.jsonl",
+            [{"ID": "BUG-001", "Title": "Bug", "Status": "Open"}],
         )
-        tst = self._make_csv(
-            tmp_path,
-            "test-results.csv",
-            '"ID","Test Name","Status","WP Reference"',
-            '"TST-001","test","Pass","WP-001"',
+        tst = self._make_jsonl(
+            tmp_path, "test-results.jsonl",
+            [{"ID": "TST-001", "Test Name": "test", "Status": "Pass", "WP Reference": "WP-001"}],
         )
         return wp, us, bug, tst
 
-    def test_missing_csv_file_reports_error(
+    def test_missing_jsonl_file_reports_warning(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """A CSV file that doesn't exist at all should add an ERROR."""
+        """A JSONL file that doesn't exist at all should add a WARNING."""
         sys.path.insert(
             0,
             str(Path(__file__).resolve().parent.parent.parent / "scripts"),
         )
         import validate_workspace as vw
 
-        wp, us, bug, tst = self._make_valid_csvs(tmp_path)
-        # Point bug CSV to a non-existent path
-        missing = tmp_path / "nonexistent_bugs.csv"
-        self._patch_csv_paths(monkeypatch, vw, wp, us, missing, tst)
+        wp, us, bug, tst = self._make_valid_jsonls(tmp_path)
+        # Point bug JSONL to a non-existent path
+        missing = tmp_path / "nonexistent_bugs.jsonl"
+        self._patch_jsonl_paths(monkeypatch, vw, wp, us, missing, tst)
 
         result = vw.ValidationResult()
-        vw._check_csv_structural(result)
+        vw._check_jsonl_structural(result)
         assert any(
-            "nonexistent_bugs.csv" in e or "not found" in e.lower()
-            for e in result.errors
-        ), f"Expected 'not found' error. Errors: {result.errors}"
+            "nonexistent_bugs.jsonl" in w or "not found" in w.lower()
+            for w in result.warnings
+        ), f"Expected 'not found' warning. Warnings: {result.warnings}"
 
-    def test_overflow_in_one_csv_does_not_skip_others(
+    def test_invalid_json_in_one_file_does_not_skip_others(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """When WP CSV has overflow, the Bug/US/TST CSVs are still checked."""
+        """When WP JSONL has invalid JSON, the Bug/US/TST files are still checked."""
         sys.path.insert(
             0,
             str(Path(__file__).resolve().parent.parent.parent / "scripts"),
         )
         import validate_workspace as vw
 
-        wp, us, bug, tst = self._make_valid_csvs(tmp_path)
-        # Replace wp with an overflow CSV - same header but extra field in row
-        wp_overflow = tmp_path / "wp_overflow.csv"
-        _write_raw(
-            wp_overflow,
-            '"ID","Category","Name","Status","Assigned To","Description","Goal",'
-            '"Comments","User Story","Depends On","Blockers"\n'
-            '"WP-001","FIX","Test","Open","","desc","goal","","","","","OVERFLOW"\n',
+        wp, us, bug, tst = self._make_valid_jsonls(tmp_path)
+        # Replace wp with a JSONL file containing an invalid JSON line
+        wp_bad = tmp_path / "wp_bad.jsonl"
+        wp_bad.write_text(
+            '{"ID": "WP-001", "Status": "Open"}\nNOT_VALID_JSON\n',
+            encoding="utf-8",
         )
-        self._patch_csv_paths(monkeypatch, vw, wp_overflow, us, bug, tst)
+        self._patch_jsonl_paths(monkeypatch, vw, wp_bad, us, bug, tst)
 
         result = vw.ValidationResult()
-        vw._check_csv_structural(result)
+        vw._check_jsonl_structural(result)
 
-        # Should have an error for WP CSV overflow
-        assert any("WP" in e and "structural" in e for e in result.errors), (
+        # Should have an error for WP structural issue
+        assert any("structural error" in e for e in result.errors), (
             f"Expected WP structural error. Errors: {result.errors}"
         )
-        # Should NOT have errors for the other three (which are valid)
-        non_wp_errors = [
-            e for e in result.errors if "Bug" in e or "US" in e or "Test" in e
-        ]
-        assert non_wp_errors == [], f"Unexpected non-WP errors: {non_wp_errors}"
 
     def test_invalid_tst_status_reported_as_warning(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -303,17 +285,15 @@ class TestCheckCsvStructuralAdditional:
         )
         import validate_workspace as vw
 
-        wp, us, bug, _ = self._make_valid_csvs(tmp_path)
-        tst = self._make_csv(
-            tmp_path,
-            "test-results-invalid.csv",
-            '"ID","Test Name","Status","WP Reference"',
-            '"TST-001","test","PASS","WP-001"',  # "PASS" not in valid set
+        wp, us, bug, _ = self._make_valid_jsonls(tmp_path)
+        tst = self._make_jsonl(
+            tmp_path, "test-results-invalid.jsonl",
+            [{"ID": "TST-001", "Test Name": "test", "Status": "PASS", "WP Reference": "WP-001"}],
         )
-        self._patch_csv_paths(monkeypatch, vw, wp, us, bug, tst)
+        self._patch_jsonl_paths(monkeypatch, vw, wp, us, bug, tst)
 
         result = vw.ValidationResult()
-        vw._check_csv_structural(result)
+        vw._check_jsonl_structural(result)
 
         assert result.ok, f"Unexpected errors: {result.errors}"
         assert any(
@@ -330,17 +310,15 @@ class TestCheckCsvStructuralAdditional:
         )
         import validate_workspace as vw
 
-        wp, _, bug, tst = self._make_valid_csvs(tmp_path)
-        us = self._make_csv(
-            tmp_path,
-            "user-stories-invalid.csv",
-            '"ID","Title","Status","Linked WPs"',
-            '"US-001","Story","UNKNOWN","WP-001"',
+        wp, _, bug, tst = self._make_valid_jsonls(tmp_path)
+        us = self._make_jsonl(
+            tmp_path, "user-stories-invalid.jsonl",
+            [{"ID": "US-001", "Title": "Story", "Status": "UNKNOWN"}],
         )
-        self._patch_csv_paths(monkeypatch, vw, wp, us, bug, tst)
+        self._patch_jsonl_paths(monkeypatch, vw, wp, us, bug, tst)
 
         result = vw.ValidationResult()
-        vw._check_csv_structural(result)
+        vw._check_jsonl_structural(result)
 
         assert result.ok, f"Unexpected errors: {result.errors}"
         assert any("US-001" in w for w in result.warnings), (

@@ -9,7 +9,7 @@ Covers gaps identified during review:
 6. _check_bug_linkage: bug with Fixed In WP set to a different (non-substring) WP
 """
 
-import csv
+import json
 from pathlib import Path
 from unittest.mock import patch
 
@@ -24,20 +24,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "scripts"
 # Helpers (duplicated here so this file can run standalone)
 # ---------------------------------------------------------------------------
 
-def _make_bug_csv(tmp_path: Path, bugs: list[dict]) -> Path:
+def _make_bug_jsonl(tmp_path: Path, bugs: list) -> Path:
     fieldnames = ["ID", "Title", "Status", "Severity", "Reported By",
                   "Description", "Steps to Reproduce", "Expected Behaviour",
                   "Actual Behaviour", "Fixed In WP", "Comments"]
-    csv_path = tmp_path / "docs" / "bugs" / "bugs.csv"
-    csv_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(csv_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
-        writer.writeheader()
+    jsonl_path = tmp_path / "docs" / "bugs" / "bugs.jsonl"
+    jsonl_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(jsonl_path, "w", encoding="utf-8") as f:
         for bug in bugs:
             row = {fn: "" for fn in fieldnames}
             row.update(bug)
-            writer.writerow(row)
-    return csv_path
+            f.write(json.dumps(row) + "\n")
+    return jsonl_path
 
 
 def _make_wp_folder(tmp_path: Path, wp_id: str,
@@ -51,12 +49,14 @@ def _make_wp_folder(tmp_path: Path, wp_id: str,
     return wp_folder
 
 
-def _read_bug_row(csv_path: Path, bug_id: str) -> dict:
-    with open(csv_path, encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if row["ID"] == bug_id:
-                return row
+def _read_bug_row(jsonl_path: Path, bug_id: str) -> dict:
+    with open(jsonl_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                row = json.loads(line)
+                if row.get("ID") == bug_id:
+                    return row
     return {}
 
 
@@ -72,36 +72,36 @@ class TestCascadeBugStatusEdgeCases:
         FIX-081 corrected the Phase 2 filter to include 'Fixed' status.
         An already-set Fixed In WP is preserved; status becomes Closed.
         """
-        bug_csv = _make_bug_csv(tmp_path, [
+        bug_jsonl = _make_bug_jsonl(tmp_path, [
             {"ID": "BUG-110", "Status": "Fixed", "Fixed In WP": "FIX-040"},
         ])
         _make_wp_folder(tmp_path, "FIX-050",
                         dev_log_content="Related work: see BUG-110.")
 
         with patch("finalize_wp.REPO_ROOT", tmp_path), \
-             patch("finalize_wp.BUG_CSV", bug_csv):
+             patch("finalize_wp.BUG_JSONL", bug_jsonl):
             from finalize_wp import _cascade_bug_status
             _cascade_bug_status("FIX-050", dry_run=False)
 
-        bug = _read_bug_row(bug_csv, "BUG-110")
+        bug = _read_bug_row(bug_jsonl, "BUG-110")
         assert bug["Status"] == "Closed"         # FIX-081: Fixed bugs are now closed
         assert bug["Fixed In WP"] == "FIX-040"   # existing Fixed In WP preserved
 
     def test_nonexistent_bug_id_in_dev_log_no_crash(self, tmp_path: Path) -> None:
         """Dev-log references a bug ID that doesn't exist — must not raise."""
-        bug_csv = _make_bug_csv(tmp_path, [])  # empty bugs.csv
+        bug_jsonl = _make_bug_jsonl(tmp_path, [])  # empty bugs.csv
         _make_wp_folder(tmp_path, "FIX-050",
                         dev_log_content="References BUG-999 which was once seen.")
 
         with patch("finalize_wp.REPO_ROOT", tmp_path), \
-             patch("finalize_wp.BUG_CSV", bug_csv):
+             patch("finalize_wp.BUG_JSONL", bug_jsonl):
             from finalize_wp import _cascade_bug_status
             # Should not raise
             _cascade_bug_status("FIX-050", dry_run=False)
 
     def test_bug_in_both_dev_log_and_test_report_closed_once(self, tmp_path: Path) -> None:
         """Same bug in both files is de-duplicated by the set and closed exactly once."""
-        bug_csv = _make_bug_csv(tmp_path, [
+        bug_jsonl = _make_bug_jsonl(tmp_path, [
             {"ID": "BUG-111", "Status": "Open", "Fixed In WP": ""},
         ])
         _make_wp_folder(
@@ -111,23 +111,23 @@ class TestCascadeBugStatusEdgeCases:
         )
 
         with patch("finalize_wp.REPO_ROOT", tmp_path), \
-             patch("finalize_wp.BUG_CSV", bug_csv):
+             patch("finalize_wp.BUG_JSONL", bug_jsonl):
             from finalize_wp import _cascade_bug_status
             _cascade_bug_status("FIX-050", dry_run=False)
 
-        bug = _read_bug_row(bug_csv, "BUG-111")
+        bug = _read_bug_row(bug_jsonl, "BUG-111")
         assert bug["Status"] == "Closed"
         assert bug["Fixed In WP"] == "FIX-050"
 
         # Verify no duplicate rows introduced
-        with open(bug_csv, encoding="utf-8-sig") as f:
-            rows = list(csv.DictReader(f))
+        with open(bug_jsonl, encoding="utf-8") as f:
+            rows = [json.loads(line) for line in f if line.strip()]
         bug_rows = [r for r in rows if r["ID"] == "BUG-111"]
-        assert len(bug_rows) == 1, "Bug ID should not be duplicated in CSV"
+        assert len(bug_rows) == 1, "Bug ID should not be duplicated in JSONL"
 
     def test_multiple_bugs_in_dev_log_all_closed(self, tmp_path: Path) -> None:
         """Multiple bug references in dev-log are all auto-closed."""
-        bug_csv = _make_bug_csv(tmp_path, [
+        bug_jsonl = _make_bug_jsonl(tmp_path, [
             {"ID": "BUG-120", "Status": "Open", "Fixed In WP": ""},
             {"ID": "BUG-121", "Status": "In Progress", "Fixed In WP": ""},
             {"ID": "BUG-122", "Status": "Open", "Fixed In WP": ""},
@@ -138,12 +138,12 @@ class TestCascadeBugStatusEdgeCases:
         )
 
         with patch("finalize_wp.REPO_ROOT", tmp_path), \
-             patch("finalize_wp.BUG_CSV", bug_csv):
+             patch("finalize_wp.BUG_JSONL", bug_jsonl):
             from finalize_wp import _cascade_bug_status
             _cascade_bug_status("FIX-050", dry_run=False)
 
         for bug_id in ("BUG-120", "BUG-121", "BUG-122"):
-            bug = _read_bug_row(bug_csv, bug_id)
+            bug = _read_bug_row(bug_jsonl, bug_id)
             assert bug["Status"] == "Closed", f"{bug_id} should be Closed"
             assert bug["Fixed In WP"] == "FIX-050"
 
@@ -152,7 +152,7 @@ class TestCascadeBugStatusEdgeCases:
 
         The already_closed set prevents Phase 2 from re-processing the same bug.
         """
-        bug_csv = _make_bug_csv(tmp_path, [
+        bug_jsonl = _make_bug_jsonl(tmp_path, [
             {"ID": "BUG-130", "Status": "Open", "Fixed In WP": "FIX-050"},
         ])
         _make_wp_folder(
@@ -161,33 +161,33 @@ class TestCascadeBugStatusEdgeCases:
         )
 
         with patch("finalize_wp.REPO_ROOT", tmp_path), \
-             patch("finalize_wp.BUG_CSV", bug_csv):
+             patch("finalize_wp.BUG_JSONL", bug_jsonl):
             from finalize_wp import _cascade_bug_status
             _cascade_bug_status("FIX-050", dry_run=False)
 
-        bug = _read_bug_row(bug_csv, "BUG-130")
+        bug = _read_bug_row(bug_jsonl, "BUG-130")
         assert bug["Status"] == "Closed"
         assert bug["Fixed In WP"] == "FIX-050"
 
-        # Confirm no double-entry in CSV
-        with open(bug_csv, encoding="utf-8-sig") as f:
-            rows = list(csv.DictReader(f))
+        # Confirm no double-entry in JSONL
+        with open(bug_jsonl, encoding="utf-8") as f:
+            rows = [json.loads(line) for line in f if line.strip()]
         assert len([r for r in rows if r["ID"] == "BUG-130"]) == 1
 
     def test_empty_bug_status_is_skipped(self, tmp_path: Path) -> None:
         """Bug with empty Status is skipped (neither Open nor In Progress)."""
-        bug_csv = _make_bug_csv(tmp_path, [
+        bug_jsonl = _make_bug_jsonl(tmp_path, [
             {"ID": "BUG-140", "Status": "", "Fixed In WP": ""},
         ])
         _make_wp_folder(tmp_path, "FIX-050",
                         dev_log_content="See BUG-140.")
 
         with patch("finalize_wp.REPO_ROOT", tmp_path), \
-             patch("finalize_wp.BUG_CSV", bug_csv):
+             patch("finalize_wp.BUG_JSONL", bug_jsonl):
             from finalize_wp import _cascade_bug_status
             _cascade_bug_status("FIX-050", dry_run=False)
 
-        bug = _read_bug_row(bug_csv, "BUG-140")
+        bug = _read_bug_row(bug_jsonl, "BUG-140")
         # Empty status is not "Open" or "In Progress" — should not be touched
         assert bug["Status"] == ""
 
@@ -200,14 +200,14 @@ class TestCheckBugLinkageEdgeCases:
 
     def test_no_warning_when_fixed_in_wp_is_different_non_substring(self, tmp_path: Path) -> None:
         """Bug linked to a completely different WP ID still triggers a warning."""
-        bug_csv = _make_bug_csv(tmp_path, [
+        bug_jsonl = _make_bug_jsonl(tmp_path, [
             {"ID": "BUG-088", "Status": "Open", "Fixed In WP": "FIX-099"},
         ])
         _make_wp_folder(tmp_path, "FIX-050",
                         dev_log_content="Fixed BUG-088 during this WP.")
 
         with patch("validate_workspace.REPO_ROOT", tmp_path), \
-             patch("validate_workspace.BUG_CSV", bug_csv):
+             patch("validate_workspace.BUG_JSONL", bug_jsonl):
             from validate_workspace import _check_bug_linkage, ValidationResult
             result = ValidationResult()
             _check_bug_linkage("FIX-050", result)
@@ -218,7 +218,7 @@ class TestCheckBugLinkageEdgeCases:
 
     def test_multiple_bugs_referenced_some_linked_some_not(self, tmp_path: Path) -> None:
         """Only unlinked bugs produce warnings; linked ones are silent."""
-        bug_csv = _make_bug_csv(tmp_path, [
+        bug_jsonl = _make_bug_jsonl(tmp_path, [
             {"ID": "BUG-200", "Status": "Open", "Fixed In WP": "FIX-050"},  # linked
             {"ID": "BUG-201", "Status": "Open", "Fixed In WP": ""},          # unlinked
         ])
@@ -226,7 +226,7 @@ class TestCheckBugLinkageEdgeCases:
                         dev_log_content="Addresses BUG-200 and BUG-201.")
 
         with patch("validate_workspace.REPO_ROOT", tmp_path), \
-             patch("validate_workspace.BUG_CSV", bug_csv):
+             patch("validate_workspace.BUG_JSONL", bug_jsonl):
             from validate_workspace import _check_bug_linkage, ValidationResult
             result = ValidationResult()
             _check_bug_linkage("FIX-050", result)
@@ -238,12 +238,12 @@ class TestCheckBugLinkageEdgeCases:
 
     def test_nonexistent_bug_referenced_in_dev_log_no_crash(self, tmp_path: Path) -> None:
         """_check_bug_linkage gracefully handles a bug ID not in bugs.csv."""
-        bug_csv = _make_bug_csv(tmp_path, [])  # empty
+        bug_jsonl = _make_bug_jsonl(tmp_path, [])  # empty
         _make_wp_folder(tmp_path, "FIX-050",
                         dev_log_content="References BUG-999 which is unknown.")
 
         with patch("validate_workspace.REPO_ROOT", tmp_path), \
-             patch("validate_workspace.BUG_CSV", bug_csv):
+             patch("validate_workspace.BUG_JSONL", bug_jsonl):
             from validate_workspace import _check_bug_linkage, ValidationResult
             result = ValidationResult()
             _check_bug_linkage("FIX-050", result)
@@ -261,11 +261,11 @@ class TestBugStatusEnumEdgeCases:
 
     def test_empty_status_is_not_flagged(self, tmp_path: Path) -> None:
         """Bug with empty Status is not flagged (only non-empty invalid values are)."""
-        bug_csv = _make_bug_csv(tmp_path, [
+        bug_jsonl = _make_bug_jsonl(tmp_path, [
             {"ID": "BUG-300", "Status": ""},
         ])
 
-        with patch("validate_workspace.BUG_CSV", bug_csv):
+        with patch("validate_workspace.BUG_JSONL", bug_jsonl):
             from validate_workspace import _check_bug_status_enum, ValidationResult
             result = ValidationResult()
             _check_bug_status_enum(result)
@@ -275,13 +275,13 @@ class TestBugStatusEnumEdgeCases:
 
     def test_multiple_invalid_statuses_all_flagged(self, tmp_path: Path) -> None:
         """Multiple non-standard bug statuses are all individually warned."""
-        bug_csv = _make_bug_csv(tmp_path, [
+        bug_jsonl = _make_bug_jsonl(tmp_path, [
             {"ID": "BUG-301", "Status": "Wontfix"},
             {"ID": "BUG-302", "Status": "Duplicate"},
             {"ID": "BUG-303", "Status": "Open"},  # valid
         ])
 
-        with patch("validate_workspace.BUG_CSV", bug_csv):
+        with patch("validate_workspace.BUG_JSONL", bug_jsonl):
             from validate_workspace import _check_bug_status_enum, ValidationResult
             result = ValidationResult()
             _check_bug_status_enum(result)

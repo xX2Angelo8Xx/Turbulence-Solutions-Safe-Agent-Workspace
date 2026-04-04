@@ -35,8 +35,8 @@ def _make_bug(bug_id: str, status: str, fixed_in: str = "") -> dict:
     }
 
 
-def _patch_read_csv(bugs: list[dict]):
-    """Return a repeatable read_csv side_effect that always yields the same list."""
+def _patch_read_jsonl(bugs: list[dict]):
+    """Return a repeatable read_jsonl side_effect that always yields the same list."""
     def _read(*args, **kwargs):
         return BUG_FIELDNAMES, [dict(b) for b in bugs]
     return _read
@@ -62,7 +62,7 @@ class TestPhase2VerifiedSkip:
             updated_values.append((id_val, col, val))
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell", side_effect=_update_cell),
             patch.object(fw, "REPO_ROOT", tmp_path),
         ):
@@ -85,7 +85,7 @@ class TestPhase2VerifiedSkip:
         updated_values = []
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell", side_effect=lambda *a: updated_values.append(a)),
             patch.object(fw, "REPO_ROOT", tmp_path),
         ):
@@ -118,7 +118,7 @@ class TestAlreadyClosedSetPreventsReprocessing:
                 status_update_calls.append(id_val)
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell", side_effect=_update_cell),
             patch.object(fw, "REPO_ROOT", tmp_path),
         ):
@@ -150,7 +150,7 @@ class TestAlreadyClosedSetPreventsReprocessing:
                 status_update_calls.append(id_val)
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell", side_effect=_update_cell),
             patch.object(fw, "REPO_ROOT", tmp_path),
         ):
@@ -187,7 +187,7 @@ class TestDryRunWithDevLog:
         ]
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv(bugs)),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl(bugs)),
             patch.object(fw, "update_cell") as mock_update,
             patch.object(fw, "REPO_ROOT", tmp_path),
         ):
@@ -210,7 +210,7 @@ class TestDryRunWithDevLog:
         original_print = __builtins__["print"] if isinstance(__builtins__, dict) else print
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell") as mock_update,
             patch.object(fw, "REPO_ROOT", tmp_path),
             patch("builtins.print", side_effect=lambda *args: output_lines.append(" ".join(str(a) for a in args))),
@@ -247,7 +247,7 @@ class TestMixedStatusBatch:
                 status_updates[id_val] = val
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv(bugs)),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl(bugs)),
             patch.object(fw, "update_cell", side_effect=_update_cell),
             patch.object(fw, "REPO_ROOT", REPO_ROOT / "tmp_nonexistent"),
         ):

@@ -36,22 +36,22 @@ def test_startup_reads_project_scope():
 
 def test_startup_reads_decisions_index():
     body = _load_body()
-    assert "decisions/index.csv" in body or "index.csv" in body, (
+    assert "decisions/index.jsonl" in body or "index.jsonl" in body, (
         "Startup section does not mention reading the ADR index"
     )
 
 
 def test_startup_reads_workpackages_csv():
     body = _load_body()
-    assert "workpackages.csv" in body, (
-        "Startup section does not mention reading 'workpackages.csv'"
+    assert "workpackages.jsonl" in body, (
+        "Startup section does not mention reading 'workpackages.jsonl'"
     )
 
 
 def test_startup_reads_bugs_csv():
     body = _load_body()
-    assert "bugs.csv" in body, (
-        "Startup section does not mention reading 'bugs.csv'"
+    assert "bugs.jsonl" in body, (
+        "Startup section does not mention reading 'bugs.jsonl'"
     )
 
 
@@ -111,8 +111,8 @@ def test_constraints_no_wp_creation():
     body = _load_body()
     assert "DO NOT" in body, "Constraints section has no DO NOT rules"
     lower = body.lower()
-    assert "workpackage" in lower or "workpackages.csv" in lower, (
-        "Constraints do not mention prohibiting WP creation or CSV edits"
+    assert "workpackage" in lower or "workpackages.jsonl" in lower, (
+        "Constraints do not mention prohibiting WP creation or JSONL edits"
     )
 
 
@@ -133,6 +133,6 @@ def test_constraints_no_handoff_before_approval():
 
 def test_constraints_no_csv_editing():
     body = _load_body()
-    assert "csv" in body.lower(), (
-        "Constraints do not explicitly mention prohibiting CSV editing"
+    assert "jsonl" in body.lower(), (
+        "Constraints do not explicitly mention prohibiting JSONL editing"
     )

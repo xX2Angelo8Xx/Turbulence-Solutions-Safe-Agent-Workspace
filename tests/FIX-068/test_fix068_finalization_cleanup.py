@@ -228,7 +228,7 @@ class TestCheckOrphanedStateFiles:
         mock_rows = [{"ID": "FIX-099", "Status": "Done"}]
 
         result = vw.ValidationResult()
-        with patch.object(vw, "read_csv", return_value=([], mock_rows)), \
+        with patch.object(vw, "read_jsonl", return_value=([], mock_rows)), \
              patch.object(vw, "REPO_ROOT", tmp_path):
             vw._check_orphaned_state_files(result)
 
@@ -247,7 +247,7 @@ class TestCheckOrphanedStateFiles:
         mock_rows = [{"ID": "FIX-099", "Status": "In Progress"}]
 
         result = vw.ValidationResult()
-        with patch.object(vw, "read_csv", return_value=([], mock_rows)), \
+        with patch.object(vw, "read_jsonl", return_value=([], mock_rows)), \
              patch.object(vw, "REPO_ROOT", tmp_path):
             vw._check_orphaned_state_files(result)
 
@@ -265,7 +265,7 @@ class TestCheckOrphanedStateFiles:
         mock_rows = [{"ID": "FIX-099", "Status": "Done"}]
 
         result = vw.ValidationResult()
-        with patch.object(vw, "read_csv", return_value=([], mock_rows)), \
+        with patch.object(vw, "read_jsonl", return_value=([], mock_rows)), \
              patch.object(vw, "REPO_ROOT", tmp_path):
             vw._check_orphaned_state_files(result)
 
@@ -368,7 +368,7 @@ class TestTesterEdgeCases:
     # --- _check_orphaned_state_files edge cases ---
 
     def test_orphaned_state_file_unknown_wp_id_no_warn(self, tmp_path):
-        """State file for a WP not in workpackages.csv is silently ignored."""
+        """State file for a WP not in workpackages.jsonl is silently ignored."""
         import validate_workspace as vw
 
         wp_dir = tmp_path / "docs" / "workpackages" / "FIX-999"
@@ -378,7 +378,7 @@ class TestTesterEdgeCases:
         mock_rows = [{"ID": "FIX-001", "Status": "Done"}]  # FIX-999 not present
 
         result = vw.ValidationResult()
-        with patch.object(vw, "read_csv", return_value=([], mock_rows)), \
+        with patch.object(vw, "read_jsonl", return_value=([], mock_rows)), \
              patch.object(vw, "REPO_ROOT", tmp_path):
             vw._check_orphaned_state_files(result)
 
@@ -395,7 +395,7 @@ class TestTesterEdgeCases:
         mock_rows = [{"ID": "FIX-099", "Status": "Review"}]
 
         result = vw.ValidationResult()
-        with patch.object(vw, "read_csv", return_value=([], mock_rows)), \
+        with patch.object(vw, "read_jsonl", return_value=([], mock_rows)), \
              patch.object(vw, "REPO_ROOT", tmp_path):
             vw._check_orphaned_state_files(result)
 

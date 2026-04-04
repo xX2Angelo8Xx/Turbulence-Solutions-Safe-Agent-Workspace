@@ -1,7 +1,7 @@
 """FIX-059: Validate case-insensitive Status recognition in the workspace validator.
 
 Tests that _check_tst_coverage() correctly recognises 'PASS', 'Pass', and 'pass'
-as passing statuses, and that normalized CSV entries have correct column alignment.
+as passing statuses, and that normalized JSONL entries have correct column alignment.
 """
 
 from __future__ import annotations
@@ -31,10 +31,10 @@ def test_pass_uppercase_recognized():
     result = ValidationResult()
     wp_rows = _make_wp_rows(["FIX-100"])
     tst_rows = _make_tst_rows([("FIX-100", "PASS")])
-    with patch("validate_workspace.read_csv") as mock_csv:
-        mock_csv.side_effect = [
-            ([], wp_rows),  # WP CSV
-            ([], tst_rows),  # TST CSV
+    with patch("validate_workspace.read_jsonl") as mock_jsonl:
+        mock_jsonl.side_effect = [
+            ([], wp_rows),  # WP JSONL
+            ([], tst_rows),  # TST JSONL
         ]
         _check_tst_coverage(result)
     assert result.ok, f"Unexpected errors: {result.errors}"
@@ -45,8 +45,8 @@ def test_pass_titlecase_recognized():
     result = ValidationResult()
     wp_rows = _make_wp_rows(["FIX-100"])
     tst_rows = _make_tst_rows([("FIX-100", "Pass")])
-    with patch("validate_workspace.read_csv") as mock_csv:
-        mock_csv.side_effect = [
+    with patch("validate_workspace.read_jsonl") as mock_jsonl:
+        mock_jsonl.side_effect = [
             ([], wp_rows),
             ([], tst_rows),
         ]
@@ -59,8 +59,8 @@ def test_pass_lowercase_recognized():
     result = ValidationResult()
     wp_rows = _make_wp_rows(["FIX-100"])
     tst_rows = _make_tst_rows([("FIX-100", "pass")])
-    with patch("validate_workspace.read_csv") as mock_csv:
-        mock_csv.side_effect = [
+    with patch("validate_workspace.read_jsonl") as mock_jsonl:
+        mock_jsonl.side_effect = [
             ([], wp_rows),
             ([], tst_rows),
         ]
@@ -73,8 +73,8 @@ def test_fail_not_counted_as_pass():
     result = ValidationResult()
     wp_rows = _make_wp_rows(["FIX-100"])
     tst_rows = _make_tst_rows([("FIX-100", "Fail")])
-    with patch("validate_workspace.read_csv") as mock_csv:
-        mock_csv.side_effect = [
+    with patch("validate_workspace.read_jsonl") as mock_jsonl:
+        mock_jsonl.side_effect = [
             ([], wp_rows),
             ([], tst_rows),
         ]
@@ -83,13 +83,13 @@ def test_fail_not_counted_as_pass():
     assert any("FIX-100" in e for e in result.errors)
 
 
-def test_normalized_csv_column_alignment():
+def test_normalized_jsonl_column_alignment():
     """Verify the 14 normalized legacy entries now have correct WP Reference."""
-    csv_path = Path(__file__).resolve().parents[2] / "docs" / "test-results" / "test-results.csv"
+    jsonl_path = Path(__file__).resolve().parents[2] / "docs" / "test-results" / "test-results.jsonl"
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
-    from csv_utils import read_csv
+    from jsonl_utils import read_jsonl
 
-    _, rows = read_csv(csv_path)
+    _, rows = read_jsonl(jsonl_path)
 
     # These TST IDs were the 14 legacy entries that had misaligned columns
     legacy_ids = {

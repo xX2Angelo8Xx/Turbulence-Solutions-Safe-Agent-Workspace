@@ -40,19 +40,18 @@ def test_state_file_deleted(rel_path: str) -> None:
 
 
 def test_bugs_closed() -> None:
-    """All 21 target bugs must have Status=Closed in bugs.csv."""
-    import csv
+    """All 21 target bugs must have Status=Closed in bugs.jsonl."""
     import sys
 
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
-    from csv_utils import read_csv
+    from jsonl_utils import read_jsonl
 
-    bugs_csv = REPO_ROOT / "docs/bugs/bugs.csv"
-    _, rows = read_csv(bugs_csv)
+    bugs_jsonl = REPO_ROOT / "docs/bugs/bugs.jsonl"
+    _, rows = read_jsonl(bugs_jsonl)
     bug_status = {row["ID"]: row["Status"] for row in rows}
 
     for bug_id in CLOSED_BUG_IDS:
-        assert bug_id in bug_status, f"{bug_id} not found in bugs.csv"
+        assert bug_id in bug_status, f"{bug_id} not found in bugs.jsonl"
         assert bug_status[bug_id] == "Closed", (
             f"{bug_id} has Status={bug_status[bug_id]!r}, expected 'Closed'"
         )
@@ -176,10 +175,12 @@ def test_done_actions_have_nonempty_resolved_by() -> None:
 def test_excluded_bugs_not_unintentionally_closed() -> None:
     """Bugs BUG-112, BUG-116, BUG-118 (gaps in target list) must not be Closed
     purely from this WP's actions — they were not in scope."""
-    import csv
-    rows = list(csv.DictReader(
-        (REPO_ROOT / "docs/bugs/bugs.csv").open(encoding="utf-8-sig")
-    ))
+    import json
+    rows = []
+    for line in (REPO_ROOT / "docs/bugs/bugs.jsonl").read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line:
+            rows.append(json.loads(line))
     bug_map = {r["ID"]: r["Status"] for r in rows}
 
     # These IDs were intentionally excluded from the closure list.

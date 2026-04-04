@@ -61,8 +61,8 @@ class TestTestingProtocolTstId:
         assert "## TST-ID Uniqueness" in self.content
 
     def test_no_manual_rows_rule(self):
-        assert "Never manually add rows" in self.content
-        assert "test-results.csv" in self.content
+        assert "Never manually add" in self.content
+        assert "test-results.jsonl" in self.content
 
     def test_script_usage_rule(self):
         assert "scripts/add_test_result.py" in self.content
@@ -75,8 +75,8 @@ class TestTestingProtocolTstId:
         assert "scripts/dedup_test_ids.py --dry-run" in self.content
 
     def test_section_after_csv_table(self):
-        # TST-ID Uniqueness must appear after the Test Result CSV table
-        idx_csv_table = self.content.index("## Test Result CSV")
+        # TST-ID Uniqueness must appear after the Test Result JSONL table
+        idx_csv_table = self.content.index("## Test Result JSONL")
         idx_tst_id = self.content.index("## TST-ID Uniqueness")
         idx_report_format = self.content.index("## Test Report Format")
         assert idx_csv_table < idx_tst_id < idx_report_format

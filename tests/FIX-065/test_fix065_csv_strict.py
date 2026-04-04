@@ -5,7 +5,7 @@ Tests cover:
   2. read_csv(strict=False) merges overflow (backward compat)
   3. write_csv() atomic write works for valid data
   4. write_csv() rejects data with bare newlines in field values
-  5. _check_csv_structural() catches invalid enum values
+  5. _check_jsonl_structural() catches invalid enum values
 """
 
 import os
@@ -178,66 +178,58 @@ class TestWriteCsvSanitization:
 
 
 # ---------------------------------------------------------------------------
-# Test 5: _check_csv_structural catches invalid enum values
+# Test 5: _check_jsonl_structural catches invalid enum values
 # ---------------------------------------------------------------------------
 
-class TestCheckCsvStructural:
-    def _make_csv(self, tmp_path: Path, name: str, header: str, rows_text: str) -> Path:
+class TestCheckJsonlStructural:
+    def _make_jsonl(self, tmp_path: Path, name: str, rows: list) -> Path:
+        import json as _json
         p = tmp_path / name
-        _write_raw(p, header + "\n" + rows_text + "\n")
+        p.write_text("\n".join(_json.dumps(r) for r in rows) + "\n", encoding="utf-8")
         return p
 
     def test_valid_enums_no_errors(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "scripts"))
         import validate_workspace as vw
 
-        # Create minimal valid CSVs
-        wp = self._make_csv(tmp_path, "workpackages.csv",
-            '"ID","Category","Name","Status","Assigned To","Description","Goal","Comments","User Story","Depends On","Blockers"',
-            '"WP-001","FIX","Test","Open","","desc","goal","","","",""')
-        us = self._make_csv(tmp_path, "user-stories.csv",
-            '"ID","Title","Status","Linked WPs"',
-            '"US-001","Story","Open",""')
-        bug = self._make_csv(tmp_path, "bugs.csv",
-            '"ID","Title","Status","Fixed In WP"',
-            '"BUG-001","Bug","Open",""')
-        tst = self._make_csv(tmp_path, "test-results.csv",
-            '"ID","Test Name","Status","WP Reference"',
-            '"TST-001","test","Pass","WP-001"')
+        wp = self._make_jsonl(tmp_path, "workpackages.jsonl",
+            [{"ID": "WP-001", "Category": "FIX", "Name": "Test", "Status": "Open"}])
+        us = self._make_jsonl(tmp_path, "user-stories.jsonl",
+            [{"ID": "US-001", "Title": "Story", "Status": "Open"}])
+        bug = self._make_jsonl(tmp_path, "bugs.jsonl",
+            [{"ID": "BUG-001", "Title": "Bug", "Status": "Open"}])
+        tst = self._make_jsonl(tmp_path, "test-results.jsonl",
+            [{"ID": "TST-001", "Test Name": "test", "Status": "Pass", "WP Reference": "WP-001"}])
 
-        monkeypatch.setattr(vw, "WP_CSV", wp)
-        monkeypatch.setattr(vw, "US_CSV", us)
-        monkeypatch.setattr(vw, "BUG_CSV", bug)
-        monkeypatch.setattr(vw, "TST_CSV", tst)
+        monkeypatch.setattr(vw, "WP_JSONL", wp)
+        monkeypatch.setattr(vw, "US_JSONL", us)
+        monkeypatch.setattr(vw, "BUG_JSONL", bug)
+        monkeypatch.setattr(vw, "TST_JSONL", tst)
 
         result = vw.ValidationResult()
-        vw._check_csv_structural(result)
+        vw._check_jsonl_structural(result)
         assert result.ok, f"Unexpected errors: {result.errors}"
 
     def test_invalid_wp_status_reported(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "scripts"))
         import validate_workspace as vw
 
-        wp = self._make_csv(tmp_path, "workpackages.csv",
-            '"ID","Category","Name","Status","Assigned To","Description","Goal","Comments","User Story","Depends On","Blockers"',
-            '"WP-001","FIX","Test","INVALID","","desc","goal","","","",""')
-        us = self._make_csv(tmp_path, "user-stories.csv",
-            '"ID","Title","Status","Linked WPs"',
-            '"US-001","Story","Open",""')
-        bug = self._make_csv(tmp_path, "bugs.csv",
-            '"ID","Title","Status","Fixed In WP"',
-            '"BUG-001","Bug","Open",""')
-        tst = self._make_csv(tmp_path, "test-results.csv",
-            '"ID","Test Name","Status","WP Reference"',
-            '"TST-001","test","Pass","WP-001"')
+        wp = self._make_jsonl(tmp_path, "workpackages.jsonl",
+            [{"ID": "WP-001", "Status": "INVALID"}])
+        us = self._make_jsonl(tmp_path, "user-stories.jsonl",
+            [{"ID": "US-001", "Status": "Open"}])
+        bug = self._make_jsonl(tmp_path, "bugs.jsonl",
+            [{"ID": "BUG-001", "Status": "Open"}])
+        tst = self._make_jsonl(tmp_path, "test-results.jsonl",
+            [{"ID": "TST-001", "Status": "Pass", "WP Reference": "WP-001"}])
 
-        monkeypatch.setattr(vw, "WP_CSV", wp)
-        monkeypatch.setattr(vw, "US_CSV", us)
-        monkeypatch.setattr(vw, "BUG_CSV", bug)
-        monkeypatch.setattr(vw, "TST_CSV", tst)
+        monkeypatch.setattr(vw, "WP_JSONL", wp)
+        monkeypatch.setattr(vw, "US_JSONL", us)
+        monkeypatch.setattr(vw, "BUG_JSONL", bug)
+        monkeypatch.setattr(vw, "TST_JSONL", tst)
 
         result = vw.ValidationResult()
-        vw._check_csv_structural(result)
+        vw._check_jsonl_structural(result)
         assert result.ok  # enum issues are warnings, not errors
         assert any("INVALID" in w and "WP-001" in w for w in result.warnings)
 
@@ -245,55 +237,49 @@ class TestCheckCsvStructural:
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "scripts"))
         import validate_workspace as vw
 
-        wp = self._make_csv(tmp_path, "workpackages.csv",
-            '"ID","Category","Name","Status","Assigned To","Description","Goal","Comments","User Story","Depends On","Blockers"',
-            '"WP-001","FIX","Test","Open","","desc","goal","","","",""')
-        us = self._make_csv(tmp_path, "user-stories.csv",
-            '"ID","Title","Status","Linked WPs"',
-            '"US-001","Story","Open",""')
-        bug = self._make_csv(tmp_path, "bugs.csv",
-            '"ID","Title","Status","Fixed In WP"',
-            '"BUG-001","Bug","BadStatus",""')
-        tst = self._make_csv(tmp_path, "test-results.csv",
-            '"ID","Test Name","Status","WP Reference"',
-            '"TST-001","test","Pass","WP-001"')
+        wp = self._make_jsonl(tmp_path, "workpackages.jsonl",
+            [{"ID": "WP-001", "Status": "Open"}])
+        us = self._make_jsonl(tmp_path, "user-stories.jsonl",
+            [{"ID": "US-001", "Status": "Open"}])
+        bug = self._make_jsonl(tmp_path, "bugs.jsonl",
+            [{"ID": "BUG-001", "Status": "BadStatus"}])
+        tst = self._make_jsonl(tmp_path, "test-results.jsonl",
+            [{"ID": "TST-001", "Status": "Pass", "WP Reference": "WP-001"}])
 
-        monkeypatch.setattr(vw, "WP_CSV", wp)
-        monkeypatch.setattr(vw, "US_CSV", us)
-        monkeypatch.setattr(vw, "BUG_CSV", bug)
-        monkeypatch.setattr(vw, "TST_CSV", tst)
+        monkeypatch.setattr(vw, "WP_JSONL", wp)
+        monkeypatch.setattr(vw, "US_JSONL", us)
+        monkeypatch.setattr(vw, "BUG_JSONL", bug)
+        monkeypatch.setattr(vw, "TST_JSONL", tst)
 
         result = vw.ValidationResult()
-        vw._check_csv_structural(result)
+        vw._check_jsonl_structural(result)
         assert result.ok  # enum issues are warnings, not errors
         assert any("BadStatus" in w and "BUG-001" in w for w in result.warnings)
 
-    def test_overflow_csv_reported(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_invalid_json_line_reported(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "scripts"))
         import validate_workspace as vw
 
-        # WP CSV with overflow column
-        wp = tmp_path / "workpackages.csv"
-        _write_raw(wp, '''\
-            "ID","Category","Name","Status","Assigned To","Description","Goal","Comments","User Story","Depends On","Blockers"
-            "WP-001","FIX","Test","Open","","desc","goal","","","","","EXTRA"
-        ''')
-        us = self._make_csv(tmp_path, "user-stories.csv",
-            '"ID","Title","Status","Linked WPs"',
-            '"US-001","Story","Open",""')
-        bug = self._make_csv(tmp_path, "bugs.csv",
-            '"ID","Title","Status","Fixed In WP"',
-            '"BUG-001","Bug","Open",""')
-        tst = self._make_csv(tmp_path, "test-results.csv",
-            '"ID","Test Name","Status","WP Reference"',
-            '"TST-001","test","Pass","WP-001"')
+        # WP JSONL with an invalid JSON line (structural error)
+        wp = tmp_path / "workpackages.jsonl"
+        wp.write_text(
+            '{"ID": "WP-001", "Status": "Open"}\n'
+            'NOT_VALID_JSON\n',
+            encoding="utf-8",
+        )
+        us = self._make_jsonl(tmp_path, "user-stories.jsonl",
+            [{"ID": "US-001", "Status": "Open"}])
+        bug = self._make_jsonl(tmp_path, "bugs.jsonl",
+            [{"ID": "BUG-001", "Status": "Open"}])
+        tst = self._make_jsonl(tmp_path, "test-results.jsonl",
+            [{"ID": "TST-001", "Status": "Pass", "WP Reference": "WP-001"}])
 
-        monkeypatch.setattr(vw, "WP_CSV", wp)
-        monkeypatch.setattr(vw, "US_CSV", us)
-        monkeypatch.setattr(vw, "BUG_CSV", bug)
-        monkeypatch.setattr(vw, "TST_CSV", tst)
+        monkeypatch.setattr(vw, "WP_JSONL", wp)
+        monkeypatch.setattr(vw, "US_JSONL", us)
+        monkeypatch.setattr(vw, "BUG_JSONL", bug)
+        monkeypatch.setattr(vw, "TST_JSONL", tst)
 
         result = vw.ValidationResult()
-        vw._check_csv_structural(result)
+        vw._check_jsonl_structural(result)
         assert not result.ok
         assert any("structural error" in e for e in result.errors)

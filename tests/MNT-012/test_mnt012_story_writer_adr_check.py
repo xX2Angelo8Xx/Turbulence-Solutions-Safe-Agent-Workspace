@@ -19,8 +19,8 @@ def test_agent_file_exists():
 
 def test_startup_has_adr_step():
     content = _content()
-    assert "docs/decisions/index.csv" in content, (
-        "Startup section must reference docs/decisions/index.csv"
+    assert "docs/decisions/index.jsonl" in content, (
+        "Startup section must reference docs/decisions/index.jsonl"
     )
 
 
@@ -50,9 +50,9 @@ def test_quality_checklist_has_adr_item():
 
 def test_quality_checklist_adr_item_references_index():
     content = _content()
-    # The checklist item should also reference decisions/index.csv
-    assert "decisions/index.csv" in content, (
-        "Quality checklist ADR item must reference docs/decisions/index.csv"
+    # The checklist item should also reference decisions/index.jsonl
+    assert "decisions/index.jsonl" in content, (
+        "Quality checklist ADR item must reference docs/decisions/index.jsonl"
     )
 
 
@@ -70,15 +70,15 @@ def test_adr_checklist_item_is_checkbox():
 
 
 def test_startup_step_order():
-    """Step 4 (ADR check) must come after step 3 (user-stories.csv read)."""
+    """Step 4 (ADR check) must come after step 3 (user-stories.jsonl read)."""
     content = _content()
     startup_section = content.split("## Workflow")[0]
-    pos_step3 = startup_section.find("user-stories/user-stories.csv")
-    pos_step4 = startup_section.find("docs/decisions/index.csv")
-    assert pos_step3 != -1, "Step 3 reference to user-stories.csv not found"
-    assert pos_step4 != -1, "Step 4 reference to decisions/index.csv not found"
+    pos_step3 = startup_section.find("user-stories/user-stories.jsonl")
+    pos_step4 = startup_section.find("docs/decisions/index.jsonl")
+    assert pos_step3 != -1, "Step 3 reference to user-stories.jsonl not found"
+    assert pos_step4 != -1, "Step 4 reference to decisions/index.jsonl not found"
     assert pos_step3 < pos_step4, (
-        "Step 3 (user-stories.csv) must appear before step 4 (decisions/index.csv)"
+        "Step 3 (user-stories.jsonl) must appear before step 4 (decisions/index.jsonl)"
     )
 
 

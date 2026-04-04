@@ -41,24 +41,26 @@ def test_verified_accepted_as_cli_argument() -> None:
     assert args.status == "Verified"
 
 
-def test_verified_status_updates_csv(tmp_path: Path) -> None:
+def test_verified_status_updates_jsonl(tmp_path: Path) -> None:
     """main() must succeed (return 0) when setting a bug to Verified."""
-    bugs_csv = tmp_path / "bugs.csv"
-    bugs_csv.write_text(
-        "ID,Title,Status,Severity,Component,Description,Steps,Expected,Actual,"
-        "Fixed In WP,Reporter\n"
-        "BUG-001,Test bug,Fixed,Low,Scripts,desc,steps,exp,act,,tester\n",
+    import json
+    bugs_jsonl = tmp_path / "bugs.jsonl"
+    bugs_jsonl.write_text(
+        json.dumps({"ID": "BUG-001", "Title": "Test bug", "Status": "Fixed",
+                    "Severity": "Low", "Component": "Scripts", "Description": "desc",
+                    "Steps": "steps", "Expected": "exp", "Actual": "act",
+                    "Fixed In WP": "", "Reporter": "tester"}) + "\n",
         encoding="utf-8",
     )
 
     with (
-        patch.object(update_bug_status, "CSV_PATH", bugs_csv),
+        patch.object(update_bug_status, "JSONL_PATH", bugs_jsonl),
         patch("sys.argv", ["update_bug_status.py", "BUG-001", "--status", "Verified"]),
     ):
         result = update_bug_status.main()
 
     assert result == 0
-    content = bugs_csv.read_text(encoding="utf-8")
+    content = bugs_jsonl.read_text(encoding="utf-8")
     assert "Verified" in content
 
 
@@ -88,17 +90,19 @@ def test_invalid_status_rejected() -> None:
 
 
 def test_unknown_bug_id_returns_error(tmp_path: Path) -> None:
-    """main() must return non-zero when the bug ID is not found in bugs.csv."""
-    bugs_csv = tmp_path / "bugs.csv"
-    bugs_csv.write_text(
-        "ID,Title,Status,Severity,Component,Description,Steps,Expected,Actual,"
-        "Fixed In WP,Reporter\n"
-        "BUG-001,Test bug,Open,Low,Scripts,desc,steps,exp,act,,tester\n",
+    """main() must return non-zero when the bug ID is not found in bugs.jsonl."""
+    import json
+    bugs_jsonl = tmp_path / "bugs.jsonl"
+    bugs_jsonl.write_text(
+        json.dumps({"ID": "BUG-001", "Title": "Test bug", "Status": "Open",
+                    "Severity": "Low", "Component": "Scripts", "Description": "desc",
+                    "Steps": "steps", "Expected": "exp", "Actual": "act",
+                    "Fixed In WP": "", "Reporter": "tester"}) + "\n",
         encoding="utf-8",
     )
 
     with (
-        patch.object(update_bug_status, "CSV_PATH", bugs_csv),
+        patch.object(update_bug_status, "JSONL_PATH", bugs_jsonl),
         patch("sys.argv", ["update_bug_status.py", "BUG-999", "--status", "Verified"]),
     ):
         result = update_bug_status.main()

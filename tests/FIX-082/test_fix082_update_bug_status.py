@@ -47,7 +47,7 @@ def _make_bug(bug_id: str, status: str) -> dict:
     }
 
 
-def _mock_read_csv(bugs: list[dict]):
+def _mock_read_jsonl(bugs: list[dict]):
     def _read(path, **kwargs):
         return BUG_FIELDNAMES, [dict(b) for b in bugs]
     return _read
@@ -65,7 +65,7 @@ class TestUpdateBugStatus:
         updated_rows = []
 
         with (
-            patch.object(ubs, "read_csv", side_effect=_mock_read_csv([bug])),
+            patch.object(ubs, "read_jsonl", side_effect=_mock_read_jsonl([bug])),
             patch.object(ubs, "update_cell", side_effect=lambda *a, **kw: updated_rows.append((a[2], a[4]))),
         ):
             rc = ubs.main.__wrapped__() if hasattr(ubs.main, "__wrapped__") else None
@@ -81,7 +81,7 @@ class TestUpdateBugStatus:
         bug = _make_bug("BUG-001", "Fixed")
 
         with (
-            patch.object(ubs, "read_csv", side_effect=_mock_read_csv([bug])),
+            patch.object(ubs, "read_jsonl", side_effect=_mock_read_jsonl([bug])),
             patch.object(ubs, "update_cell"),
             patch("sys.argv", ["update_bug_status.py", "BUG-001", "--status", "Closed"]),
         ):
@@ -105,7 +105,7 @@ class TestUpdateBugStatus:
         bug = _make_bug("BUG-001", "Fixed")
 
         with (
-            patch.object(ubs, "read_csv", side_effect=_mock_read_csv([bug])),
+            patch.object(ubs, "read_jsonl", side_effect=_mock_read_jsonl([bug])),
             patch("sys.argv", ["update_bug_status.py", "BUG-999", "--status", "Closed"]),
         ):
             rc = ubs.main()
@@ -120,7 +120,7 @@ class TestUpdateBugStatus:
         updated_rows = []
 
         with (
-            patch.object(ubs, "read_csv", side_effect=_mock_read_csv([bug])),
+            patch.object(ubs, "read_jsonl", side_effect=_mock_read_jsonl([bug])),
             patch.object(ubs, "update_cell", side_effect=lambda *a, **kw: updated_rows.append((a[2], a[4]))),
             patch("sys.argv", ["update_bug_status.py", "BUG-002", "--status", "Open"]),
         ):
@@ -135,7 +135,7 @@ class TestUpdateBugStatus:
         updated_rows = []
 
         with (
-            patch.object(ubs, "read_csv", side_effect=_mock_read_csv([bug])),
+            patch.object(ubs, "read_jsonl", side_effect=_mock_read_jsonl([bug])),
             patch.object(ubs, "update_cell", side_effect=lambda *a, **kw: updated_rows.append((a[2], a[4]))),
             patch("sys.argv", ["update_bug_status.py", "BUG-003", "--status", "In Progress"]),
         ):
@@ -150,7 +150,7 @@ class TestUpdateBugStatus:
         updated_rows = []
 
         with (
-            patch.object(ubs, "read_csv", side_effect=_mock_read_csv([bug])),
+            patch.object(ubs, "read_jsonl", side_effect=_mock_read_jsonl([bug])),
             patch.object(ubs, "update_cell", side_effect=lambda *a, **kw: updated_rows.append((a[2], a[4]))),
             patch("sys.argv", ["update_bug_status.py", "BUG-004", "--status", "Fixed"]),
         ):
@@ -165,7 +165,7 @@ class TestUpdateBugStatus:
         updated_rows = []
 
         with (
-            patch.object(ubs, "read_csv", side_effect=_mock_read_csv([bug])),
+            patch.object(ubs, "read_jsonl", side_effect=_mock_read_jsonl([bug])),
             patch.object(ubs, "update_cell", side_effect=lambda *a, **kw: updated_rows.append((a[2], a[4]))),
             patch("sys.argv", ["update_bug_status.py", "BUG-005", "--status", "Closed"]),
         ):

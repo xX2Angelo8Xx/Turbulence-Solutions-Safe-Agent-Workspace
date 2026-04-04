@@ -1,19 +1,23 @@
 """
-FIX-009: Test that every TST-ID in test-results.csv is unique.
+FIX-009: Test that every TST-ID in test-results.jsonl is unique.
 """
-import csv
+import json
 import os
 import pytest
 
-CSV_PATH = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'docs', 'test-results', 'test-results.csv'
+JSONL_PATH = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'docs', 'test-results', 'test-results.jsonl'
 )
 
 
 def test_no_duplicate_tst_ids():
-    """Every TST-ID in test-results.csv must be unique."""
-    with open(CSV_PATH, newline='', encoding='utf-8') as f:
-        rows = list(csv.DictReader(f))
+    """Every TST-ID in test-results.jsonl must be unique."""
+    rows = []
+    with open(JSONL_PATH, encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
 
     ids = [r['ID'] for r in rows]
     assert len(set(ids)) == len(ids), (

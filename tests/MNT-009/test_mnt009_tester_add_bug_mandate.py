@@ -57,9 +57,9 @@ def test_pre_done_checklist_mentions_add_bug_py():
 def test_pre_done_checklist_prohibits_direct_bugs_csv_editing():
     section = _section(_content(), "Pre-Done Checklist")
     lower = section.lower()
-    assert "bugs.csv" in lower and (
+    assert "bugs.jsonl" in lower and (
         "prohibited" in lower or "never edit" in lower or "direct" in lower
-    ), "Pre-Done Checklist must prohibit direct editing of docs/bugs/bugs.csv"
+    ), "Pre-Done Checklist must prohibit direct editing of docs/bugs/bugs.jsonl"
 
 
 def test_pre_done_checklist_add_bug_is_checkbox():
@@ -85,8 +85,8 @@ def test_constraints_mentions_add_bug_py():
 def test_constraints_prohibits_direct_bugs_csv_editing():
     section = _section(_content(), "Constraints")
     lower = section.lower()
-    assert "bugs.csv" in lower and "prohibited" in lower, (
-        "Constraints section must state that direct editing of docs/bugs/bugs.csv is prohibited"
+    assert "bugs.jsonl" in lower and "prohibited" in lower, (
+        "Constraints section must state that direct editing of docs/bugs/bugs.jsonl is prohibited"
     )
 
 

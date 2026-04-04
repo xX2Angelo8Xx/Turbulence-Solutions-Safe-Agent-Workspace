@@ -44,16 +44,16 @@ def _make_bug(bug_id: str, status: str, fixed_in: str = "") -> dict:
     }
 
 
-def _mock_read_csv_factory(wps=None, bugs=None):
+def _mock_read_jsonl_factory(wps=None, bugs=None):
     """Return a read_csv mock that dispatches based on the path."""
     wps = wps or []
     bugs = bugs or []
 
     def _read(path, **kwargs):
         p = str(path)
-        if "workpackages.csv" in p:
+        if "workpackages.jsonl" in p:
             return WP_FIELDNAMES, [dict(w) for w in wps]
-        if "bugs.csv" in p:
+        if "bugs.jsonl" in p:
             return BUG_FIELDNAMES, [dict(b) for b in bugs]
         return [], []
 
@@ -76,11 +76,16 @@ class TestApplyFixes:
         state_file = wp_dir / ".finalization-state.json"
         state_file.write_text('{"state": "done"}', encoding="utf-8")
 
+        # Create the JSONL file so WP_JSONL.exists() returns True
+        wp_jsonl = tmp_path / "docs" / "workpackages" / "workpackages.jsonl"
+        wp_jsonl.parent.mkdir(parents=True, exist_ok=True)
+        wp_jsonl.touch()
+
         with (
-            patch.object(vw, "read_csv", side_effect=_mock_read_csv_factory(wps=[wp])),
+            patch.object(vw, "read_jsonl", side_effect=_mock_read_jsonl_factory(wps=[wp])),
             patch.object(vw, "REPO_ROOT", tmp_path),
-            patch.object(vw, "WP_CSV", tmp_path / "docs" / "workpackages" / "workpackages.csv"),
-            patch.object(vw, "BUG_CSV", tmp_path / "docs" / "bugs" / "bugs.csv"),
+            patch.object(vw, "WP_JSONL", wp_jsonl),
+            patch.object(vw, "BUG_JSONL", tmp_path / "docs" / "bugs" / "bugs.jsonl"),
         ):
             fixes = vw.apply_fixes()
 
@@ -94,7 +99,7 @@ class TestApplyFixes:
         updated_cells = []
 
         with (
-            patch.object(vw, "read_csv", side_effect=_mock_read_csv_factory(wps=[wp], bugs=[bug])),
+            patch.object(vw, "read_jsonl", side_effect=_mock_read_jsonl_factory(wps=[wp], bugs=[bug])),
             patch.object(vw, "update_cell", side_effect=lambda *a, **kw: updated_cells.append((a[2], a[4]))),
             patch.object(vw, "REPO_ROOT", Path("/nonexistent/tmp")),
         ):
@@ -111,7 +116,7 @@ class TestApplyFixes:
         updated_cells = []
 
         with (
-            patch.object(vw, "read_csv", side_effect=_mock_read_csv_factory(wps=[wp], bugs=[bug])),
+            patch.object(vw, "read_jsonl", side_effect=_mock_read_jsonl_factory(wps=[wp], bugs=[bug])),
             patch.object(vw, "update_cell", side_effect=lambda *a, **kw: updated_cells.append((a[2], a[4]))),
             patch.object(vw, "REPO_ROOT", Path("/nonexistent/tmp")),
         ):
@@ -125,7 +130,7 @@ class TestApplyFixes:
         bug = _make_bug("BUG-001", "Closed", fixed_in="FIX-001")
 
         with (
-            patch.object(vw, "read_csv", side_effect=_mock_read_csv_factory(wps=[wp], bugs=[bug])),
+            patch.object(vw, "read_jsonl", side_effect=_mock_read_jsonl_factory(wps=[wp], bugs=[bug])),
             patch.object(vw, "update_cell"),
             patch.object(vw, "REPO_ROOT", Path("/nonexistent/tmp")),
         ):

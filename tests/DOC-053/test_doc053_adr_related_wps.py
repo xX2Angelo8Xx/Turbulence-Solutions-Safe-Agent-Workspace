@@ -1,44 +1,47 @@
 """Tests for DOC-053: Populate ADR Related WPs.
 
-Verifies that all ADR entries in docs/decisions/index.csv have non-empty
+Verifies that all ADR entries in docs/decisions/index.jsonl have non-empty
 Related WPs columns, and that every WP ID referenced there exists in
-docs/workpackages/workpackages.csv.
+docs/workpackages/workpackages.jsonl.
 """
 
-import csv
+import json
 import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-ADR_INDEX = REPO_ROOT / "docs" / "decisions" / "index.csv"
-WORKPACKAGES_CSV = REPO_ROOT / "docs" / "workpackages" / "workpackages.csv"
+ADR_INDEX = REPO_ROOT / "docs" / "decisions" / "index.jsonl"
+WORKPACKAGES_JSONL = REPO_ROOT / "docs" / "workpackages" / "workpackages.jsonl"
 ADR_DIR = REPO_ROOT / "docs" / "decisions"
 
 
 def _load_adr_index() -> list[dict]:
-    """Return all rows from docs/decisions/index.csv."""
+    """Return all rows from docs/decisions/index.jsonl."""
     rows = []
-    with ADR_INDEX.open(encoding="utf-8-sig", newline="") as fh:
-        reader = csv.DictReader(fh)
-        for row in reader:
-            rows.append(row)
+    for line in ADR_INDEX.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line:
+            rows.append(json.loads(line))
     return rows
 
 
 def _load_workpackage_ids() -> set[str]:
-    """Return all WP IDs from docs/workpackages/workpackages.csv."""
+    """Return all WP IDs from docs/workpackages/workpackages.jsonl."""
     ids: set[str] = set()
-    with WORKPACKAGES_CSV.open(encoding="utf-8-sig", newline="") as fh:
-        reader = csv.DictReader(fh)
-        for row in reader:
+    for line in WORKPACKAGES_JSONL.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line:
+            row = json.loads(line)
             wp_id = row.get("ID", "").strip()
             if wp_id:
                 ids.add(wp_id)
     return ids
 
 
-def _extract_wp_ids(related_wps_field: str) -> list[str]:
-    """Parse a comma-separated Related WPs field into a list of WP IDs."""
+def _extract_wp_ids(related_wps_field) -> list:
+    """Parse Related WPs field (string or list) into a list of WP IDs."""
+    if isinstance(related_wps_field, list):
+        return [p for p in related_wps_field if p]
     raw = related_wps_field.strip()
     if not raw:
         return []
@@ -51,22 +54,22 @@ def _extract_wp_ids(related_wps_field: str) -> list[str]:
 # ---------------------------------------------------------------------------
 
 
-def test_adr_index_has_six_entries():
-    """The ADR index must contain exactly 6 entries (ADR-001 through ADR-006)."""
+def test_adr_index_has_seven_entries():
+    """The ADR index must contain exactly 7 entries (ADR-001 through ADR-007)."""
     rows = _load_adr_index()
-    assert len(rows) == 6, (
-        f"Expected 6 ADR entries, found {len(rows)}: "
+    assert len(rows) == 7, (
+        f"Expected 7 ADR entries, found {len(rows)}: "
         + str([r.get("ADR-ID") for r in rows])
     )
 
 
 def test_all_adr_entries_have_related_wps():
-    """Every ADR entry in index.csv must have a non-empty Related WPs column."""
+    """Every ADR entry in index.jsonl must have a non-empty Related WPs column."""
     rows = _load_adr_index()
     empty = [
         row.get("ADR-ID", "<unknown>")
         for row in rows
-        if not row.get("Related WPs", "").strip()
+        if not _extract_wp_ids(row.get("Related WPs", ""))
     ]
     assert not empty, (
         f"The following ADRs have empty Related WPs: {empty}"
@@ -201,6 +204,25 @@ def test_adr_006_markdown_has_related_wps():
     assert match is not None, "ADR-006 markdown missing **Related WPs:** line"
     value = match.group(1).strip()
     assert value, "ADR-006 markdown Related WPs field is empty"
+
+
+def test_adr_007_related_wps_non_empty():
+    """ADR-007 must have at least one Related WP."""
+    rows = _load_adr_index()
+    adr = next((r for r in rows if r.get("ADR-ID") == "ADR-007"), None)
+    assert adr is not None, "ADR-007 not found in index.jsonl"
+    related = _extract_wp_ids(adr.get("Related WPs", ""))
+    assert len(related) > 0, "ADR-007 has no Related WPs"
+
+
+def test_adr_007_markdown_has_related_wps():
+    """ADR-007 markdown file must have a non-empty Related WPs field."""
+    adr_file = ADR_DIR / "ADR-007-csv-to-jsonl-migration.md"
+    content = adr_file.read_text(encoding="utf-8")
+    match = re.search(r"\*\*Related WPs:\*\*\s*(.+)", content)
+    assert match is not None, "ADR-007 markdown missing **Related WPs:** line"
+    value = match.group(1).strip()
+    assert value, "ADR-007 markdown Related WPs field is empty"
 
 
 def test_wp_ids_in_index_have_valid_format():

@@ -63,7 +63,7 @@ class TestAgentWorkflowEdgeCases:
         section = self.content[idx_checklist:idx_git_ops]
         # Count lines that start with a digit followed by dot
         items = re.findall(r"^\d+\.", section, re.MULTILINE)
-        assert len(items) == 7, f"Expected 7 checklist items, found {len(items)}"
+        assert len(items) == 8, f"Expected 8 checklist items, found {len(items)}"
 
     def test_item_7_references_fixed_in_wp_field(self):
         """Item 7 must reference the Fixed In WP field by name."""
@@ -83,15 +83,15 @@ class TestAgentWorkflowEdgeCases:
         )
 
     def test_tester_checklist_has_bug_logging_requirement(self):
-        """Tester PASS Checklist should require bugs to be logged in bugs.csv."""
+        """Tester PASS Checklist should require bugs to be logged in bugs.jsonl."""
         tester_idx = self.content.index("### Tester PASS Checklist")
         git_ops_after = self.content.find("### ", tester_idx + 5)
         if git_ops_after == -1:
             tester_section = self.content[tester_idx:]
         else:
             tester_section = self.content[tester_idx:git_ops_after]
-        assert "bugs.csv" in tester_section, (
-            "Tester PASS Checklist must require logging bugs in bugs.csv"
+        assert "bugs.jsonl" in tester_section, (
+            "Tester PASS Checklist must require logging bugs in bugs.jsonl"
         )
 
 

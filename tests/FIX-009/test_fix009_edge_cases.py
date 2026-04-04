@@ -6,21 +6,26 @@ Additional tests beyond the Developer's suite:
   - WP Reference column has no empty values
   - All Run Date values are valid ISO 8601 calendar dates
 """
-import csv
+import json
 import datetime
 import os
 import re
 
 import pytest
 
-CSV_PATH = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'docs', 'test-results', 'test-results.csv'
+JSONL_PATH = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'docs', 'test-results', 'test-results.jsonl'
 )
 
 
 def _load_rows():
-    with open(CSV_PATH, newline='', encoding='utf-8') as f:
-        return list(csv.DictReader(f))
+    rows = []
+    with open(JSONL_PATH, encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
+    return rows
 
 
 def test_tst_ids_sequential_no_gaps_in_renumbered_range():
@@ -31,10 +36,18 @@ def test_tst_ids_sequential_no_gaps_in_renumbered_range():
     gaps or unexpected jumps.
     """
     rows = _load_rows()
+
+    def _to_int(row_id):
+        try:
+            return int(row_id.split('-')[1])
+        except (ValueError, IndexError):
+            return None
+
     nums = sorted(
-        int(r['ID'].split('-')[1])
-        for r in rows
-        if r['ID'].startswith('TST-') and int(r['ID'].split('-')[1]) >= 786
+        n for r in rows
+        if r['ID'].startswith('TST-')
+        for n in [_to_int(r['ID'])]
+        if n is not None and n >= 786
     )
     if not nums:
         pytest.skip('No renumbered IDs found (range 786+)')
@@ -56,7 +69,7 @@ def test_tst_ids_sequential_no_gaps_in_renumbered_range():
 
 def test_wp_reference_not_empty_for_all_rows():
     """
-    Every row in test-results.csv must have a non-blank WP Reference.
+    Every row in test-results.jsonl must have a non-blank WP Reference.
     The deduplication run should not have introduced rows without a WP linkage.
     """
     rows = _load_rows()

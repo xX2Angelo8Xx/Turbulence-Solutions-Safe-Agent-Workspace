@@ -81,6 +81,4 @@ Each line is a self-contained JSON object. Example for workpackages:
 5. Old CSV files deleted — not kept alongside JSONL
 6. Historical maintenance logs are NOT updated (they document past state)
 
-## Related WPs
-
-MNT-014 through MNT-023 (CSV-to-JSONL migration batch)
+**Related WPs:** MNT-014, MNT-015, MNT-016, MNT-017, MNT-018, MNT-019, MNT-020, MNT-021, MNT-022, MNT-023

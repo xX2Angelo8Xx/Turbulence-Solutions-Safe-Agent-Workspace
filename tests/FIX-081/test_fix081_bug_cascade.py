@@ -41,8 +41,8 @@ def _make_bug(bug_id: str, status: str, fixed_in: str = "") -> dict:
     }
 
 
-def _patch_read_csv(bugs: list[dict]):
-    """Return a read_csv mock that yields the given bugs list."""
+def _patch_read_jsonl(bugs: list[dict]):
+    """Return a read_jsonl mock that yields the given bugs list."""
     def _read_csv(path, **kwargs):
         return BUG_FIELDNAMES, [dict(b) for b in bugs]
     return _read_csv
@@ -60,7 +60,7 @@ class TestPhase1StatusFilter:
         closed = []
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell", side_effect=lambda *a, **kw: closed.append(a[2])),
             patch.object(fw, "REPO_ROOT", REPO_ROOT / "tmp_nonexistent"),
         ):
@@ -118,7 +118,7 @@ class TestPhase2StatusFilter:
                 fixed_in_updates.append(id_val)
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell", side_effect=_update_cell),
             patch.object(fw, "REPO_ROOT", tmp_path),
         ):
@@ -223,7 +223,7 @@ class TestErrorHandling:
                 closed.append(id_val)
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv(bugs)),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl(bugs)),
             patch.object(fw, "update_cell", side_effect=_update_cell_fail_first),
             patch.object(fw, "REPO_ROOT", REPO_ROOT / "tmp_nonexistent"),
         ):
@@ -237,7 +237,7 @@ class TestErrorHandling:
         bug = _make_bug("BUG-003", "Open", fixed_in="WP-FAIL")
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell", side_effect=Exception("disk full")),
             patch.object(fw, "REPO_ROOT", REPO_ROOT / "tmp_nonexistent"),
         ):
@@ -250,7 +250,7 @@ class TestErrorHandling:
         bug = _make_bug("BUG-004", "Open", fixed_in="WP-OK")
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell"),
             patch.object(fw, "REPO_ROOT", REPO_ROOT / "tmp_nonexistent"),
         ):
@@ -261,7 +261,7 @@ class TestErrorHandling:
     def test_cascade_returns_true_with_no_bugs(self):
         """_cascade_bug_status returns True when there are no matching bugs."""
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([])),
             patch.object(fw, "REPO_ROOT", REPO_ROOT / "tmp_nonexistent"),
         ):
             result = fw._cascade_bug_status("WP-EMPTY", dry_run=False)
@@ -288,7 +288,7 @@ class TestErrorHandling:
                 closed.append(id_val)
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv(bugs)),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl(bugs)),
             patch.object(fw, "update_cell", side_effect=_update_cell_fail_010),
             patch.object(fw, "REPO_ROOT", tmp_path),
         ):
@@ -302,7 +302,7 @@ class TestErrorHandling:
         bug = _make_bug("BUG-005", "Fixed", fixed_in="WP-DRY")
 
         with (
-            patch.object(fw, "read_csv", side_effect=_patch_read_csv([bug])),
+            patch.object(fw, "read_jsonl", side_effect=_patch_read_jsonl([bug])),
             patch.object(fw, "update_cell") as mock_update,
             patch.object(fw, "REPO_ROOT", REPO_ROOT / "tmp_nonexistent"),
         ):
