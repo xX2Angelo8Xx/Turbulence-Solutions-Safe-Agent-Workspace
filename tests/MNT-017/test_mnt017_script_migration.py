@@ -174,7 +174,7 @@ def test_check_jsonl_structural_passes_valid_data(tmp_path):
     _write_jsonl(wp_file, [{"ID": "GUI-001", "Status": "Done", "Name": "T"}])
     _write_jsonl(bug_file, [{"ID": "BUG-001", "Status": "Open", "Title": "T"}])
     _write_jsonl(tst_file, [{"ID": "TST-1", "Status": "Pass", "Test Name": "T"}])
-    _write_jsonl(us_file, [{"ID": "US-001", "Status": "Open", "Name": "T"}])
+    _write_jsonl(us_file, [{"ID": "US-001", "Status": "Open", "Title": "T"}])
 
     validate_workspace.WP_JSONL = wp_file
     validate_workspace.BUG_JSONL = bug_file

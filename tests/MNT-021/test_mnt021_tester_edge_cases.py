@@ -19,6 +19,7 @@ ADR_007 = REPO_ROOT / "docs" / "decisions" / "ADR-007-csv-to-jsonl-migration.md"
 ALLOWED_DIRS = {
     "MNT-016", "MNT-017", "MNT-018", "MNT-019", "MNT-020",
     "MNT-021",
+    "MNT-022",  # CSV retirement WP — legitimately references CSV file names to verify removal
     "FIX-065",  # tests for csv_utils are still valid (deprecated but functional)
 }
 
