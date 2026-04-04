@@ -2405,3 +2405,5 @@
 "TST-2524","FIX-100: targeted suite","Unit","FIX-100","Pass","2026-04-04","Windows 11 + Python 3.11","16 passed in 0.27s",""
 "TST-2525","FIX-100: targeted suite","Regression","FIX-100","Pass","2026-04-04","Windows 11 + Python 3.11","16 passed in 0.27s","Tester Agent review pass"
 "TST-2526","DOC-054: targeted suite","Unit","DOC-054","Pass","2026-04-04","Windows 11 + Python 3.11","14 passed in 0.29s",""
+"TST-2527","DOC-054: full regression suite","Unit","DOC-054","Fail","2026-04-04","Windows 11 + Python 3.11","8114 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 135.27s (0:02:15)",""
+"TST-2528","DOC-054: targeted suite","Unit","DOC-054","Pass","2026-04-04","Windows 11 + Python 3.11","25 passed in 0.31s",""
