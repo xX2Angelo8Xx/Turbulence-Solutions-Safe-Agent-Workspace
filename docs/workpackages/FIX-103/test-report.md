@@ -2,7 +2,7 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-04-04  
-**Verdict:** ❌ FAIL — return to Developer
+**Verdict:** ✅ PASS (Iteration 2)
 
 ---
 
@@ -149,3 +149,42 @@ The `known_failures` field must remain a **dict** (not a list). Restore the dict
 6. Re-run: `python scripts/run_tests.py` — all DOC-051 tests must pass
 
 **Reference:** The pre-FIX-103 format is visible at git commit `c3fefd4` (`tests/regression-baseline.json`).
+
+---
+
+## Iteration 2 — Tester Review (2026-04-04)
+
+**Test Result ID:** TST-2598
+
+### Fix Applied
+
+Developer restored `known_failures` from a list back to a dict with `{"reason": "..."}` objects per the documented schema.
+
+### Verification
+
+**`tests/regression-baseline.json` structure:**
+- `known_failures` type: **dict** ✅
+- `_count`: 147 ✅
+- Actual entries: 147 ✅
+- Count matches: ✅
+- All entries have `reason` field: ✅
+
+**DOC-051 tests:** 32/32 passed ✅  
+- `test_regression_baseline_has_known_failures_field` — PASSED  
+- `test_regression_baseline_each_entry_has_reason` — PASSED  
+- All other DOC-051 tests — PASSED  
+
+**FIX-103 regression tests:** 9/9 passed ✅
+
+**Full test suite (TST-2598):**
+- Collected: ~9,256
+- Passed: 8,769
+- Failed: 141 (all pre-existing in baseline — 0 new regressions)
+- Skipped: 346
+- xfailed: 5
+
+**Regression baseline check:** 141 failures vs 147 baseline entries — 0 new regressions ✅
+
+**`validate_workspace.py --wp FIX-103`:** Passed with 1 warning (BUG-190 Fixed-In field mismatch — non-blocking) ✅
+
+### Verdict: PASS
