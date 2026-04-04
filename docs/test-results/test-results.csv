@@ -2427,3 +2427,5 @@
 "TST-2546","DOC-058: full regression suite","Regression","DOC-058","Fail","2026-04-04","Windows 11 + Python 3.11","8213 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 133.16s (0:02:13)",""
 "TST-2547","DOC-058: targeted suite","Unit","DOC-058","Pass","2026-04-04","Windows 11 + Python 3.11","10 passed in 0.24s",""
 "TST-2548","MNT-015: targeted suite","Unit","MNT-015","Pass","2026-04-04","Windows 11 + Python 3.11","32 passed in 0.69s",""
+"TST-2549","MNT-015: targeted suite","Unit","MNT-015","Pass","2026-04-04","Windows 11 + Python 3.11","54 passed in 2.27s",""
+"TST-2550","MNT-015: full regression suite","Regression","MNT-015","Fail","2026-04-04","Windows 11 + Python 3.11","8266 passed, 37 skipped, 5 xfailed, 3 warnings, 50 errors in 126.87s (0:02:06)",""
