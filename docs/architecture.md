@@ -281,6 +281,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-055/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-056/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1146,6 +1149,7 @@ Templates (bundled inside Launcher)
 │   ├── DOC-053/
 │   ├── DOC-054/
 │   ├── DOC-055/
+│   ├── DOC-056/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
