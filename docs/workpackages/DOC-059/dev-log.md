@@ -69,3 +69,25 @@ This was fixed in FIX-103 through FIX-107 and companion MNT-024.
 ## Known Limitations
 
 None. This WP is purely documentation.
+
+---
+
+## Iteration 2 — Regression Fixes (2026-04-05)
+
+**Tester Verdict (Iteration 1):** FAIL — 2 regressions introduced by DOC-059.
+
+### Regression 1 Fixed: ADR count assertion in DOC-053
+
+**File:** `tests/DOC-053/test_doc053_adr_related_wps.py`  
+**Change:** Updated `test_adr_index_has_seven_entries` — changed assertion from `== 7` to `== 8` and updated docstring to reflect ADR-001 through ADR-008.
+
+### Regression 2 Fixed: Stale-path guard in DOC-017
+
+**File:** `tests/DOC-017/test_doc017_tester_edge_cases.py`  
+**Change:** Added `STALE_CODING_EXEMPT` set containing `decisions/ADR-008-tests-track-code.md` and `work-rules/testing-protocol.md`. The `test_broad_docs_tree_no_stale_coding` test now skips these files because their references to `templates/coding/` are intentional historical documentation (root-cause analysis), not stale paths.
+
+### Tests Re-run
+
+- `tests/DOC-053/test_doc053_adr_related_wps.py` — all pass
+- `tests/DOC-017/test_doc017_tester_edge_cases.py` — all pass
+- `tests/DOC-059/` — 18 passed (TST-2602)

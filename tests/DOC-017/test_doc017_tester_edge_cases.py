@@ -140,6 +140,13 @@ HISTORICAL_DIRS = {
     "maintenance", "plans",
 }
 
+# Files that contain intentional historical references to templates/coding/
+# (e.g., root-cause documentation in ADRs or process rules).
+STALE_CODING_EXEMPT = {
+    "decisions/ADR-008-tests-track-code.md",
+    "work-rules/testing-protocol.md",
+}
+
 
 def test_broad_docs_tree_no_stale_coding():
     """No non-historical docs file contains templates/coding/."""
@@ -149,6 +156,10 @@ def test_broad_docs_tree_no_stale_coding():
         # Skip historical directories
         parts = set(f.relative_to(docs_root).parts[:-1])
         if parts & HISTORICAL_DIRS:
+            continue
+        # Skip files with intentional historical references
+        rel = str(f.relative_to(docs_root)).replace("\\", "/")
+        if rel in STALE_CODING_EXEMPT:
             continue
         content = f.read_text(encoding="utf-8")
         if "templates/coding/" in content:

@@ -55,10 +55,10 @@ def _extract_wp_ids(related_wps_field) -> list:
 
 
 def test_adr_index_has_seven_entries():
-    """The ADR index must contain exactly 7 entries (ADR-001 through ADR-007)."""
+    """The ADR index must contain exactly 8 entries (ADR-001 through ADR-008)."""
     rows = _load_adr_index()
-    assert len(rows) == 7, (
-        f"Expected 7 ADR entries, found {len(rows)}: "
+    assert len(rows) == 8, (
+        f"Expected 8 ADR entries, found {len(rows)}: "
         + str([r.get("ADR-ID") for r in rows])
     )
 
