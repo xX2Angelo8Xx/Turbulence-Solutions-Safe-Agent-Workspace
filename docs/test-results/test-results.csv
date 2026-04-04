@@ -2403,3 +2403,4 @@
 "TST-2522","FIX-099: targeted suite","Unit","FIX-099","Pass","2026-04-04","Windows 11 + Python 3.11","9 passed in 0.29s",""
 "TST-2523","FIX-099: full suite (Tester run, 12 passed)","Unit","FIX-099","Pass","2026-04-04","Windows 11 + Python 3.11","12 passed in 0.34s","9 developer tests + 3 tester edge cases: decomposed guard, tmp-file, exception skip"
 "TST-2524","FIX-100: targeted suite","Unit","FIX-100","Pass","2026-04-04","Windows 11 + Python 3.11","16 passed in 0.27s",""
+"TST-2525","FIX-100: targeted suite","Regression","FIX-100","Pass","2026-04-04","Windows 11 + Python 3.11","16 passed in 0.27s","Tester Agent review pass"
