@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Archive old test results to keep the active CSV small.
+"""Archive old test results to keep the active JSONL small.
 
 Moves TST entries for Done workpackages into an archived file. The active
-test-results.csv stays lean for faster locking and ID computation.
+test-results.jsonl stays lean for faster locking and ID computation.
 
 Usage:
     .venv/Scripts/python scripts/archive_test_results.py

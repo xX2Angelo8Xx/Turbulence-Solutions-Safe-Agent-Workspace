@@ -11,10 +11,10 @@ Generate a comprehensive, structured status report for the **Turbulence Solution
 
 Read the following files **in full** before generating the report:
 
-1. `docs/workpackages/workpackages.csv` — All workpackages (ID, Status, Category)
-2. `docs/bugs/bugs.csv` — All bugs (ID, Status, Severity)
-3. `docs/test-results/test-results.csv` — Test results (last 50 entries are sufficient)
-4. `docs/user-stories/user-stories.csv` — User stories and their status
+1. `docs/workpackages/workpackages.jsonl` — All workpackages (ID, Status, Category)
+2. `docs/bugs/bugs.jsonl` — All bugs (ID, Status, Severity)
+3. `docs/test-results/test-results.jsonl` — Test results (last 50 entries are sufficient)
+4. `docs/user-stories/user-stories.jsonl` — User stories and their status
 5. `docs/project-scope.md` — Project vision and capabilities
 6. `docs/architecture.md` — Architecture overview
 7. `docs/maintenance/` — The 2 most recent maintenance logs (sorted by date)

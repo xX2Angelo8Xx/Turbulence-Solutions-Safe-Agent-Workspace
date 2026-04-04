@@ -63,7 +63,6 @@ Templates (bundled inside Launcher)
 │   │   ├── ADR-006-defer-code-signing.md
 │   │   ├── ADR-007-csv-to-jsonl-migration.md
 │   │   ├── ADR-TEMPLATE.md
-│   │   ├── index.csv
 │   │   └── index.jsonl
 │   ├── maintenance/
 │   │   ├── .gitkeep
@@ -821,6 +820,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── MNT-022/
 │   │   ├── SAF-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1047,7 +1047,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
-│   │   ├── workpackages.csv
 │   │   └── workpackages.jsonl
 │   ├── architecture.md
 │   ├── macos-installation-guide.md
@@ -1357,6 +1356,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-019/
 │   ├── MNT-020/
 │   ├── MNT-021/
+│   ├── MNT-022/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/

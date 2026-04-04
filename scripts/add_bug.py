@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add a bug row to bugs.csv with auto-assigned BUG-ID.
+"""Add a bug row to bugs.jsonl with auto-assigned BUG-ID.
 
 Usage:
     .venv/Scripts/python scripts/add_bug.py \

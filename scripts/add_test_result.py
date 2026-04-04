@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add a test result row to test-results.csv with auto-assigned TST-ID.
+"""Add a test result row to test-results.jsonl with auto-assigned TST-ID.
 
 Usage:
     .venv/Scripts/python scripts/add_test_result.py \

@@ -2,7 +2,7 @@
 """Run pytest for a workpackage and atomically log the result.
 
 Executes the test suite in tests/<WP-ID>/, parses pytest output, and logs
-the result to test-results.csv via locked_next_id_and_append(). This
+the result to test-results.jsonl via locked_next_id_and_append(). This
 closes the "self-reported results" loophole — the script is proof that
 tests were actually executed.
 

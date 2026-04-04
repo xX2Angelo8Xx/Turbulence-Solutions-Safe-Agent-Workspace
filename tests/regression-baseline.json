@@ -1,6 +1,6 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 686,
+  "_count": 684,
   "_updated": "2026-04-04",
   "known_failures": {
     "tests.DOC-004.test_doc004_project_readme_placeholders.test_both_readmes_are_identical": {
@@ -1961,12 +1961,6 @@
     },
     "tests.MNT-002.test_mnt002_action_tracker.test_initial_action_count": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.MNT-018.test_mnt018_data_conversion.test_csv_files_deleted": {
-      "reason": "pre-existing failure: workpackages.csv not deleted by MNT-018"
-    },
-    "tests.MNT-020.test_mnt020_jsonl_docs.test_architecture_md_no_stale_csv": {
-      "reason": "pre-existing failure: architecture.md still has workpackages.csv in file tree"
     },
     "tests.SAF-010.test_saf010_hook_config.test_command_uses_python - A...": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"

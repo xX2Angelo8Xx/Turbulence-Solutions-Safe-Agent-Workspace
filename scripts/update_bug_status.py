@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Update the Status field of a bug in bugs.csv.
+"""Update the Status field of a bug in bugs.jsonl.
 
 Usage:
     .venv\\Scripts\\python scripts/update_bug_status.py BUG-111 --status Closed
@@ -19,7 +19,7 @@ VALID_STATUSES = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Update the status of a bug in bugs.csv."
+        description="Update the status of a bug in bugs.jsonl."
     )
     parser.add_argument("bug_id", help="Bug ID to update (e.g. BUG-111)")
     parser.add_argument(

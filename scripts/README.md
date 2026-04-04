@@ -1,6 +1,6 @@
 # Agent Helper Scripts
 
-CLI tools that automate error-prone bookkeeping tasks. **Agents MUST use these scripts** instead of editing CSVs manually for the operations they cover.
+CLI tools that automate error-prone bookkeeping tasks. **Agents MUST use these scripts** instead of editing JSONL files manually for the operations they cover.
 
 All scripts are non-interactive, use file locking for parallel safety, and run via the workspace `.venv`.
 
@@ -11,9 +11,9 @@ All scripts are non-interactive, use file locking for parallel safety, and run v
 | Script | Purpose | Replaces |
 |--------|---------|----------|
 | `run_tests.py` | **Mandatory.** Run pytest + auto-log results | Manual test execution + `add_test_result.py` |
-| `add_test_result.py` | Add test result row with auto TST-ID (fallback) | Manual CSV editing for test results |
-| `add_workpackage.py` | Create WP with auto ID + US cross-ref | Manual CSV editing + forgetting US Linked WPs update |
-| `add_bug.py` | Log bug with auto BUG-ID | Manual CSV editing for bugs |
+| `add_test_result.py` | Add test result row with auto TST-ID (fallback) | Manual JSONL editing for test results |
+| `add_workpackage.py` | Create WP with auto ID + US cross-ref | Manual JSONL editing + forgetting US Linked WPs update |
+| `add_bug.py` | Log bug with auto BUG-ID | Manual JSONL editing for bugs |
 | `validate_workspace.py` | Pre-commit integrity checker (also runs as pre-commit hook) | Manual checklist verification |
 | `finalize_wp.py` | Post-Done merge, cleanup, cascades (idempotent) | 10-step manual Post-Done Finalization |
 | `update_architecture.py` | Regenerate architecture.md tree | Manual architecture.md updates |
@@ -44,7 +44,7 @@ All commands assume you're in the repository root.
     --full-suite
 ```
 
-**Mandatory for:** Developer (Step 5) and Tester (Step 2 & 5). This is the primary tool for running tests and logging results. It executes pytest, parses the output, and atomically logs the result to `test-results.csv`.
+**Mandatory for:** Developer (Step 5) and Tester (Step 2 & 5). This is the primary tool for running tests and logging results. It executes pytest, parses the output, and atomically logs the result to `test-results.jsonl`.
 
 ### add_test_result.py (Fallback)
 
@@ -59,7 +59,7 @@ All commands assume you're in the repository root.
     --notes "Optional notes"
 ```
 
-Fallback for cases where `run_tests.py` cannot be used (e.g., manual testing, external tools). Direct CSV editing for test results is prohibited.
+Fallback for cases where `run_tests.py` cannot be used (e.g., manual testing, external tools). Direct JSONL editing for test results is prohibited.
 
 ### add_workpackage.py
 
@@ -144,7 +144,7 @@ Sets `git config core.hooksPath scripts/hooks` so Git uses the tracked pre-commi
 .venv\Scripts\python scripts/dedup_test_ids.py
 ```
 
-One-time utility to renumber duplicate TST-IDs in `test-results.csv`.
+One-time utility to renumber duplicate TST-IDs in `test-results.jsonl`.
 
 ### archive_test_results.py
 
@@ -156,7 +156,7 @@ One-time utility to renumber duplicate TST-IDs in `test-results.csv`.
 .venv\Scripts\python scripts/archive_test_results.py
 ```
 
-Moves test result entries for Done WPs to `docs/test-results/archived-test-results.csv` to keep the active CSV small.
+Moves test result entries for Done WPs to `docs/test-results/archived-test-results.jsonl` to keep the active JSONL small.
 
 ---
 
@@ -176,18 +176,20 @@ This ensures the pre-commit hook (which runs `validate_workspace.py --full`) is 
 
 ## Parallel Safety
 
-All scripts use `FileLock` (atomic lock file creation) to prevent race conditions when multiple agents modify the same CSV simultaneously. The `locked_next_id_and_append()` function in `csv_utils.py` atomically reads the current max ID, computes the next one, and appends the row — all within a single lock.
+All scripts use `FileLock` (atomic lock file creation) to prevent race conditions when multiple agents modify the same JSONL file simultaneously. The `locked_next_id_and_append()` function in `jsonl_utils.py` atomically reads the current max ID, computes the next one, and appends the row — all within a single lock.
 
 ---
 
-## Shared Module: csv_utils.py
+## Shared Module: jsonl_utils.py
 
-Internal module used by all scripts. Key exports:
+Internal module used by all active scripts. Key exports:
 
 - `FileLock(path)` — cross-platform file lock context manager
-- `read_csv(path, expected_columns=None)` → `(fieldnames, rows)` — read CSV into dicts (with optional schema validation)
-- `write_csv(path, fieldnames, rows)` — write CSV with QUOTE_ALL (project standard)
-- `next_id(path, prefix)` — get next sequential ID (no lock)
-- `append_row(path, row)` — append with duplicate check (locked)
+- `read_jsonl(path, expected_columns=None)` → `(fieldnames, rows)` — read JSONL into dicts
+- `write_jsonl(path, fieldnames, rows)` — write JSONL
+- `next_id(prefix, rows)` — get next sequential ID
 - `update_cell(path, id_col, id_val, target_col, new_val)` — update one cell (locked)
-- `locked_next_id_and_append(path, prefix, row)` — atomic ID assign + append (locked)
+- `locked_next_id_and_append(path, prefix, row_template, id_column, zero_pad)` — atomic ID assign + append (locked)
+
+> **Note:** `csv_utils.py` is a legacy module retained only to support permanent regression test files
+> from FIX-065 (which tested CSV overflow handling). It is not used by any active operational script.

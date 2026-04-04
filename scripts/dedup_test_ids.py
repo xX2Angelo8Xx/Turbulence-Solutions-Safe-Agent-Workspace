@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-time deduplication of TST-IDs in test-results.csv.
+"""One-time deduplication of TST-IDs in test-results.jsonl.
 
 Scans all rows, identifies duplicate TST-IDs, and assigns new unique IDs
 to later occurrences of each duplicate. The first occurrence keeps its

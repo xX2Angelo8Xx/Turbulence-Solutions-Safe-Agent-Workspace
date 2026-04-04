@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add a workpackage row to workpackages.csv with auto-assigned ID.
+"""Add a workpackage row to workpackages.jsonl with auto-assigned ID.
 
 Automatically updates the parent User Story's Linked WPs column to include
 the new WP ID, preventing cross-reference drift.
