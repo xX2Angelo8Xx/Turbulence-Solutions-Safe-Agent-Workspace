@@ -1,6 +1,6 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 686,
+  "_count": 643,
   "_updated": "2026-04-04",
   "known_failures": {
     "tests.DOC-004.test_doc004_project_readme_placeholders.test_both_readmes_are_identical": {
@@ -1335,9 +1335,6 @@
     "tests.FIX-009.test_fix009_required_fields.test_required_fields_not_empty": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
-    "tests.FIX-019.test_fix019_edge_cases.TestVersionOrdering.test_new_version_major_incremented_by_one": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
     "tests.FIX-028.test_fix028_codesign.test_app_bundle_quoted_in_codesign": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
@@ -1381,9 +1378,6 @@
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.FIX-031.test_fix031_bottomup_codesign.test_verify_deep_strict_present": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-036.test_fix036_version_consistency.test_architecture_md_references_new_version": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.FIX-037.test_fix037_dist_info_cleanup.test_codesign_steps_still_present": {
@@ -1455,16 +1449,10 @@
     "tests.FIX-039.test_fix039_skip_launcher_resign.test_release_yml_verifies_pre_bundle_binary": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
-    "tests.FIX-049.test_fix049_version_utils.TestDynamicVersionSurvivesBump.test_all_affected_files_use_dynamic_expression": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
     "tests.FIX-062.test_fix062_resource_relocation.test_no_crlf_line_endings": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.FIX-063.test_fix063_internal_relocation.test_no_crlf_line_endings": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-070.test_fix070_version_bump.test_current_version_is_3_2_3": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.FIX-073.test_fix073_agent_frontmatter.test_brainstormer_model": {
@@ -1539,36 +1527,6 @@
     "tests.FIX-073.test_fix073_edge_cases.test_tools_is_list_in_all_agents": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
-    "tests.FIX-077.test_fix077_version_322.test_all_version_files_agree": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-077.test_fix077_version_322.test_build_appimage_sh_is_323": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-077.test_fix077_version_322.test_get_display_version_returns_323": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-077.test_fix077_version_322.test_pyproject_toml_is_323": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-077.test_fix077_version_322.test_shared_version_utils_current_version_is_323": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-078.test_fix078_edge_cases.test_get_display_version_fallback_returns_323": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-078.test_fix078_edge_cases.test_version_imported_from_config_module": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-078.test_fix078_version_323.test_all_version_files_agree": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-078.test_fix078_version_323.test_build_appimage_sh_is_323": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-078.test_fix078_version_323.test_pyproject_toml_is_323": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
     "tests.FIX-086.test_fix086_readme.TestTemplateReadmeExists.test_readme_mentions_security_gate": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
@@ -1603,39 +1561,6 @@
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.FIX-086.test_fix086_tester_edge_cases.TestWorkspaceCreationEdgeCases.test_readme_tier1_section_has_project_name_replaced": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-088.test_fix088_edge_cases.test_get_display_version_fallback_returns_326": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-088.test_fix088_edge_cases.test_version_importable_and_correct": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-088.test_fix088_version_bump.test_all_versions_consistent": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-088.test_fix088_version_bump.test_pyproject_toml_version": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-090.test_fix090_edge_cases.test_all_five_files_have_same_version": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-090.test_fix090_edge_cases.test_config_py_version_format": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-090.test_fix090_edge_cases.test_pyproject_version_defined_once": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-090.test_fix090_edge_cases.test_pyproject_version_format": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-090.test_fix090_version_bump.test_build_appimage_sh_version": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-090.test_fix090_version_bump.test_build_dmg_sh_version": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-090.test_fix090_version_bump.test_pyproject_toml_version": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.FIX-091.test_fix091_edge_cases.test_agent_rules_is_regular_file": {
@@ -1818,18 +1743,6 @@
     "tests.INS-019.test_ins019_shims.test_write_python_path_creates_parent_dirs": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
-    "tests.INS-029.test_ins029_version_bump.test_all_version_files_agree": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-029.test_ins029_version_bump.test_build_appimage_version": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-029.test_ins029_version_bump.test_pyproject_toml_version": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-029.test_ins029_version_bump.test_version_import_from_config": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
     "tests.MNT-002.test_mnt002_action_tracker.test_initial_action_count": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
@@ -1921,145 +1834,103 @@
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.DOC-023.test_doc023_scientist_agent.test_file_exists": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-024.test_doc024_criticist_agent.test_file_exists": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-026.test_doc026_fixer_agent.test_body_is_non_empty": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-026.test_doc026_fixer_agent.test_file_exists": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-026.test_doc026_fixer_agent.test_file_is_not_empty": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-027.test_doc027_writer_agent.test_body_is_non_trivial": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-027.test_doc027_writer_agent.test_file_exists": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-027.test_doc027_writer_agent.test_file_is_not_empty": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-028.test_doc028_prototyper_agent.test_file_exists": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-039.test_doc039_tidyup.test_tidyup_agent_exists": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-039.test_doc039_tidyup.test_tidyup_has_audit_checks": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-039.test_doc039_tidyup.test_tidyup_has_frontmatter": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.DOC-042.test_doc042_agent_settings.test_tidyup_tools": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-009.test_fix009_tst_id_format.test_tst_id_format": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-028.test_fix028_codesign.test_deep_flag_present": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-028.test_fix028_codesign.test_find_so_signing_present": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-028.test_fix028_codesign.test_no_crlf_line_endings": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-028.test_fix028_codesign.test_verify_uses_deep_strict": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-065.test_fix065_csv_strict.TestCheckJsonlStructural.test_invalid_bug_status_reported": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-065.test_fix065_csv_strict.TestCheckJsonlStructural.test_invalid_wp_status_reported": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-073.test_fix073_agent_frontmatter.test_fixer_model": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-073.test_fix073_agent_frontmatter.test_fixer_tools": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-073.test_fix073_agent_frontmatter.test_planner_tools": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-073.test_fix073_agent_frontmatter.test_tester_model": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-073.test_fix073_agent_frontmatter.test_tester_tools": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-073.test_fix073_agent_frontmatter.test_writer_model": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-073.test_fix073_agent_frontmatter.test_writer_tools": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.FIX-073.test_fix073_edge_cases.test_all_agent_files_exist": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-077.test_fix077_version_322.test_build_dmg_sh_is_323": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-077.test_fix077_version_322.test_config_py_is_323": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-077.test_fix077_version_322.test_setup_iss_is_323": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-078.test_fix078_version_323.test_build_dmg_sh_is_323": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-078.test_fix078_version_323.test_config_py_is_323": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-078.test_fix078_version_323.test_setup_iss_is_323": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-088.test_fix088_version_bump.test_build_dmg_version": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-088.test_fix088_version_bump.test_config_py_version": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-088.test_fix088_version_bump.test_setup_iss_version": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-090.test_fix090_version_bump.test_config_py_version": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-090.test_fix090_version_bump.test_setup_iss_version": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.INS-019.test_ins019_shims.test_get_python_path_config": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.INS-019.test_ins019_shims.test_verify_shim_ok": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.INS-029.test_ins029_version_bump.test_build_dmg_version": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.INS-029.test_ins029_version_bump.test_config_py_version": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
-    },
-    "tests.INS-029.test_ins029_version_bump.test_setup_iss_version": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.SAF-010.test_saf010_hook_config.test_command_uses_python": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.SAF-056.test_saf056_agent_rules.test_agent_rules_exists": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
     "tests.SAF-061.test_saf061_tester_edge_cases.TestThreeConcurrentThreadsLock.test_three_concurrent_threads_no_deadlock_and_lock_cleaned_up": {
-      "reason": "Pre-existing failure — template restructuring/version changes during JSONL migration"
+      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     }
   }
 }

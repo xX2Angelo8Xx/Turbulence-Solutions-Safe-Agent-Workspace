@@ -2461,3 +2461,4 @@
 {"ID": "TST-2581", "Test Name": "FIX-102: targeted suite", "Test Type": "Unit", "WP Reference": "FIX-102", "Status": "Pass", "Run Date": "2026-04-04", "Environment": "Windows 11 + Python 3.11", "Result": "9 passed in 0.30s", "Notes": ""}
 {"ID": "TST-2582", "Test Name": "FIX-107: targeted suite", "Test Type": "Unit", "WP Reference": "FIX-107", "Status": "Pass", "Run Date": "2026-04-04", "Environment": "Windows 11 + Python 3.13", "Result": "3 passed in 0.14s", "Notes": ""}
 {"ID": "TST-2583", "Test Name": "FIX-107: targeted suite", "Test Type": "Regression", "WP Reference": "FIX-107", "Status": "Pass", "Run Date": "2026-04-04", "Environment": "Windows 11 + Python 3.13", "Result": "3 passed in 0.13s", "Notes": ""}
+{"ID": "TST-2584", "Test Name": "FIX-104: targeted suite", "Test Type": "Unit", "WP Reference": "FIX-104", "Status": "Pass", "Run Date": "2026-04-04", "Environment": "Windows 11 + Python 3.13", "Result": "6 passed in 0.15s", "Notes": ""}

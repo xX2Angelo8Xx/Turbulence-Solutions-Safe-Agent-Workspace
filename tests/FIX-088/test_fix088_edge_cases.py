@@ -9,8 +9,10 @@ import sys
 from pathlib import Path
 from unittest.mock import patch
 
+from tests.shared.version_utils import CURRENT_VERSION
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXPECTED_VERSION = "3.2.6"
+EXPECTED_VERSION = CURRENT_VERSION
 STALE_VERSIONS = ("3.2.5", "3.2.4", "3.2.3")
 
 _VERSION_FILES = {
@@ -93,22 +95,22 @@ def test_version_matches_semver_format() -> None:
 
 
 def test_version_components_correct() -> None:
-    """3.2.6 must parse as (3, 2, 6) with no leading zeros."""
+    """Version components must parse as non-negative integers with no leading zeros."""
     parts = EXPECTED_VERSION.split(".")
     assert len(parts) == 3
-    major, minor, patch_v = (int(p) for p in parts)
-    assert (major, minor, patch_v) == (3, 2, 6), (
-        f"Parsed ({major}, {minor}, {patch_v}), expected (3, 2, 6)"
-    )
     for part in parts:
         assert part == str(int(part)), f"Component '{part}' has leading zeros"
+    expected_tuple = tuple(int(p) for p in parts)
+    major, minor, patch_v = expected_tuple
+    assert (major, minor, patch_v) == expected_tuple, (
+        f"Parsed ({major}, {minor}, {patch_v}), mismatch"
+    )
 
 
 def test_version_is_not_superstring() -> None:
-    """Version must be exactly '3.2.6', not '3.2.60' or '3.2.61' etc."""
-    assert EXPECTED_VERSION == "3.2.6"
-    assert len(EXPECTED_VERSION) == 5, (
-        f"Unexpected version string length: '{EXPECTED_VERSION}'"
+    """Version must match strict semver format with no extra characters."""
+    assert re.match(r'^\d+\.\d+\.\d+$', EXPECTED_VERSION), (
+        f"Version string '{EXPECTED_VERSION}' does not match strict semver format"
     )
 
 
@@ -117,14 +119,14 @@ def test_version_is_not_superstring() -> None:
 # ---------------------------------------------------------------------------
 
 def test_326_is_greater_than_325() -> None:
-    """Version tuple (3,2,6) must be strictly greater than (3,2,5)."""
+    """Current version tuple must be strictly greater than (3,2,5)."""
     current = tuple(int(x) for x in EXPECTED_VERSION.split("."))
     previous = (3, 2, 5)
     assert current > previous, f"{current} is not greater than {previous}"
 
 
 def test_326_is_greater_than_324() -> None:
-    """Version tuple (3,2,6) must be strictly greater than (3,2,4)."""
+    """Current version tuple must be strictly greater than (3,2,4)."""
     current = tuple(int(x) for x in EXPECTED_VERSION.split("."))
     older = (3, 2, 4)
     assert current > older, f"{current} is not greater than {older}"

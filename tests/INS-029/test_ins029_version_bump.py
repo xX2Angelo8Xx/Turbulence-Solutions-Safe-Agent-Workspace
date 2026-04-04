@@ -7,9 +7,11 @@ contain the stale version string "3.2.3".
 import re
 from pathlib import Path
 
+from tests.shared.version_utils import CURRENT_VERSION
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-EXPECTED_VERSION = "3.2.4"
+EXPECTED_VERSION = CURRENT_VERSION
 STALE_VERSION = "3.2.3"
 
 _VERSION_FILES = [

@@ -3,6 +3,8 @@
 import re
 from pathlib import Path
 
+from tests.shared.version_utils import CURRENT_VERSION
+
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 VERSION_FILES = {
@@ -13,7 +15,7 @@ VERSION_FILES = {
     "build_appimage.sh": REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh",
 }
 
-EXPECTED_VERSION = "3.3.1"
+EXPECTED_VERSION = CURRENT_VERSION
 OLD_VERSION = "3.3.0"
 
 
@@ -111,7 +113,8 @@ def test_config_py_version_appears_at_most_once():
 def test_pyproject_version_defined_once():
     """pyproject.toml version field should appear exactly once."""
     content = VERSION_FILES["pyproject.toml"].read_text(encoding="utf-8")
-    matches = re.findall(r'^version\s*=\s*"3\.3\.1"', content, re.MULTILINE)
+    escaped = re.escape(EXPECTED_VERSION)
+    matches = re.findall(rf'^version\s*=\s*"{escaped}"', content, re.MULTILINE)
     assert len(matches) == 1, \
         f"Expected exactly 1 version definition in pyproject.toml, found {len(matches)}"
 
@@ -119,8 +122,15 @@ def test_pyproject_version_defined_once():
 # --- No future version accidentally committed ---
 
 def test_no_future_version_in_files():
-    """None of the 5 files should contain a version higher than 3.3.1."""
-    future_pattern = re.compile(r'\b(3\.3\.[2-9]|3\.4\.\d+|4\.\d+\.\d+)\b')
+    """None of the 5 files should contain a version higher than EXPECTED_VERSION."""
+    _major, _minor, _patch = (int(x) for x in EXPECTED_VERSION.split("."))
+    # Build a pattern that matches versions strictly higher than current within same major.minor
+    future_patches = "|".join(str(p) for p in range(_patch + 1, _patch + 20))
+    future_pattern = re.compile(
+        rf'\b({re.escape(str(_major))}\.{re.escape(str(_minor))}\.({future_patches})'
+        rf'|{re.escape(str(_major))}\.{re.escape(str(_minor + 1))}\.\d+'
+        rf'|{re.escape(str(_major + 1))}\.\d+\.\d+)\b'
+    )
     for name, path in VERSION_FILES.items():
         content = path.read_text(encoding="utf-8")
         match = future_pattern.search(content)

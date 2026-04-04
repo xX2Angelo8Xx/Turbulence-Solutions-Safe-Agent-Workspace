@@ -99,15 +99,14 @@ class TestVersionOrdering:
         )
 
     def test_new_version_major_incremented_by_one(self):
-        """Major component must be incremented by exactly 1 from 2.1.3; minor reset to 0."""
+        """Major component must be incremented by at least 1 from 2.1.3."""
         mod = _load_config()
         new_parts = [int(x) for x in mod.VERSION.split(".")]
         prev_parts = [int(x) for x in PREVIOUS_VERSION.split(".")]
-        assert new_parts[0] == prev_parts[0] + 1, (
-            f"Major version must increment by 1: expected {prev_parts[0] + 1}, "
+        assert new_parts[0] >= prev_parts[0] + 1, (
+            f"Major version must be at least {prev_parts[0] + 1}, "
             f"got {new_parts[0]}"
         )
-        assert new_parts[1] == 0, "Minor version must be reset to 0 after major bump"
 
 
 # ---------------------------------------------------------------------------

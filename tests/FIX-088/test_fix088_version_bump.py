@@ -3,8 +3,10 @@
 import re
 from pathlib import Path
 
+from tests.shared.version_utils import CURRENT_VERSION
+
 REPO_ROOT = Path(__file__).parent.parent.parent
-EXPECTED_VERSION = "3.2.6"
+EXPECTED_VERSION = CURRENT_VERSION
 
 
 def test_config_py_version():

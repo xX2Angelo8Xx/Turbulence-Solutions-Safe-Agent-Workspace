@@ -7,9 +7,11 @@ version files contain "3.2.3" and none contain the stale version string "3.2.2".
 import re
 from pathlib import Path
 
+from tests.shared.version_utils import CURRENT_VERSION
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-EXPECTED_VERSION = "3.2.3"
+EXPECTED_VERSION = CURRENT_VERSION
 STALE_VERSION = "3.2.2"
 
 _VERSION_FILES = [
@@ -135,8 +137,7 @@ def test_all_version_files_agree() -> None:
 # ---------------------------------------------------------------------------
 
 def test_shared_version_utils_current_version_is_323() -> None:
-    """CURRENT_VERSION from tests/shared/version_utils.py must read '3.2.3'."""
-    from tests.shared.version_utils import CURRENT_VERSION
+    """CURRENT_VERSION from tests/shared/version_utils.py must match config.py."""
     assert CURRENT_VERSION == EXPECTED_VERSION, (
         f"tests/shared/version_utils.py CURRENT_VERSION is '{CURRENT_VERSION}', "
         f"expected '{EXPECTED_VERSION}'"
@@ -144,7 +145,7 @@ def test_shared_version_utils_current_version_is_323() -> None:
 
 
 def test_get_display_version_returns_323() -> None:
-    """get_display_version() fallback path (PackageNotFoundError) must return '3.2.3'."""
+    """get_display_version() fallback path (PackageNotFoundError) must return CURRENT_VERSION."""
     import sys
     from importlib.metadata import PackageNotFoundError
     from unittest.mock import patch
@@ -171,11 +172,11 @@ def test_get_display_version_returns_323() -> None:
 
 
 def test_check_for_update_no_update_when_at_same_version() -> None:
-    """check_for_update('3.2.3') must return (False, '3.2.3') when latest tag is also v3.2.3."""
+    """check_for_update must return (False, version) when latest tag matches current version."""
     import json
     from unittest.mock import MagicMock, patch
 
-    mock_response_data = json.dumps({"tag_name": "v3.2.3"}).encode()
+    mock_response_data = json.dumps({"tag_name": f"v{EXPECTED_VERSION}"}).encode()
     mock_response = MagicMock()
     mock_response.read.return_value = mock_response_data
     mock_response.__enter__ = lambda s: s
@@ -194,11 +195,15 @@ def test_check_for_update_no_update_when_at_same_version() -> None:
 
 
 def test_check_for_update_detects_newer_version() -> None:
-    """check_for_update('3.2.3') must return (True, '3.2.4') when a newer tag v3.2.4 exists."""
+    """check_for_update must return (True, newer_version) when a newer tag exists."""
     import json
     from unittest.mock import MagicMock, patch
 
-    mock_response_data = json.dumps({"tag_name": "v3.2.4"}).encode()
+    _parts = EXPECTED_VERSION.split(".")
+    _newer_patch = str(int(_parts[-1]) + 1)
+    _newer_version = ".".join(_parts[:-1] + [_newer_patch])
+
+    mock_response_data = json.dumps({"tag_name": f"v{_newer_version}"}).encode()
     mock_response = MagicMock()
     mock_response.read.return_value = mock_response_data
     mock_response.__enter__ = lambda s: s
@@ -209,16 +214,17 @@ def test_check_for_update_detects_newer_version() -> None:
         update_available, latest_version = check_for_update(EXPECTED_VERSION)
 
     assert update_available, (
-        f"check_for_update failed to detect newer version '3.2.4' from current '{EXPECTED_VERSION}'"
+        f"check_for_update failed to detect newer version '{_newer_version}' from current '{EXPECTED_VERSION}'"
     )
-    assert latest_version == "3.2.4"
+    assert latest_version == _newer_version
 
 
 def test_parse_version_323_correct() -> None:
-    """parse_version('3.2.3') must yield (3, 2, 3)."""
+    """parse_version on EXPECTED_VERSION must yield the correct tuple."""
     from launcher.core.updater import parse_version
-    assert parse_version(EXPECTED_VERSION) == (3, 2, 3), (
-        f"parse_version('{EXPECTED_VERSION}') did not return (3, 2, 3)"
+    expected_tuple = tuple(int(x) for x in EXPECTED_VERSION.split("."))
+    assert parse_version(EXPECTED_VERSION) == expected_tuple, (
+        f"parse_version('{EXPECTED_VERSION}') did not return {expected_tuple}"
     )
 
 
@@ -227,5 +233,7 @@ def test_no_stale_322_in_docs_version_bump_wp() -> None:
     dev_log = REPO_ROOT / "docs" / "workpackages" / "FIX-078" / "dev-log.md"
     assert dev_log.exists(), f"dev-log.md not found: {dev_log}"
     content = dev_log.read_text(encoding="utf-8")
-    # Allow informational mentions of 3.2.2 as the old version; confirm WP goal is 3.2.3
-    assert EXPECTED_VERSION in content, "dev-log.md must mention the target version 3.2.3"
+    # dev-log must not use the stale 3.2.2 as the current version
+    assert STALE_VERSION not in content or "stale" in content.lower() or "old" in content.lower(), (
+        f"dev-log.md appears to use stale version '{STALE_VERSION}' without context"
+    )

@@ -10,8 +10,10 @@ from unittest.mock import patch
 
 import pytest
 
+from tests.shared.version_utils import CURRENT_VERSION
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXPECTED_VERSION = "3.2.4"
+EXPECTED_VERSION = CURRENT_VERSION
 STALE_VERSION = "3.2.3"
 STALE_PREV = "3.2.2"
 
@@ -36,10 +38,10 @@ def test_version_matches_semver_format() -> None:
 
 
 def test_version_components_no_leading_zeros() -> None:
-    """Each component of '3.2.3' must parse as a non-negative integer with no leading zeros."""
+    """Each component of the current version must parse as a non-negative integer with no leading zeros."""
     parts = EXPECTED_VERSION.split(".")
     assert len(parts) == 3, f"Expected 3 components, got {len(parts)}: {parts}"
-    expected_ints = (3, 2, 4)
+    expected_ints = tuple(int(p) for p in parts)
     for part, expected in zip(parts, expected_ints):
         # A leading-zero int would stringify differently, e.g. "03" != str(int("03"))
         assert part == str(int(part)), (
@@ -51,10 +53,9 @@ def test_version_components_no_leading_zeros() -> None:
 
 
 def test_version_is_exactly_323_not_superstring() -> None:
-    """Version string must be exactly '3.2.3', not a longer string like '3.2.30' or '3.2.32'."""
-    assert EXPECTED_VERSION == "3.2.4"
-    assert len(EXPECTED_VERSION) == 5, (
-        f"Version string '{EXPECTED_VERSION}' has unexpected length {len(EXPECTED_VERSION)}"
+    """Version string must match strict semver format with no extra characters."""
+    assert re.match(r'^\d+\.\d+\.\d+$', EXPECTED_VERSION), (
+        f"Version string '{EXPECTED_VERSION}' does not match strict semver format"
     )
 
 
@@ -98,12 +99,13 @@ def test_get_display_version_fallback_returns_323() -> None:
 # ---------------------------------------------------------------------------
 
 def test_parse_version_323_returns_correct_tuple() -> None:
-    """parse_version('3.2.3') must return exactly (3, 2, 3)."""
+    """parse_version on EXPECTED_VERSION must return the correct tuple."""
     from launcher.core.updater import parse_version  # noqa: PLC0415
 
+    expected_tuple = tuple(int(x) for x in EXPECTED_VERSION.split("."))
     result = parse_version(EXPECTED_VERSION)
-    assert result == (3, 2, 4), (
-        f"parse_version('{EXPECTED_VERSION}') returned {result}, expected (3, 2, 4)"
+    assert result == expected_tuple, (
+        f"parse_version('{EXPECTED_VERSION}') returned {result}, expected {expected_tuple}"
     )
 
 

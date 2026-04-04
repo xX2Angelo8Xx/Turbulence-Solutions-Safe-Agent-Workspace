@@ -14,9 +14,7 @@ BUILD_DMG = REPO_ROOT / "src" / "installer" / "macos" / "build_dmg.sh"
 BUILD_APPIMAGE = REPO_ROOT / "src" / "installer" / "linux" / "build_appimage.sh"
 
 # Use the shared version utility instead of hardcoding.
-import sys
-sys.path.insert(0, str(REPO_ROOT / "tests" / "shared"))
-from version_utils import CURRENT_VERSION as TARGET_VERSION
+from tests.shared.version_utils import CURRENT_VERSION as TARGET_VERSION
 
 import pytest
 
