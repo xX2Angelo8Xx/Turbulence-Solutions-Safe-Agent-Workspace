@@ -63,6 +63,7 @@ Templates (bundled inside Launcher)
 │   │   ├── ADR-006-defer-code-signing.md
 │   │   ├── ADR-007-csv-to-jsonl-migration.md
 │   │   ├── ADR-TEMPLATE.md
+│   │   ├── index.csv
 │   │   └── index.jsonl
 │   ├── maintenance/
 │   │   ├── .gitkeep
@@ -811,6 +812,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── MNT-019/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-020/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1040,6 +1044,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
+│   │   ├── workpackages.csv
 │   │   └── workpackages.jsonl
 │   ├── architecture.md
 │   ├── macos-installation-guide.md
@@ -1053,7 +1058,7 @@ Templates (bundled inside Launcher)
 │   ├── add_test_result.py
 │   ├── add_workpackage.py
 │   ├── archive_test_results.py
-│   ├── csv_utils.py               ← deprecated (scheduled for deletion in MNT-022)
+│   ├── csv_utils.py
 │   ├── dedup_test_ids.py
 │   ├── finalize_wp.py
 │   ├── generate_manifest.py
@@ -1347,6 +1352,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-017/
 │   ├── MNT-018/
 │   ├── MNT-019/
+│   ├── MNT-020/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
