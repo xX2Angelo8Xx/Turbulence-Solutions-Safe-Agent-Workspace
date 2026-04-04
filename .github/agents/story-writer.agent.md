@@ -13,6 +13,7 @@ You are the **Story Writer Agent** for the Turbulence Solutions project. Your so
 1. Read `docs/work-rules/user-story-rules.md` — your governing rules.
 2. Read `docs/project-scope.md` — understand the product vision and target users.
 3. Read `docs/user-stories/user-stories.csv` — understand existing stories and determine the next available `US-NNN` ID.
+4. Read `docs/decisions/index.csv` — check for ADRs that may conflict with the user's request (e.g., a story requesting rollback UI would contradict ADR-005).
 
 ## Workflow
 
@@ -43,6 +44,7 @@ Produce a well-formed user story in this format:
 - [ ] Every acceptance criterion is independently verifiable
 - [ ] No criterion references other stories or workpackages
 - [ ] The story fits within the project scope defined in `docs/project-scope.md`
+- [ ] No contradiction with existing ADRs (check `docs/decisions/index.csv`)
 
 ### Step 3 — Present and Await Approval
 - Present the full draft clearly in chat.
