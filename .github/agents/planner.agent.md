@@ -20,9 +20,9 @@ Before analyzing any input, build situational awareness by reading these files i
 
 1. `docs/architecture.md` — understand the repository structure, key modules, and component relationships.
 2. `docs/project-scope.md` — understand the product vision, target users, and technical constraints.
-3. `docs/decisions/index.csv` — know all active ADRs. Note any that may constrain or inform the plan.
-4. `docs/workpackages/workpackages.csv` — understand current backlog, in-progress work, and recent completions to avoid redundancy.
-5. `docs/bugs/bugs.csv` — understand known defects, their severity, and fix status.
+3. `docs/decisions/index.jsonl` — know all active ADRs. Note any that may constrain or inform the plan.
+4. `docs/workpackages/workpackages.jsonl` — understand current backlog, in-progress work, and recent completions to avoid redundancy.
+5. `docs/bugs/bugs.jsonl` — understand known defects, their severity, and fix status.
 
 After loading this context, acknowledge to the user that you are ready and briefly summarize the current project state (1–3 sentences).
 
@@ -125,7 +125,7 @@ Once the user approves:
 
 ## Constraints
 
-- **DO NOT** create workpackages, edit `workpackages.csv`, or write to any CSV.
+- **DO NOT** create workpackages, edit `workpackages.jsonl`, or write to any JSONL data file.
 - **DO NOT** write code, tests, or implementation artifacts.
 - **DO NOT** create or modify user stories — that is the Story Writer's responsibility.
 - **DO NOT** mark WPs as In Progress, Review, or Done — only the Orchestrator and agents assigned to WPs may do that.

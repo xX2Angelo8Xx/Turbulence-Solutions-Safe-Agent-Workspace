@@ -24,10 +24,10 @@ This project has the highest security classification. Prioritize safety over con
 |------|---------|
 | `docs/architecture.md` | Project overview and repository structure |
 | `docs/project-scope.md` | Vision, capabilities, technology stack |
-| `docs/workpackages/workpackages.csv` | Task tracking — single source of truth |
-| `docs/user-stories/user-stories.csv` | User stories |
-| `docs/bugs/bugs.csv` | Bug tracking |
-| `docs/test-results/test-results.csv` | Test execution records |
+| `docs/workpackages/workpackages.jsonl` | Task tracking — single source of truth |
+| `docs/user-stories/user-stories.jsonl` | User stories |
+| `docs/bugs/bugs.jsonl` | Bug tracking |
+| `docs/test-results/test-results.jsonl` | Test execution records |
 | `templates/agent-workbench/` | Agent Workbench template shipped to users — **never modify for testing** |
 
 ## Rules & Workflows
@@ -35,5 +35,5 @@ All detailed rules, workflows, and protocols are in **`docs/work-rules/index.md`
 
 ## For AI Agents
 
-1. Read `docs/work-rules/agent-workflow.md` and `docs/workpackages/workpackages.csv` to understand current project state.
+1. Read `docs/work-rules/agent-workflow.md` and `docs/workpackages/workpackages.jsonl` to understand current project state.
 2. Read the rule file(s) relevant to your assigned task (find them via `docs/work-rules/index.md`).

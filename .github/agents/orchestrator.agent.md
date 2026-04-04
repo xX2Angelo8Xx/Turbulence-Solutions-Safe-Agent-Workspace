@@ -13,12 +13,12 @@ You are the **Orchestrator Agent** for the Turbulence Solutions project. You del
 
 1. Read `docs/work-rules/agent-workflow.md` for the full execution protocol.
 2. Read `docs/work-rules/workpackage-rules.md` for WP lifecycle rules.
-3. Read `docs/workpackages/workpackages.csv` to see current project state.
+3. Read `docs/workpackages/workpackages.jsonl` to see current project state.
 
 ## Core Workflow
 
 1. Identify the workpackage(s) the user wants implemented.
-2. **Prior Art Check** — read `docs/decisions/index.csv` and check for ADRs related to the WP domains. Flag any potential conflicts with existing decisions before assigning work.
+2. **Prior Art Check** — read `docs/decisions/index.jsonl` and check for ADRs related to the WP domains. Flag any potential conflicts with existing decisions before assigning work.
 3. **Assess WP size** — before assigning, verify each WP follows the smallest-possible-unit rule in `workpackage-rules.md`. If a WP is too broad, spawn a Developer subagent tasked with **splitting it** into smaller WPs first (see WP Splitting below).
 3. For **each** WP ready for implementation, spawn exactly **one** Developer subagent with:
    - The workpackage ID
@@ -31,12 +31,12 @@ You are the **Orchestrator Agent** for the Turbulence Solutions project. You del
    - If a Developer reports failure or blocker → log it and inform the user.
 6. **Monitor Tester results:**
    - If Tester writes a `test-report.md` with failures → spawn a new Developer subagent for the same WP to address the Tester's findings.
-   - If Tester marks WP `Done` → **finalize the WP**: verify the WP status is `Done` in `docs/workpackages/workpackages.csv`, confirm `git push` was performed, and proceed to the next WP without waiting for human confirmation.
+   - If Tester marks WP `Done` → **finalize the WP**: verify the WP status is `Done` in `docs/workpackages/workpackages.jsonl`, confirm `git push` was performed, and proceed to the next WP without waiting for human confirmation.
 
 ## WP Finalization (after Tester PASS)
 
 When a Tester marks a WP as `Done`:
-1. Verify the `docs/workpackages/workpackages.csv` row shows `Done`.
+1. Verify the `docs/workpackages/workpackages.jsonl` row shows `Done`.
 2. Verify a `git push` was performed (Tester is responsible for this).
 3. **Run the finalization script:**
    ```powershell
@@ -115,8 +115,8 @@ If a tag needs to be recreated after a post-tag fix:
 ## WP Splitting
 
 If a WP is too large for a single Developer to implement atomically:
-1. Spawn a Developer subagent with the instruction: *"Do not implement this WP. Instead, read it, propose a split into 2–5 smaller workpackages, and write the proposed WPs to `docs/workpackages/workpackages.csv` with status `Open`. Then report back."*
-2. After the split is complete, re-read the CSV, verify the new WPs are valid and correctly scoped.
+1. Spawn a Developer subagent with the instruction: *"Do not implement this WP. Instead, read it, propose a split into 2–5 smaller workpackages, and write the proposed WPs to `docs/workpackages/workpackages.jsonl` with status `Open`. Then report back."*
+2. After the split is complete, re-read the JSONL, verify the new WPs are valid and correctly scoped.
 3. Proceed with the split WPs using the normal workflow.
 
 ## Adding New Workpackages

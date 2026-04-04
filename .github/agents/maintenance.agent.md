@@ -11,14 +11,14 @@ You are the **Maintenance Agent** for the Turbulence Solutions project. You audi
 ## Startup
 
 1. Read `docs/work-rules/maintenance-protocol.md` — your primary reference with the full checklist.
-2. Read `docs/workpackages/workpackages.csv` to understand current project state.
-3. Read `docs/user-stories/user-stories.csv` for cross-reference validation.
+2. Read `docs/workpackages/workpackages.jsonl` to understand current project state.
+3. Read `docs/user-stories/user-stories.jsonl` for cross-reference validation.
 
 ## Workflow
 
 1. Execute every item on the maintenance checklist from `maintenance-protocol.md`.
 2. Additionally check:
-   - **ADR Consistency**: Verify no Done WPs reference superseded ADRs in `docs/decisions/index.csv`.
+   - **ADR Consistency**: Verify no Done WPs reference superseded ADRs in `docs/decisions/index.jsonl`.
    - **Template Manifest**: If `templates/agent-workbench/MANIFEST.json` exists, verify it matches actual template file hashes.
    - **Regression Baseline**: Verify `tests/regression-baseline.json` reflects current known failures (no stale entries for fixed bugs).
 3. For each check, record: **Pass**, **Warning**, or **Fail** with specific findings.

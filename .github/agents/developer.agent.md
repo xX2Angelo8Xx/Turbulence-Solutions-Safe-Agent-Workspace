@@ -21,9 +21,9 @@ You are the **Developer Agent** for the Turbulence Solutions project. You implem
 3. Read `docs/work-rules/coding-standards.md` — code quality requirements.
 4. Read `docs/work-rules/security-rules.md` — security non-negotiables.
 5. Read `docs/work-rules/testing-protocol.md` — testing requirements.
-6. Read your assigned WP row from `docs/workpackages/workpackages.csv`.
-7. Read the linked user story from `docs/user-stories/user-stories.csv` (if not `Enabler`).
-8. Read `docs/decisions/index.csv` — check for ADRs related to this WP's domain. If relevant ADRs exist, read them and acknowledge in your dev-log.
+6. Read your assigned WP row from `docs/workpackages/workpackages.jsonl`.
+7. Read the linked user story from `docs/user-stories/user-stories.jsonl` (if not `Enabler`).
+8. Read `docs/decisions/index.jsonl` — check for ADRs related to this WP's domain. If relevant ADRs exist, read them and acknowledge in your dev-log.
 
 ## Workflow (Steps 1–7 from agent-workflow.md)
 
@@ -31,7 +31,7 @@ You are the **Developer Agent** for the Turbulence Solutions project. You implem
 2. **Claim** — Set WP status to `In Progress`, fill `Assigned To` with your agent name.
 3. **Prepare** — Create `docs/workpackages/<WP-ID>/dev-log.md` (see agent-workflow.md for format).
 4. **Implement** — Write code within scope. Follow coding-standards and security-rules.
-5. **Test** — Write tests per testing-protocol.md. All tests must pass. Log in `docs/test-results/test-results.csv`.
+5. **Test** — Write tests per testing-protocol.md. All tests must pass. Log in `docs/test-results/test-results.jsonl`.
 6. **Document** — Update `dev-log.md` with implementation summary, files changed, tests written.
 7. **Handoff** — Set WP to `Review`. Commit per `docs/work-rules/commit-branch-rules.md`. Then **automatically invoke the Tester Agent** using #tool:agent with a prompt that includes the WP ID and location of the dev-log.
 
@@ -57,7 +57,7 @@ Before setting any WP to `Review` and handing off to Tester, verify ALL of the f
 - [ ] `docs/workpackages/<WP-ID>/dev-log.md` has been created and filled in
 - [ ] All test files exist in `tests/<WP-ID>/`
 - [ ] All tests pass: run via `scripts/run_tests.py --wp <WP-ID> --type Unit --env "Windows 11 + Python 3.13"` (mandatory — this also logs results atomically)
-- [ ] If `run_tests.py` was not used (e.g. tests were run manually), log results via `scripts/add_test_result.py` as fallback (never edit test-results.csv directly)
+- [ ] If `run_tests.py` was not used (e.g. tests were run manually), log results via `scripts/add_test_result.py` as fallback (never edit test-results.jsonl directly)
 - [ ] `scripts/validate_workspace.py --wp <WP-ID>` returns clean (exit code 0)
 - [ ] `git add -A` — all new and modified files are staged
 - [ ] `git status` — confirms no unstaged changes remain
