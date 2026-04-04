@@ -6,15 +6,15 @@ Rules for logging, triaging, and resolving bugs.
 
 ## Tracking
 
-- All bugs are tracked in `docs/bugs/bugs.csv`.
+- All bugs are tracked in `docs/bugs/bugs.jsonl`.
 
 ## ID Format
 
 - IDs use the prefix `BUG-NNN` (e.g., `BUG-001`, `BUG-042`).
 
-## CSV Columns
+## JSONL Fields
 
-| Column | Required | Description |
+| Field | Required | Description |
 |--------|----------|-------------|
 | ID | Yes | Bug identifier (e.g., `BUG-001`) |
 | Title | Yes | Short descriptive summary |
@@ -53,7 +53,7 @@ Open → In Progress → Fixed → Closed
 ## Rules
 
 - Every bug fix **must** reference a workpackage. If no WP exists, request one.
-- Bugs found during testing should be logged in `docs/bugs/bugs.csv` **and** noted in the WP's `test-report.md`.
+- Bugs found during testing should be logged in `docs/bugs/bugs.jsonl` **and** noted in the WP's `test-report.md`.
 - All mandatory columns must be filled when logging a bug — incomplete entries will be rejected during maintenance checks.
 - A regression test must be written for every fixed bug to prevent recurrence.
 - **Use `scripts/add_bug.py`** for auto-ID assignment and field validation:

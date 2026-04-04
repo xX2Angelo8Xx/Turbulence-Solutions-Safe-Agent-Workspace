@@ -26,10 +26,10 @@ The following checks are executed in order. Each item produces a **Pass**, **War
 - Does every user story's `Linked WPs` column match the actual workpackages referencing it?
 - Does each user story's status match the aggregate status of its linked workpackages?
 
-### 3. CSV Integrity
-- Are all CSV files parseable with no malformed rows?
+### 3. JSONL Integrity
+- Are all JSONL files parseable (valid JSON per line, no malformed entries)?
 - Are required fields filled for every entry?
-- Are there duplicate IDs in any CSV?
+- Are there duplicate IDs in any JSONL file?
 - Are all status values valid enum values (e.g., `Open`, `In Progress`, `Review`, `Done`)?
 
 ### 4. Documentation Freshness
@@ -44,11 +44,11 @@ The following checks are executed in order. Each item produces a **Pass**, **War
 
 ### 6. Orphan Detection
 - Are there files in `Project/` not referenced by any workpackage or documentation?
-- Are there WP folders under `docs/workpackages/` with no matching WP in the CSV?
+- Are there WP folders under `docs/workpackages/` with no matching WP in the JSONL file?
 - Is there dead code or unused imports in the codebase?
 
 ### 7. Test Coverage Gaps
-- Are there workpackages in `Done` status with code changes but no corresponding test results in `docs/test-results/test-results.csv`?
+- Are there workpackages in `Done` status with code changes but no corresponding test results in `docs/test-results/test-results.jsonl`?
 - Are there `Done` WPs without a `test-report.md` in their folder?
 - Does every `Done` WP have a corresponding test subfolder at `tests/<WP-ID>/` with at least one test file?
 - Are all test files in `tests/<WP-ID>/` still present and unmodified (permanent artifacts — must not be deleted)?
@@ -56,7 +56,7 @@ The following checks are executed in order. Each item produces a **Pass**, **War
 ### 8. Bug Tracking
 - Are there open bugs without an assigned workpackage?
 - Are there bugs in `Fixed` status without a verification step?
-- Are all mandatory fields filled in `docs/bugs/bugs.csv`?
+- Are all mandatory fields filled in `docs/bugs/bugs.jsonl`?
 
 ### 9. Structural Integrity
 - Is `copilot-instructions.md` still under 40 lines with no detailed process rules?

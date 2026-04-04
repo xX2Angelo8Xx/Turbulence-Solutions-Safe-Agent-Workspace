@@ -18,7 +18,7 @@ Central hub for all project rules, workflows, and protocols. Every rule in this 
 | Write, run, or log tests | [testing-protocol.md](testing-protocol.md) |
 | Perform project maintenance | [maintenance-protocol.md](maintenance-protocol.md) |
 | Recover from failures | [recovery.md](recovery.md) |
-| Review or create architecture decisions | [../decisions/ADR-TEMPLATE.md](../decisions/ADR-TEMPLATE.md) and [../decisions/index.csv](../decisions/index.csv) |
+| Review or create architecture decisions | [../decisions/ADR-TEMPLATE.md](../decisions/ADR-TEMPLATE.md) and [../decisions/index.jsonl](../decisions/index.jsonl) |
 | Onboard as an AI agent | [agent-workflow.md](agent-workflow.md) |
 | Use a helper script | [scripts/README.md](../../scripts/README.md) |
 ---
@@ -29,11 +29,11 @@ Central hub for all project rules, workflows, and protocols. Every rule in this 
 |------|---------|
 | `docs/architecture.md` | Project overview, repository structure, architecture diagrams |
 | `docs/project-scope.md` | Vision, target users, capabilities, technology stack |
-| `docs/workpackages/workpackages.csv` | **Single source of truth** for all tasks. Every code change must reference a workpackage ID |
+| `docs/workpackages/workpackages.jsonl` | **Single source of truth** for all tasks. Every code change must reference a workpackage ID |
 | `docs/workpackages/<WP-ID>/` | Per-workpackage folder containing dev logs, test reports, and iteration artifacts |
-| `docs/user-stories/user-stories.csv` | User stories — parent of workpackages |
-| `docs/bugs/bugs.csv` | Bug tracking — all identified defects |
-| `docs/test-results/test-results.csv` | Test execution records — all test runs |
+| `docs/user-stories/user-stories.jsonl` | User stories — parent of workpackages |
+| `docs/bugs/bugs.jsonl` | Bug tracking — all identified defects |
+| `docs/test-results/test-results.jsonl` | Test execution records — all test runs |
 | `docs/maintenance/` | Maintenance audit logs (timestamped) |
 | `templates/agent-workbench/` | Template shipped to end users — **never modify for testing** |
 

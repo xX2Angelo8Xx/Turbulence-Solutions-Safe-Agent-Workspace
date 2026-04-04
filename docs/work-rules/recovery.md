@@ -4,19 +4,19 @@ Runbook for recovering from common failure modes. When something goes wrong, fin
 
 ---
 
-## Corrupt CSV File
+## Corrupt JSONL File
 
-**Symptoms:** Script crashes with `UnicodeDecodeError`, `KeyError` on a column name, or CSV shows garbled data.
+**Symptoms:** Script crashes with `UnicodeDecodeError`, `json.JSONDecodeError`, `KeyError` on a field name, or the file contains malformed JSON lines.
 
 **Recovery:**
 1. Do NOT attempt to edit the corrupt file manually.
 2. Find the last known-good version in Git history:
    ```bash
-   git log --oneline -20 -- <path-to-csv>
+   git log --oneline -20 -- <path-to-jsonl>
    ```
 3. Restore the file from that commit:
    ```bash
-   git checkout <commit-hash> -- <path-to-csv>
+   git checkout <commit-hash> -- <path-to-jsonl>
    ```
 4. Run `scripts/validate_workspace.py --full` to verify integrity.
 5. Re-apply any legitimate changes that were lost (check recent dev-logs and commit messages).
@@ -28,7 +28,7 @@ Runbook for recovering from common failure modes. When something goes wrong, fin
 **Symptoms:** Script hangs or fails with `TimeoutError: Could not acquire lock on <path>.lock within 30s`.
 
 **Recovery:**
-1. Confirm no other agent or process is actively running a CSV operation:
+1. Confirm no other agent or process is actively running a JSONL operation:
    ```bash
    # Check for running Python processes
    tasklist | findstr python    # Windows
@@ -41,7 +41,7 @@ Runbook for recovering from common failure modes. When something goes wrong, fin
    ```
 3. Retry the operation.
 
-**Note:** As of `csv_utils.py` v2, lock files older than 5 minutes are automatically cleaned up. This manual procedure is only needed if the automatic cleanup also fails.
+**Note:** As of `jsonl_utils.py`, lock files older than 5 minutes are automatically cleaned up. This manual procedure is only needed if the automatic cleanup also fails.
 
 ---
 
@@ -121,7 +121,7 @@ Runbook for recovering from common failure modes. When something goes wrong, fin
 
 ---
 
-## Duplicate TST-IDs in test-results.csv
+## Duplicate TST-IDs in test-results.jsonl
 
 **Symptoms:** `validate_workspace.py --full` reports duplicate TST-IDs.
 
@@ -136,7 +136,7 @@ Runbook for recovering from common failure modes. When something goes wrong, fin
    .venv/Scripts/python scripts/validate_workspace.py --full
    ```
 
-**Prevention:** Always use `scripts/run_tests.py` or `scripts/add_test_result.py` instead of manual CSV editing. These scripts use `locked_next_id_and_append()` which prevents collisions.
+**Prevention:** Always use `scripts/run_tests.py` or `scripts/add_test_result.py` instead of manual JSONL editing. These scripts use `locked_next_id_and_append()` which prevents collisions.
 
 ---
 

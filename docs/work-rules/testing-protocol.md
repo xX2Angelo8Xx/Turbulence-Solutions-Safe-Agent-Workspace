@@ -142,14 +142,14 @@ Bug-fix workpackages follow the same testing requirements as feature WPs with th
 
 1. Every FIX WP **must** have a dedicated `tests/FIX-xxx/` directory with at least one regression test that reproduces the original bug and confirms the fix.
 2. If the fix is validated primarily through an existing WP's test suite (e.g., FIX-004 fixes a bug in INS-006), the FIX WP's test directory should contain at minimum a test that specifically targets the fixed behavior.
-3. All FIX WP tests **must** be logged as individual entries in `test-results.csv` with the FIX WP's ID in the `WP Reference` column.
+3. All FIX WP tests **must** be logged as individual entries in `test-results.jsonl` with the FIX WP's ID in the `WP Reference` field.
 4. The Tester **must** write a `test-report.md` for FIX WPs, just as for any other WP.
 
-## Test Result CSV
+## Test Result JSONL
 
-All test runs are logged in `docs/test-results/test-results.csv`.
+All test runs are logged in `docs/test-results/test-results.jsonl`.
 
-| Column | Description |
+| Field | Description |
 |--------|-------------|
 | ID | Test identifier (`TST-NNN`) |
 | Test Name | Descriptive name of the test |
@@ -165,7 +165,7 @@ All test runs are logged in `docs/test-results/test-results.csv`.
 
 Test result IDs (`TST-NNN`) must be globally unique. To prevent duplicates:
 
-- **Never manually add rows** to `docs/test-results/test-results.csv`. Manual edits risk ID collisions and corrupt the sequential numbering.
+- **Never manually add entries** to `docs/test-results/test-results.jsonl`. Manual edits risk ID collisions and corrupt the sequential numbering.
 - **Always use `scripts/run_tests.py`** (primary) for test result logging — it runs pytest and atomically logs results. Use `scripts/add_test_result.py` only as a fallback when `run_tests.py` cannot be used (e.g. manual verification). Both scripts use atomic ID assignment via `locked_next_id_and_append()` to prevent duplicate IDs even under concurrent execution.
 - If duplicate TST-IDs are suspected, run `scripts/dedup_test_ids.py --dry-run` to check for collisions without modifying the file. Remove the `--dry-run` flag to apply fixes.
 
@@ -189,7 +189,7 @@ The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages
 | ... | ... | ... | ... |
 
 ## Bugs Found
-- BUG-NNN: <title> (logged in docs/bugs/bugs.csv)
+- BUG-NNN: <title> (logged in docs/bugs/bugs.jsonl)
 
 ## TODOs for Developer
 - [ ] <specific actionable item>
@@ -201,7 +201,7 @@ The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages
 
 ## Minimum Standards
 
-- **No workpackage moves to `Done` without logged test results** in both the CSV and the WP's test-report.md.
+- **No workpackage moves to `Done` without logged test results** in both the JSONL file and the WP's test-report.md.
 - **Security WPs** require both protection tests and bypass-attempt tests — no exceptions.
 - **Every bug fix** requires a regression test proving the bug is fixed and cannot recur.
 - The testing protocol is the **floor**, not the ceiling. Always seek additional failure modes.
@@ -212,7 +212,7 @@ The Tester writes `test-report.md` in the workpackage folder (`docs/workpackages
 
 ## TST-ID Assignment — Mandatory Script Usage
 
-Agents **MUST** use `scripts/run_tests.py` to execute tests and log results. This script runs pytest, parses the output, and atomically logs the result to `docs/test-results/test-results.csv` — closing the "self-reported results" loophole. The script is **proof that tests were actually executed**.
+Agents **MUST** use `scripts/run_tests.py` to execute tests and log results. This script runs pytest, parses the output, and atomically logs the result to `docs/test-results/test-results.jsonl` — closing the "self-reported results" loophole. The script is **proof that tests were actually executed**.
 
 ```powershell
 # Run WP-specific tests and log result
@@ -236,7 +236,7 @@ For cases where `run_tests.py` cannot be used (e.g., manual test verification), 
 ```
 
 Rules:
-1. **Never edit test-results.csv by hand.** Always use the script.
+1. **Never edit test-results.jsonl by hand.** Always use the script.
 2. **Never reuse or reassign TST-IDs.** Once an ID is issued it is permanent, even if the row is later removed.
 3. The script uses `locked_next_id_and_append()` which holds a file lock for the entire read-compute-write cycle — safe for parallel agent execution.
 4. See `scripts/README.md` for full usage reference.
@@ -250,7 +250,7 @@ Test scripts are **permanent project artifacts**. They are not throw-away code.
 - The final test script for each workpackage (`tests/<WP-ID>/test_<name>.py`) **must never be deleted** after the WP reaches `Done`.
 - These scripts serve as regression tests for every future version of the project.
 - Minimize one-time / disposable code. If temporary test scaffolding is needed during development, remove it before handoff — the committed test script must be clean and reusable.
-- The results produced by the final test script are what is archived in `docs/test-results/test-results.csv`. Future releases run the same scripts; if output changes, it is a regression.
+- The results produced by the final test script are what is archived in `docs/test-results/test-results.jsonl`. Future releases run the same scripts; if output changes, it is a regression.
 - When adding edge-case tests during Tester review, add them to the same `tests/<WP-ID>/` file — do not create separate throw-away scripts.
 
 ---
@@ -339,7 +339,7 @@ tests.DOC-004.test_doc004_project_readme_placeholders.test_both_readmes_are_iden
 | A bug-fix WP is completed and the referenced test now passes | **Remove** the entry from `known_failures` |
 | A new bug is found whose test is expected to fail until fixed | **Add** an entry with `reason` referencing the bug ID |
 | Intentional behaviour change makes an existing test permanently obsolete | **Remove** the entry (and update or delete the test itself) |
-| Release preparation (Orchestrator release sweep) | **Review all entries**, remove any whose bugs are marked `Closed` in `bugs.csv` |
+| Release preparation (Orchestrator release sweep) | **Review all entries**, remove any whose bugs are marked `Closed` in `bugs.jsonl` |
 
 ### Who Updates
 

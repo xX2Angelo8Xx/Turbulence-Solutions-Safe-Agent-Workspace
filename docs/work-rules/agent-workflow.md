@@ -9,7 +9,7 @@ Onboarding checklist and standard execution protocol for all AI agents working i
 1. `copilot-instructions.md` is auto-loaded (landing page with non-negotiable rules).
 2. Read `docs/work-rules/index.md` to find which rules apply to your task.
 3. Read the specific rule file(s) relevant to your assignment.
-4. Read `docs/workpackages/workpackages.csv` to see current project state.
+4. Read `docs/workpackages/workpackages.jsonl` to see current project state.
 
 ---
 
@@ -21,12 +21,12 @@ Every agent follows this exact workflow when implementing a workpackage. No step
 
 | Step | Action | Details |
 |------|--------|---------|
-| 0 | **Prior Art Check** | Read `docs/decisions/index.csv`. Search for ADRs related to this WP's domain. If relevant ADRs exist, acknowledge them in `dev-log.md` or propose supersession. This prevents contradicting prior architectural decisions. |
-| 1 | **Read** | Read the WP row from `docs/workpackages/workpackages.csv`. Read the linked user story. Read `coding-standards.md`, `security-rules.md`, `testing-protocol.md`. |
+| 0 | **Prior Art Check** | Read `docs/decisions/index.jsonl`. Search for ADRs related to this WP's domain. If relevant ADRs exist, acknowledge them in `dev-log.md` or propose supersession. This prevents contradicting prior architectural decisions. |
+| 1 | **Read** | Read the WP row from `docs/workpackages/workpackages.jsonl`. Read the linked user story. Read `coding-standards.md`, `security-rules.md`, `testing-protocol.md`. |
 | 2 | **Claim** | Set WP status to `In Progress`. Fill in `Assigned To`. |
 | 3 | **Prepare** | Create the WP folder: `docs/workpackages/<WP-ID>/`. Create `dev-log.md` inside it (see format below). |
 | 4 | **Implement** | Write code following `coding-standards.md` and `security-rules.md`. Stay within WP scope. |
-| 5 | **Test** | Create `tests/<WP-ID>/` folder if it doesn't exist. Write and run tests per `testing-protocol.md`. All tests must pass. **Run the final pre-handoff test suite via `scripts/run_tests.py`** (mandatory — this executes pytest and atomically logs results to the CSV). `scripts/add_test_result.py` is a manual fallback only for cases where `run_tests.py` cannot be used; direct CSV editing is always prohibited. |
+| 5 | **Test** | Create `tests/<WP-ID>/` folder if it doesn't exist. Write and run tests per `testing-protocol.md`. All tests must pass. **Run the final pre-handoff test suite via `scripts/run_tests.py`** (mandatory — this executes pytest and atomically logs results to the JSONL file). `scripts/add_test_result.py` is a manual fallback only for cases where `run_tests.py` cannot be used; direct JSONL editing is always prohibited. |
 | 6 | **Document** | Update `dev-log.md` with implementation summary, decisions made, tests written, and known limitations. |
 | 7 | **Handoff** | Set WP status to `Review`. Commit per `commit-branch-rules.md`. Hand off to Tester Agent. Include the list of changed files (output of `git diff --cached --name-only`) in the handoff message. |
 
@@ -79,7 +79,7 @@ Rules:
 | Step | Action | Details |
 |------|--------|---------|
 | 8 | **Review** | Read the WP row, `dev-log.md`, linked user story, and code changes. Verify requirements are met. |
-| 9 | **Test** | Run the full test suite. Add edge-case tests beyond the Developer's. Think beyond the protocol: attack vectors, boundaries, race conditions. Log all runs using `scripts/add_test_result.py` (mandatory — direct CSV editing is prohibited). |
+| 9 | **Test** | Run the full test suite. Add edge-case tests beyond the Developer's. Think beyond the protocol: attack vectors, boundaries, race conditions. Log all runs using `scripts/add_test_result.py` (mandatory — direct JSONL editing is prohibited). |
 | 10 | **Verdict** | Write `test-report.md` in the WP folder (see `testing-protocol.md` for format). |
 
 **If PASS:** Set WP to `Done`. Push.  
@@ -100,13 +100,13 @@ Before marking a WP as Done, the Tester MUST verify:
 1. `docs/workpackages/<WP-ID>/dev-log.md` exists and is non-empty.
 2. `docs/workpackages/<WP-ID>/test-report.md` has been written (by you, the Tester).
 3. All test files exist in `tests/<WP-ID>/`.
-4. All test runs are logged in `docs/test-results/test-results.csv`.
-5. All bugs found during testing are logged in `docs/bugs/bugs.csv`.
+4. All test runs are logged in `docs/test-results/test-results.jsonl`.
+5. All bugs found during testing are logged in `docs/bugs/bugs.jsonl`.
 6. WP branch follows `<WP-ID>/<short-desc>` naming convention.
 7. No `tmp_` files remain in `docs/workpackages/<WP-ID>/` or `tests/<WP-ID>/`.
-8. For each bug in `docs/bugs/bugs.csv` with `Fixed In WP` matching this WP-ID and Status=`Fixed`, run:
+8. For each bug in `docs/bugs/bugs.jsonl` with `Fixed In WP` matching this WP-ID and Status=`Fixed`, run:
    `.venv\Scripts\python scripts/update_bug_status.py <BUG-ID> --status Closed`
-9. Run `git add -A` to stage all new test files and CSV updates.
+9. Run `git add -A` to stage all new test files and JSONL updates.
 10. Commit: `<WP-ID>: Tester PASS`
 11. Push: `git push origin <branch-name>`
 

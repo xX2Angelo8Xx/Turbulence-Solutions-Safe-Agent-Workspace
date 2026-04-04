@@ -6,8 +6,8 @@ Rules governing workpackage creation, lifecycle, and tracking.
 
 ## Tracking
 
-- All workpackages are tracked in `docs/workpackages/workpackages.csv` (CSV format, viewable as a table in VS Code with a CSV extension).
-- This CSV is the **single source of truth** for all task tracking.
+- All workpackages are tracked in `docs/workpackages/workpackages.jsonl` (JSONL format, one JSON object per line).
+- This JSONL file is the **single source of truth** for all task tracking.
 
 ## ID Format
 
@@ -24,9 +24,9 @@ IDs use category prefixes followed by a three-digit number:
 
 New categories may be introduced as the project evolves. Prefix must be uppercase, number zero-padded to three digits.
 
-## CSV Columns
+## JSONL Fields
 
-| Column | Description |
+| Field | Description |
 |--------|-------------|
 | ID | Workpackage identifier (e.g., `GUI-001`) |
 | Category | INS, SAF, GUI, DOC, etc. |
@@ -150,12 +150,12 @@ When creating a new workpackage, **use `scripts/add_workpackage.py`** which auto
 
 The script:
 1. Assigns the next sequential ID within the category (e.g., `GUI-019`).
-2. Appends the row to `workpackages.csv` with duplicate-ID prevention.
-3. **Automatically updates the User Story's `Linked WPs` column** in `user-stories.csv`.
+2. Appends the entry to `workpackages.jsonl` with duplicate-ID prevention.
+3. **Automatically updates the User Story's `Linked WPs` field** in `user-stories.jsonl`.
 4. Uses file locking for parallel agent safety.
 
-If manual CSV editing is unavoidable:
-1. **Update the User Story's `Linked WPs` column** in `user-stories.csv` to include the new WP ID in the same commit.
+If manual JSONL editing is unavoidable:
+1. **Update the User Story's `Linked WPs` field** in `user-stories.jsonl` to include the new WP ID in the same commit.
 2. This is mandatory — failing to do so creates cross-reference drift that must be caught and fixed during maintenance.
-3. **When a Developer creates or claims a WP that references a User Story**, the Developer MUST verify that the WP ID is listed in the parent User Story's `Linked WPs` column in `docs/user-stories/user-stories.csv`. If not present, add it before beginning implementation.
+3. **When a Developer creates or claims a WP that references a User Story**, the Developer MUST verify that the WP ID is listed in the parent User Story's `Linked WPs` field in `docs/user-stories/user-stories.jsonl`. If not present, add it before beginning implementation.
 3. When decomposing a WP into sub-WPs, update the parent User Story's `Linked WPs` to include all sub-WP IDs.
