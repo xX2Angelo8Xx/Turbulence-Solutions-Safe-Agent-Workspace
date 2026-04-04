@@ -2,6 +2,8 @@
 
 Comprehensive testing standards for all workpackages. This protocol defines the **minimum** testing requirements — agents and humans are expected to exceed it where applicable.
 
+> **Supported Python Versions:** This project supports Python 3.11+ (tested on 3.11 and 3.13). Examples in this document use Python 3.11 but work identically on 3.13.
+
 ---
 
 ## Test Structure
@@ -116,7 +118,7 @@ these firing during an automated test run can destabilise or crash the system.
 4. All **existing** tests must still pass (no regressions).
 5. **Run tests via `scripts/run_tests.py`** (mandatory). This executes pytest and atomically logs the result. Direct `pytest` invocation is allowed for development iteration, but the final pre-handoff run **must** use this script:
    ```powershell
-   .venv\Scripts\python scripts/run_tests.py --wp <WP-ID> --type Unit --env "Windows 11 + Python 3.13"
+   .venv\Scripts\python scripts/run_tests.py --wp <WP-ID> --type Unit --env "Windows 11 + Python 3.11"
    ```
 6. Document test approach and results in the WP's `dev-log.md`.
 7. **Never use interactive constructs** — no `input()`, no commands that await stdin, no `[y/n]` prompts.
@@ -126,7 +128,7 @@ these firing during an automated test run can destabilise or crash the system.
 1. Read the Developer's `dev-log.md` in the WP folder.
 2. Run the full test suite via `scripts/run_tests.py` (mandatory):
    ```powershell
-   .venv\Scripts\python scripts/run_tests.py --wp <WP-ID> --type Regression --env "Windows 11 + Python 3.13" --full-suite
+   .venv\Scripts\python scripts/run_tests.py --wp <WP-ID> --type Regression --env "Windows 11 + Python 3.11" --full-suite
    ```
 3. Add edge-case tests the Developer may have missed — place them in `tests/<WP-ID>/`.
 4. **Think beyond the protocol**: consider attack vectors, boundary conditions, race conditions, concurrency issues, invalid inputs, and platform-specific quirks.
@@ -214,10 +216,10 @@ Agents **MUST** use `scripts/run_tests.py` to execute tests and log results. Thi
 
 ```powershell
 # Run WP-specific tests and log result
-.venv\Scripts\python scripts/run_tests.py --wp GUI-001 --type Unit --env "Windows 11 + Python 3.13"
+.venv\Scripts\python scripts/run_tests.py --wp GUI-001 --type Unit --env "Windows 11 + Python 3.11"
 
 # Run full regression suite and log result
-.venv\Scripts\python scripts/run_tests.py --wp GUI-001 --type Regression --env "Windows 11 + Python 3.13" --full-suite
+.venv\Scripts\python scripts/run_tests.py --wp GUI-001 --type Regression --env "Windows 11 + Python 3.11" --full-suite
 ```
 
 For cases where `run_tests.py` cannot be used (e.g., manual test verification), `scripts/add_test_result.py` may be used as a fallback:
@@ -228,7 +230,7 @@ For cases where `run_tests.py` cannot be used (e.g., manual test verification), 
     --type Unit `
     --wp GUI-001 `
     --status Pass `
-    --env "Windows 11 + Python 3.13" `
+    --env "Windows 11 + Python 3.11" `
     --result "5 passed / 0 failed" `
     --notes "Optional notes"
 ```
