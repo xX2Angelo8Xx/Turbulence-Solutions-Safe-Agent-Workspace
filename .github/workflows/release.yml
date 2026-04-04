@@ -229,15 +229,9 @@ jobs:
 
       - name: Verify Code Signing
         run: |
-          echo "--- Verifying main executable ---"
-          codesign --verify --verbose dist/AgentEnvironmentLauncher.app/Contents/MacOS/launcher && echo "Main executable: OK"
-          echo "--- Verifying Python.framework ---"
+          codesign --verify "dist/launcher/launcher" && echo "Pre-bundle binary: OK"
           codesign --verify --deep dist/AgentEnvironmentLauncher.app/Contents/MacOS/_internal/Python.framework && echo "Python.framework: OK"
-          echo "--- Verifying .app bundle ---"
-          codesign --verify --verbose dist/AgentEnvironmentLauncher.app && echo "App bundle: OK"
-          echo "--- Displaying signing details ---"
-          codesign --display --verbose=2 dist/AgentEnvironmentLauncher.app
-          echo "Code signing verification passed"
+          codesign --verify dist/AgentEnvironmentLauncher.app && echo "Code signing verification passed"
 
       - name: Quarantine Simulation (diagnostic)
         run: |

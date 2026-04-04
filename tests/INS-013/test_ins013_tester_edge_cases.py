@@ -46,13 +46,14 @@ def test_yaml_round_trip_no_data_loss(workflow):
 
 def test_no_duplicate_job_names(workflow):
     """YAML dicts forbid duplicates structurally, but verify explicitly
-    that the parsed jobs dict count matches the expected distinct job set."""
+    that the parsed jobs dict count matches the expected distinct job set.
+    Updated: validate-version and run-tests jobs added in FIX-010/MNT-005 (now 6 total)."""
     jobs = workflow.get("jobs", {})
     job_names = list(jobs.keys())
     assert len(job_names) == len(set(job_names)), (
         f"Duplicate job names detected: {[j for j in job_names if job_names.count(j) > 1]}"
     )
-    assert len(jobs) == 4, f"Expected exactly 4 jobs (macos-intel-build removed in FIX-011), found {len(jobs)}: {job_names}"
+    assert len(jobs) == 6, f"Expected exactly 6 jobs (validate-version, run-tests, windows-build, macos-arm-build, linux-build, release), found {len(jobs)}: {job_names}"
 
 
 # ---------------------------------------------------------------------------
@@ -72,14 +73,17 @@ def test_workflow_name_is_non_empty_string(workflow):
 # ---------------------------------------------------------------------------
 
 def test_no_explicit_shell_directives(workflow):
-    """No step in any job should set an explicit 'shell:' key.
-    Let GitHub Actions choose the platform default (bash on Linux/macOS,
-    pwsh on Windows). Hard-coding shell limits portability of future steps."""
+    """No step in any job should set an explicit 'shell:' key to a platform-specific shell.
+    shell: python is allowed (cross-platform inline Python scripts).
+    Let GitHub Actions choose the platform default (bash on Linux/macOS, pwsh on Windows)."""
     for job_name, job_def in workflow["jobs"].items():
         for step in job_def.get("steps", []):
-            assert "shell" not in step, (
-                f"Job '{job_name}' has a step with explicit 'shell:' directive: {step}"
-            )
+            if "shell" in step:
+                # shell: python is acceptable (cross-platform Python scripts)
+                assert step["shell"] == "python", (
+                    f"Job '{job_name}' has a step with explicit 'shell: {step['shell']}' directive "
+                    f"that hard-codes a platform-specific shell: {step}"
+                )
 
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 610,
+  "_count": 577,
   "_updated": "2026-04-07",
   "known_failures": {
     "tests.DOC-004.test_doc004_project_readme_placeholders.test_both_readmes_are_identical": {
@@ -1335,120 +1335,6 @@
     "tests.FIX-009.test_fix009_required_fields.test_required_fields_not_empty": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
-    "tests.FIX-028.test_fix028_codesign.test_app_bundle_quoted_in_codesign": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-028.test_fix028_codesign.test_app_bundle_variable_used_in_codesign": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-028.test_fix028_codesign.test_find_dylib_signing_present": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-028.test_fix028_codesign.test_python_framework_signing_uses_deep": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_contains_codesign_verify": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_full_command": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyStepSafeguards.test_step_run_contains_strict_flag": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-031.test_fix031_bottomup_codesign.test_app_bundle_sign_no_deep": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-031.test_fix031_bottomup_codesign.test_dylib_so_signed_before_app_bundle": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-031.test_fix031_bottomup_codesign.test_find_dylib_command_exists": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-031.test_fix031_bottomup_codesign.test_find_so_command_exists": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-031.test_fix031_bottomup_codesign.test_main_launcher_signed": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-031.test_fix031_bottomup_codesign.test_python_framework_signed_with_deep": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-031.test_fix031_bottomup_codesign.test_signing_order_bottom_up": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-031.test_fix031_bottomup_codesign.test_verify_deep_strict_present": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-037.test_fix037_dist_info_cleanup.test_codesign_steps_still_present": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-038.test_fix038_component_codesign.test_dylib_signing_present": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-038.test_fix038_component_codesign.test_explanatory_comment_present": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-038.test_fix038_component_codesign.test_main_executable_signing_present": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-038.test_fix038_component_codesign.test_so_signing_present": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-038.test_fix038_edge_cases.test_explanatory_comment_mentions_non_code_files": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-038.test_fix038_edge_cases.test_explanatory_comment_mentions_pyinstaller": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-038.test_fix038_edge_cases.test_signing_order_dylib_before_so": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-038.test_fix038_edge_cases.test_signing_order_framework_before_launcher": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-038.test_fix038_edge_cases.test_signing_order_so_before_framework": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_edge_cases.test_build_dmg_launcher_verify_before_framework_verify": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_edge_cases.test_build_dmg_verify_before_hdiutil": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_edge_cases.test_build_dmg_verify_uses_dist_dir_variable": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_edge_cases.test_release_yml_verify_step_no_app_path": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_edge_cases.test_release_yml_verify_step_uses_pre_bundle_launcher": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_no_verify_launcher_in_bundle": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_still_signs_dylib": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_still_signs_python_framework": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_still_signs_so": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_skip_launcher_resign.test_build_dmg_verify_pre_bundle_binary": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_skip_launcher_resign.test_regression_release_yml_old_verify_gone": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_skip_launcher_resign.test_release_yml_no_verify_launcher_in_bundle": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.FIX-039.test_fix039_skip_launcher_resign.test_release_yml_verifies_pre_bundle_binary": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
     "tests.FIX-062.test_fix062_resource_relocation.test_no_crlf_line_endings": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
@@ -1585,21 +1471,6 @@
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.INS-007.test_ins007_tester.TestLineEndings.test_no_crlf_line_endings": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-013.test_ins013_tester_edge_cases.test_no_duplicate_job_names": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-013.test_ins013_tester_edge_cases.test_no_explicit_shell_directives": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-014.test_ins014_windows_build_job.test_windows_build_job_has_7_steps": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_has_5_steps": {
-      "reason": "pre-existing failure as of 2026-04-04 baseline reset"
-    },
-    "tests.INS-017.test_ins017_release_job.test_release_job_has_3_steps": {
       "reason": "pre-existing failure as of 2026-04-04 baseline reset"
     },
     "tests.INS-019.test_ins019_edge_cases.test_read_python_path_bom_causes_fail_closed": {
@@ -1776,18 +1647,6 @@
     "tests.FIX-009.test_fix009_tst_id_format.test_tst_id_format": {
       "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
-    "tests.FIX-028.test_fix028_codesign.test_deep_flag_present": {
-      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-028.test_fix028_codesign.test_find_so_signing_present": {
-      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-028.test_fix028_codesign.test_no_crlf_line_endings": {
-      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
-    },
-    "tests.FIX-028.test_fix028_codesign.test_verify_uses_deep_strict": {
-      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
-    },
     "tests.FIX-065.test_fix065_csv_strict.TestCheckJsonlStructural.test_invalid_bug_status_reported": {
       "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
@@ -1830,8 +1689,50 @@
     "tests.SAF-056.test_saf056_agent_rules.test_agent_rules_exists": {
       "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
     },
-    "tests.SAF-061.test_saf061_tester_edge_cases.TestThreeConcurrentThreadsLock.test_three_concurrent_threads_no_deadlock_and_lock_cleaned_up": {
-      "reason": "Pre-existing failure \u2014 template restructuring/version changes during JSONL migration"
+    "tests.SAF-022.test_saf022_noagentzone_exclude.TestHashIntegrity.test_default_gate_settings_hash_matches": {
+      "reason": "pre-existing settings hash mismatch as of 2026-04-07"
+    },
+    "tests.SAF-022.test_saf022_noagentzone_exclude.TestHashIntegrity.test_template_gate_settings_hash_matches": {
+      "reason": "pre-existing settings hash mismatch as of 2026-04-07"
+    },
+    "tests.SAF-025.test_saf025_hash_sync.test_embedded_settings_hash_matches_actual_file": {
+      "reason": "pre-existing settings hash mismatch as of 2026-04-07"
+    },
+    "tests.SAF-025.test_saf025_hash_sync.test_verify_file_integrity_passes_templates_copy": {
+      "reason": "pre-existing settings hash mismatch as of 2026-04-07"
+    },
+    "tests.SAF-071.test_saf071.test_settings_hash_matches_actual_file": {
+      "reason": "pre-existing settings hash mismatch as of 2026-04-07"
+    },
+    "tests.FIX-042.test_fix042_noagentzone_visible.test_security_gate_hashes_valid": {
+      "reason": "pre-existing settings hash mismatch as of 2026-04-07"
+    },
+    "tests.FIX-079.test_fix079_noagentzone_visible.test_security_gate_settings_hash_valid": {
+      "reason": "pre-existing settings hash mismatch as of 2026-04-07"
+    },
+    "tests.FIX-015.test_fix015_logo_aspect_ratio.test_logo_ctk_image_size_is_proportional": {
+      "reason": "pre-existing logo/GUI failure as of 2026-04-07"
+    },
+    "tests.FIX-015.test_fix015_logo_aspect_ratio.test_logo_zero_height_no_crash": {
+      "reason": "pre-existing logo/GUI failure as of 2026-04-07"
+    },
+    "tests.FIX-015.test_fix015_logo_aspect_ratio.test_logo_pil_open_failure_no_crash": {
+      "reason": "pre-existing logo/GUI failure as of 2026-04-07"
+    },
+    "tests.FIX-015.test_fix015_logo_aspect_ratio.test_logo_very_wide_image_ctk_called_with_large_width": {
+      "reason": "pre-existing logo/GUI failure as of 2026-04-07"
+    },
+    "tests.FIX-016.test_fix016_ico_icon.test_app_uses_iconphoto_on_non_windows": {
+      "reason": "pre-existing logo/GUI failure as of 2026-04-07"
+    },
+    "tests.GUI-013.test_gui013_logo.test_app_init_sets_icon_photo": {
+      "reason": "pre-existing logo/GUI failure as of 2026-04-07"
+    },
+    "tests.GUI-013.test_gui013_logo.test_app_build_ui_creates_logo_label": {
+      "reason": "pre-existing logo/GUI failure as of 2026-04-07"
+    },
+    "tests.GUI-013.test_gui013_tester_edge_cases.test_logo_label_placed_at_row_zero_columnspan_3": {
+      "reason": "pre-existing logo/GUI failure as of 2026-04-07"
     }
   }
 }

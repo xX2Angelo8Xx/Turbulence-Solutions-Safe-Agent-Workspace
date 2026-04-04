@@ -74,26 +74,32 @@ def test_build_dmg_verify_pre_bundle_binary():
 # ---------------------------------------------------------------------------
 
 def test_build_dmg_still_signs_dylib():
-    """Signing of .dylib files must be preserved."""
+    """Signing of .dylib files must be preserved.
+    Updated: --options runtime is now used between --force and --sign.
+    """
     content = _dmg_content()
-    # The script uses: find ... -name "*.dylib" -exec codesign --force --sign - {} \;
-    # so *.dylib appears before codesign on the same logical line
-    pattern = re.compile(r'\*\.dylib.*codesign\s+--force\s+--sign\s+-', re.DOTALL)
+    # Accept --options runtime between --force and --sign (current approach)
+    pattern = re.compile(r'\*\.dylib.*codesign.*--force.*--sign\s+-', re.DOTALL)
     assert pattern.search(content), "build_dmg.sh does not sign .dylib files"
 
 
 def test_build_dmg_still_signs_so():
-    """Signing of .so files must be preserved."""
+    """Signing of .so files must be preserved.
+    Updated: --options runtime is now used between --force and --sign.
+    """
     content = _dmg_content()
-    # The script uses: find ... -name "*.so" -exec codesign --force --sign - {} \;
-    pattern = re.compile(r'\*\.so.*codesign\s+--force\s+--sign\s+-', re.DOTALL)
+    # Accept --options runtime between --force and --sign (current approach)
+    pattern = re.compile(r'\*\.so.*codesign.*--force.*--sign\s+-', re.DOTALL)
     assert pattern.search(content), "build_dmg.sh does not sign .so files"
 
 
 def test_build_dmg_still_signs_python_framework():
-    """Signing of Python.framework must be preserved."""
+    """Signing of Python.framework must be preserved.
+    Updated: --options runtime and --entitlements are now used with --deep --force --sign.
+    """
     content = _dmg_content()
-    pattern = re.compile(r'codesign\s+--deep\s+--force\s+--sign\s+-.*Python\.framework')
+    # Accept --options runtime and --entitlements between --deep --force and --sign
+    pattern = re.compile(r'codesign\s+--deep.*--force.*--sign\s+-.*Python\.framework')
     assert pattern.search(content), "build_dmg.sh does not sign Python.framework"
 
 

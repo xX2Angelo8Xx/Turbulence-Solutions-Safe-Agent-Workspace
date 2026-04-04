@@ -71,9 +71,12 @@ def test_release_job_runs_on_ubuntu_latest(release_job):
 
 
 def test_release_job_has_3_steps(release_steps):
-    """release job must have exactly 3 steps: checkout, download, gh-release."""
-    assert len(release_steps) == 3, (
-        f"Expected 3 steps, got {len(release_steps)}: "
+    """release job must have exactly 5 steps.
+    Updated: Fetch tags and Validate tag exist steps added for workflow_dispatch support.
+    Steps: checkout, fetch-tags (conditional), validate-tag (conditional), download-artifacts, gh-release.
+    """
+    assert len(release_steps) == 5, (
+        f"Expected 5 steps, got {len(release_steps)}: "
         + str([s.get("name") or s.get("uses") for s in release_steps])
     )
 

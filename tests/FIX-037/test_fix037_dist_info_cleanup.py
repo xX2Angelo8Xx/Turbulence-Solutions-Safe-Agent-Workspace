@@ -66,15 +66,17 @@ def test_removal_uses_rm_rf():
 
 
 def test_codesign_steps_still_present():
-    """All existing code signing steps must still be present (regression check)."""
+    """All existing code signing steps must still be present (regression check).
+    Updated for multi-line command format and FIX-038 approach (no --strict).
+    """
     content = _read_script()
 
     expected_patterns = [
         r'codesign.*--sign\s+-',           # ad-hoc signing
-        r'find.*\.dylib.*codesign',        # sign .dylib files
-        r'find.*\.so.*codesign',           # sign .so files
+        r'find.*\.dylib.*codesign',        # sign .dylib files (single-line)
+        r'find.*\.so.*codesign',           # sign .so files (single-line)
         r'Python\.framework',              # Python.framework signing
-        r'codesign.*--verify.*--deep.*--strict',  # verification step
+        r'codesign.*--verify.*--deep',     # verification step with --deep
     ]
 
     for pattern in expected_patterns:

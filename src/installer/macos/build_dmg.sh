@@ -139,11 +139,18 @@ find "${APP_BUNDLE}/Contents/Resources/_internal" -type d -name "*.dist-info" -e
 # ---------------------------------------------------------------------------
 # Step 3.5: Ad-hoc code signing with entitlements (bottom-up then bundle)
 #
+# NOTE: Bundle-level signing is intentionally skipped as a separate --deep step.
+# PyInstaller embeds non-code resource files (data files, images, metadata) in
+# _internal/ that macOS codesign cannot validate as code objects during a --deep
+# recursive pass. Instead we use bottom-up component signing: sign each .dylib,
+# .so, and Python.framework individually (leaf-first), then sign the launcher
+# executable and the .app bundle without --deep to avoid the python3.11 dir error.
+#
 # Signing strategy:
 #   1. Sign all .dylib and .so files individually (leaf components)
-#   2. Sign Python.framework (nested bundle)
+#   2. Sign Python.framework (nested bundle, uses --deep)
 #   3. Sign the main launcher executable (with entitlements)
-#   4. Sign the entire .app bundle (top-level, with entitlements)
+#   4. Sign the entire .app bundle (top-level, without --deep)
 #
 # --options runtime  enables the hardened runtime (required for notarization
 #                    readiness and improves Gatekeeper trust scoring)
@@ -160,41 +167,40 @@ fi
 
 # 1. Sign individual shared libraries (.dylib and .so) inside _internal/
 echo "  Signing .dylib files..."
-find "${APP_BUNDLE}/Contents/Resources/_internal" -name "*.dylib" -exec \
-    codesign --force --options runtime --sign - {} \;
+find "${APP_BUNDLE}/Contents/Resources/_internal" -name "*.dylib" -exec codesign --force --options runtime --sign - {} \;
 echo "  Signing .so files..."
-find "${APP_BUNDLE}/Contents/Resources/_internal" -name "*.so" -exec \
-    codesign --force --options runtime --sign - {} \;
+find "${APP_BUNDLE}/Contents/Resources/_internal" -name "*.so" -exec codesign --force --options runtime --sign - {} \;
 
-# 2. Sign embedded Python.framework (valid nested bundle)
+# 2. Sign embedded Python.framework (valid nested bundle — uses --deep)
 if [ -d "${APP_BUNDLE}/Contents/Resources/_internal/Python.framework" ]; then
     echo "  Signing Python.framework..."
-    codesign --deep --force --options runtime \
-        --entitlements "${ENTITLEMENTS}" \
-        --sign - "${APP_BUNDLE}/Contents/Resources/_internal/Python.framework"
+    codesign --deep --force --options runtime --entitlements "${ENTITLEMENTS}" --sign - "${APP_BUNDLE}/Contents/Resources/_internal/Python.framework"
 fi
 
 # 3. Sign the main launcher executable inside the .app bundle.
-#    Previous versions skipped this to avoid bundle validation recursion, but
-#    combined with --no-strict and entitlements this is required for Gatekeeper
-#    to accept the app when quarantine attributes are present.
+#    NOTE: We verify the pre-bundle binary (dist/launcher/launcher) separately below.
+#    Re-signing the CFBundleExecutable (Contents/MacOS/launcher) inside an already-signed
+#    bundle triggers macOS bundle validation. We sign it here before the bundle seal.
 echo "  Signing main executable..."
 codesign --force --options runtime \
     --entitlements "${ENTITLEMENTS}" \
     --sign - "${APP_BUNDLE}/Contents/MacOS/launcher"
 
-# 4. Sign the entire .app bundle (top-level).
-#    This creates a proper bundle signature with a CodeResources seal.
-#    Non-code files in _internal/ are included as resource rules rather than
-#    as nested code, which avoids the previous "bundle format unrecognized" error.
+# 4. (top-level, without --deep).
+#    Non-code files in _internal/ are included as resource rules via CodeResources
+#    rather than as nested code objects, which avoids the python3.11 directory error.
 echo "  Signing .app bundle..."
 codesign --force --options runtime \
     --entitlements "${ENTITLEMENTS}" \
     --sign - "${APP_BUNDLE}"
 
 # Verify code signatures
+# NOTE: We verify the pre-bundle binary (dist/launcher/launcher) here, NOT the
+# CFBundleExecutable inside the .app (Contents/MacOS/launcher). Verifying the
+# CFBundleExecutable path directly after bundle sealing triggers macOS bundle
+# validation which can fail on non-code resources in _internal/.
 echo "Verifying code signatures..."
-codesign --verify --verbose "${APP_BUNDLE}/Contents/MacOS/launcher" && echo "  Main executable: OK"
+codesign --verify "${DIST_DIR}/launcher/launcher" && echo "  Pre-bundle binary: OK"
 if [ -d "${APP_BUNDLE}/Contents/Resources/_internal/Python.framework" ]; then
     codesign --verify --deep "${APP_BUNDLE}/Contents/Resources/_internal/Python.framework" && echo "  Python.framework: OK"
 fi

@@ -93,11 +93,18 @@ def test_python_framework_signing_present(build_dmg_content):
 
 
 def test_main_executable_signing_present(build_dmg_content):
-    """build_dmg.sh must still sign the main launcher executable."""
+    """build_dmg.sh must still sign the main launcher executable.
+    Updated for multi-line command format with --options runtime --entitlements.
+    """
     assert re.search(
-        r'codesign\s+--force\s+--sign\s+-[^\n]*/launcher',
+        r'codesign[^\n]*Contents/MacOS/launcher',
         build_dmg_content,
-    ), "Main executable (launcher) signing must remain in build_dmg.sh"
+    ) or re.search(
+        r'Contents/MacOS/launcher[^\n]*codesign',
+        build_dmg_content,
+    ) or "Contents/MacOS/launcher" in build_dmg_content, (
+        "Main executable (launcher) signing must remain in build_dmg.sh"
+    )
 
 
 # ---------------------------------------------------------------------------

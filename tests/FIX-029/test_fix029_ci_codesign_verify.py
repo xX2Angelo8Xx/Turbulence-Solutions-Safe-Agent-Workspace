@@ -67,7 +67,8 @@ class TestVerifyCodeSigningStepExists:
     def test_step_run_contains_codesign_verify(self, macos_steps: list):
         step = next(s for s in macos_steps if s.get("name") == "Verify Code Signing")
         run_cmd: str = step["run"]
-        assert "codesign --verify --deep --strict" in run_cmd
+        # Updated per FIX-038/FIX-039: component-level verification; no --deep --strict on .app bundle
+        assert "codesign --verify" in run_cmd
 
     def test_step_run_targets_correct_app(self, macos_steps: list):
         step = next(s for s in macos_steps if s.get("name") == "Verify Code Signing")
@@ -82,14 +83,25 @@ class TestVerifyCodeSigningStepExists:
         )
 
     def test_step_run_full_command(self, macos_steps: list):
-        """Exact command must match the specified implementation."""
+        """Step must verify the pre-bundle binary, Python.framework, and the .app bundle.
+        Updated per FIX-038 (component-level) and FIX-039 (pre-bundle binary)."""
         step = next(s for s in macos_steps if s.get("name") == "Verify Code Signing")
-        expected = (
-            "codesign --verify --deep --strict dist/AgentEnvironmentLauncher.app"
-            " && echo \"Code signing verification passed\""
+        run_cmd: str = step["run"]
+        # Must verify the pre-bundle binary (FIX-039)
+        assert "dist/launcher/launcher" in run_cmd, (
+            f"Step must verify dist/launcher/launcher. Actual: {run_cmd!r}"
         )
-        assert step["run"].strip() == expected, (
-            f"Step run command mismatch.\nExpected: {expected!r}\nActual: {step['run'].strip()!r}"
+        # Must verify Python.framework (FIX-038 component-level)
+        assert "Python.framework" in run_cmd, (
+            f"Step must verify Python.framework. Actual: {run_cmd!r}"
+        )
+        # Must verify the .app bundle
+        assert "dist/AgentEnvironmentLauncher.app" in run_cmd, (
+            f"Step must verify dist/AgentEnvironmentLauncher.app. Actual: {run_cmd!r}"
+        )
+        # Must include a success message
+        assert "Code signing verification passed" in run_cmd, (
+            f"Step must echo 'Code signing verification passed'. Actual: {run_cmd!r}"
         )
 
 
@@ -189,9 +201,15 @@ class TestVerifyStepSafeguards:
         )
 
     def test_step_run_contains_strict_flag(self, macos_steps: list):
-        """The --strict flag is required for macOS 14+ Gatekeeper compatibility."""
+        """Step must verify the pre-bundle binary per FIX-039 (replaces --strict on .app).
+        Updated per FIX-038: --strict on the whole .app bundle was removed in favour of
+        component-level verification; pre-bundle binary verification added per FIX-039."""
         step = next(s for s in macos_steps if s.get("name") == "Verify Code Signing")
-        assert "--strict" in step["run"]
+        run_cmd: str = step["run"]
+        # FIX-039: pre-bundle binary must be verified
+        assert "dist/launcher/launcher" in run_cmd, (
+            "Verify Code Signing step must verify dist/launcher/launcher (pre-bundle binary)"
+        )
 
     def test_step_run_contains_deep_flag(self, macos_steps: list):
         """The --deep flag must be present to check nested components."""

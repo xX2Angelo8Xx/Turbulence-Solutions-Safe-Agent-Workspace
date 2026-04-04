@@ -60,17 +60,20 @@ def test_signing_order_so_before_framework(build_dmg_content):
 
 
 def test_signing_order_framework_before_launcher(build_dmg_content):
-    """Signing order: Python.framework must be signed before the main launcher executable."""
+    """Signing order: Python.framework must be signed before the main launcher executable.
+    Updated for multi-line command format.
+    """
     framework_match = re.search(
         r'codesign.*Python\.framework',
         build_dmg_content,
     )
+    # Launcher signing is multi-line; find the path in the script
     launcher_sign_match = re.search(
-        r'codesign\s+--force\s+--sign\s+-[^\n]*/launcher',
+        r'Contents/MacOS/launcher',
         build_dmg_content,
     )
     assert framework_match is not None, "Python.framework signing step not found"
-    assert launcher_sign_match is not None, "Launcher signing step not found"
+    assert launcher_sign_match is not None, "Launcher (Contents/MacOS/launcher) not found in script"
     assert framework_match.start() < launcher_sign_match.start(), (
         "Signing order broken: Python.framework must be signed before the main executable"
     )

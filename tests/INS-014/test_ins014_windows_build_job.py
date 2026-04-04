@@ -40,8 +40,8 @@ def test_windows_build_runs_on_windows_latest(windows_job):
 
 
 def test_windows_build_job_has_7_steps(windows_steps):
-    assert len(windows_steps) == 7, (
-        f"Expected 7 steps, got {len(windows_steps)}: "
+    assert len(windows_steps) == 8, (
+        f"Expected 8 steps (added Python embeddable download step in INS-018), got {len(windows_steps)}: "
         + str([s.get("name") or s.get("uses") for s in windows_steps])
     )
 
