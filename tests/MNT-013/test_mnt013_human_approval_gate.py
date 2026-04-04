@@ -138,3 +138,44 @@ def test_user_verdict_required_before_proceeding():
         "orchestrator.agent.md CI/CD section does not state that proceeding without "
         "user confirmation is forbidden"
     )
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case additions
+# ---------------------------------------------------------------------------
+
+def test_fallback_section_retained():
+    """The Fallback section must still be present in the CI/CD section."""
+    section = _cicd_section(_read())
+    assert "Fallback" in section, (
+        "orchestrator.agent.md CI/CD section is missing the '### Fallback' subsection — "
+        "it must be retained (required by DOC-034 tests)"
+    )
+
+
+def test_dry_run_flag_documented():
+    """The --dry-run flag must be documented in the CI/CD section for safety preview."""
+    section = _cicd_section(_read())
+    assert "--dry-run" in section, (
+        "orchestrator.agent.md CI/CD section does not document --dry-run flag — "
+        "operators must be able to preview release changes before execution"
+    )
+
+
+def test_version_bump_on_rejection():
+    """Step 3b must require a version bump after rejection (no tag reuse)."""
+    section = _cicd_section(_read())
+    assert "bump" in section.lower() or "increment" in section.lower(), (
+        "orchestrator.agent.md CI/CD section Step 3b does not mention version bumping "
+        "after rejection — rejecting a build must result in a new version, not a tag reuse"
+    )
+
+
+def test_no_tag_reuse_after_rejection():
+    """The CI/CD section must explicitly forbid reusing a rejected version tag."""
+    section = _cicd_section(_read())
+    assert "reuse" in section.lower() or "do not reuse" in section.lower() or \
+           "never reuse" in section.lower() or "rejected version" in section.lower(), (
+        "orchestrator.agent.md CI/CD section does not forbid reuse of a rejected version tag — "
+        "this is a critical process-safety requirement"
+    )
