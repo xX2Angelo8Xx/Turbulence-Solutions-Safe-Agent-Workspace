@@ -62,6 +62,7 @@ Templates (bundled inside Launcher)
 │   │   ├── ADR-005-no-rollback-ui.md
 │   │   ├── ADR-006-defer-code-signing.md
 │   │   ├── ADR-007-csv-to-jsonl-migration.md
+│   │   ├── ADR-008-tests-track-code.md
 │   │   ├── ADR-TEMPLATE.md
 │   │   └── index.jsonl
 │   ├── maintenance/
@@ -289,6 +290,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-058/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── DOC-059/
+│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-001/
@@ -1203,6 +1208,7 @@ Templates (bundled inside Launcher)
 │   ├── DOC-056/
 │   ├── DOC-057/
 │   ├── DOC-058/
+│   ├── DOC-059/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
