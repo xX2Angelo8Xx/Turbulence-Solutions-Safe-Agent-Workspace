@@ -1,0 +1,7 @@
+{"ADR-ID": "ADR-001", "Title": "Use Draft GitHub Releases for Pre-Release Testing", "Status": "Active", "Date": "2026-04-03", "Related WPs": ["MNT-004", "MNT-013", "INS-017"], "Superseded By": ""}
+{"ADR-ID": "ADR-002", "Title": "Mandatory CI Test Gate Before Release Builds", "Status": "Active", "Date": "2026-04-03", "Related WPs": ["MNT-005", "MNT-007", "DOC-051"], "Superseded By": ""}
+{"ADR-ID": "ADR-003", "Title": "Template Manifest and Workspace Upgrade System", "Status": "Active", "Date": "2026-04-03", "Related WPs": ["SAF-077", "DOC-052", "FIX-096"], "Superseded By": ""}
+{"ADR-ID": "ADR-004", "Title": "Adopt Architecture Decision Records (ADRs)", "Status": "Active", "Date": "2026-04-03", "Related WPs": ["MNT-012", "DOC-053"], "Superseded By": ""}
+{"ADR-ID": "ADR-005", "Title": "No Rollback UI — Use GitHub Releases", "Status": "Active", "Date": "2026-04-03", "Related WPs": ["DOC-053"], "Superseded By": ""}
+{"ADR-ID": "ADR-006", "Title": "Defer Code Signing", "Status": "Active", "Date": "2026-04-03", "Related WPs": ["DOC-053"], "Superseded By": ""}
+{"ADR-ID": "ADR-007", "Title": "Migrate from CSV to JSONL for All Data Files", "Status": "Active", "Date": "2026-04-04", "Related WPs": ["MNT-014", "MNT-015", "MNT-016", "MNT-017", "MNT-018", "MNT-019", "MNT-020", "MNT-021", "MNT-022", "MNT-023"], "Superseded By": ""}
