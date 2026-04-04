@@ -797,6 +797,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── MNT-015/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-016/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1048,6 +1051,7 @@ Templates (bundled inside Launcher)
 │   ├── install-macos.sh
 │   ├── install_hooks.py
 │   ├── jsonl_utils.py
+│   ├── migrate_csv_to_jsonl.py
 │   ├── README.md
 │   ├── release.py
 │   ├── run_tests.py
@@ -1329,6 +1333,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-012/
 │   ├── MNT-013/
 │   ├── MNT-015/
+│   ├── MNT-016/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
