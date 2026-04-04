@@ -85,3 +85,34 @@ def test_invalid_status_rejected() -> None:
     )
     with pytest.raises(SystemExit):
         parser.parse_args(["--status", "Pending"])
+
+
+def test_unknown_bug_id_returns_error(tmp_path: Path) -> None:
+    """main() must return non-zero when the bug ID is not found in bugs.csv."""
+    bugs_csv = tmp_path / "bugs.csv"
+    bugs_csv.write_text(
+        "ID,Title,Status,Severity,Component,Description,Steps,Expected,Actual,"
+        "Fixed In WP,Reporter\n"
+        "BUG-001,Test bug,Open,Low,Scripts,desc,steps,exp,act,,tester\n",
+        encoding="utf-8",
+    )
+
+    with (
+        patch.object(update_bug_status, "CSV_PATH", bugs_csv),
+        patch("sys.argv", ["update_bug_status.py", "BUG-999", "--status", "Verified"]),
+    ):
+        result = update_bug_status.main()
+
+    assert result != 0
+
+
+def test_verified_case_sensitive_rejected() -> None:
+    """'verified' (lowercase) must NOT be accepted — status values are case-sensitive."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--status",
+        required=True,
+        choices=sorted(update_bug_status.VALID_STATUSES),
+    )
+    with pytest.raises(SystemExit):
+        parser.parse_args(["--status", "verified"])
