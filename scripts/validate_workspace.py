@@ -17,12 +17,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import REPO_ROOT, read_csv, update_cell
+from jsonl_utils import REPO_ROOT, read_jsonl, update_cell
 
-WP_CSV = REPO_ROOT / "docs" / "workpackages" / "workpackages.csv"
-US_CSV = REPO_ROOT / "docs" / "user-stories" / "user-stories.csv"
-BUG_CSV = REPO_ROOT / "docs" / "bugs" / "bugs.csv"
-TST_CSV = REPO_ROOT / "docs" / "test-results" / "test-results.csv"
+WP_JSONL = REPO_ROOT / "docs" / "workpackages" / "workpackages.jsonl"
+US_JSONL = REPO_ROOT / "docs" / "user-stories" / "user-stories.jsonl"
+BUG_JSONL = REPO_ROOT / "docs" / "bugs" / "bugs.jsonl"
+TST_JSONL = REPO_ROOT / "docs" / "test-results" / "test-results.jsonl"
 EXCEPTIONS_JSON = REPO_ROOT / "docs" / "workpackages" / "validation-exceptions.json"
 
 
@@ -74,8 +74,11 @@ class ValidationResult:
 
 
 def _check_duplicate_ids(path: Path, id_column: str, result: ValidationResult) -> None:
-    """Check for duplicate IDs in a CSV file."""
-    _, rows = read_csv(path)
+    """Check for duplicate IDs in a JSONL file."""
+    if not path.exists():
+        result.warning(f"JSONL file not found (pre-MNT-018): {path.name}")
+        return
+    _, rows = read_jsonl(path)
     seen: dict[str, int] = {}
     for row in rows:
         rid = row.get(id_column, "").strip()
@@ -143,10 +146,12 @@ def _check_wp_artifacts(
 
 def _check_bug_cascade(result: ValidationResult) -> None:
     """Check for bugs with Done fix-WP that should be Closed."""
-    _, wp_rows = read_csv(WP_CSV)
+    if not WP_JSONL.exists() or not BUG_JSONL.exists():
+        return
+    _, wp_rows = read_jsonl(WP_JSONL)
     wp_status = {r["ID"]: r["Status"] for r in wp_rows}
 
-    _, bug_rows = read_csv(BUG_CSV)
+    _, bug_rows = read_jsonl(BUG_JSONL)
     for bug in bug_rows:
         bug_id = bug.get("ID", "")
         bug_status = bug.get("Status", "")
@@ -161,17 +166,22 @@ def _check_bug_cascade(result: ValidationResult) -> None:
 
 def _check_us_cascade(result: ValidationResult) -> None:
     """Check for User Stories where all linked WPs are Done."""
-    _, wp_rows = read_csv(WP_CSV)
+    if not WP_JSONL.exists() or not US_JSONL.exists():
+        return
+    _, wp_rows = read_jsonl(WP_JSONL)
     wp_status = {r["ID"]: r["Status"] for r in wp_rows}
 
-    _, us_rows = read_csv(US_CSV)
+    _, us_rows = read_jsonl(US_JSONL)
     for us in us_rows:
         us_id = us.get("ID", "")
         us_status = us.get("Status", "")
-        linked_raw = us.get("Linked WPs", "").strip()
-        if not linked_raw or us_status in ("Done", "Closed"):
+        linked_val = us.get("Linked WPs", "")
+        if not linked_val or us_status in ("Done", "Closed"):
             continue
-        linked_wps = [w.strip() for w in linked_raw.split(",") if w.strip()]
+        if isinstance(linked_val, list):
+            linked_wps = [w.strip() for w in linked_val if w.strip()]
+        else:
+            linked_wps = [w.strip() for w in str(linked_val).split(",") if w.strip()]
         if not linked_wps:
             continue
         if all(wp_status.get(wp) == "Done" for wp in linked_wps):
@@ -205,9 +215,10 @@ def _check_tst_coverage(result: ValidationResult, exceptions: dict | None = None
     """Check that every Done WP with code changes has passing test results."""
     if exceptions is None:
         exceptions = {}
-
-    _, wp_rows = read_csv(WP_CSV)
-    _, tst_rows = read_csv(TST_CSV)
+    if not WP_JSONL.exists() or not TST_JSONL.exists():
+        return
+    _, wp_rows = read_jsonl(WP_JSONL)
+    _, tst_rows = read_jsonl(TST_JSONL)
 
     # Build set of WP IDs that have at least one passing TST entry
     wp_with_pass = set()
@@ -234,41 +245,43 @@ def _check_tst_coverage(result: ValidationResult, exceptions: dict | None = None
 
         if wp_id not in wp_with_pass:
             result.error(
-                f"{wp_id}: Done WP has no passing test entry in test-results.csv"
+                f"{wp_id}: Done WP has no passing test entry in test-results.jsonl"
             )
 
 
-def _check_csv_structural(result: ValidationResult) -> None:
-    """Verify all 4 CSVs parse cleanly in strict mode with valid enum values."""
+def _check_jsonl_structural(result: ValidationResult) -> None:
+    """Verify all 4 JSONL files parse cleanly with valid enum values."""
     # Enum definitions for status fields
     VALID_WP_STATUS = {"Open", "In Progress", "Review", "Done"}
     VALID_BUG_STATUS = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
     VALID_TST_STATUS = {"Pass", "Fail", "Blocked", "Skipped", "XFail"}
     VALID_US_STATUS = {"Open", "In Progress", "Done", "Closed"}
 
-    csv_configs = [
-        (WP_CSV, "Status", VALID_WP_STATUS, "WP"),
-        (BUG_CSV, "Status", VALID_BUG_STATUS, "Bug"),
-        (TST_CSV, "Status", VALID_TST_STATUS, "Test"),
-        (US_CSV, "Status", VALID_US_STATUS, "US"),
+    jsonl_configs = [
+        (WP_JSONL, "Status", VALID_WP_STATUS, "WP"),
+        (BUG_JSONL, "Status", VALID_BUG_STATUS, "Bug"),
+        (TST_JSONL, "Status", VALID_TST_STATUS, "Test"),
+        (US_JSONL, "Status", VALID_US_STATUS, "US"),
     ]
 
-    for csv_path, status_col, valid_values, label in csv_configs:
-        if not csv_path.exists():
-            result.error(f"{label} CSV not found: {csv_path.name}")
+    for jsonl_path, status_col, valid_values, label in jsonl_configs:
+        if not jsonl_path.exists():
+            result.warning(f"{label} JSONL not found (pre-MNT-018): {jsonl_path.name}")
             continue
 
-        # Strict parse check
+        # Structural parse check — each line must be valid JSON
         try:
-            _, rows = read_csv(csv_path, strict=True)
+            _, rows = read_jsonl(jsonl_path)
         except ValueError as e:
-            result.error(f"{label} CSV structural error: {e}")
+            result.error(f"{label} JSONL structural error: {e}")
             continue
 
         # Enum validation (warnings — pre-existing data may have non-standard values)
         for row in rows:
             row_id = row.get("ID", "<no ID>")
-            status = row.get(status_col, "").strip()
+            status = row.get(status_col, "")
+            if isinstance(status, str):
+                status = status.strip()
             if status and status not in valid_values:
                 result.warning(
                     f"{row_id}: invalid {label} Status '{status}' — "
@@ -281,7 +294,9 @@ VALID_BUG_STATUSES = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
 
 def _check_bug_status_enum(result: ValidationResult) -> None:
     """Verify all bug statuses are from the allowed set."""
-    _, bug_rows = read_csv(BUG_CSV)
+    if not BUG_JSONL.exists():
+        return
+    _, bug_rows = read_jsonl(BUG_JSONL)
     for bug in bug_rows:
         bug_id = bug.get("ID", "<no ID>")
         status = bug.get("Status", "").strip()
@@ -305,7 +320,9 @@ def _check_bug_linkage(wp_id: str, result: ValidationResult) -> None:
     if not bug_refs:
         return
 
-    _, bug_rows = read_csv(BUG_CSV)
+    if not BUG_JSONL.exists():
+        return
+    _, bug_rows = read_jsonl(BUG_JSONL)
     bug_map = {b["ID"]: b for b in bug_rows}
     for bug_id in sorted(bug_refs):
         bug = bug_map.get(bug_id)
@@ -321,7 +338,9 @@ def _check_bug_linkage(wp_id: str, result: ValidationResult) -> None:
 
 def _check_orphaned_state_files(result: ValidationResult) -> None:
     """Check for orphaned .finalization-state.json files in WP folders."""
-    _, wp_rows = read_csv(WP_CSV)
+    if not WP_JSONL.exists():
+        return
+    _, wp_rows = read_jsonl(WP_JSONL)
     wp_status = {r["ID"]: r["Status"] for r in wp_rows}
 
     wp_base = REPO_ROOT / "docs" / "workpackages"
@@ -360,7 +379,11 @@ def apply_fixes() -> int:
     """Auto-fix detectable issues. Returns the number of fixes applied."""
     fixes = 0
 
-    _, wp_rows = read_csv(WP_CSV)
+    if not WP_JSONL.exists():
+        print("No JSONL data files found — run MNT-018 to convert data files.")
+        return 0
+
+    _, wp_rows = read_jsonl(WP_JSONL)
     wp_status = {r["ID"]: r["Status"] for r in wp_rows}
 
     # Fix 1: Delete orphaned .finalization-state.json for Done WPs
@@ -373,14 +396,14 @@ def apply_fixes() -> int:
             fixes += 1
 
     # Fix 2: Close Fixed bugs whose fix-WP is Done
-    _, bug_rows = read_csv(BUG_CSV)
+    _, bug_rows = read_jsonl(BUG_JSONL)
     for bug in bug_rows:
         bug_id = bug.get("ID", "")
         bug_status = bug.get("Status", "").strip()
         fixed_wp = bug.get("Fixed In WP", "").strip()
         if bug_status == "Fixed" and fixed_wp:
             if wp_status.get(fixed_wp) == "Done":
-                update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
+                update_cell(BUG_JSONL, "ID", bug_id, "Status", "Closed")
                 print(f"FIX: Closed {bug_id} (fixed by Done WP {fixed_wp})")
                 fixes += 1
 
@@ -389,17 +412,24 @@ def apply_fixes() -> int:
 
 def _check_dependency_ordering(result: ValidationResult) -> None:
     """Check that WP dependencies are satisfied (dependent WPs are Done before dependents start)."""
-    _, rows = read_csv(WP_CSV)
+    if not WP_JSONL.exists():
+        return
+    _, rows = read_jsonl(WP_JSONL)
     wp_status = {}
     wp_deps = {}
     for row in rows:
         wp_id = row.get("ID", "").strip()
         status = row.get("Status", "").strip()
-        depends_on = row.get("Depends On", "").strip()
+        depends_on_val = row.get("Depends On", "")
         if wp_id:
             wp_status[wp_id] = status
-            if depends_on:
-                wp_deps[wp_id] = [d.strip() for d in depends_on.split(",") if d.strip()]
+            if depends_on_val:
+                if isinstance(depends_on_val, list):
+                    deps = [d.strip() for d in depends_on_val if d.strip()]
+                else:
+                    deps = [d.strip() for d in str(depends_on_val).split(",") if d.strip()]
+                if deps:
+                    wp_deps[wp_id] = deps
 
     for wp_id, deps in wp_deps.items():
         status = wp_status.get(wp_id, "")
@@ -412,7 +442,7 @@ def _check_dependency_ordering(result: ValidationResult) -> None:
                         f"which is not Done yet"
                     )
                 elif not dep_status:
-                    result.warning(f"{wp_id} depends on {dep} which does not exist in workpackages.csv")
+                    result.warning(f"{wp_id} depends on {dep} which does not exist in workpackages.jsonl")
 
     # Check for circular dependencies
     def _has_cycle(wp_id: str, visited: set, stack: set) -> bool:
@@ -436,11 +466,11 @@ def _check_dependency_ordering(result: ValidationResult) -> None:
 
 def _check_adr_consistency(result: ValidationResult) -> None:
     """Check ADR index for superseded decisions referenced by Done WPs."""
-    adr_index = REPO_ROOT / "docs" / "decisions" / "index.csv"
+    adr_index = REPO_ROOT / "docs" / "decisions" / "index.jsonl"
     if not adr_index.exists():
         return  # ADR system not yet set up
 
-    _, adr_rows = read_csv(adr_index)
+    _, adr_rows = read_jsonl(adr_index)
     superseded_adrs = {}
     for row in adr_rows:
         adr_id = row.get("ADR-ID", "").strip()
@@ -452,7 +482,9 @@ def _check_adr_consistency(result: ValidationResult) -> None:
     if not superseded_adrs:
         return
 
-    _, wp_rows = read_csv(WP_CSV)
+    if not WP_JSONL.exists():
+        return
+    _, wp_rows = read_jsonl(WP_JSONL)
     for row in wp_rows:
         wp_id = row.get("ID", "").strip()
         status = row.get("Status", "").strip()
@@ -474,18 +506,19 @@ def validate_full(result: ValidationResult) -> None:
     exceptions = _load_exceptions()
 
     # Duplicate ID checks
-    _check_duplicate_ids(TST_CSV, "ID", result)
-    _check_duplicate_ids(WP_CSV, "ID", result)
-    _check_duplicate_ids(BUG_CSV, "ID", result)
-    _check_duplicate_ids(US_CSV, "ID", result)
+    _check_duplicate_ids(TST_JSONL, "ID", result)
+    _check_duplicate_ids(WP_JSONL, "ID", result)
+    _check_duplicate_ids(BUG_JSONL, "ID", result)
+    _check_duplicate_ids(US_JSONL, "ID", result)
 
     # WP artifact checks for all Done and Review WPs
-    _, wp_rows = read_csv(WP_CSV)
-    for wp in wp_rows:
-        if wp.get("Status") in ("Done", "Review"):
-            _check_wp_artifacts(
-                wp["ID"], wp["Status"], wp.get("Comments", ""), result, exceptions
-            )
+    if WP_JSONL.exists():
+        _, wp_rows = read_jsonl(WP_JSONL)
+        for wp in wp_rows:
+            if wp.get("Status") in ("Done", "Review"):
+                _check_wp_artifacts(
+                    wp["ID"], wp["Status"], wp.get("Comments", ""), result, exceptions
+                )
 
     # TST coverage cross-validation
     _check_tst_coverage(result, exceptions)
@@ -501,7 +534,7 @@ def validate_full(result: ValidationResult) -> None:
     _check_branch_naming(result)
 
     # CSV structural integrity
-    _check_csv_structural(result)
+    _check_jsonl_structural(result)
 
     # Orphaned finalization state files
     _check_orphaned_state_files(result)
@@ -521,10 +554,19 @@ def validate_wp(wp_id: str, result: ValidationResult) -> None:
     exceptions = _load_exceptions()
 
     # Duplicate IDs (always check — other WPs may have caused collisions)
-    _check_duplicate_ids(TST_CSV, "ID", result)
+    _check_duplicate_ids(TST_JSONL, "ID", result)
+
+    # Guard: WP JSONL must exist to run WP artifact and bug cascade checks
+    if not WP_JSONL.exists():
+        result.warning(
+            f"WP JSONL not found (pre-MNT-018): {WP_JSONL.name} — "
+            f"run MNT-018 to convert data files to JSONL"
+        )
+        _check_branch_naming(result)
+        return
 
     # WP artifacts
-    _, wp_rows = read_csv(WP_CSV)
+    _, wp_rows = read_jsonl(WP_JSONL)
     for wp in wp_rows:
         if wp["ID"] == wp_id:
             _check_wp_artifacts(
@@ -532,11 +574,20 @@ def validate_wp(wp_id: str, result: ValidationResult) -> None:
             )
             break
     else:
-        result.error(f"Workpackage {wp_id} not found in workpackages.csv")
+        result.error(f"Workpackage {wp_id} not found in workpackages.jsonl")
         return
 
     # Bug cascade (only for this WP)
-    _, bug_rows = read_csv(BUG_CSV)
+    if not BUG_JSONL.exists():
+        result.warning(
+            f"Bug JSONL not found (pre-MNT-018): {BUG_JSONL.name} — "
+            f"run MNT-018 to convert data files to JSONL"
+        )
+        _check_branch_naming(result)
+        _check_bug_linkage(wp_id, result)
+        return
+
+    _, bug_rows = read_jsonl(BUG_JSONL)
     wp = next(r for r in wp_rows if r["ID"] == wp_id)
     for bug in bug_rows:
         if bug.get("Fixed In WP", "").strip() == wp_id and bug.get("Status") == "Open":

@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import REPO_ROOT
+from jsonl_utils import REPO_ROOT
 
 ARCH_PATH = REPO_ROOT / "docs" / "architecture.md"
 

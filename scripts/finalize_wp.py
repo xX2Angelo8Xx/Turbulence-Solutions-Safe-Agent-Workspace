@@ -17,11 +17,11 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from csv_utils import REPO_ROOT, FileLock, read_csv, update_cell, write_csv
+from jsonl_utils import REPO_ROOT, FileLock, read_jsonl, update_cell, write_jsonl
 
-WP_CSV = REPO_ROOT / "docs" / "workpackages" / "workpackages.csv"
-US_CSV = REPO_ROOT / "docs" / "user-stories" / "user-stories.csv"
-BUG_CSV = REPO_ROOT / "docs" / "bugs" / "bugs.csv"
+WP_JSONL = REPO_ROOT / "docs" / "workpackages" / "workpackages.jsonl"
+US_JSONL = REPO_ROOT / "docs" / "user-stories" / "user-stories.jsonl"
+BUG_JSONL = REPO_ROOT / "docs" / "bugs" / "bugs.jsonl"
 
 CANONICAL_ORIGIN = (
     "https://github.com/xX2Angelo8Xx/"
@@ -120,7 +120,7 @@ def _validate_wp(wp_id: str) -> None:
 
 def _cascade_us_status(wp_id: str, dry_run: bool) -> None:
     """If all linked WPs for the parent US are Done, set US to Done."""
-    _, wp_rows = read_csv(WP_CSV)
+    _, wp_rows = read_jsonl(WP_JSONL)
     wp_row = next((r for r in wp_rows if r["ID"] == wp_id), None)
     if not wp_row:
         return
@@ -132,7 +132,7 @@ def _cascade_us_status(wp_id: str, dry_run: bool) -> None:
 
     wp_status_map = {r["ID"]: r["Status"] for r in wp_rows}
 
-    _, us_rows = read_csv(US_CSV)
+    _, us_rows = read_jsonl(US_JSONL)
     for us in us_rows:
         if us["ID"] != us_id:
             continue
@@ -140,8 +140,11 @@ def _cascade_us_status(wp_id: str, dry_run: bool) -> None:
             print(f"  Skip US cascade: {us_id} already {us['Status']}")
             return
 
-        linked_raw = us.get("Linked WPs", "").strip()
-        linked_wps = [w.strip() for w in linked_raw.split(",") if w.strip()]
+        linked_val = us.get("Linked WPs", [])
+        if isinstance(linked_val, list):
+            linked_wps = [w.strip() for w in linked_val if w.strip()]
+        else:
+            linked_wps = [w.strip() for w in str(linked_val).split(",") if w.strip()]
         if not linked_wps:
             return
 
@@ -150,14 +153,14 @@ def _cascade_us_status(wp_id: str, dry_run: bool) -> None:
             if dry_run:
                 print(f"  [DRY RUN] Set {us_id} status to Done (all {len(linked_wps)} WPs done)")
             else:
-                update_cell(US_CSV, "ID", us_id, "Status", "Done")
+                update_cell(US_JSONL, "ID", us_id, "Status", "Done")
                 print(f"  Set {us_id} status to Done")
         else:
             pending = [wp for wp in linked_wps if wp_status_map.get(wp) != "Done"]
             print(f"  Skip US cascade: {us_id} has pending WPs: {', '.join(pending)}")
         return
 
-    print(f"  Warning: User Story {us_id} not found in user-stories.csv")
+    print(f"  Warning: User Story {us_id} not found in user-stories.jsonl")
 
 
 def _cascade_bug_status(wp_id: str, dry_run: bool) -> bool:
@@ -165,7 +168,7 @@ def _cascade_bug_status(wp_id: str, dry_run: bool) -> bool:
 
     Returns True if all bugs were processed without error, False if any update failed.
     """
-    _, bug_rows = read_csv(BUG_CSV)
+    _, bug_rows = read_jsonl(BUG_JSONL)
     already_closed: set[str] = set()
     all_succeeded = True
 
@@ -178,7 +181,7 @@ def _cascade_bug_status(wp_id: str, dry_run: bool) -> bool:
                 print(f"  [DRY RUN] Close {bug_id} (fixed by {wp_id})")
             else:
                 try:
-                    update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
+                    update_cell(BUG_JSONL, "ID", bug_id, "Status", "Closed")
                     print(f"  Closed {bug_id} (fixed by {wp_id})")
                 except Exception as exc:
                     print(f"  ERROR: Failed to close {bug_id}: {exc}")
@@ -198,7 +201,7 @@ def _cascade_bug_status(wp_id: str, dry_run: bool) -> bool:
 
     # Re-read bugs after Phase 1 updates (status may have changed)
     if bug_refs:
-        _, bug_rows = read_csv(BUG_CSV)
+        _, bug_rows = read_jsonl(BUG_JSONL)
         bug_map = {b["ID"]: b for b in bug_rows}
 
         for bug_id in sorted(bug_refs):
@@ -219,8 +222,8 @@ def _cascade_bug_status(wp_id: str, dry_run: bool) -> bool:
                 try:
                     fixed_wp = bug.get("Fixed In WP", "").strip()
                     if not fixed_wp:
-                        update_cell(BUG_CSV, "ID", bug_id, "Fixed In WP", wp_id)
-                    update_cell(BUG_CSV, "ID", bug_id, "Status", "Closed")
+                        update_cell(BUG_JSONL, "ID", bug_id, "Fixed In WP", wp_id)
+                    update_cell(BUG_JSONL, "ID", bug_id, "Status", "Closed")
                     print(f"  Auto-closed {bug_id} (referenced in dev-log/test-report, fixed by {wp_id})")
                 except Exception as exc:
                     print(f"  ERROR: Failed to auto-close {bug_id}: {exc}")
@@ -276,10 +279,10 @@ def finalize(wp_id: str, dry_run: bool) -> int:
 
     # Step 1: Read WP row, confirm Done
     print(f"\n--- Step 1: Verify WP status ---")
-    _, wp_rows = read_csv(WP_CSV)
+    _, wp_rows = read_jsonl(WP_JSONL)
     wp_row = next((r for r in wp_rows if r["ID"] == wp_id), None)
     if not wp_row:
-        print(f"Error: {wp_id} not found in workpackages.csv")
+        print(f"Error: {wp_id} not found in workpackages.jsonl")
         return 1
     if wp_row["Status"] != "Done":
         print(f"Error: {wp_id} status is '{wp_row['Status']}', expected 'Done'")
