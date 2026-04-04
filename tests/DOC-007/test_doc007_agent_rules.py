@@ -272,7 +272,12 @@ def test_valid_markdown_h1_title():
     lines = content.splitlines()
     first_nonempty = next((ln for ln in lines if ln.strip()), "")
     assert first_nonempty.startswith("# "), (
+<<<<<<< Updated upstream
         f"File must begin with an H1 heading. First non-empty line: {first_nonempty!r}"
+=======
+        f"File must begin with an H1 heading (''# ...'')."
+        f" First non-empty line: {first_nonempty!r}"
+>>>>>>> Stashed changes
     )
 
 
@@ -281,7 +286,11 @@ def test_all_seven_numbered_sections_present():
     content = _content()
     for i in range(1, 8):
         assert re.search(rf"##\s+{i}\.", content), (
+<<<<<<< Updated upstream
             f"Numbered section {i} not found - expected a heading like ## {i}. title"
+=======
+            f"Numbered section {i} not found - expected a heading like ''## {i}. <title>''"
+>>>>>>> Stashed changes
         )
 
 
@@ -300,7 +309,11 @@ def test_matrix_covers_create_directory_explicitly():
 
 
 def test_matrix_write_tools_are_zone_checked():
+<<<<<<< Updated upstream
     """Write tools in the matrix must use Zone-checked permission label."""
+=======
+    """Write tools in the matrix must use Zone-checked, not just Allowed."""
+>>>>>>> Stashed changes
     content = _content()
     matrix_match = re.search(
         r"##[^\n]*tool.{0,20}permission.{0,20}matrix(.*?)(?=^##|\Z)",
@@ -308,9 +321,16 @@ def test_matrix_write_tools_are_zone_checked():
     )
     assert matrix_match, "Could not locate Tool Permission Matrix section"
     section = matrix_match.group(1)
+<<<<<<< Updated upstream
     assert "Zone-checked" in section, (
         "Tool permission matrix must contain Zone-checked label for write tools"
     )
+=======
+    for tool in ("create_file", "replace_string_in_file"):
+        assert "Zone-checked" in section, (
+            f"Tool permission matrix must use Zone-checked label (needed for write tools including {tool})"
+        )
+>>>>>>> Stashed changes
 
 
 def test_matrix_covers_terminal_category():
@@ -338,7 +358,13 @@ def test_denied_zones_presented_as_table():
     section = denied_match.group(1)
     assert "|" in section, "Denied Zones must be presented as a markdown table"
     for path in (".github/", ".vscode/", "NoAgentZone/"):
+<<<<<<< Updated upstream
         assert path in section, f"Denied path {path} not found in the Denied Zones table"
+=======
+        assert path in section, (
+            f"Denied path '{path}' not found in the Denied Zones table"
+        )
+>>>>>>> Stashed changes
 
 
 def test_markdown_no_unclosed_code_fence():
@@ -346,5 +372,10 @@ def test_markdown_no_unclosed_code_fence():
     content = _content()
     fences = re.findall(r"^```", content, re.MULTILINE)
     assert len(fences) % 2 == 0, (
+<<<<<<< Updated upstream
         f"Odd number of triple-backtick code fences ({len(fences)}) - not all closed."
+=======
+        f"Odd number of triple-backtick code fences ({len(fences)}) - "
+        f"at least one code block is not properly closed."
+>>>>>>> Stashed changes
     )

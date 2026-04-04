@@ -821,6 +821,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── MNT-022/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-023/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1050,6 +1053,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
+│   │   ├── workpackages.csv
 │   │   └── workpackages.jsonl
 │   ├── architecture.md
 │   ├── macos-installation-guide.md
@@ -1360,6 +1364,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-020/
 │   ├── MNT-021/
 │   ├── MNT-022/
+│   ├── MNT-023/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
