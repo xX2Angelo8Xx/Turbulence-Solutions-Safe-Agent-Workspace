@@ -61,6 +61,7 @@ Templates (bundled inside Launcher)
 │   │   ├── ADR-004-architecture-decision-records.md
 │   │   ├── ADR-005-no-rollback-ui.md
 │   │   ├── ADR-006-defer-code-signing.md
+│   │   ├── ADR-007-csv-to-jsonl-migration.md
 │   │   ├── ADR-TEMPLATE.md
 │   │   └── index.csv
 │   ├── maintenance/
@@ -291,7 +292,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-058/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-001/
@@ -796,6 +796,10 @@ Templates (bundled inside Launcher)
 │   │   ├── MNT-013/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── MNT-015/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── SAF-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1043,6 +1047,7 @@ Templates (bundled inside Launcher)
 │   ├── generate_manifest.py
 │   ├── install-macos.sh
 │   ├── install_hooks.py
+│   ├── jsonl_utils.py
 │   ├── README.md
 │   ├── release.py
 │   ├── run_tests.py
@@ -1323,6 +1328,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-011/
 │   ├── MNT-012/
 │   ├── MNT-013/
+│   ├── MNT-015/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
