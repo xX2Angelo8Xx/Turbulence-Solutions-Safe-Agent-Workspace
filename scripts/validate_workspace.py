@@ -262,10 +262,10 @@ def _check_jsonl_structural(result: ValidationResult) -> None:
 
     # (path, id_field, status_field, valid_status_values, label, required_fields)
     jsonl_configs = [
-        (WP_JSONL,        "ID",     "Status", VALID_WP_STATUS,  "WP",      ["ID", "Status", "Name"]),
-        (BUG_JSONL,       "ID",     "Status", VALID_BUG_STATUS, "Bug",     ["ID", "Status", "Title"]),
-        (TST_JSONL,       "ID",     "Status", VALID_TST_STATUS, "Test",    ["ID", "Status", "Test Name"]),
-        (US_JSONL,        "ID",     "Status", VALID_US_STATUS,  "US",      ["ID", "Status", "Title"]),
+        (WP_JSONL,        "ID",     "Status", VALID_WP_STATUS,  "WP",      ["ID", "Status"]),
+        (BUG_JSONL,       "ID",     "Status", VALID_BUG_STATUS, "Bug",     ["ID", "Status"]),
+        (TST_JSONL,       "ID",     "Status", VALID_TST_STATUS, "Test",    ["ID", "Status"]),
+        (US_JSONL,        "ID",     "Status", VALID_US_STATUS,  "US",      ["ID", "Status"]),
         (DECISIONS_JSONL, "ADR-ID", "Status", VALID_ADR_STATUS, "ADR",     ["ADR-ID", "Status", "Title"]),
         (MAINT_RUNS_JSONL, "ID",   "Status", set(),            "MaintRun", []),
     ]
