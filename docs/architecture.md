@@ -53,7 +53,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── Minimal_Agent_Feedback-3.3.8.md
 │   │   │   ├── SAE_macOS_Error_Report_v323.md
 │   │   │   └── security-hook-report.md
-│   │   └── bugs.csv
+│   │   └── bugs.jsonl
 │   ├── decisions/
 │   │   ├── ADR-001-draft-releases.md
 │   │   ├── ADR-002-ci-test-gate.md
@@ -63,7 +63,7 @@ Templates (bundled inside Launcher)
 │   │   ├── ADR-006-defer-code-signing.md
 │   │   ├── ADR-007-csv-to-jsonl-migration.md
 │   │   ├── ADR-TEMPLATE.md
-│   │   └── index.csv
+│   │   └── index.jsonl
 │   ├── maintenance/
 │   │   ├── .gitkeep
 │   │   ├── 2026-03-11-maintenance.md
@@ -77,7 +77,7 @@ Templates (bundled inside Launcher)
 │   │   ├── 2026-03-30-maintenance.md
 │   │   ├── 2026-04-01-maintenance.md
 │   │   ├── action-tracker.json
-│   │   └── orchestrator-runs.csv
+│   │   └── orchestrator-runs.jsonl
 │   ├── plans/
 │   │   ├── plan-fixLegacyValidationErrors.md
 │   │   ├── plan-project-status-next-steps.md
@@ -95,9 +95,9 @@ Templates (bundled inside Launcher)
 │   ├── status-reports/
 │   │   └── 2026-03-29-status-report.md
 │   ├── test-results/
-│   │   └── test-results.csv
+│   │   └── test-results.jsonl
 │   ├── user-stories/
-│   │   └── user-stories.csv
+│   │   └── user-stories.jsonl
 │   ├── work-rules/
 │   │   ├── agent-workflow.md
 │   │   ├── branch-protection.md
@@ -278,7 +278,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-054/
-│   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── DOC-055/
@@ -796,10 +795,22 @@ Templates (bundled inside Launcher)
 │   │   ├── MNT-013/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── MNT-014/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── MNT-015/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── MNT-016/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-017/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-018/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-019/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1029,7 +1040,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
-│   │   └── workpackages.csv
+│   │   └── workpackages.jsonl
 │   ├── architecture.md
 │   ├── macos-installation-guide.md
 │   └── project-scope.md
@@ -1038,8 +1049,6 @@ Templates (bundled inside Launcher)
 │   │   └── pre-commit
 │   ├── __init__.py
 │   ├── _add_wps_batch.py
-│   ├── _repair_csvs.py
-│   ├── _verify.py
 │   ├── add_bug.py
 │   ├── add_test_result.py
 │   ├── add_workpackage.py
@@ -1332,8 +1341,12 @@ Templates (bundled inside Launcher)
 │   ├── MNT-011/
 │   ├── MNT-012/
 │   ├── MNT-013/
+│   ├── MNT-014/
 │   ├── MNT-015/
 │   ├── MNT-016/
+│   ├── MNT-017/
+│   ├── MNT-018/
+│   ├── MNT-019/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
