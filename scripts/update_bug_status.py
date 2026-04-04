@@ -14,7 +14,7 @@ from csv_utils import REPO_ROOT, read_csv, update_cell
 
 CSV_PATH = REPO_ROOT / "docs" / "bugs" / "bugs.csv"
 
-VALID_STATUSES = {"Open", "In Progress", "Fixed", "Closed"}
+VALID_STATUSES = {"Open", "In Progress", "Fixed", "Verified", "Closed"}
 
 
 def main() -> int:
