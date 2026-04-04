@@ -69,3 +69,24 @@ def test_manifest_json_scope_not_in_files():
     data = json.loads(_MANIFEST_PATH.read_text(encoding="utf-8"))
     files = data.get("files", {})
     assert "_scope" not in files, "_scope must be a top-level key, not inside 'files'"
+
+
+def test_manifest_json_scope_is_nonempty_string():
+    """_scope must be a non-empty string, not None, a list, or a dict."""
+    data = json.loads(_MANIFEST_PATH.read_text(encoding="utf-8"))
+    scope = data.get("_scope")
+    assert isinstance(scope, str), f"_scope must be str, got {type(scope)}"
+    assert len(scope.strip()) > 0, "_scope must not be an empty or whitespace-only string"
+
+
+def test_generate_manifest_scope_is_nonempty_string():
+    """generate_manifest() _scope value must be a non-empty string."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("generate_manifest", _SCRIPT_PATH)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    manifest = mod.generate_manifest()
+    scope = manifest.get("_scope")
+    assert isinstance(scope, str), f"_scope must be str, got {type(scope)}"
+    assert len(scope.strip()) > 0, "_scope must not be empty"
