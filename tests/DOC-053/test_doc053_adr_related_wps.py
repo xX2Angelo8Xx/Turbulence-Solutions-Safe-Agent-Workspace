@@ -77,7 +77,7 @@ def test_all_adr_entries_have_related_wps():
 
 
 def test_all_referenced_wp_ids_exist_in_workpackages():
-    """Every WP ID referenced in ADR index Related WPs must exist in workpackages.csv."""
+    """Every WP ID referenced in ADR index Related WPs must exist in workpackages.jsonl."""
     adr_rows = _load_adr_index()
     wp_ids = _load_workpackage_ids()
     missing: list[str] = []
@@ -96,7 +96,7 @@ def test_adr_001_related_wps_non_empty():
     """ADR-001 must have at least one Related WP."""
     rows = _load_adr_index()
     adr = next((r for r in rows if r.get("ADR-ID") == "ADR-001"), None)
-    assert adr is not None, "ADR-001 not found in index.csv"
+    assert adr is not None, "ADR-001 not found in index.jsonl"
     related = _extract_wp_ids(adr.get("Related WPs", ""))
     assert len(related) > 0, "ADR-001 has no Related WPs"
 
@@ -105,7 +105,7 @@ def test_adr_002_related_wps_non_empty():
     """ADR-002 must have at least one Related WP."""
     rows = _load_adr_index()
     adr = next((r for r in rows if r.get("ADR-ID") == "ADR-002"), None)
-    assert adr is not None, "ADR-002 not found in index.csv"
+    assert adr is not None, "ADR-002 not found in index.jsonl"
     related = _extract_wp_ids(adr.get("Related WPs", ""))
     assert len(related) > 0, "ADR-002 has no Related WPs"
 
@@ -114,7 +114,7 @@ def test_adr_003_related_wps_non_empty():
     """ADR-003 must have at least one Related WP."""
     rows = _load_adr_index()
     adr = next((r for r in rows if r.get("ADR-ID") == "ADR-003"), None)
-    assert adr is not None, "ADR-003 not found in index.csv"
+    assert adr is not None, "ADR-003 not found in index.jsonl"
     related = _extract_wp_ids(adr.get("Related WPs", ""))
     assert len(related) > 0, "ADR-003 has no Related WPs"
 
@@ -123,7 +123,7 @@ def test_adr_004_related_wps_non_empty():
     """ADR-004 must have at least one Related WP."""
     rows = _load_adr_index()
     adr = next((r for r in rows if r.get("ADR-ID") == "ADR-004"), None)
-    assert adr is not None, "ADR-004 not found in index.csv"
+    assert adr is not None, "ADR-004 not found in index.jsonl"
     related = _extract_wp_ids(adr.get("Related WPs", ""))
     assert len(related) > 0, "ADR-004 has no Related WPs"
 
@@ -132,7 +132,7 @@ def test_adr_005_related_wps_non_empty():
     """ADR-005 must have at least one Related WP."""
     rows = _load_adr_index()
     adr = next((r for r in rows if r.get("ADR-ID") == "ADR-005"), None)
-    assert adr is not None, "ADR-005 not found in index.csv"
+    assert adr is not None, "ADR-005 not found in index.jsonl"
     related = _extract_wp_ids(adr.get("Related WPs", ""))
     assert len(related) > 0, "ADR-005 has no Related WPs"
 
@@ -141,7 +141,7 @@ def test_adr_006_related_wps_non_empty():
     """ADR-006 must have at least one Related WP."""
     rows = _load_adr_index()
     adr = next((r for r in rows if r.get("ADR-ID") == "ADR-006"), None)
-    assert adr is not None, "ADR-006 not found in index.csv"
+    assert adr is not None, "ADR-006 not found in index.jsonl"
     related = _extract_wp_ids(adr.get("Related WPs", ""))
     assert len(related) > 0, "ADR-006 has no Related WPs"
 

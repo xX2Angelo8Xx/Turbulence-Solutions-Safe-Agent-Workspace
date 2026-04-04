@@ -89,7 +89,7 @@ class TestCascadeBugStatusEdgeCases:
 
     def test_nonexistent_bug_id_in_dev_log_no_crash(self, tmp_path: Path) -> None:
         """Dev-log references a bug ID that doesn't exist — must not raise."""
-        bug_jsonl = _make_bug_jsonl(tmp_path, [])  # empty bugs.csv
+        bug_jsonl = _make_bug_jsonl(tmp_path, [])  # empty bugs.jsonl
         _make_wp_folder(tmp_path, "FIX-050",
                         dev_log_content="References BUG-999 which was once seen.")
 
@@ -237,7 +237,7 @@ class TestCheckBugLinkageEdgeCases:
         assert "BUG-200" not in result.warnings[0]
 
     def test_nonexistent_bug_referenced_in_dev_log_no_crash(self, tmp_path: Path) -> None:
-        """_check_bug_linkage gracefully handles a bug ID not in bugs.csv."""
+        """_check_bug_linkage gracefully handles a bug ID not in bugs.jsonl."""
         bug_jsonl = _make_bug_jsonl(tmp_path, [])  # empty
         _make_wp_folder(tmp_path, "FIX-050",
                         dev_log_content="References BUG-999 which is unknown.")

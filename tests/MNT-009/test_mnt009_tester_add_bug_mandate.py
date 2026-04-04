@@ -40,7 +40,7 @@ def test_edit_permissions_prohibits_direct_csv_editing():
     section = _section(_content(), "Edit Permissions")
     assert "direct CSV editing prohibited" in section.lower() or (
         "direct" in section.lower() and "prohibited" in section.lower()
-    ), "Edit Permissions section must state that direct CSV editing of bugs.csv is prohibited"
+    ), "Edit Permissions section must state that direct editing of bugs data is prohibited"
 
 
 # ---------------------------------------------------------------------------
