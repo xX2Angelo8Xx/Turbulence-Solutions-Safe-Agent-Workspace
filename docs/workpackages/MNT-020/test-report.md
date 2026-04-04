@@ -2,8 +2,36 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-04-04  
-**Iteration:** 1  
-**Verdict:** FAIL — return to Developer
+**Iteration:** 2 (final)  
+**Verdict:** PASS — WP marked Done
+
+---
+
+## Iteration 2 Review
+
+**Fix verified:** `docs/work-rules/maintenance-protocol.md` line 101 now reads `| 3 | JSONL Integrity | Pass/Warning/Fail | <findings> |`. No `CSV Integrity` string remains anywhere in the file.
+
+## Tests Executed (Iteration 2)
+
+| Test | Type | Result | Notes |
+|------|------|--------|-------|
+| MNT-020 full suite (33 tests) — TST-2567 | Unit | **Pass** | All 33 tests pass (18 developer + 15 tester edge cases) |
+| MNT-020 Tester full regression check — TST-2568 | Regression | **Pass** | Zero new failures; 739 pre-existing failures, all unrelated to MNT-020 |
+
+## Pre-Done Checklist (Iteration 2)
+
+- [x] `docs/workpackages/MNT-020/dev-log.md` exists and is non-empty (Iteration 2 section added)
+- [x] `docs/workpackages/MNT-020/test-report.md` written by Tester
+- [x] Test files exist in `tests/MNT-020/` (33 tests across 2 files)
+- [x] TST-2567 and TST-2568 logged via `scripts/add_test_result.py`
+- [x] `scripts/validate_workspace.py --wp MNT-020` returns clean (exit 0)
+- [x] No tmp_ files in MNT-020 folders
+
+---
+
+## Iteration 1 Report (archived below)
+
+---
 
 ---
 
