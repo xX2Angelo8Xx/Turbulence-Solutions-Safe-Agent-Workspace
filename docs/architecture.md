@@ -24,6 +24,7 @@ Templates (bundled inside Launcher)
 │   │   ├── developer.agent.md
 │   │   ├── maintenance.agent.md
 │   │   ├── orchestrator.agent.md
+│   │   ├── planner.agent.md
 │   │   ├── story-writer.agent.md
 │   │   └── tester.agent.md
 │   ├── instructions/
@@ -755,6 +756,10 @@ Templates (bundled inside Launcher)
 │   │   ├── MNT-005/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── MNT-006/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── MNT-007/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1290,6 +1295,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-003/
 │   ├── MNT-004/
 │   ├── MNT-005/
+│   ├── MNT-006/
 │   ├── MNT-007/
 │   ├── MNT-008/
 │   ├── MNT-009/
