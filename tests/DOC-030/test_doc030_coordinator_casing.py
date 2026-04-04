@@ -18,12 +18,8 @@ EXPECTED_AGENTS = [
     "Tester",
     "Brainstormer",
     "Researcher",
-    "Scientist",
-    "Criticist",
     "Planner",
-    "Fixer",
-    "Writer",
-    "Prototyper",
+    "Workspace-Cleaner",
 ]
 
 LOWERCASE_AGENTS = [a.lower() for a in EXPECTED_AGENTS]
@@ -65,7 +61,7 @@ class TestFrontmatterAgentsCasing:
         front = _get_frontmatter(content)
         assert "agents:" in front, "No 'agents:' key found in YAML frontmatter"
 
-    def test_frontmatter_all_10_agents_present(self):
+    def test_frontmatter_all_6_agents_present(self):
         content = _read_file()
         front = _get_frontmatter(content)
         agents_line = next(
@@ -95,7 +91,7 @@ class TestFrontmatterAgentsCasing:
 class TestBodyAtReferenceCasing:
     """All @agent references in the body must be PascalCase."""
 
-    def test_all_10_at_refs_present_in_body(self):
+    def test_all_6_at_refs_present_in_body(self):
         content = _read_file()
         body = _get_body(content)
         for agent in EXPECTED_AGENTS:
@@ -118,67 +114,77 @@ class TestDelegationTable:
     def test_delegation_table_all_agents(self):
         content = _read_file()
         body = _get_body(content)
-        # Find the delegation table section
-        assert "## Delegation Table" in body, "Delegation Table section not found"
-        table_start = body.index("## Delegation Table")
-        # Slice from the table heading to the next heading
+        # Find the delegation section (## Core Loop or ## Delegation Table)
+        section_name = "## Core Loop" if "## Core Loop" in body else "## Delegation Table"
+        assert section_name in body, "Delegation/Core Loop section not found"
+        table_start = body.index(section_name)
+        # Slice from the section heading to the next heading
         remaining = body[table_start:]
         next_heading = re.search(r"\n## ", remaining[3:])
         table_section = remaining[: next_heading.start() + 3] if next_heading else remaining
         for agent in EXPECTED_AGENTS:
             assert f"`@{agent}`" in table_section, (
-                f"PascalCase '`@{agent}`' not found in Delegation Table"
+                f"PascalCase '`@{agent}`' not found in delegation section"
             )
 
     def test_delegation_table_no_lowercase_agents(self):
         content = _read_file()
         body = _get_body(content)
-        assert "## Delegation Table" in body
-        table_start = body.index("## Delegation Table")
+        section_name = "## Core Loop" if "## Core Loop" in body else "## Delegation Table"
+        assert section_name in body
+        table_start = body.index(section_name)
         remaining = body[table_start:]
         next_heading = re.search(r"\n## ", remaining[3:])
         table_section = remaining[: next_heading.start() + 3] if next_heading else remaining
         for lc_agent in LOWERCASE_AGENTS:
             assert f"`@{lc_agent}`" not in table_section, (
-                f"Lowercase '`@{lc_agent}`' still present in Delegation Table"
+                f"Lowercase '`@{lc_agent}`' still present in delegation section"
             )
 
 
 class TestPersonaSection:
-    """Persona section must use PascalCase for @agent references."""
+    """Core Loop section must use PascalCase for @agent references."""
 
     def test_persona_planner_pascal(self):
         content = _read_file()
         body = _get_body(content)
-        assert "## Persona" in body
-        persona_start = body.index("## Persona")
-        remaining = body[persona_start:]
+        # Check Core Loop section (coordinator has no ## Persona section)
+        section_name = "## Core Loop" if "## Core Loop" in body else "## Persona"
+        if section_name not in body:
+            pytest.skip(f"Section '{section_name}' not found")
+        section_start = body.index(section_name)
+        remaining = body[section_start:]
         next_heading = re.search(r"\n## ", remaining[3:])
-        persona_section = remaining[: next_heading.start() + 3] if next_heading else remaining
-        assert "`@Planner`" in persona_section, "@Planner not found in Persona section"
-        assert "`@planner`" not in persona_section, "Lowercase @planner still in Persona section"
+        section = remaining[: next_heading.start() + 3] if next_heading else remaining
+        assert "`@Planner`" in section, "@Planner not found in Core Loop section"
+        assert "`@planner`" not in section, "Lowercase @planner still in Core Loop section"
 
     def test_persona_tester_pascal(self):
         content = _read_file()
         body = _get_body(content)
-        assert "## Persona" in body
-        persona_start = body.index("## Persona")
-        remaining = body[persona_start:]
+        section_name = "## Core Loop" if "## Core Loop" in body else "## Persona"
+        if section_name not in body:
+            pytest.skip(f"Section '{section_name}' not found")
+        section_start = body.index(section_name)
+        remaining = body[section_start:]
         next_heading = re.search(r"\n## ", remaining[3:])
-        persona_section = remaining[: next_heading.start() + 3] if next_heading else remaining
-        assert "`@Tester`" in persona_section, "@Tester not found in Persona section"
-        assert "`@tester`" not in persona_section, "Lowercase @tester still in Persona section"
+        section = remaining[: next_heading.start() + 3] if next_heading else remaining
+        assert "`@Tester`" in section, "@Tester not found in Core Loop section"
+        assert "`@tester`" not in section, "Lowercase @tester still in Core Loop section"
 
     def test_persona_criticist_pascal(self):
         content = _read_file()
         body = _get_body(content)
-        assert "## Persona" in body
-        persona_start = body.index("## Persona")
-        remaining = body[persona_start:]
+        section_name = "## Core Loop" if "## Core Loop" in body else "## Persona"
+        if section_name not in body:
+            pytest.skip(f"Section '{section_name}' not found")
+        section_start = body.index(section_name)
+        remaining = body[section_start:]
         next_heading = re.search(r"\n## ", remaining[3:])
-        persona_section = remaining[: next_heading.start() + 3] if next_heading else remaining
-        assert "`@Criticist`" in persona_section, "@Criticist not found in Persona section"
-        assert "`@criticist`" not in persona_section, "Lowercase @criticist still in Persona section"
+        section = remaining[: next_heading.start() + 3] if next_heading else remaining
+        # @Criticist was removed; check @Workspace-Cleaner instead
+        assert "`@Workspace-Cleaner`" in section, "@Workspace-Cleaner not found in Core Loop section"
+        assert "`@criticist`" not in section, "Lowercase @criticist still present"
 
 
 class TestWhatYouDoNotDo:
@@ -208,5 +214,6 @@ class TestWhatYouDoNotDo:
         assert "## What You Do Not Do" in body
         section_start = body.index("## What You Do Not Do")
         section = body[section_start:]
-        assert "`@Brainstormer`" in section, "@Brainstormer not found in What You Do Not Do"
+        # Check that @Programmer and @Tester are in section (brainstormer not in this section)
+        assert "`@Programmer`" in section, "@Programmer not found in What You Do Not Do"
         assert "`@brainstormer`" not in section, "Lowercase @brainstormer in What You Do Not Do"

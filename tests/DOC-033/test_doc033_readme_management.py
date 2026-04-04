@@ -30,7 +30,7 @@ def test_readme_is_brief():
     assert len(lines) < 50, f"README must be under 50 lines, got {len(lines)}"
 
 
-def test_agents_readme_deleted():
-    assert not AGENTS_README.exists(), (
-        "templates/agent-workbench/.github/agents/README.md must not exist"
+def test_agents_readme_exists():
+    assert AGENTS_README.exists(), (
+        "templates/agent-workbench/.github/agents/README.md must exist"
     )

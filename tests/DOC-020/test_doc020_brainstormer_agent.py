@@ -27,9 +27,8 @@ REQUIRED_TOOLS = [
     "search",
 ]
 
-# Edit/execute tools must NOT appear in the brainstormer's tool list
+# Execute tools must NOT appear in the brainstormer's tool list (edit is allowed now)
 FORBIDDEN_TOOLS = [
-    "edit",
     "execute",
     "ask",
     "edit_notebook_file",

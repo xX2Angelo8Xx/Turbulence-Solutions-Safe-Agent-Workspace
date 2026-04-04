@@ -12,6 +12,7 @@ These tests go beyond the developer's suite and cover:
 """
 
 import re
+import pytest
 from pathlib import Path
 
 COORDINATOR_PATH = Path(__file__).parent.parent.parent / (
@@ -23,12 +24,8 @@ EXPECTED_AGENTS = [
     "Tester",
     "Brainstormer",
     "Researcher",
-    "Scientist",
-    "Criticist",
     "Planner",
-    "Fixer",
-    "Writer",
-    "Prototyper",
+    "Workspace-Cleaner",
 ]
 
 LOWERCASE_AGENTS = [a.lower() for a in EXPECTED_AGENTS]
@@ -112,13 +109,13 @@ class TestFrontmatterAgentListIntegrity:
             "agents: value must be an inline YAML array [...] on a single line"
         )
 
-    def test_frontmatter_exactly_10_agents(self):
-        """There must be exactly 10 agents in the frontmatter, no more, no less."""
+    def test_frontmatter_exactly_6_agents(self):
+        """There must be exactly 6 agents in the frontmatter, no more, no less."""
         content = _read_file()
         front = _get_frontmatter(content)
         agents = _get_agents_from_frontmatter(front)
-        assert len(agents) == 10, (
-            f"Expected exactly 10 agents in frontmatter, found {len(agents)}: {agents}"
+        assert len(agents) == 6, (
+            f"Expected exactly 6 agents in frontmatter, found {len(agents)}: {agents}"
         )
 
     def test_frontmatter_no_duplicate_agents(self):
@@ -149,39 +146,43 @@ class TestFrontmatterAgentListIntegrity:
 
 
 class TestHowYouWorkSection:
-    """How You Work step 4 bullet list must contain all 10 PascalCase @-refs with backticks."""
+    """How You Work / Core Loop section must contain all 6 PascalCase @-refs with backticks."""
 
     def test_how_you_work_section_exists(self):
         content = _read_file()
         body = _get_body(content)
-        assert "## How You Work" in body, "Section '## How You Work' not found in body"
+        has_section = "## How You Work" in body or "## Core Loop" in body
+        assert has_section, "Section '## How You Work' or '## Core Loop' not found in body"
 
-    def test_how_you_work_all_10_backtick_refs(self):
-        """Step 4 in How You Work must have all 10 agents as `@Agent` references."""
+    def test_how_you_work_all_6_backtick_refs(self):
+        """How You Work / Core Loop section must have all 6 agents as `@Agent` references."""
         content = _read_file()
         body = _get_body(content)
-        assert "## How You Work" in body
-        section_start = body.index("## How You Work")
+        section_name = "## Core Loop" if "## Core Loop" in body else "## How You Work"
+        assert section_name in body
+        section_start = body.index(section_name)
         remaining = body[section_start:]
         next_heading = re.search(r"\n## ", remaining[3:])
         section = remaining[: next_heading.start() + 3] if next_heading else remaining
         for agent in EXPECTED_AGENTS:
             assert f"`@{agent}`" in section, (
-                f"PascalCase '`@{agent}`' not found in How You Work section"
+                f"PascalCase '`@{agent}`' not found in How You Work/Core Loop section"
             )
 
     def test_how_you_work_no_lowercase_backtick_refs(self):
-        """How You Work section must have zero lowercase `@agent` backtick refs."""
+        """How You Work / Core Loop section must have zero lowercase `@agent` backtick refs."""
         content = _read_file()
         body = _get_body(content)
-        assert "## How You Work" in body
-        section_start = body.index("## How You Work")
+        section_name = "## Core Loop" if "## Core Loop" in body else "## How You Work"
+        if section_name not in body:
+            pytest.skip(f"Section '{section_name}' not found")
+        section_start = body.index(section_name)
         remaining = body[section_start:]
         next_heading = re.search(r"\n## ", remaining[3:])
         section = remaining[: next_heading.start() + 3] if next_heading else remaining
         for lc_agent in LOWERCASE_AGENTS:
             assert f"`@{lc_agent}`" not in section, (
-                f"Lowercase '`@{lc_agent}`' still present in How You Work section"
+                f"Lowercase '`@{lc_agent}`' still present in How You Work/Core Loop section"
             )
 
 

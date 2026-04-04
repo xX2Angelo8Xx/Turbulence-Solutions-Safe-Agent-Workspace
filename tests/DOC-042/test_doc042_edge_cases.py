@@ -23,12 +23,12 @@ AGENT_NAMES = [
     "programmer",
     "researcher",
     "tester",
-    "tidyup",
+    "workspace-cleaner",
 ]
 
 AGENT_FILES = {name: AGENTS_DIR / f"{name}.agent.md" for name in AGENT_NAMES}
 
-SONNET_AGENTS = ["brainstormer", "coordinator", "programmer", "researcher", "tester", "tidyup"]
+SONNET_AGENTS = ["brainstormer", "programmer", "researcher", "tester", "workspace-cleaner"]
 OPUS_AGENTS = ["planner"]
 
 
@@ -88,9 +88,9 @@ def test_tester_frontmatter_is_valid_yaml():
     _parse_frontmatter("tester")
 
 
-def test_tidyup_frontmatter_is_valid_yaml():
+def test_workspace_cleaner_frontmatter_is_valid_yaml():
     """Frontmatter must parse without error."""
-    _parse_frontmatter("tidyup")
+    _parse_frontmatter("workspace-cleaner")
 
 
 # ── Required YAML keys present ────────────────────────────────────────────────
@@ -167,7 +167,7 @@ def test_no_agent_has_empty_name():
 # ── Model exclusivity ─────────────────────────────────────────────────────────
 
 def test_planner_is_only_opus_agent():
-    """Only planner may use Opus; every other agent must use Sonnet."""
+    """Only planner and coordinator may use Opus; pure-Sonnet agents must not use Opus."""
     for agent_name in AGENT_NAMES:
         try:
             fm = _parse_frontmatter(agent_name)
@@ -180,6 +180,9 @@ def test_planner_is_only_opus_agent():
             assert "Opus" in model_val, (
                 f"{agent_name}.agent.md should use Opus, got: {model_val}"
             )
+        elif agent_name == "coordinator":
+            # Coordinator intentionally uses both Opus and Sonnet
+            pass
         else:
             assert "Opus" not in model_val, (
                 f"{agent_name}.agent.md must NOT use Opus, got: {model_val}"
@@ -234,10 +237,10 @@ def test_tester_has_project_name_placeholder():
     )
 
 
-def test_tidyup_has_project_name_placeholder():
-    body = _read_body("tidyup")
+def test_workspace_cleaner_has_project_name_placeholder():
+    body = _read_body("workspace-cleaner")
     assert "{{PROJECT_NAME}}" in body, (
-        "tidyup.agent.md: {{PROJECT_NAME}} placeholder missing from body"
+        "workspace-cleaner.agent.md: {{PROJECT_NAME}} placeholder missing from body"
     )
 
 

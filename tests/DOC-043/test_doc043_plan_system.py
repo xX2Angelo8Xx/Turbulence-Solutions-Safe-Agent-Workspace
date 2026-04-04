@@ -12,9 +12,9 @@ TEMPLATE_ROOT = os.path.join(
 
 PLANNER_MD = os.path.join(TEMPLATE_ROOT, ".github", "agents", "planner.agent.md")
 COORDINATOR_MD = os.path.join(TEMPLATE_ROOT, ".github", "agents", "coordinator.agent.md")
-TIDYUP_MD = os.path.join(TEMPLATE_ROOT, ".github", "agents", "tidyup.agent.md")
+TIDYUP_MD = os.path.join(TEMPLATE_ROOT, ".github", "agents", "workspace-cleaner.agent.md")
 AGENTDOCS_README = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs", "README.md")
-AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AGENT-RULES.md")
+AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs", "AGENT-RULES.md")
 PLAN_MD = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs", "plan.md")
 
 
@@ -117,20 +117,20 @@ def test_coordinator_references_plan_in_progress():
 # tidyup.agent.md
 # ---------------------------------------------------------------------------
 
-def test_tidyup_has_plan_file_section():
-    """tidyup.agent.md must have a '### Plan files' audit section."""
+def test_workspace_cleaner_has_plan_file_section():
+    """workspace-cleaner.agent.md must have a '### Plan files' audit section."""
     with open(TIDYUP_MD, encoding="utf-8") as f:
         content = f.read()
     assert "### Plan files" in content, \
-        "tidyup.agent.md is missing '### Plan files' audit section"
+        "workspace-cleaner.agent.md is missing '### Plan files' audit section"
 
 
-def test_tidyup_checks_plan_completion():
-    """tidyup.agent.md plan audit must check for completed plans."""
+def test_workspace_cleaner_checks_plan_completion():
+    """workspace-cleaner.agent.md plan audit must check for completed plans."""
     with open(TIDYUP_MD, encoding="utf-8") as f:
         content = f.read()
     assert "completed" in content.lower() or "archiv" in content.lower(), \
-        "tidyup.agent.md plan section does not mention checking for completed plans"
+        "workspace-cleaner.agent.md plan section does not mention checking for completed plans"
 
 
 # ---------------------------------------------------------------------------

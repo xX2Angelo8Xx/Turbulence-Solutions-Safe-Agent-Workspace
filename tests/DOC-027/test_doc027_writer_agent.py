@@ -1,3 +1,6 @@
+import pytest
+pytestmark = pytest.mark.skip(reason="writer.agent.md was removed in the Agent Workbench redesign")
+
 """
 Tests for DOC-027: writer.agent.md for Agent Workbench.
 

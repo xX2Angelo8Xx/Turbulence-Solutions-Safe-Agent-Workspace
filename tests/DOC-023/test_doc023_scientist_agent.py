@@ -1,3 +1,6 @@
+import pytest
+pytestmark = pytest.mark.skip(reason="scientist.agent.md was removed in the Agent Workbench redesign")
+
 """
 Tests for DOC-023: scientist.agent.md for Agent Workbench.
 

@@ -14,9 +14,9 @@ TEMPLATE_ROOT = os.path.join(
 
 PLANNER_MD = os.path.join(TEMPLATE_ROOT, ".github", "agents", "planner.agent.md")
 COORDINATOR_MD = os.path.join(TEMPLATE_ROOT, ".github", "agents", "coordinator.agent.md")
-TIDYUP_MD = os.path.join(TEMPLATE_ROOT, ".github", "agents", "tidyup.agent.md")
+TIDYUP_MD = os.path.join(TEMPLATE_ROOT, ".github", "agents", "workspace-cleaner.agent.md")
 AGENTDOCS_README = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs", "README.md")
-AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AGENT-RULES.md")
+AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs", "AGENT-RULES.md")
 PLAN_MD = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs", "plan.md")
 
 
@@ -40,12 +40,12 @@ def test_coordinator_has_project_name_placeholder():
         "coordinator.agent.md is missing {{PROJECT_NAME}} placeholder — it may have been corrupted"
 
 
-def test_tidyup_has_project_name_placeholder():
-    """tidyup.agent.md must still contain {{PROJECT_NAME}} placeholder."""
+def test_workspace_cleaner_has_project_name_placeholder():
+    """workspace-cleaner.agent.md must still contain {{PROJECT_NAME}} placeholder."""
     with open(TIDYUP_MD, encoding="utf-8") as f:
         content = f.read()
     assert "{{PROJECT_NAME}}" in content, \
-        "tidyup.agent.md is missing {{PROJECT_NAME}} placeholder — it may have been corrupted"
+        "workspace-cleaner.agent.md is missing {{PROJECT_NAME}} placeholder — it may have been corrupted"
 
 
 def test_agent_rules_has_project_name_placeholder():

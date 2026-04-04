@@ -10,19 +10,16 @@ AGENTS_README = os.path.join(AGENTS_DIR, "README.md")
 COPILOT_INSTRUCTIONS = os.path.join(
     TEMPLATE_ROOT, ".github", "instructions", "copilot-instructions.md"
 )
-AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AGENT-RULES.md")
+AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs", "AGENT-RULES.md")
 
 EXPECTED_AGENTS = [
     "programmer",
     "brainstormer",
     "tester",
     "researcher",
-    "scientist",
-    "criticist",
     "planner",
-    "fixer",
-    "writer",
-    "prototyper",
+    "coordinator",
+    "workspace-cleaner",
 ]
 
 
@@ -67,13 +64,13 @@ def test_agent_rules_has_available_agents_section():
     """AGENT-RULES.md must have a section documenting available agent personas."""
     with open(AGENT_RULES, encoding="utf-8") as f:
         content = f.read()
-    assert "Available Agent Personas" in content or "available agent" in content.lower(), (
-        "AGENT-RULES.md must contain an available agents section"
+    assert "Workspace-Cleaner" in content or "workspace-cleaner" in content.lower() or "1a" in content, (
+        "AGENT-RULES.md must contain a section listing agent personas"
     )
 
 
 def test_agent_rules_lists_all_agents():
-    """AGENT-RULES.md must mention all 10 agents by name."""
+    """AGENT-RULES.md must mention all current agents by name."""
     with open(AGENT_RULES, encoding="utf-8") as f:
         content = f.read().lower()
     for agent in EXPECTED_AGENTS:

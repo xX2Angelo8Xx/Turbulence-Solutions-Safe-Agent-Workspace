@@ -1,3 +1,6 @@
+import pytest
+pytestmark = pytest.mark.skip(reason="prototyper.agent.md was removed in the Agent Workbench redesign")
+
 """
 Edge-case tests for DOC-028: prototyper.agent.md
 

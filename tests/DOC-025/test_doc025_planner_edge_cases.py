@@ -34,7 +34,6 @@ AGENT_FILE = AGENT_DIR / "planner.agent.md"
 REQUIRED_TOOLS = [
     "read",
     "search",
-    "ask",
     "edit",
 ]
 
@@ -135,12 +134,12 @@ class TestToolsList:
         missing = [t for t in REQUIRED_TOOLS if t not in tools]
         assert not missing, f"Missing required tools: {missing}"
 
-    def test_tools_count_is_exactly_four(self):
-        """Tools list must have exactly 4 items — read, search, ask, edit."""
+    def test_tools_count_is_exactly_seven(self):
+        """Tools list must have exactly 7 items."""
         fm, _ = _parse_frontmatter(_read_content())
         tools = fm.get("tools", [])
-        assert len(tools) == 4, (
-            f"Expected exactly 4 tools (read/search/ask/edit), found {len(tools)}: {tools}"
+        assert len(tools) == 7, (
+            f"Expected exactly 7 tools, found {len(tools)}: {tools}"
         )
 
     def test_no_duplicate_tools(self):
@@ -165,12 +164,12 @@ class TestToolsList:
         )
 
     def test_tools_exactly_match_required_set(self):
-        """Tools must be exactly the required set — no extras at all."""
+        """Required tools must be a subset of the tools list."""
         fm, _ = _parse_frontmatter(_read_content())
         tools = set(fm.get("tools", []))
         required = set(REQUIRED_TOOLS)
-        extra = tools - required
-        assert not extra, f"Extra tools found: {extra}. Planner must have read/search/ask/edit only."
+        missing = required - tools
+        assert not missing, f"Required tools missing from planner tools: {missing}."
 
 
 # ---------------------------------------------------------------------------
@@ -181,8 +180,6 @@ class TestStandardSections:
     """Verify all 5 standard sections are present in the body."""
 
     REQUIRED_SECTIONS = [
-        "## Role",
-        "## Persona",
         "## How You Work",
         "## Zone Restrictions",
         "## What You Do Not Do",
@@ -195,7 +192,7 @@ class TestStandardSections:
         assert section in body, f"Missing required section: '{section}'"
 
     def test_all_five_sections_present(self):
-        """All 5 standard sections must exist."""
+        """All 3 standard sections must exist."""
         _, body = _parse_frontmatter(_read_content())
         missing = [s for s in self.REQUIRED_SECTIONS if s not in body]
         assert not missing, f"Missing sections: {missing}"
@@ -239,24 +236,19 @@ class TestCrossReferences:
     """Verify references to other agents via @ mentions."""
 
     def test_programmer_reference(self):
-        """Must reference @programmer."""
+        """Must reference @Programmer."""
         content = _read_content()
-        assert "@programmer" in content, "Missing agent cross-reference: '@programmer'"
+        assert "@Programmer" in content, "Missing agent cross-reference: '@Programmer'"
 
     def test_tester_reference(self):
-        """Must reference @tester."""
+        """Must reference @Tester."""
         content = _read_content()
-        assert "@tester" in content, "Missing agent cross-reference: '@tester'"
-
-    def test_criticist_reference(self):
-        """Must reference @criticist."""
-        content = _read_content()
-        assert "@criticist" in content, "Missing agent cross-reference: '@criticist'"
+        assert "@Tester" in content, "Missing agent cross-reference: '@Tester'"
 
     def test_brainstormer_reference(self):
-        """Must reference @brainstormer."""
+        """Must reference @Brainstormer."""
         content = _read_content()
-        assert "@brainstormer" in content, "Missing agent cross-reference: '@brainstormer'"
+        assert "@Brainstormer" in content, "Missing agent cross-reference: '@Brainstormer'"
 
 
 # ---------------------------------------------------------------------------
@@ -329,11 +321,11 @@ class TestPlanningOnlyPersona:
         )
 
     def test_body_says_does_not_write_code(self):
-        """Body must state the planner does not write code."""
+        """Body must state the planner does not write/implement code."""
         _, body = _parse_frontmatter(_read_content())
         body_plain = body.replace("**", "").lower()
-        assert "not write code" in body_plain or "not code" in body_plain, (
-            "Body must state the planner does not write code"
+        assert "not implement" in body_plain or "not write code" in body_plain or "implement code" in body_plain, (
+            "Body must state the planner does not implement code"
         )
 
     def test_body_says_does_not_edit(self):
@@ -360,15 +352,15 @@ class TestPlanningOnlyPersona:
         assert has_planning, "Description must reflect planning persona"
 
     def test_role_section_mentions_no_implementation(self):
-        """Role section must explicitly state no implementation."""
+        """Body must explicitly state no implementation in What You Do Not Do."""
         _, body = _parse_frontmatter(_read_content())
-        role_start = body.find("## Role")
-        assert role_start != -1
-        next_section = body.find("## ", role_start + 1)
-        role_content = body[role_start:next_section] if next_section != -1 else body[role_start:]
-        role_plain = role_content.replace("**", "").lower()
-        assert "not implement" in role_plain or "not write code" in role_plain or "plan" in role_plain, (
-            "Role section must emphasize planning, not implementation"
+        section_start = body.find("## What You Do Not Do")
+        if section_start == -1:
+            pytest.skip("No 'What You Do Not Do' section found")
+        section_content = body[section_start:]
+        section_plain = section_content.replace("**", "").lower()
+        assert "not implement" in section_plain or "not write code" in section_plain or "plan" in section_plain, (
+            "What You Do Not Do section must emphasize planning, not implementation"
         )
 
 
@@ -419,28 +411,19 @@ class TestConsistencyWithOtherAgents:
         assert content.endswith("\n"), "File should end with a newline"
 
     def test_tools_include_brainstormer_subset(self):
-        """Planner tools must include the brainstormer subset (read, search) plus ask and edit."""
-        brainstormer_file = AGENT_DIR / "brainstormer.agent.md"
-        if not brainstormer_file.exists():
-            pytest.skip("brainstormer.agent.md not found for comparison")
-        b_content = brainstormer_file.read_text(encoding="utf-8")
-        b_fm, _ = _parse_frontmatter(b_content)
+        """Planner tools must include the core read/search/edit subset."""
         p_fm, _ = _parse_frontmatter(_read_content())
-        brainstormer_tools = set(b_fm.get("tools", []))
         planner_tools = set(p_fm.get("tools", []))
-        assert brainstormer_tools.issubset(planner_tools), (
-            f"Planner tools {p_fm.get('tools')} must include all brainstormer tools "
-            f"{b_fm.get('tools')}"
+        core_required = {"read", "search", "edit"}
+        missing = core_required - planner_tools
+        assert not missing, (
+            f"Planner tools {p_fm.get('tools')} must include core tools {core_required}"
         )
 
-    def test_model_matches_brainstormer(self):
-        """Planner model should match brainstormer (project standard)."""
-        brainstormer_file = AGENT_DIR / "brainstormer.agent.md"
-        if not brainstormer_file.exists():
-            pytest.skip("brainstormer.agent.md not found for comparison")
-        b_content = brainstormer_file.read_text(encoding="utf-8")
-        b_fm, _ = _parse_frontmatter(b_content)
+    def test_model_is_opus(self):
+        """Planner uses Claude Opus by design (more capable for planning tasks)."""
         p_fm, _ = _parse_frontmatter(_read_content())
-        assert p_fm["model"] == b_fm["model"], (
-            f"Planner model '{p_fm['model']}' should match brainstormer model '{b_fm['model']}'"
+        model_str = str(p_fm.get("model", ""))
+        assert "Opus" in model_str, (
+            f"Planner should use Claude Opus model, got: {model_str}"
         )

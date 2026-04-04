@@ -109,6 +109,7 @@ class TestDeletedFilesAbsent:
             f"Project/README.md still exists at {old_path} — should have been deleted"
         )
 
+    @pytest.mark.skip(reason="AgentDocs/README.md was subsequently re-created by DOC-035 WP to document the AgentDocs system")
     def test_old_agentdocs_readme_deleted(self):
         """AgentDocs/README.md must NOT exist — it was deleted after merging."""
         old_path = AGENTDOCS_DIR / "README.md"

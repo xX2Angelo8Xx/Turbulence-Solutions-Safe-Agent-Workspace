@@ -4,7 +4,7 @@ import pathlib
 
 TEMPLATE_AGENTS = pathlib.Path(__file__).resolve().parents[2] / "templates" / "agent-workbench" / ".github" / "agents"
 
-EXPECTED_AGENTS = ["coordinator", "brainstormer", "researcher", "planner", "programmer", "tester"]
+EXPECTED_AGENTS = ["coordinator", "brainstormer", "researcher", "planner", "programmer", "tester", "workspace-cleaner"]
 DELETED_AGENTS = ["scientist", "criticist", "writer", "fixer", "prototyper"]
 
 
@@ -47,7 +47,8 @@ def test_agents_read_progress_md():
 def test_researcher_has_fetch_tool():
     path = TEMPLATE_AGENTS / "researcher.agent.md"
     content = path.read_text(encoding="utf-8")
-    assert "fetch" in content.split("---")[1], "Researcher frontmatter missing fetch tool"
+    frontmatter = content.split("---")[1]
+    assert "web" in frontmatter or "browser" in frontmatter, "Researcher frontmatter missing web/browser tool"
 
 
 def test_coordinator_agents_list():

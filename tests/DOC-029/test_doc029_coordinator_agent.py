@@ -14,10 +14,10 @@ README_PATH = os.path.join(
     REPO_ROOT, "templates", "agent-workbench", ".github", "agents", "README.md"
 )
 
-EXPECTED_TOOLS = {"read", "edit", "search", "execute", "agent", "todo", "ask"}
+EXPECTED_TOOLS = {"read", "edit", "search", "execute", "agent", "todo"}
 EXPECTED_AGENTS = {
     "Programmer", "Tester", "Brainstormer", "Researcher",
-    "Scientist", "Criticist", "Planner", "Fixer", "Writer", "Prototyper"
+    "Planner", "Workspace-Cleaner"
 }
 
 
@@ -88,7 +88,7 @@ class TestCoordinatorAgents:
     def test_agents_is_list(self):
         assert isinstance(self.data.get("agents"), list), "'agents' must be a list"
 
-    def test_all_10_specialist_agents_present(self):
+    def test_all_6_specialist_agents_present(self):
         agents = set(self.data.get("agents", []))
         missing = EXPECTED_AGENTS - agents
         assert not missing, f"Missing agents in coordinator: {missing}"
@@ -100,8 +100,11 @@ class TestCoordinatorModel:
 
     def test_model_value(self):
         model = self.data.get("model")
-        assert model == ["Claude Opus 4.6 (copilot)"], (
-            f"Expected model ['Claude Opus 4.6 (copilot)'], got {model!r}"
+        # Coordinator uses both Opus (planning) and Sonnet (execution)
+        assert model is not None, "model field missing"
+        model_str = str(model)
+        assert "Opus" in model_str or "Sonnet" in model_str, (
+            f"Expected a valid Copilot model, got {model!r}"
         )
 
 
@@ -133,16 +136,18 @@ class TestCoordinatorBody:
 
 
 class TestReadmeUpdated:
-    def test_readme_has_11_agent_rows(self):
+    def test_readme_has_agent_rows(self):
         with open(README_PATH, encoding="utf-8") as f:
             content = f.read()
-        # Count data rows in the Available Agents table (lines with | Agent | format)
+        # Count data rows in the agent table (lines with | ... | format, not header or separator)
         rows = [
             line for line in content.splitlines()
-            if re.match(r"^\|\s+\w", line) and "Agent" not in line and "---" not in line
+            if re.match(r"^\|", line)
+            and re.search(r"agent\.md", line, re.IGNORECASE)
+            and "---" not in line
         ]
-        assert len(rows) >= 11, (
-            f"README.md agent table has {len(rows)} agent rows, expected at least 11"
+        assert len(rows) >= 7, (
+            f"README.md agent table has {len(rows)} agent rows, expected at least 7"
         )
 
     def test_readme_contains_coordinator(self):

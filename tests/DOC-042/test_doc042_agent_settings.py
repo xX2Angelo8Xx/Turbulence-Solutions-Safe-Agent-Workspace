@@ -20,10 +20,10 @@ AGENT_FILES = {
     "programmer": AGENTS_DIR / "programmer.agent.md",
     "researcher": AGENTS_DIR / "researcher.agent.md",
     "tester": AGENTS_DIR / "tester.agent.md",
-    "tidyup": AGENTS_DIR / "tidyup.agent.md",
+    "workspace-cleaner": AGENTS_DIR / "workspace-cleaner.agent.md",
 }
 
-SONNET_AGENTS = ["brainstormer", "coordinator", "programmer", "researcher", "tester", "tidyup"]
+SONNET_AGENTS = ["brainstormer", "programmer", "researcher", "tester", "workspace-cleaner"]
 OPUS_AGENTS = ["planner"]
 
 COMMON_TOOLS = ["vscode/memory", "vscode/vscodeAPI", "vscode/askQuestions"]
@@ -35,10 +35,10 @@ EXPECTED_TOOLS = {
     "programmer": ["vscode/memory", "vscode/vscodeAPI", "vscode/askQuestions", "execute", "read", "agent", "edit", "search", "todo"],
     "researcher": ["vscode/memory", "vscode/vscodeAPI", "vscode/askQuestions", "read", "agent", "edit", "search", "web", "browser"],
     "tester": ["vscode/memory", "vscode/vscodeAPI", "vscode/askQuestions", "execute", "read", "edit", "search", "todo"],
-    "tidyup": ["vscode/memory", "vscode/vscodeAPI", "vscode/askQuestions", "execute", "read", "agent", "edit", "search", "todo"],
+    "workspace-cleaner": ["vscode/memory", "vscode/vscodeAPI", "vscode/askQuestions", "execute", "read", "agent", "edit", "search", "todo"],
 }
 
-COORDINATOR_AGENTS = ["Programmer", "Tester", "Brainstormer", "Researcher", "Planner", "Tidyup"]
+COORDINATOR_AGENTS = ["Programmer", "Tester", "Brainstormer", "Researcher", "Planner", "Workspace-Cleaner"]
 
 
 def _read_frontmatter(agent_name: str) -> str:
@@ -69,8 +69,8 @@ def test_researcher_file_exists():
 def test_tester_file_exists():
     assert AGENT_FILES["tester"].is_file()
 
-def test_tidyup_file_exists():
-    assert AGENT_FILES["tidyup"].is_file()
+def test_workspace_cleaner_file_exists():
+    assert AGENT_FILES["workspace-cleaner"].is_file()
 
 
 # ── Model tests ───────────────────────────────────────────────────────────────
@@ -123,10 +123,10 @@ def test_tester_tools():
     for tool in EXPECTED_TOOLS["tester"]:
         assert tool in fm, f"tester.agent.md missing tool: {tool}"
 
-def test_tidyup_tools():
-    fm = _read_frontmatter("tidyup")
-    for tool in EXPECTED_TOOLS["tidyup"]:
-        assert tool in fm, f"tidyup.agent.md missing tool: {tool}"
+def test_workspace_cleaner_tools():
+    fm = _read_frontmatter("workspace-cleaner")
+    for tool in EXPECTED_TOOLS["workspace-cleaner"]:
+        assert tool in fm, f"workspace-cleaner.agent.md missing tool: {tool}"
 
 def test_coordinator_tools():
     fm = _read_frontmatter("coordinator")
@@ -148,8 +148,8 @@ def test_coordinator_lists_all_specialist_agents():
         )
 
 
-# ── Tidyup argument-hint ──────────────────────────────────────────────────────
+# ── Workspace-Cleaner argument-hint ──────────────────────────────────────────
 
-def test_tidyup_has_argument_hint():
-    fm = _read_frontmatter("tidyup")
-    assert "argument-hint" in fm, "tidyup.agent.md must have an argument-hint field"
+def test_workspace_cleaner_has_argument_hint():
+    fm = _read_frontmatter("workspace-cleaner")
+    assert "argument-hint" in fm, "workspace-cleaner.agent.md must have an argument-hint field"

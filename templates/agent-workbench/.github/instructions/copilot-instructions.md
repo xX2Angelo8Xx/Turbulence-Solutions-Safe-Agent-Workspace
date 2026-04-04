@@ -30,6 +30,12 @@ Read `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` for your complete permissions, 
 | Venv activation (`.\venv\Scripts\activate`) | Run `.venv\Scripts\python.exe` directly |
 | Venv python (`venv\Scripts\python.exe -c "..."`) | Use system `python` command |
 
+## AgentDocs
+
+`{{PROJECT_NAME}}/AgentDocs/` is the shared knowledge base for agents and humans. All agents read and write to these documents as they work.
+
+See `{{PROJECT_NAME}}/AgentDocs/README.md` for the philosophy, document registry, and contribution rules.
+
 ## Agents
 
-Specialist agents are in `.github/agents/`. Invoke with `@<agent-name>` in chat.
+Specialist agents are in `.github/agents/`. See `.github/agents/README.md` for the full agent roster and when-to-use guidance. Invoke with `@<agent-name>` in chat.

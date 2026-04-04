@@ -8,7 +8,7 @@ TEMPLATE_ROOT = os.path.join(
     "templates", "agent-workbench"
 )
 AGENT_DOCS = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs")
-AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AGENT-RULES.md")
+AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs", "AGENT-RULES.md")
 COPILOT_INSTRUCTIONS = os.path.join(TEMPLATE_ROOT, ".github", "instructions", "copilot-instructions.md")
 WORKSPACE_README = os.path.join(TEMPLATE_ROOT, "README.md")
 

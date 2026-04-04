@@ -11,7 +11,7 @@ TIDYUP_FILE = AGENTS_DIR / "tidyup.agent.md"
 COORDINATOR_FILE = AGENTS_DIR / "coordinator.agent.md"
 AGENT_RULES_FILE = (
     Path(__file__).parents[2]
-    / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
+    / "templates" / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
 )
 TEMPLATE_ROOT = Path(__file__).parents[2] / "templates" / "agent-workbench"
 

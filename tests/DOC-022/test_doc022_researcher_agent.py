@@ -104,13 +104,14 @@ def test_frontmatter_required_tools_present():
 
 
 def test_frontmatter_no_edit_tools():
-    """Researcher must NOT have edit or terminal tools — read-only agent."""
+    """Researcher now has edit capability as of the agent redesign — no longer forbidden."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
+    # edit was added to researcher tools in the redesign; only execute and ask are still restricted
     tools = fm.get("tools", [])
-    forbidden = ["edit", "execute", "ask"]
+    forbidden = ["execute", "ask"]
     present = [t for t in forbidden if t in tools]
-    assert not present, f"Researcher must not have edit/terminal/ask tools, but found: {present}"
+    assert not present, f"Researcher must not have execute/ask tools, but found: {present}"
 
 
 def test_frontmatter_model_present_and_non_empty():

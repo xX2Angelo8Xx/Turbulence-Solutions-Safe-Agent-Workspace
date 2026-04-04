@@ -49,13 +49,11 @@ def test_frontmatter_tools_has_search():
 
 
 def test_frontmatter_no_edit_tool():
-    """edit must NOT be in the tools list — brainstormer never creates or edits files."""
+    """Brainstormer now has edit capability as of the agent redesign — no longer forbidden."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
-    tools = fm.get("tools", [])
-    assert "edit" not in tools, (
-        "edit found in tools list — brainstormer is ideation-only and must not edit files"
-    )
+    # edit was removed from forbidden tools in the agent redesign
+    assert "tools" in fm, "frontmatter must have tools field"
 
 
 def test_frontmatter_no_execute_tool():

@@ -21,11 +21,10 @@ AGENT_FILE = (
     / "planner.agent.md"
 )
 
-# Planner can now ask clarifying questions and create plan files: read, search, ask, edit
+# Planner tools: read, search, edit (plus agent and vscode/* tools)
 REQUIRED_TOOLS = [
     "read",
     "search",
-    "ask",
     "edit",
 ]
 

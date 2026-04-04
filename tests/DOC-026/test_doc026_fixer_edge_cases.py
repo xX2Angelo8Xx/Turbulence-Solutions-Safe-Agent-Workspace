@@ -1,3 +1,6 @@
+import pytest
+pytestmark = pytest.mark.skip(reason="fixer.agent.md was removed in the Agent Workbench redesign")
+
 """
 Edge-case tests for DOC-026: fixer.agent.md for Agent Workbench.
 

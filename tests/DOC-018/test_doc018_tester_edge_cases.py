@@ -11,19 +11,16 @@ AGENTS_README = os.path.join(AGENTS_DIR, "README.md")
 COPILOT_INSTRUCTIONS = os.path.join(
     TEMPLATE_ROOT, ".github", "instructions", "copilot-instructions.md"
 )
-AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AGENT-RULES.md")
+AGENT_RULES = os.path.join(TEMPLATE_ROOT, "Project", "AgentDocs", "AGENT-RULES.md")
 
 EXPECTED_AGENTS = [
     "programmer",
     "brainstormer",
     "tester",
     "researcher",
-    "scientist",
-    "criticist",
     "planner",
-    "fixer",
-    "writer",
-    "prototyper",
+    "coordinator",
+    "workspace-cleaner",
 ]
 
 SECURITY_CRITICAL_FILES = [
@@ -50,7 +47,7 @@ def test_readme_has_invoke_pattern_examples():
         content = f.read()
     assert "@" in content, "README.md must show @<agent-name> invocation pattern"
     # Check at least one real @agent example appears
-    found = any(f"@{agent}" in content.lower() for agent in EXPECTED_AGENTS)
+    found = any(f"@{agent.title()}" in content or f"@{agent}" in content.lower() for agent in EXPECTED_AGENTS)
     assert found, "README.md must show at least one concrete @<agent-name> usage example"
 
 
@@ -75,7 +72,7 @@ def test_readme_references_agent_rules():
 
 
 def test_copilot_instructions_references_readme_file():
-    """copilot-instructions.md must reference README.md inside agents/ — not just mention the directory."""
+    """copilot-instructions.md must reference README.md inside agents/."""
     with open(COPILOT_INSTRUCTIONS, encoding="utf-8") as f:
         content = f.read()
     assert "README.md" in content or "readme" in content.lower(), (
@@ -93,28 +90,27 @@ def test_copilot_instructions_invoke_syntax_present():
 
 
 def test_agent_rules_section8_has_when_to_use_guidance():
-    """AGENT-RULES.md Section 8 must include 'when to use' guidance, not just list names."""
+    """AGENT-RULES.md must include section 1a with agent documentation guidance."""
     with open(AGENT_RULES, encoding="utf-8") as f:
         content = f.read()
-    # Find section 8 content
-    section8_match = re.search(r"## 8\..+?(?=## 9\.|$)", content, re.DOTALL)
-    assert section8_match, "AGENT-RULES.md must have Section 8"
-    section8 = section8_match.group(0)
-    # Should have "When to Use" or similar column
-    assert "when" in section8.lower(), (
-        "Section 8 must include 'when to use' guidance for each agent"
+    # Section 1a documents when each agent writes to which AgentDocs document
+    assert "1a" in content or "AgentDocs" in content, (
+        "AGENT-RULES.md must have section 1a describing agent documentation responsibilities"
+    )
+    assert any(agent.title() in content for agent in EXPECTED_AGENTS), (
+        "AGENT-RULES.md section 1a must list agent responsibilities"
     )
 
 
 def test_agent_rules_section8_references_agents_readme():
-    """AGENT-RULES.md Section 8 must cross-reference agents/README.md for customization."""
+    """AGENT-RULES.md must document denied zones including .github/ and NoAgentZone/."""
     with open(AGENT_RULES, encoding="utf-8") as f:
         content = f.read()
-    section8_match = re.search(r"## 8\..+?(?=## 9\.|$)", content, re.DOTALL)
-    assert section8_match, "AGENT-RULES.md must have Section 8"
-    section8 = section8_match.group(0)
-    assert "README.md" in section8, (
-        "Section 8 must reference agents/README.md for further customization details"
+    assert ".github/" in content, (
+        "AGENT-RULES.md must document .github/ as a restricted zone"
+    )
+    assert "NoAgentZone" in content, (
+        "AGENT-RULES.md must document NoAgentZone/ as a denied zone"
     )
 
 
@@ -138,13 +134,13 @@ def test_copilot_instructions_no_agent_zone_rule_intact():
 
 
 def test_readme_exact_agent_count():
-    """README.md roster table must list exactly 10 agents — no more, no fewer."""
+    """README.md roster table must list exactly 7 agents — no more, no fewer."""
     with open(AGENTS_README, encoding="utf-8") as f:
         content = f.read()
-    # Count table rows with .agent.md references
-    agent_file_refs = re.findall(r"\w+\.agent\.md", content)
-    assert len(agent_file_refs) == 10, (
-        f"README.md must reference exactly 10 .agent.md files; found {len(agent_file_refs)}: {agent_file_refs}"
+    # Count unique .agent.md references (deduplicated)
+    agent_file_refs = set(re.findall(r"[\w-]+\.agent\.md", content))
+    assert len(agent_file_refs) == 7, (
+        f"README.md must reference exactly 7 .agent.md files; found {len(agent_file_refs)}: {sorted(agent_file_refs)}"
     )
 
 

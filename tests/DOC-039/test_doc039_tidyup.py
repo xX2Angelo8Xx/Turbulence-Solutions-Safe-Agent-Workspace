@@ -3,32 +3,32 @@
 import pathlib
 
 AGENTS_DIR = pathlib.Path(__file__).resolve().parents[2] / "templates" / "agent-workbench" / ".github" / "agents"
-AGENT_RULES = pathlib.Path(__file__).resolve().parents[2] / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
+AGENT_RULES = pathlib.Path(__file__).resolve().parents[2] / "templates" / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
 
 
-def test_tidyup_agent_exists():
-    assert (AGENTS_DIR / "tidyup.agent.md").exists()
+def test_workspace_cleaner_agent_exists():
+    assert (AGENTS_DIR / "workspace-cleaner.agent.md").exists()
 
 
-def test_tidyup_has_frontmatter():
-    content = (AGENTS_DIR / "tidyup.agent.md").read_text(encoding="utf-8")
+def test_workspace_cleaner_has_frontmatter():
+    content = (AGENTS_DIR / "workspace-cleaner.agent.md").read_text(encoding="utf-8")
     parts = content.split("---")
     assert len(parts) >= 3
-    assert "Tidyup" in parts[1]
+    assert "Workspace-Cleaner" in parts[1]
 
 
-def test_tidyup_has_audit_checks():
-    content = (AGENTS_DIR / "tidyup.agent.md").read_text(encoding="utf-8")
+def test_workspace_cleaner_has_audit_checks():
+    content = (AGENTS_DIR / "workspace-cleaner.agent.md").read_text(encoding="utf-8")
     assert "architecture.md" in content
     assert "decisions.md" in content
     assert "progress.md" in content
     assert "open-questions.md" in content
 
 
-def test_coordinator_includes_tidyup():
+def test_coordinator_includes_workspace_cleaner():
     content = (AGENTS_DIR / "coordinator.agent.md").read_text(encoding="utf-8")
     frontmatter = content.split("---")[1]
-    assert "Tidyup" in frontmatter
+    assert "Workspace-Cleaner" in frontmatter
 
 
 def test_coordinator_tools_preserved():
@@ -38,9 +38,9 @@ def test_coordinator_tools_preserved():
     assert "vscode" in frontmatter or "execute" in frontmatter
 
 
-def test_agent_rules_includes_tidyup():
+def test_agent_rules_includes_workspace_cleaner():
     content = AGENT_RULES.read_text(encoding="utf-8")
-    assert "Tidyup" in content
+    assert "Workspace-Cleaner" in content
 
 
 def test_no_deleted_agent_references():

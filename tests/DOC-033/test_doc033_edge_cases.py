@@ -9,19 +9,16 @@ TEMPLATE_ROOT = pathlib.Path(__file__).parents[2] / "templates" / "agent-workben
 README = TEMPLATE_ROOT / "README.md"
 AGENTS_DIR = TEMPLATE_ROOT / ".github" / "agents"
 
-# All expected .agent.md files that must survive the deletion of README.md
+# All expected .agent.md files in the current 7-agent roster
 EXPECTED_AGENT_FILES = [
     "brainstormer.agent.md",
     "coordinator.agent.md",
-    "criticist.agent.md",
-    "fixer.agent.md",
     "planner.agent.md",
     "programmer.agent.md",
-    "prototyper.agent.md",
     "researcher.agent.md",
-    "scientist.agent.md",
     "tester.agent.md",
-    "writer.agent.md",
+    "workspace-cleaner.agent.md",
+    "README.md",
 ]
 
 # Patterns that indicate an agent-facing instruction document
@@ -59,16 +56,17 @@ def test_readme_mentions_agent_rules_file():
 
 
 def test_agent_md_files_still_present():
-    """All .agent.md files in .github/agents/ must still exist — only README.md was deleted."""
-    missing = [f for f in EXPECTED_AGENT_FILES if not (AGENTS_DIR / f).exists()]
+    """All current .agent.md files in .github/agents/ must exist."""
+    expected_agent_files = [f for f in EXPECTED_AGENT_FILES if f.endswith(".agent.md")]
+    missing = [f for f in expected_agent_files if not (AGENTS_DIR / f).exists()]
     assert missing == [], (
         f"The following .agent.md files are unexpectedly missing from "
         f".github/agents/: {missing}"
     )
 
 
-def test_agents_dir_contains_only_agent_md_files():
-    """No README.md or other unexpected files should exist in .github/agents/."""
+def test_agents_dir_contains_expected_files():
+    """agents/ dir must contain exactly the 7 .agent.md files plus README.md."""
     actual_files = {p.name for p in AGENTS_DIR.iterdir() if p.is_file()}
     unexpected = actual_files - set(EXPECTED_AGENT_FILES)
     assert unexpected == set(), (

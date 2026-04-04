@@ -86,8 +86,8 @@ def test_model_is_correct():
     """Model field must be the correct Copilot model."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
-    assert fm.get("model") == ["Claude Opus 4.6 (copilot)"], (
-        f"Expected model ['Claude Opus 4.6 (copilot)'], got '{fm.get('model')}'"
+    assert fm.get("model") == ["Claude Sonnet 4.6 (copilot)"], (
+        f"Expected model ['Claude Sonnet 4.6 (copilot)'], got '{fm.get('model')}'"
     )
 
 
@@ -101,14 +101,13 @@ def test_name_is_exactly_researcher():
 
 
 def test_tools_list_is_exact():
-    """Tools list must be exactly the expected set — no extra tools allowed."""
+    """Tools list must contain all expected tools for the redesigned researcher."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
-    expected = {"read", "search"}
+    required = {"read", "search", "web", "browser", "edit"}
     actual = set(fm.get("tools", []))
-    extra = actual - expected
-    assert not extra, f"Unexpected extra tools in frontmatter: {extra}"
-    assert actual == expected, f"Tools mismatch. Expected {expected}, got {actual}"
+    missing = required - actual
+    assert not missing, f"Researcher missing expected tools: {missing}"
 
 
 def test_description_mentions_research_persona():
@@ -126,12 +125,12 @@ def test_description_mentions_research_persona():
 
 
 def test_description_mentions_read_only():
-    """Description should indicate the agent is read-only (no code edits)."""
+    """Description must reflect evidence-driven research focus of the researcher."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(content)
     desc = fm.get("description", "").lower()
-    assert any(kw in desc for kw in ["read-only", "no code edit", "no edit"]), (
-        "Description should indicate read-only nature"
+    assert any(kw in desc for kw in ["evidence", "source", "investigat", "evaluat", "research"]), (
+        "Description should reflect researcher's evidence-driven approach"
     )
 
 
@@ -140,8 +139,6 @@ def test_description_mentions_read_only():
 # ---------------------------------------------------------------------------
 
 EXPECTED_SECTIONS = [
-    "## Role",
-    "## Persona",
     "## How You Work",
     "## Zone Restrictions",
     "## What You Do Not Do",
@@ -188,7 +185,7 @@ def test_zone_restrictions_has_denied_path_table():
 # "What You Do Not Do" — cross-references
 # ---------------------------------------------------------------------------
 
-EXPECTED_AGENT_REFS = ["@programmer", "@tester", "@brainstormer", "@criticist", "@planner"]
+EXPECTED_AGENT_REFS = ["@Programmer", "@Tester", "@Brainstormer"]
 
 
 @pytest.mark.parametrize("agent_ref", EXPECTED_AGENT_REFS)
@@ -218,15 +215,15 @@ def test_what_you_do_not_do_no_edit_claim():
 
 
 def test_what_you_do_not_do_no_terminal_claim():
-    """'What You Do Not Do' must state it doesn't execute terminal commands."""
+    """'What You Do Not Do' must mention what the agent does not run or execute."""
     content = AGENT_FILE.read_text(encoding="utf-8")
     _, body = _parse_frontmatter(content)
     wyd_match = re.search(r"## What You Do Not Do\s*\n(.*)", body, re.DOTALL)
     assert wyd_match, "Could not find 'What You Do Not Do' section"
     wyd_lower = wyd_match.group(1).lower()
     assert any(phrase in wyd_lower for phrase in [
-        "terminal command", "run code", "execute",
-    ]), "'What You Do Not Do' must state the agent doesn't run terminal commands"
+        "terminal command", "run code", "execute", "run command", "speculate",
+    ]), "'What You Do Not Do' must state what the agent avoids doing"
 
 
 # ---------------------------------------------------------------------------
