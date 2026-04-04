@@ -1,45 +1,55 @@
 # Test Report — DOC-059
 
 **Tester:** Tester Agent  
-**Date:** 2026-04-04  
-**Iteration:** 1
+**Date:** 2026-04-05 (Iteration 2 — updated)  
+**Iteration:** 2
 
 ## Summary
 
 DOC-059 delivers a solid documentation artifact: ADR-008 is well-structured, complete, and accurately documents the root cause of the CI failure wave. The `testing-protocol.md` section is clear, actionable, and correctly cross-references ADR-008. The `index.jsonl` entry is properly formatted.
 
-However, the WP introduced **two test regressions** by violating the very process rule it documents: externally-asserted values changed (ADR count, stale-path guard) without updating the affected tests.
+Iteration 1 found two regressions; Iteration 2 confirms those are fully resolved. No new regressions were introduced by DOC-059.
 
-**Verdict: FAIL — Return to Developer**
+**Verdict: PASS**
 
 ---
 
 ## Tests Executed
 
+### Iteration 1 (2026-04-04)
+
 | Test | Type | Result | Notes |
 |------|------|--------|-------|
 | `tests/DOC-059/test_doc059_adr008.py` (8 tests) | Unit | PASS | All developer-written tests pass |
 | `tests/DOC-059/test_doc059_edge_cases.py` (10 tests) | Unit | PASS | Tester-added edge cases — all pass |
-| Full regression suite | Regression | FAIL | 2 new failures introduced by DOC-059 (see below) |
+| Full regression suite | Regression | FAIL | 2 new failures introduced by DOC-059 |
 
 **TST-2600** — DOC-059 targeted suite: 18 passed (logged)  
-**TST-2601** — Full regression suite: 143 failed (logged; 141 are pre-existing per baseline)
+**TST-2601** — Full regression suite: 143 failed (141 pre-existing + 2 DOC-059 regressions)
+
+### Iteration 2 (2026-04-05)
+
+| Test | Type | Result | Notes |
+|------|------|--------|-------|
+| `tests/DOC-059/test_doc059_adr008.py` (8 tests) | Unit | PASS | |
+| `tests/DOC-059/test_doc059_edge_cases.py` (10 tests) | Unit | PASS | |
+| `tests/DOC-053/test_doc053_adr_related_wps.py` | Regression | PASS | Regression 1 fixed — `test_adr_index_has_seven_entries` now asserts 8 |
+| `tests/DOC-017/test_doc017_tester_edge_cases.py` | Regression | PASS | Regression 2 fixed — `test_broad_docs_tree_no_stale_coding` exempts historical docs |
+| Full regression suite | Regression | PASS | 138 failed (all ≤ 147 baseline); no new regressions from DOC-059 |
+
+**TST-2603** — DOC-059 Iteration 2 targeted suite: 18 passed  
+**TST-2604** — Regression fix verification (DOC-053 + DOC-017): pass  
+**TST-2605** — Full regression suite: 138 failed, all baseline-known
 
 ---
 
-## Regressions Introduced by DOC-059
+## Regressions from Iteration 1 — Resolution Status
 
 ### Regression 1: ADR count test broken
 
 **Test:** `tests/DOC-053/test_doc053_adr_related_wps.py::test_adr_index_has_seven_entries`
 
-**Failure:**
-```
-AssertionError: Expected 7 ADR entries, found 8: 
-['ADR-001', 'ADR-002', ..., 'ADR-008']
-```
-
-**Root cause:** DOC-053's test was written when 7 ADRs existed. Adding ADR-008 to `index.jsonl` increased the count to 8, but the test was not updated. This is textbook test drift — the exact pattern ADR-008 documents.
+**Fix (Iteration 2):** Assertion updated from `== 7` to `== 8`. Docstring updated to reference ADR-001 through ADR-008. **RESOLVED ✓**
 
 ---
 
@@ -47,14 +57,7 @@ AssertionError: Expected 7 ADR entries, found 8:
 
 **Test:** `tests/DOC-017/test_doc017_tester_edge_cases.py::test_broad_docs_tree_no_stale_coding`
 
-**Failure:**
-```
-AssertionError: Found 'templates/coding/' in:
-  docs\decisions\ADR-008-tests-track-code.md
-  docs\work-rules\testing-protocol.md
-```
-
-**Root cause:** The DOC-017 stale-path guard rejects any doc that literally contains `templates/coding/`. ADR-008 and the new testing-protocol section reference the old path in a historical context (documenting Wave 1 of test drift). The test does not exempt historical-documentation files in `docs/decisions/` or the new section in `testing-protocol.md`.
+**Fix (Iteration 2):** `STALE_CODING_EXEMPT` set added containing `decisions/ADR-008-tests-track-code.md` and `work-rules/testing-protocol.md`. Both files contain intentional historical references to `templates/coding/` as root-cause documentation. **RESOLVED ✓**
 
 ---
 
@@ -79,26 +82,12 @@ File: `tests/DOC-059/test_doc059_edge_cases.py` — 10 tests
 
 ## Bugs Found
 
-None — the regressions above are test gaps, not defects in the documentation content itself.
-
----
-
-## TODOs for Developer
-
-- [ ] **Fix Regression 1** — Update `tests/DOC-053/test_doc053_adr_related_wps.py::test_adr_index_has_seven_entries` to expect **8** entries instead of 7. The assertion `assert len(rows) == 7` must become `assert len(rows) == 8`. Also update the docstring to say "ADR-001 through ADR-008".
-
-- [ ] **Fix Regression 2** — Resolve the `templates/coding/` literal in docs files. Choose one of:
-  - **Option A (preferred):** Update `tests/DOC-017/test_doc017_tester_edge_cases.py::test_broad_docs_tree_no_stale_coding` to add `ADR-008-tests-track-code.md` to the historical-docs exception list, and add `docs/work-rules/testing-protocol.md` to the list of files permitted to reference the old path as historical context.
-  - **Option B:** Rephrase the Wave 1 references in `ADR-008-tests-track-code.md` and `testing-protocol.md` to avoid the literal substring `templates/coding/` where possible (e.g., `templates/coding` without the trailing slash), and verify the DOC-017 test no longer flags them.
-
-- [ ] **Pre-handoff:** After fixing, run `python scripts/run_tests.py --wp DOC-059 --type Regression --env "Windows 11 + Python 3.13" --full-suite` and confirm the two regression tests now pass.
-
-- [ ] **Ironically:** This WP violated the process rule it was documenting. The Developer must grep `tests/` for all values changed by a WP before handoff. Explicitly note this in the dev-log update.
+None.
 
 ---
 
 ## Verdict
 
-**FAIL — Return to Developer**
+**PASS — Marking Done**
 
-The documentation content quality is high and the 18 DOC-059-specific tests all pass. However, two pre-existing tests were broken by adding ADR-008 (an intended consequence of this WP) without updating those tests. Per `testing-protocol.md` — the very document being updated — test assertions must be updated in the same commit as the change that breaks them.
+All 18 DOC-059 tests pass. Both Iteration 1 regressions are resolved. The full regression suite (138 failures) is entirely within the 147-entry baseline — no new regressions from DOC-059. Documentation quality is high: ADR-008 is well-structured, complete, and accurately documents the CI failure root cause. The `testing-protocol.md` section is actionable and correctly cross-references ADR-008.
