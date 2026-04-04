@@ -168,3 +168,27 @@ Run via `scripts/run_tests.py --wp FIX-103 --type Unit --env "Windows 11 + Pytho
 ## Known Limitations
 
 None.
+
+---
+
+## Iteration 2 — 2026-04-04
+
+**Tester returned:** ❌ FAIL (test-report.md, TST-2596) — 2 DOC-051 tests broken by schema change.
+
+### Root Cause
+
+During the regression baseline reset in Iteration 1, the `known_failures` field in `tests/regression-baseline.json` was incorrectly converted from a dict-of-objects to a plain list of strings. This broke:
+- `test_regression_baseline_has_known_failures_field` — expects `isinstance(data["known_failures"], dict)`
+- `test_regression_baseline_each_entry_has_reason` — calls `.items()` which fails on a list
+
+### Fix Applied
+
+Converted `known_failures` back to a dict where each key is the dotted test ID and each value is `{"reason": "pre-existing failure as of 2026-04-04 baseline reset"}`. All 147 entries retained. `_count` remains 147.
+
+**File changed:** `tests/regression-baseline.json`
+
+### Test Results (Iteration 2)
+
+- `tests/DOC-051/`: 32 passed (including the 2 previously broken tests)
+- `tests/FIX-103/`: 9 passed
+- Logged as TST-2597
