@@ -5,3 +5,4 @@
 "ADR-004","Adopt Architecture Decision Records (ADRs)","Active","2026-04-03","MNT-012, DOC-053",""
 "ADR-005","No Rollback UI — Use GitHub Releases","Active","2026-04-03","DOC-053",""
 "ADR-006","Defer Code Signing","Active","2026-04-03","DOC-053",""
+"ADR-007","Migrate from CSV to JSONL for All Data Files","Active","2026-04-04","MNT-014, MNT-015, MNT-016, MNT-017, MNT-018, MNT-019, MNT-020, MNT-021, MNT-022, MNT-023",""

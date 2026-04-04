@@ -1,12 +1,13 @@
 ---
 name: planner
 description: "Accepts feature requests, bug reports, and security gaps. Drafts structured plans with analysis and recommendations. Hands off to Orchestrator for US/WP/FIX creation and implementation."
-tools: [read, search, agent, todo, vscode/askQuestions, vscode/memory]
+tools: [vscode/memory, vscode/askQuestions, read, agent, search, todo]
 agents: [orchestrator, story-writer]
 model: ['Claude Opus 4.6 (copilot)']
 argument-hint: "Describe the feature, bug, or security gap you want analyzed"
 handoffs:
-  - agent: orchestrator
+  - label: "Hand off to Orchestrator"
+    agent: orchestrator
     prompt: "The Planner has produced a finalized plan approved by the user. Please create the necessary user stories (via Story Writer), workpackages, or FIX entries to implement it. The plan is included below.\n\n{{plan}}"
     send: true
 ---
