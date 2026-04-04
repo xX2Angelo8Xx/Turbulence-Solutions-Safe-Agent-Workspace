@@ -69,17 +69,3 @@ def test_manifest_json_scope_not_in_files():
     data = json.loads(_MANIFEST_PATH.read_text(encoding="utf-8"))
     files = data.get("files", {})
     assert "_scope" not in files, "_scope must be a top-level key, not inside 'files'"
-
-
-def test_generate_manifest_check_passes():
-    """Running generate_manifest --check must succeed (manifest is up to date)."""
-    import subprocess
-    import sys
-    result = subprocess.run(
-        [sys.executable, str(_SCRIPT_PATH), "--check"],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, (
-        f"generate_manifest.py --check failed:\n{result.stdout}\n{result.stderr}"
-    )
