@@ -58,8 +58,8 @@ After completing a development phase and all WPs are finalized on main:
 
 #### Step 1 — Create Draft Release
 
-1. **Run the release script**: `.venv\Scripts\python scripts/release.py <version> --rc` (e.g., `.venv\Scripts\python scripts/release.py 3.3.10 --rc`)
-   - The `--rc` flag is **cosmetic** — it marks the commit message as a release candidate but does not affect the draft/publish behaviour
+1. **Run the release script**: `.venv\Scripts\python scripts/release.py <version>` (e.g., `.venv\Scripts\python scripts/release.py 3.3.10`)
+   - All releases are **automatically created as drafts** — no flag required (see ADR-001)
    - The script bumps all 5 version files (config.py, pyproject.toml, setup.iss, build_dmg.sh, build_appimage.sh)
    - Validates all files were updated correctly
    - Creates a release commit and annotated tag

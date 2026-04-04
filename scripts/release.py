@@ -1,4 +1,8 @@
-"""Release script: bumps all 5 version files, creates a git commit and annotated tag, then pushes."""
+"""Release script: bumps all 5 version files, creates a git commit and annotated tag, then pushes.
+
+All GitHub Releases are created as drafts by default (enforced by the CI/CD workflow).
+Draft releases are not visible to the auto-updater or end users until manually published.
+See ADR-001 for rationale."""
 
 import argparse
 import re
@@ -118,18 +122,17 @@ def validate_version_file(key: str, expected_version: str) -> bool:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Bump all version files, commit, tag, and push a new release."
+        description=(
+            "Bump all version files, commit, tag, and push a new release. "
+            "All releases are created as draft GitHub Releases by default; "
+            "manually publish the draft when testing is complete."
+        )
     )
     parser.add_argument("version", help="New version string in X.Y.Z format (e.g. 3.2.7)")
     parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print what would be done without making any changes.",
-    )
-    parser.add_argument(
-        "--rc",
-        action="store_true",
-        help="Create a release candidate. Reminds you that the GitHub Release will be a draft.",
     )
     args = parser.parse_args()
 
@@ -233,22 +236,10 @@ def main() -> None:
     print()
     print(f"Release {tag} complete.")
 
-    if args.rc:
-        print()
-        print("=" * 60)
-        print("RELEASE CANDIDATE — Draft Release Workflow")
-        print("=" * 60)
-        print(f"1. CI/CD will build artifacts and create a DRAFT release for {tag}")
-        print("2. Draft releases are NOT visible to the auto-updater")
-        print("3. Run staging smoke tests: Actions → 'Staging Smoke Tests' → Run workflow")
-        print("4. Download and test artifacts manually on your machine")
-        print("5. When satisfied, publish the draft on GitHub Releases page")
-        print("=" * 60)
-    else:
-        print()
-        print("NOTE: GitHub Release will be created as a DRAFT.")
-        print("You must manually publish it on the GitHub Releases page")
-        print("after verifying staging smoke tests pass.")
+    print()
+    print("NOTE: GitHub Release will be created as a DRAFT (enforced by CI/CD).")
+    print("Draft releases are not visible to the auto-updater until manually published.")
+    print("Go to GitHub Releases and publish the draft when ready.")
 
 
 if __name__ == "__main__":

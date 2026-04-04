@@ -104,14 +104,14 @@ def test_rejection_path_creates_fix_workpackages():
     )
 
 
-def test_rc_flag_clarified_as_cosmetic():
-    """The --rc flag must be explicitly clarified as cosmetic in the CI/CD section."""
+def test_all_releases_are_draft_documented():
+    """The CI/CD section must document that all releases are automatically drafts (FIX-097)."""
     section = _cicd_section(_read())
-    assert "--rc" in section, (
-        "orchestrator.agent.md CI/CD section does not mention --rc flag"
+    assert "--rc" not in section, (
+        "orchestrator.agent.md CI/CD section still references the removed --rc flag"
     )
-    assert "cosmetic" in section.lower(), (
-        "orchestrator.agent.md CI/CD section does not clarify that --rc is cosmetic"
+    assert "draft" in section.lower(), (
+        "orchestrator.agent.md CI/CD section does not mention that releases are drafts"
     )
 
 
