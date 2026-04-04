@@ -83,3 +83,18 @@ Updated all 6 agent definition files in `.github/agents/` and `copilot-instructi
 ## Known Limitations
 - `docs/work-rules/` files (agent-workflow.md, workpackage-rules.md, etc.) are not in scope for this WP; they still reference `.csv`. Those are handled by separate MNT WPs.
 - Historical references to "CSV" format (e.g., in ADR descriptions or migration context) remain unchanged.
+
+---
+
+## Iteration 2 — 2026-04-04
+
+**Returned by Tester:** Defect DEF-001 (BUG-188): Residual generic noun "CSVs" in `.github/agents/planner.agent.md` line 15.
+
+**Root cause:** Developer's test pattern `FORBIDDEN_CSV_PATH_PATTERN` only matched specific filenames (e.g., `workpackages.csv`) and did not catch the generic noun "CSVs" used as a format description. The Tester's edge-case test `test_planner_no_generic_csv_word` exposed this gap.
+
+**Fix applied:**
+- `.github/agents/planner.agent.md` line 15: `edit CSVs` → `edit JSONL data files`
+
+**Tests run:** 25 passed, 0 failed (14 original + 11 Tester edge cases) — logged as TST-2561.
+
+**Workspace validation:** Clean (exit code 0).
