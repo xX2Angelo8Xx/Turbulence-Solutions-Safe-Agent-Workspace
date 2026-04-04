@@ -161,3 +161,46 @@ def test_readme_no_csv_utils_active_section():
     assert "## Shared Module: csv_utils.py" not in content, (
         "scripts/README.md still has csv_utils.py as the primary shared module section"
     )
+
+
+# ---------------------------------------------------------------------------
+# 6. Edge-case / extra coverage tests (Tester additions)
+# ---------------------------------------------------------------------------
+
+def test_csv_utils_retained_for_legacy_tests():
+    """scripts/csv_utils.py must still exist — retained for FIX-065 permanent tests."""
+    path = SCRIPTS_DIR / "csv_utils.py"
+    assert path.exists(), (
+        "csv_utils.py was deleted but is required by FIX-065 permanent regression tests"
+    )
+
+
+def test_migrate_csv_to_jsonl_retained_for_legacy_tests():
+    """scripts/migrate_csv_to_jsonl.py must still exist — retained for MNT-016 permanent tests."""
+    path = SCRIPTS_DIR / "migrate_csv_to_jsonl.py"
+    assert path.exists(), (
+        "migrate_csv_to_jsonl.py was deleted but is required by MNT-016 permanent regression tests"
+    )
+
+
+def test_architecture_md_no_stale_csv_data_files():
+    """docs/architecture.md must not list workpackages.csv or index.csv in the file tree."""
+    arch_path = REPO_ROOT / "docs" / "architecture.md"
+    assert arch_path.exists(), "docs/architecture.md not found"
+    content = arch_path.read_text(encoding="utf-8")
+    assert "workpackages.csv" not in content, (
+        "docs/architecture.md still references workpackages.csv — update_architecture.py was not re-run"
+    )
+    assert "index.csv" not in content, (
+        "docs/architecture.md still references index.csv — update_architecture.py was not re-run"
+    )
+
+
+def test_readme_has_legacy_deprecation_note():
+    """scripts/README.md must document that csv_utils.py is retained as legacy test infrastructure."""
+    readme = SCRIPTS_DIR / "README.md"
+    content = readme.read_text(encoding="utf-8")
+    # The README must make clear csv_utils is legacy, not active
+    assert "legacy" in content.lower() and "csv_utils" in content, (
+        "scripts/README.md must note that csv_utils.py is retained as legacy infrastructure"
+    )
