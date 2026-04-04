@@ -95,12 +95,14 @@ def _check_wp_artifacts(
     result: ValidationResult,
     exceptions: dict | None = None,
 ) -> None:
-    """Check that a Done WP has required artifacts.
+    """Check that Done and Review WPs have required artifacts.
 
-    For Done WPs, missing artifacts are ERRORS (not warnings) because the
-    WP should not have reached Done without them.
+    For Done WPs: dev-log.md, test-report.md (unless excepted), and tests/ are
+    required — missing any is an ERROR.
+    For Review WPs: dev-log.md and tests/ are required — missing either is an
+    ERROR. test-report.md is NOT checked (only the Tester creates it).
     """
-    if status != "Done":
+    if status not in ("Done", "Review"):
         return
 
     # Skip decomposed WPs
@@ -121,7 +123,9 @@ def _check_wp_artifacts(
     if not dev_log.exists():
         result.error(f"{wp_id}: missing docs/workpackages/{wp_id}/dev-log.md")
 
-    if not skip_test_report and not test_report.exists():
+    # test-report.md is only required for Done WPs; Review WPs have not yet
+    # been through the Tester, so the file does not yet exist.
+    if status == "Done" and not skip_test_report and not test_report.exists():
         result.error(f"{wp_id}: missing docs/workpackages/{wp_id}/test-report.md")
 
     if not skip_test_folder:
@@ -475,10 +479,10 @@ def validate_full(result: ValidationResult) -> None:
     _check_duplicate_ids(BUG_CSV, "ID", result)
     _check_duplicate_ids(US_CSV, "ID", result)
 
-    # WP artifact checks for all Done WPs
+    # WP artifact checks for all Done and Review WPs
     _, wp_rows = read_csv(WP_CSV)
     for wp in wp_rows:
-        if wp.get("Status") == "Done":
+        if wp.get("Status") in ("Done", "Review"):
             _check_wp_artifacts(
                 wp["ID"], wp["Status"], wp.get("Comments", ""), result, exceptions
             )
