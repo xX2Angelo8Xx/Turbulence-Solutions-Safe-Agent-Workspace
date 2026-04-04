@@ -407,6 +407,118 @@ class TestInstallHooks:
 
 
 # ---------------------------------------------------------------------------
+# Tester-added edge cases
+# ---------------------------------------------------------------------------
+
+class TestUserStoryValidation:
+    def test_us_missing_title_is_error(self, tmp_path):
+        """A User Story row without Title must produce an error."""
+        f = tmp_path / "user-stories.jsonl"
+        write_jsonl_objects(f, [{"ID": "US-001", "Status": "Open"}])
+        result = ValidationResult()
+        _run_structural_check_on(f, result, label="US", required_fields=["ID", "Status", "Title"])
+        assert any("'Title'" in e for e in result.errors), result.errors
+
+    def test_us_invalid_status_is_warning(self, tmp_path):
+        """A User Story with invalid Status must produce a warning."""
+        f = tmp_path / "user-stories.jsonl"
+        write_jsonl_objects(f, [{"ID": "US-001", "Status": "Backlog", "Title": "Story"}])
+        result = ValidationResult()
+        _run_structural_check_on(
+            f, result, label="US",
+            required_fields=["ID", "Status", "Title"],
+            valid_status={"Open", "In Progress", "Done", "Closed"},
+        )
+        assert any("Backlog" in w for w in result.warnings), result.warnings
+
+    def test_us_valid_row_passes(self, tmp_path):
+        """A complete, valid User Story row must not produce errors or warnings."""
+        f = tmp_path / "user-stories.jsonl"
+        write_jsonl_objects(f, [{"ID": "US-001", "Status": "Open", "Title": "As a user"}])
+        result = ValidationResult()
+        _run_structural_check_on(
+            f, result, label="US",
+            required_fields=["ID", "Status", "Title"],
+            valid_status={"Open", "In Progress", "Done", "Closed"},
+        )
+        assert result.errors == []
+        assert result.warnings == []
+
+
+class TestTstStatusEnum:
+    def test_invalid_tst_status_is_warning(self, tmp_path):
+        """A test-result row with invalid Status must produce a warning."""
+        f = tmp_path / "test-results.jsonl"
+        write_jsonl_objects(f, [{"ID": "TST-001", "Status": "Running", "Test Name": "T"}])
+        result = ValidationResult()
+        _run_structural_check_on(
+            f, result, label="Test",
+            required_fields=["ID", "Status", "Test Name"],
+            valid_status={"Pass", "Fail", "Blocked", "Skipped", "XFail"},
+        )
+        assert any("Running" in w for w in result.warnings), result.warnings
+
+    def test_valid_tst_status_pass(self, tmp_path):
+        """A test-result row with Status=Pass must not warn."""
+        f = tmp_path / "test-results.jsonl"
+        write_jsonl_objects(f, [{"ID": "TST-001", "Status": "Pass", "Test Name": "T"}])
+        result = ValidationResult()
+        _run_structural_check_on(
+            f, result, label="Test",
+            required_fields=["ID", "Status", "Test Name"],
+            valid_status={"Pass", "Fail", "Blocked", "Skipped", "XFail"},
+        )
+        assert result.errors == []
+        assert result.warnings == []
+
+
+class TestEdgeCases:
+    def test_multiple_consecutive_empty_lines_produces_multiple_errors(self, tmp_path):
+        """Two consecutive blank lines must produce two separate error entries."""
+        f = tmp_path / "wp.jsonl"
+        write_jsonl(f, [
+            '{"ID": "WP-001", "Status": "Open", "Name": "A"}',
+            "",
+            "",
+            '{"ID": "WP-002", "Status": "Open", "Name": "B"}',
+        ])
+        result = ValidationResult()
+        _run_structural_check_on(f, result, label="WP")
+        assert len([e for e in result.errors if "empty line" in e]) >= 2, result.errors
+
+    def test_crlf_file_with_blank_line_detected(self, tmp_path):
+        """A CRLF file with a blank line in the middle must still be flagged."""
+        f = tmp_path / "wp.jsonl"
+        f.write_bytes(
+            b'{"ID": "WP-001", "Status": "Open", "Name": "A"}\r\n'
+            b'\r\n'
+            b'{"ID": "WP-002", "Status": "Open", "Name": "B"}\r\n'
+        )
+        result = ValidationResult()
+        _run_structural_check_on(f, result, label="WP")
+        assert any("empty line" in e for e in result.errors), result.errors
+
+    def test_nonexistent_file_produces_warning_not_error(self, tmp_path):
+        """_check_duplicate_ids on a nonexistent file must warn, not error."""
+        f = tmp_path / "nonexistent.jsonl"
+        result = ValidationResult()
+        _check_duplicate_ids(f, "ID", result)
+        assert result.errors == []
+        assert result.warnings != []
+
+    def test_empty_id_field_skipped_in_duplicate_check(self, tmp_path):
+        """Rows with empty ID values must not be counted as duplicates."""
+        f = tmp_path / "wp.jsonl"
+        write_jsonl_objects(f, [
+            {"ID": "", "Status": "Open", "Name": "A"},
+            {"ID": "", "Status": "Open", "Name": "B"},
+        ])
+        result = ValidationResult()
+        _check_duplicate_ids(f, "ID", result)
+        assert result.errors == []
+
+
+# ---------------------------------------------------------------------------
 # Internal helper: run _check_jsonl_structural logic on a custom path
 # ---------------------------------------------------------------------------
 
