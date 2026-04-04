@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Date:** 2026-04-03  
-**Related WPs:** N/A (structural overhaul)  
+**Related WPs:** MNT-005, MNT-007, DOC-051  
 **Supersedes:** None  
 **Superseded by:** None
 
