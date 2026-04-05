@@ -32,3 +32,23 @@ Added ADR-009 entry to `docs/decisions/index.jsonl`.
 ## Known Limitations
 
 None. This WP is purely documentation.
+
+---
+
+## Iteration 2 — 2026-04-05
+
+### Tester Findings
+
+The Tester found 2 regressions caused by adding ADR-009:
+1. `tests/DOC-053/test_doc053_adr_related_wps.py::test_adr_index_has_seven_entries` — hardcoded count of 8 ADRs, now 9.
+2. `tests/DOC-017/test_doc017_tester_edge_cases.py::test_broad_docs_tree_no_stale_coding` — ADR-009 contains `templates/coding/` in a historical context table; was not in `STALE_CODING_EXEMPT`.
+
+### Changes Made
+
+- `tests/DOC-053/test_doc053_adr_related_wps.py` — Renamed `test_adr_index_has_seven_entries` → `test_adr_index_has_nine_entries`; updated assertion and docstring to expect 9 ADR entries.
+- `tests/DOC-017/test_doc017_tester_edge_cases.py` — Added `"decisions/ADR-009-cross-wp-test-impact.md"` to `STALE_CODING_EXEMPT` set.
+
+### Test Results
+
+- `tests/DOC-053/ tests/DOC-017/ tests/MNT-026/`: 60 passed, 0 failed.
+- Full suite: 72 failures, all covered by `tests/regression-baseline.json` (77 entries). No new regressions.

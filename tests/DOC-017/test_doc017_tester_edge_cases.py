@@ -144,6 +144,7 @@ HISTORICAL_DIRS = {
 # (e.g., root-cause documentation in ADRs or process rules).
 STALE_CODING_EXEMPT = {
     "decisions/ADR-008-tests-track-code.md",
+    "decisions/ADR-009-cross-wp-test-impact.md",
     "work-rules/testing-protocol.md",
 }
 
