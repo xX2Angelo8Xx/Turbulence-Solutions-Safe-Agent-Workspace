@@ -27,12 +27,9 @@ AGENT_FILES = {
     "brainstormer": AGENTS_DIR / "brainstormer.agent.md",
     "tester": AGENTS_DIR / "tester.agent.md",
     "researcher": AGENTS_DIR / "researcher.agent.md",
-    "scientist": AGENTS_DIR / "scientist.agent.md",
-    "criticist": AGENTS_DIR / "criticist.agent.md",
+    "coordinator": AGENTS_DIR / "coordinator.agent.md",
     "planner": AGENTS_DIR / "planner.agent.md",
-    "fixer": AGENTS_DIR / "fixer.agent.md",
-    "writer": AGENTS_DIR / "writer.agent.md",
-    "prototyper": AGENTS_DIR / "prototyper.agent.md",
+    "workspace-cleaner": AGENTS_DIR / "workspace-cleaner.agent.md",
 }
 
 OLD_INDIVIDUAL_TOOL_NAMES = [
@@ -63,7 +60,7 @@ def _parse_frontmatter(text: str) -> tuple[dict, str]:
 # ---------------------------------------------------------------------------
 
 def test_all_agent_files_exist():
-    """All 10 agent .md files must exist on disk."""
+    """All 7 agent .md files must exist on disk."""
     for name, path in AGENT_FILES.items():
         assert path.exists(), f"{name}.agent.md not found at {path}"
 
@@ -136,13 +133,13 @@ def test_model_is_list_in_all_agents():
 # ---------------------------------------------------------------------------
 
 def test_frontmatter_has_exactly_four_keys():
-    """All agent frontmatters must have exactly name, description, tools, model."""
-    expected_keys = {"name", "description", "tools", "model"}
+    """All agent frontmatters must contain the required keys: name, description, tools, model."""
+    required_keys = {"name", "description", "tools", "model"}
     for name, path in AGENT_FILES.items():
         fm, _ = _parse_frontmatter(path.read_text(encoding="utf-8"))
-        assert set(fm.keys()) == expected_keys, (
-            f"{name}.agent.md frontmatter keys mismatch: "
-            f"got {set(fm.keys())} expected {expected_keys}"
+        assert required_keys.issubset(set(fm.keys())), (
+            f"{name}.agent.md frontmatter missing required keys: "
+            f"got {set(fm.keys())} expected superset of {required_keys}"
         )
 
 

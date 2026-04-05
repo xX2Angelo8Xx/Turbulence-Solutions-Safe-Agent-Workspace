@@ -1,6 +1,6 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 184,
+  "_count": 152,
   "_updated": "2026-04-05",
   "known_failures": {
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_getting_started_section": {
@@ -56,102 +56,6 @@
     },
     "tests.GUI-013.test_gui013_tester_edge_cases.test_logo_label_placed_at_row_zero_columnspan_3": {
       "reason": "Requires Pillow (PIL) which is not installed. Additionally, test_app_build_ui_creates_logo_label and test_logo_label_placed_at_row_zero_columnspan_3 fail because logo_label attribute was removed from the app class in a subsequent refactor."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_programmer_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_brainstormer_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_tester_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_researcher_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_scientist_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_criticist_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_planner_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_fixer_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_writer_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_prototyper_tools": {
-      "reason": "Agent .agent.md files use an extended tools list (vscode/memory, vscode/askQuestions, agent, todo, web/fetch, browser, etc.); tests expect a minimal tools list from an earlier design. Agent capabilities were expanded after these tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_programmer_model": {
-      "reason": "Agent .agent.md files use model string 'claude-sonnet-4-5' (Sonnet); tests expect 'claude-opus-4-5' (Opus). Model was updated in the template after tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_brainstormer_model": {
-      "reason": "Agent .agent.md files use model string 'claude-sonnet-4-5' (Sonnet); tests expect 'claude-opus-4-5' (Opus). Model was updated in the template after tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_tester_model": {
-      "reason": "Agent .agent.md files use model string 'claude-sonnet-4-5' (Sonnet); tests expect 'claude-opus-4-5' (Opus). Model was updated in the template after tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_researcher_model": {
-      "reason": "Agent .agent.md files use model string 'claude-sonnet-4-5' (Sonnet); tests expect 'claude-opus-4-5' (Opus). Model was updated in the template after tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_scientist_model": {
-      "reason": "Agent .agent.md files use model string 'claude-sonnet-4-5' (Sonnet); tests expect 'claude-opus-4-5' (Opus). Model was updated in the template after tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_criticist_model": {
-      "reason": "Agent .agent.md files use model string 'claude-sonnet-4-5' (Sonnet); tests expect 'claude-opus-4-5' (Opus). Model was updated in the template after tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_fixer_model": {
-      "reason": "Agent .agent.md files use model string 'claude-sonnet-4-5' (Sonnet); tests expect 'claude-opus-4-5' (Opus). Model was updated in the template after tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_writer_model": {
-      "reason": "Agent .agent.md files use model string 'claude-sonnet-4-5' (Sonnet); tests expect 'claude-opus-4-5' (Opus). Model was updated in the template after tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_prototyper_model": {
-      "reason": "Agent .agent.md files use model string 'claude-sonnet-4-5' (Sonnet); tests expect 'claude-opus-4-5' (Opus). Model was updated in the template after tests were written."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_no_old_tool_names_in_any_agent": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_fetch_webpage_not_in_any_agent": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_planner_has_ask_tool": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_readme_example_uses_category_tools": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_agent_frontmatter.test_readme_example_uses_correct_model": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_edge_cases.test_all_agent_files_exist": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_edge_cases.test_old_model_not_in_any_file_content": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_edge_cases.test_fetch_webpage_not_in_any_agent_body": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_edge_cases.test_tools_is_list_in_all_agents": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_edge_cases.test_model_is_list_in_all_agents": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_edge_cases.test_frontmatter_has_exactly_four_keys": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_edge_cases.test_no_agent_has_empty_tools_list": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
-    },
-    "tests.FIX-073.test_fix073_edge_cases.test_all_tool_values_are_non_empty_strings": {
-      "reason": "FIX-073 test suite checks agent file structure that has since evolved: tools are now lists of category strings, fetch_webpage replaced by web/fetch, planner no longer has ask_tool, some .agent.md files were renamed or moved."
     },
     "tests.INS-019.test_ins019_edge_cases.test_read_python_path_traversal_returned_as_is": {
       "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
