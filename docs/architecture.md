@@ -632,6 +632,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-111/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-112/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1351,6 +1354,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-109/
 │   ├── FIX-110/
 │   ├── FIX-111/
+│   ├── FIX-112/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
