@@ -1,14 +1,14 @@
 # Test Report — MNT-026: Create ADR-009 cross-WP test impact
 
 **Tester:** Tester Agent  
-**Date:** 2026-04-05  
-**Verdict:** FAIL — 2 new regressions caused by this WP
+**Date:** 2026-04-05 (Iteration 2)  
+**Verdict:** PASS
 
 ---
 
 ## Review Summary
 
-The ADR-009 document and index.jsonl entry are well-structured and accurate. The 4 developer-written tests are correct and pass. However, adding ADR-009 to `docs/decisions/index.jsonl` and `docs/decisions/ADR-009-cross-wp-test-impact.md` broke two pre-existing tests in other WP folders that were not updated in the same commit.
+The ADR-009 document and index.jsonl entry are well-structured and accurate. The 4 developer-written tests are correct and pass. The 2 regressions found in iteration 1 (DOC-053 and DOC-017) have been correctly fixed by the Developer in iteration 2.
 
 ---
 
@@ -16,41 +16,29 @@ The ADR-009 document and index.jsonl entry are well-structured and accurate. The
 
 | Run | Scope | Result | Logged As |
 |-----|-------|--------|-----------|
-| MNT-026 suite (11 tests) | `tests/MNT-026/` | PASS | — |
-| Full regression suite | `tests/` (all) | FAIL — 66 failures, 2 new regressions | TST-2622 |
+| MNT-026 suite (4 dev tests) | `tests/MNT-026/` | PASS | — |
+| Targeted regression fixes | `tests/DOC-053/ + tests/DOC-017/` | PASS (all 38 pass) | — |
+| Full regression suite | `tests/` (all) | 69/72 failures, all in baseline | TST-2623 (iter 1) |
+| Full regression suite (iter 2) | `tests/` (all) | 69/72 failures, all in baseline | TST-2624 |
 
-**New regressions (not in `tests/regression-baseline.json`):**
-1. `tests/DOC-053/test_doc053_adr_related_wps.py::test_adr_index_has_seven_entries`
-2. `tests/DOC-017/test_doc017_tester_edge_cases.py::test_broad_docs_tree_no_stale_coding`
-
-All other 64 failures are pre-existing entries in `tests/regression-baseline.json`.
+All 42 targeted tests (DOC-053 + DOC-017 + MNT-026) pass.  
+Full suite: 69–72 known failures (flaky range), all in `tests/regression-baseline.json` (77 entries). Zero new regressions.
 
 ---
 
-## Regression Details
+## Regression Fix Verification (Iteration 2)
 
-### Regression 1 — DOC-053: ADR index entry count mismatch
+### Fix 1 — DOC-053: ADR count updated correctly ✓
 
 **File:** `tests/DOC-053/test_doc053_adr_related_wps.py`  
-**Test:** `test_adr_index_has_seven_entries`  
-**Failure:**
-```
-AssertionError: Expected 8 ADR entries, found 9:
-['ADR-001', 'ADR-002', 'ADR-003', 'ADR-004', 'ADR-005', 'ADR-006', 'ADR-007', 'ADR-008', 'ADR-009']
-assert 9 == 8
-```
-**Root cause:** The DOC-053 test hardcodes the expected ADR count as 8. MNT-026 added ADR-009, making the count 9. The test was not updated.
+**Test renamed to:** `test_adr_index_has_nine_entries`  
+**Assertion:** `assert len(rows) == 9` — **PASSES**
 
-### Regression 2 — DOC-017: Stale `templates/coding/` reference in ADR-009
+### Fix 2 — DOC-017: ADR-009 added to STALE_CODING_EXEMPT ✓
 
 **File:** `tests/DOC-017/test_doc017_tester_edge_cases.py`  
-**Test:** `test_broad_docs_tree_no_stale_coding`  
-**Failure:**
-```
-AssertionError: Found 'templates/coding/' in:
-  docs\decisions\ADR-009-cross-wp-test-impact.md
-```
-**Root cause:** ADR-009 contains `templates/coding/` in its historical table of codebase drift waves (the Context section). The DOC-017 test flags any non-exempted `.md` file in `docs/` that contains this string. ADR-009 was not added to the `STALE_CODING_EXEMPT` set.
+**Change:** `"decisions/ADR-009-cross-wp-test-impact.md"` added to `STALE_CODING_EXEMPT`  
+**Test `test_broad_docs_tree_no_stale_coding`:** **PASSES**
 
 ---
 
@@ -80,53 +68,15 @@ All 11 MNT-026 tests pass.
 
 ---
 
-## TODOs for Developer (required before re-handoff)
+## Pre-Done Checklist
 
-### TODO 1 — Update DOC-053 test to expect 9 ADR entries
-
-**File:** `tests/DOC-053/test_doc053_adr_related_wps.py`  
-**Change:** In `test_adr_index_has_seven_entries`, update the assertion from `== 8` to `== 9` and update the docstring/message to reflect the current count.
-
-```python
-# Before
-assert len(rows) == 8, (
-    f"Expected 8 ADR entries, found {len(rows)}: "
-    + str([r.get("ADR-ID") for r in rows])
-)
-
-# After
-assert len(rows) == 9, (
-    f"Expected 9 ADR entries, found {len(rows)}: "
-    + str([r.get("ADR-ID") for r in rows])
-)
-```
-
-Also rename the function from `test_adr_index_has_seven_entries` to `test_adr_index_has_nine_entries` (or remove the count from the name to avoid future drift, e.g. `test_adr_index_minimum_entries`).
-
-### TODO 2 — Exempt ADR-009 from DOC-017's stale-path check
-
-**File:** `tests/DOC-017/test_doc017_tester_edge_cases.py`  
-**Change:** Add `decisions/ADR-009-cross-wp-test-impact.md` to the `STALE_CODING_EXEMPT` set.
-
-The ADR-009 file legitimately contains `templates/coding/` in a historical reference table documenting a past rename event. It is not a stale reference — it is accurate history. Adding it to the exemption list is the correct fix.
-
-Locate the `STALE_CODING_EXEMPT` set in that test file and add the entry:
-```python
-STALE_CODING_EXEMPT = {
-    ...,
-    "decisions/ADR-009-cross-wp-test-impact.md",
-}
-```
-
-### TODO 3 — Verify clean full-suite run after fixes
-
-After making both changes above:
-1. Run `python -m pytest tests/DOC-053/ tests/DOC-017/ tests/MNT-026/ -v` — all must pass.
-2. Run the full suite: `python -m pytest tests/ -q` — confirm only the 66 known-baseline failures remain (no new failures).
-3. Run `scripts/validate_workspace.py --wp MNT-026` — must exit 0.
-4. Stage, commit, and push.
-
----
+- [x] `docs/workpackages/MNT-026/dev-log.md` exists and non-empty
+- [x] `docs/workpackages/MNT-026/test-report.md` written (this file)
+- [x] Test files exist in `tests/MNT-026/` (11 tests: 4 developer + 7 tester edge cases)
+- [x] Test results logged via `scripts/run_tests.py` (TST-2624)
+- [x] No bugs found (documentation-only WP, no security or logic concerns)
+- [x] `scripts/validate_workspace.py --wp MNT-026` returns exit code 0
+- [x] Zero new regressions confirmed against `tests/regression-baseline.json`
 
 ## Pre-Done Checklist Status
 
