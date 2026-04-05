@@ -63,6 +63,7 @@ Templates (bundled inside Launcher)
 │   │   ├── ADR-006-defer-code-signing.md
 │   │   ├── ADR-007-csv-to-jsonl-migration.md
 │   │   ├── ADR-008-tests-track-code.md
+│   │   ├── ADR-009-cross-wp-test-impact.md
 │   │   ├── ADR-TEMPLATE.md
 │   │   └── index.jsonl
 │   ├── maintenance/
@@ -853,6 +854,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── MNT-025/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── MNT-026/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1402,6 +1406,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-023/
 │   ├── MNT-024/
 │   ├── MNT-025/
+│   ├── MNT-026/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
