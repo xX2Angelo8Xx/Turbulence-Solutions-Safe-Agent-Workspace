@@ -98,6 +98,16 @@ Key workpackages: GUI-008, GUI-009, GUI-010, INS-009, INS-010, INS-011.
 
 ---
 
+## Platform Support Status
+
+| Platform | Status | CI Tested | Installer Built | Notes |
+|----------|--------|-----------|-----------------|-------|
+| Windows | Active | Yes | Yes (.exe) | Primary development and release platform |
+| macOS | Deferred | No | No | Source code preserved; CI and installer disabled until Windows reaches stable v4.0 |
+| Linux | Deferred | No | No | Source code preserved; CI and installer disabled until Windows reaches stable v4.0 |
+
+---
+
 ## Out of Scope
 
 - Cloud sync or remote storage

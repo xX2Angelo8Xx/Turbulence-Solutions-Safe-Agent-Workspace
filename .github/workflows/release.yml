@@ -105,7 +105,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -208,81 +208,8 @@ jobs:
           name: windows-installer
           path: src/installer/windows/Output/AgentEnvironmentLauncher-Setup.exe
 
-  macos-arm-build:
-    needs: [validate-version, run-tests]
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install -e ".[dev]"
-
-      - name: Build DMG
-        run: |
-          chmod +x src/installer/macos/build_dmg.sh
-          src/installer/macos/build_dmg.sh arm64
-
-      - name: Verify Code Signing
-        run: |
-          codesign --verify "dist/launcher/launcher" && echo "Pre-bundle binary: OK"
-          codesign --verify --deep dist/AgentEnvironmentLauncher.app/Contents/MacOS/_internal/Python.framework && echo "Python.framework: OK"
-          codesign --verify dist/AgentEnvironmentLauncher.app && echo "Code signing verification passed"
-
-      - name: Quarantine Simulation (diagnostic)
-        run: |
-          # Simulate what happens when a user downloads via Safari/Chrome.
-          # The quarantine attribute triggers Gatekeeper assessment.
-          echo "--- Simulating download quarantine flag ---"
-          xattr -w com.apple.quarantine "0083;66a1b2c3;Safari;D1234567-89AB-CDEF-0123-456789ABCDEF" dist/AgentEnvironmentLauncher.app
-          echo "--- spctl assessment (ad-hoc will be rejected — this is expected without Developer ID) ---"
-          spctl --assess --type execute --verbose dist/AgentEnvironmentLauncher.app 2>&1 || true
-          echo "--- codesign still valid after quarantine ---"
-          codesign --verify --verbose dist/AgentEnvironmentLauncher.app && echo "Bundle signature intact after quarantine: OK"
-          echo "--- Removing quarantine for DMG packaging ---"
-          xattr -cr dist/AgentEnvironmentLauncher.app
-          echo "Quarantine simulation complete — ad-hoc apps require manual workaround (xattr -cr) on user machines"
-
-      - name: Upload macOS ARM DMG
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-arm-dmg
-          path: dist/*.dmg
-
-  linux-build:
-    needs: [validate-version, run-tests]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install -e ".[dev]"
-
-      - name: Install libfuse2
-        run: sudo apt-get update && sudo apt-get install -y libfuse2
-
-      - name: Build AppImage
-        run: |
-          chmod +x src/installer/linux/build_appimage.sh
-          src/installer/linux/build_appimage.sh x86_64
-
-      - name: Upload Linux AppImage
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-appimage
-          path: dist/*.AppImage
-
   release:
-    needs: [windows-build, macos-arm-build, linux-build]
+    needs: [windows-build]
     runs-on: ubuntu-latest
     permissions:
       contents: write

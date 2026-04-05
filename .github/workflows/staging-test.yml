@@ -88,40 +88,8 @@ jobs:
               sys.exit(1)
           print("Template manifest verified")
 
-  smoke-test-ubuntu:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install -e ".[dev]"
-
-      - name: Run full test suite
-        run: python -m pytest tests/ -v --tb=short
-
-  smoke-test-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install -e ".[dev]"
-
-      - name: Run full test suite
-        run: python -m pytest tests/ -v --tb=short
-
   staging-summary:
-    needs: [smoke-test-windows, smoke-test-ubuntu, smoke-test-macos]
+    needs: [smoke-test-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Staging verification complete

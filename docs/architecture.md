@@ -1562,6 +1562,8 @@ All rules and workflows are documented in [work-rules/index.md](work-rules/index
 
 ## Development Setup
 
+> **CI/CD scope note:** CI/CD currently targets Windows only (see ADR-010). macOS and Linux workflows are preserved but disabled.
+
 Prerequisites:
 - Python 3.11+
 - VS Code with GitHub Copilot

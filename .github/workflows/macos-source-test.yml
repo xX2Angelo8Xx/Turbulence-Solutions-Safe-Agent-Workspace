@@ -14,6 +14,8 @@ on:
 
 jobs:
   macos-source-install:
+    # Disabled per ADR-010: Windows-only CI until v4.0 stable
+    if: false
     runs-on: macos-14
 
     steps:
