@@ -117,6 +117,8 @@ def test_verify_calls_python_directly_not_cmd_exe(tmp_path):
 
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     mock_result = MagicMock()
     mock_result.returncode = 0
@@ -151,6 +153,8 @@ def test_verify_success_valid_config(tmp_path):
 
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     mock_result = MagicMock()
     mock_result.returncode = 0
@@ -233,6 +237,8 @@ def test_verify_timeout_says_30_seconds(tmp_path):
 
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     with patch.object(sc, "read_python_path", return_value=fake_python), \
          patch.object(sc, "get_shim_dir", return_value=tmp_path), \
@@ -259,6 +265,8 @@ def test_verify_handles_os_error(tmp_path):
 
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     with patch.object(sc, "read_python_path", return_value=fake_python), \
          patch.object(sc, "get_shim_dir", return_value=tmp_path), \
@@ -285,6 +293,8 @@ def test_verify_path_with_spaces_and_parens(tmp_path):
 
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     mock_result = MagicMock()
     mock_result.returncode = 0

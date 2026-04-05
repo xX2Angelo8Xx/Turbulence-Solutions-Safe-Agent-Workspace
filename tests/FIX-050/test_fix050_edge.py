@@ -159,6 +159,8 @@ def test_verify_ts_python_passes_stdin_devnull(tmp_path):
     fake_python.write_text("fake")
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     mock_result = MagicMock()
     mock_result.returncode = 0
@@ -189,6 +191,8 @@ def test_verify_ts_python_passes_timeout_30(tmp_path):
     fake_python.write_text("fake")
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     mock_result = MagicMock()
     mock_result.returncode = 0
@@ -219,6 +223,8 @@ def test_verify_ts_python_nonzero_exit_code_in_message(tmp_path):
     fake_python.write_text("fake")
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     for code in [1, 2, 42, 127, 255]:
         mock_result = MagicMock()
@@ -248,6 +254,8 @@ def test_verify_ts_python_file_not_found_after_precheck(tmp_path):
     fake_python.write_text("fake")
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     with patch.object(sc, "read_python_path", return_value=fake_python), \
          patch.object(sc, "get_shim_dir", return_value=tmp_path), \
@@ -330,6 +338,8 @@ def test_verify_ts_python_strips_multiple_trailing_newlines(tmp_path):
     fake_python.write_text("fake")
     fake_shim = tmp_path / "ts-python.cmd"
     fake_shim.write_text("@echo off\n")
+    fake_shim_unix = tmp_path / "ts-python"
+    fake_shim_unix.write_text("#!/bin/sh\n")
 
     mock_result = MagicMock()
     mock_result.returncode = 0
