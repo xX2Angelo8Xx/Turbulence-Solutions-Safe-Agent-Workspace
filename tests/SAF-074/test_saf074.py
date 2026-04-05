@@ -4,10 +4,16 @@ Tests invoke the PowerShell script via subprocess on Windows.
 BUG-176: Bash/PS1 fallback hooks share same vulnerabilities as Python gate.
 """
 import json
+import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
+
+pytestmark = pytest.mark.skipif(
+    shutil.which("powershell") is None and shutil.which("pwsh") is None,
+    reason="PowerShell not available"
+)
 
 _SCRIPT = Path(__file__).resolve().parents[2] / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "require-approval.ps1"
 _WS_ROOT = Path(__file__).resolve().parents[2]
