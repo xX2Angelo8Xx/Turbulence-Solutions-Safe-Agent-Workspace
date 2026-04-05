@@ -1,12 +1,20 @@
 # MNT-024 Test Report — Reset Regression Baseline and Verify CI Green
 
-**Verdict: FAIL**
+**Verdict: PASS** *(Iteration 2 — 2026-04-05)*
 
 ---
 
 ## Summary
 
-The Developer's work is high quality: the baseline was reduced from 147 generic entries to 72 specific, well-documented entries, and all code changes are correct. However, **2 pre-existing flaky tests are not covered by the baseline**, which means CI would flag them as regressions on any run where they misbehave. The baseline must cover all known failures before this WP can be marked Done.
+**Iteration 1 result**: FAIL — 2 pre-existing flaky tests were not covered by the baseline.
+
+**Iteration 2 result**: PASS — Developer added both missing entries; baseline now has 74 entries covering all known failures. Full suite shows 0 new regressions.
+
+---
+
+### Iteration 1 Summary
+
+The Developer's work was high quality: the baseline was reduced from 147 generic entries to 72 specific, well-documented entries, and all code changes were correct. However, **2 pre-existing flaky tests were not covered by the baseline**, which meant CI would flag them as regressions on any run where they misbehaved.
 
 ---
 
@@ -14,11 +22,12 @@ The Developer's work is high quality: the baseline was reduced from 147 generic 
 
 | Run | Total Failures | New (non-baseline) | Notes |
 |-----|---------------|--------------------|-------|
-| Run 1 (tester) | 72 | 1 — MNT-015 concurrent threads | Flaky; passes in isolation |
-| Run 2 (run_tests.py --full-suite) | 68 | 0 | MNT-015 did not fire |
-| Run 3 (tester) | 68 | 1 — INS-019 test_verify_shim_existence_only_check | Flaky; passes in isolation |
+| Run 1 (tester, Iter 1) | 72 | 1 — MNT-015 concurrent threads | Flaky; passes in isolation |
+| Run 2 (run_tests.py --full-suite, Iter 1) | 68 | 0 | MNT-015 did not fire |
+| Run 3 (tester, Iter 1) | 68 | 1 — INS-019 test_verify_shim_existence_only_check | Flaky; passes in isolation |
+| Run 4 (run_tests.py --full-suite, Iter 2) | **71** | **0** | All failures in baseline; _count=74 ✅ |
 
-All 8 MNT-024 targeted tests pass:
+All 8 MNT-024 targeted tests pass (Iteration 2):
 
 ```
 tests/MNT-024/test_mnt024_baseline_reset.py::test_baseline_file_exists          PASSED
@@ -29,10 +38,10 @@ tests/MNT-024/test_mnt024_baseline_reset.py::test_baseline_updated_after_previou
 tests/MNT-024/test_mnt024_baseline_reset.py::test_all_entries_have_reason       PASSED
 tests/MNT-024/test_mnt024_baseline_reset.py::test_no_entry_uses_generic_reason  PASSED
 tests/MNT-024/test_mnt024_baseline_reset.py::test_baseline_is_valid_json        PASSED
-8 passed in 0.20s
+8 passed in 0.22s
 ```
 
-Test results logged: TST-2607 (targeted suite, Pass), TST-2608 (targeted suite re-run, Pass), TST-2609 (full suite, Fail).
+Test results logged: TST-2607 (Iter1 targeted, Pass), TST-2608 (Iter1 targeted re-run, Pass), TST-2609 (Iter1 full suite, Fail), TST-2612 (Iter2 full suite via run_tests.py, Fail → all baseline), TST-2613 (Iter2 targeted, Pass).
 
 ---
 
@@ -42,7 +51,7 @@ Test results logged: TST-2607 (targeted suite, Pass), TST-2608 (targeted suite r
 |-------|--------|
 | `dev-log.md` exists and non-empty | ✅ Pass |
 | `tests/MNT-024/` exists with 8 tests | ✅ Pass |
-| `_count` (72) == actual entry count | ✅ Pass |
+| `_count` (74) == actual entry count (74) | ✅ Pass |
 | `_count` < 100 (was 147) | ✅ Pass |
 | All entries have specific, non-generic reasons | ✅ Pass |
 | No "pre-existing failure" generic reasons remain | ✅ Pass |
@@ -50,7 +59,7 @@ Test results logged: TST-2607 (targeted suite, Pass), TST-2608 (targeted suite r
 | No `tmp_` files in `docs/workpackages/MNT-024/` | ✅ Pass |
 | Baseline structured correctly (valid JSON, 3 top-level keys) | ✅ Pass |
 | All deterministic failures covered by baseline | ✅ Pass |
-| **All flaky failures covered by baseline** | ❌ **FAIL — 2 missing** |
+| **All flaky failures covered by baseline** | ✅ **PASS (Iteration 2)** |
 
 ---
 
@@ -95,7 +104,19 @@ The 2 uncovered flaky failures are **not caused by MNT-024**. They are pre-exist
 
 ---
 
-## ❌ TODOs for Developer (must fix before Tester re-review)
+## ✅ Resolution (Iteration 2)
+
+Both TODOs were completed by the Developer:
+
+1. `tests.INS-019.test_ins019_edge_cases.test_verify_shim_existence_only_check` — added with correct reason (sys.path flaky)
+2. `tests.MNT-015.test_mnt015_tester_edge_cases.test_locked_next_id_concurrent_threads` — added with correct reason (threading race)
+3. `_count` updated from 72 → 74; `_updated` corrected to "2026-04-05"
+
+Verified: `_count` (74) == actual `known_failures` entries (74). Full suite run confirms 0 new regressions.
+
+---
+
+## ❌ TODOs for Developer (Iteration 1 — RESOLVED)
 
 ### TODO 1 — Add INS-019 flaky test to baseline
 
