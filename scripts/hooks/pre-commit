@@ -39,4 +39,13 @@ if [ $STATUS -ne 0 ]; then
     exit 1
 fi
 
+# Advisory: cross-WP test impact check (exit 0 always — never blocks commit)
+IMPACT_SCRIPT="$REPO_ROOT/scripts/check_test_impact.py"
+if [ -f "$IMPACT_SCRIPT" ]; then
+    STAGED_SRC=$(git diff --cached --name-only -- "src/" 2>/dev/null | tr '\n' ' ')
+    if [ -n "$STAGED_SRC" ]; then
+        "$PYTHON" "$IMPACT_SCRIPT" $STAGED_SRC
+    fi
+fi
+
 exit 0

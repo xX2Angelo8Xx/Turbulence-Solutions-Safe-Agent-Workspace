@@ -418,3 +418,54 @@ No dedicated script exists. Edit the file directly:
 ```
 
 **Never leave a stale entry.** An entry for a fixed bug masks future regressions in the same test. Removing it promptly is a quality gate, not an optional cleanup step.
+
+---
+
+## Cross-WP Test Impact — Developer Responsibility
+
+> **ADR-008** (`docs/decisions/ADR-008-tests-track-code.md`) established that tests must track the current codebase state. This section defines the **pre-commit mechanism** that surfaces cross-WP impact before a commit is finalized.
+
+### Mechanism
+
+`scripts/check_test_impact.py` is called automatically by the pre-commit hook (`scripts/hooks/pre-commit`) after `validate_workspace.py` succeeds. It:
+
+1. Receives the list of staged `.py` files under `src/` from `git diff --cached --name-only -- src/`.
+2. For each changed file, derives module search terms (dotted import path, slash path, bare module name).
+3. Scans every `.py` file under `tests/` for:
+   - Import references (`import launcher.core.shim_config`, `from launcher.core.shim_config import`)
+   - `patch()` / `patch.object()` targets referencing the module path (e.g., `patch("launcher.core.shim_config.subprocess.run")`)
+   - String references to the module name (e.g., `"shim_config"`)
+4. Groups results by WP directory and prints advisory warnings to stderr.
+5. **Always exits 0** — the check is advisory and never blocks a commit.
+
+### Developer Obligation
+
+**When the pre-commit hook flags external tests, the developer MUST review each flagged test and update any assertions whose expected values have changed — in the same commit as the source change.**
+
+This is not optional. Deferring test updates is the root cause of the drift documented in ADR-008. The pre-commit hook surfaces the impact; acting on it is the developer's responsibility.
+
+### Invoking Manually
+
+```powershell
+# Check impact of staged src/ files
+.venv\Scripts\python scripts/check_test_impact.py src/launcher/core/shim_config.py src/launcher/core/vscode.py
+```
+
+### Output Format
+
+When impacted tests are found, the script prints to stderr:
+
+```
+============================================================
+ADVISORY: Cross-WP test impact detected
+The following test files in OTHER workpackages reference
+modules you are changing. Review them and update assertions
+in this commit if the behavior changes (see ADR-008).
+============================================================
+
+  [DOC-042]
+    tests\DOC-042\test_doc042_shim_config.py
+      ← changes in src/launcher/core/shim_config.py
+```
+
+When no impacted tests are found, the script produces no output.
