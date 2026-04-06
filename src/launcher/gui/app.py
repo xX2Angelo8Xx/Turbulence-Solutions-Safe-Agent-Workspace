@@ -23,7 +23,7 @@ from launcher.core.workspace_upgrader import check_workspace, upgrade_workspace
 from launcher.core.shim_config import read_python_path, verify_ts_python, write_python_path, ensure_python_path_valid
 from launcher.core.user_settings import get_setting, set_setting
 from launcher.core.vscode import find_vscode, open_in_vscode
-from launcher.gui.components import make_browse_row, make_label_entry_row
+from launcher.gui.components import make_label_entry_row
 from launcher.gui.validation import (
     check_duplicate_folder,
     validate_destination_path,
@@ -31,7 +31,7 @@ from launcher.gui.validation import (
 )
 
 _WINDOW_WIDTH: int = 580
-_WINDOW_HEIGHT: int = 630
+_WINDOW_HEIGHT: int = 660
 
 # Label used for the disabled "coming soon" entry in the Project Type dropdown.
 # CTkOptionMenu has no native disabled-item support, so we guard selection in
@@ -209,14 +209,24 @@ class App:
             row=3, column=1, columnspan=2, padx=(0, 20), pady=12, sticky="ew"
         )
 
-        # Destination path label + entry + browse button
-        self.destination_entry = make_browse_row(
-            self._window,
-            label_text="Destination:",
-            browse_command=self._browse_destination,
-            placeholder="Select destination folder",
-            row=4,
+        # Destination path label + entry + browse button (browse_button stored for GUI-034 disable/enable)
+        ctk.CTkLabel(
+            self._window, text="Destination:", anchor="w", text_color=COLOR_TEXT
+        ).grid(row=4, column=0, padx=(20, 8), pady=12, sticky="w")
+        self.destination_entry = ctk.CTkEntry(
+            self._window, placeholder_text="Select destination folder", text_color=COLOR_TEXT
         )
+        self.destination_entry.grid(row=4, column=1, padx=(0, 8), pady=12, sticky="ew")
+        self.browse_button = ctk.CTkButton(
+            self._window,
+            text="Browse",
+            width=80,
+            command=self._browse_destination,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
+            text_color=COLOR_TEXT,
+        )
+        self.browse_button.grid(row=4, column=2, padx=(0, 20), pady=12)
 
         # Inline error label for destination validation feedback
         self.destination_error_label = ctk.CTkLabel(
@@ -271,8 +281,18 @@ class App:
             height=40,
         )
         self.create_button.grid(
-            row=8, column=0, columnspan=3, padx=20, pady=(20, 24), sticky="ew"
+            row=8, column=0, columnspan=3, padx=20, pady=(20, 8), sticky="ew"
         )
+
+        # Progress bar (GUI-034) -- hidden by default, shown during project creation.
+        self.create_progress_bar = ctk.CTkProgressBar(
+            self._window,
+            mode="indeterminate",
+        )
+        self.create_progress_bar.grid(
+            row=9, column=0, columnspan=3, padx=20, pady=(0, 16), sticky="ew"
+        )
+        self.create_progress_bar.grid_remove()
 
         # Blocking attempts counter section (GUI-019) -- toggle switch + threshold entry.
         # CTkSwitch is used so this does not affect the Open in VS Code CTkCheckBox count.
@@ -287,14 +307,14 @@ class App:
             button_color="#4AA8D4",
         )
         self.counter_enabled_checkbox.grid(
-            row=9, column=0, columnspan=2, padx=20, pady=(10, 2), sticky="w"
+            row=10, column=0, columnspan=2, padx=20, pady=(10, 2), sticky="w"
         )
         ctk.CTkLabel(
             self._window,
             text="Block threshold:",
             anchor="w",
             text_color=COLOR_TEXT,
-        ).grid(row=10, column=0, padx=(20, 8), pady=(0, 4), sticky="w")
+        ).grid(row=11, column=0, padx=(20, 8), pady=(0, 4), sticky="w")
         self.counter_threshold_var = ctk.StringVar(value="20")
         self.counter_threshold_entry = ctk.CTkEntry(
             self._window,
@@ -302,7 +322,7 @@ class App:
             width=80,
         )
         self.counter_threshold_entry.grid(
-            row=10, column=1, padx=(0, 8), pady=(0, 4), sticky="w"
+            row=11, column=1, padx=(0, 8), pady=(0, 4), sticky="w"
         )
 
         # Check for Updates button (GUI-010) -- secondary text-link style button.
@@ -317,7 +337,7 @@ class App:
             border_width=0,
         )
         self.check_updates_button.grid(
-            row=11, column=0, columnspan=2, padx=20, pady=(0, 4), sticky="w"
+            row=12, column=0, columnspan=2, padx=20, pady=(0, 4), sticky="w"
         )
 
         # Check Workspace Health button -- surfaces security-critical file drift (Phase 1).
@@ -332,7 +352,7 @@ class App:
             border_width=0,
         )
         self.workspace_health_button.grid(
-            row=11, column=2, padx=(0, 20), pady=(0, 4), sticky="e"
+            row=12, column=2, padx=(0, 20), pady=(0, 4), sticky="e"
         )
 
         # Update notification banner (GUI-009) -- hidden until an update is detected.
@@ -344,7 +364,7 @@ class App:
             height=28,
         )
         self.update_banner.grid(
-            row=12, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+            row=13, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
         )
         self.update_banner.grid_remove()
 
@@ -359,7 +379,7 @@ class App:
             height=32,
         )
         self.download_install_button.grid(
-            row=13, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
+            row=14, column=0, columnspan=3, padx=20, pady=(0, 8), sticky="ew"
         )
         self.download_install_button.grid_remove()
 
@@ -499,27 +519,69 @@ class App:
 
         # Read include_readmes from GUI checkbox (GUI-022).
         include_readmes = self.include_readmes_var.get()
+        # Capture open_vscode flag before disabling the checkbox (GUI-034).
+        open_vscode = self.open_in_vscode_var.get()
 
-        try:
-            created_path = create_project(
-                template_path,
-                Path(destination_str),
-                folder_name,
-                counter_enabled=counter_enabled,
-                counter_threshold=counter_threshold,
-                include_readmes=include_readmes,
-            )
-        except Exception as exc:
-            messagebox.showerror("Project Creation Failed", str(exc))
+        # GUI-034: disable UI and animate progress bar while creation runs in background.
+        self._set_creation_ui_state(disabled=True)
+
+        def _create() -> None:
+            try:
+                created_path = create_project(
+                    template_path,
+                    Path(destination_str),
+                    folder_name,
+                    counter_enabled=counter_enabled,
+                    counter_threshold=counter_threshold,
+                    include_readmes=include_readmes,
+                )
+                self._window.after(
+                    0,
+                    lambda: self._on_creation_complete(True, "", created_path, folder_name, open_vscode),
+                )
+            except Exception as exc:  # noqa: BLE001
+                error_str = str(exc)
+                self._window.after(
+                    0,
+                    lambda: self._on_creation_complete(False, error_str, None, folder_name, open_vscode),
+                )
+
+        threading.Thread(target=_create, daemon=True).start()
+
+    def _set_creation_ui_state(self, disabled: bool) -> None:
+        """Disable or re-enable widgets while project creation runs (GUI-034)."""
+        state = "disabled" if disabled else "normal"
+        self.create_button.configure(state=state)
+        self.project_name_entry.configure(state=state)
+        self.destination_entry.configure(state=state)
+        self.browse_button.configure(state=state)
+        self.project_type_dropdown.configure(state=state)
+        if disabled:
+            self.create_progress_bar.grid()
+            self.create_progress_bar.start()
+        else:
+            self.create_progress_bar.stop()
+            self.create_progress_bar.grid_remove()
+
+    def _on_creation_complete(
+        self,
+        success: bool,
+        error_msg: str,
+        created_path: "Path | None",
+        folder_name: str,
+        open_vscode: bool,
+    ) -> None:
+        """Called on the main thread when background project creation finishes (GUI-034)."""
+        self._set_creation_ui_state(disabled=False)
+        if not success:
+            messagebox.showerror("Project Creation Failed", error_msg)
             return
-
         messagebox.showinfo(
             "Project Created",
             f'Project "SAE-{folder_name}" created successfully at:\n{created_path}',
         )
-
-        # Open the new project in VS Code if the checkbox is checked (GUI-006).
-        if self.open_in_vscode_var.get():
+        # Open the new project in VS Code if the checkbox was checked (GUI-006).
+        if open_vscode:
             open_in_vscode(created_path)
 
     def _run_update_check(self) -> None:

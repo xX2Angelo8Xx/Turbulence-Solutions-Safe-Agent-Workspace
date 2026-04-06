@@ -40,10 +40,7 @@ def _make_app() -> object:
         mock_ctk.CTkSwitch.return_value = mock_widget
         mock_ctk.CTkImage.return_value = mock_widget
 
-        with (
-            patch("launcher.gui.app.make_label_entry_row", return_value=mock_widget),
-            patch("launcher.gui.app.make_browse_row", return_value=mock_widget),
-        ):
+        with patch("launcher.gui.app.make_label_entry_row", return_value=mock_widget):
             app = app_mod.App.__new__(app_mod.App)
             app._window = mock_window
             app._latest_version = "0.0.0"
