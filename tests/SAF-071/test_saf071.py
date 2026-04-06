@@ -62,11 +62,15 @@ def test_verify_file_integrity_returns_true():
     assert mod.verify_file_integrity() is True
 
 
-def test_settings_hash_matches_actual_file():
-    """_KNOWN_GOOD_SETTINGS_HASH must equal SHA256 of the actual settings.json."""
+def test_settings_hash_absent_from_security_gate():
+    """_KNOWN_GOOD_SETTINGS_HASH must NOT exist in security_gate after FIX-115.
+    Its presence would indicate the bug fix was not applied."""
     mod = _load_security_gate()
-    actual_hash = _sha256_file(SETTINGS_PATH)
-    assert mod._KNOWN_GOOD_SETTINGS_HASH == actual_hash
+    assert not hasattr(mod, "_KNOWN_GOOD_SETTINGS_HASH"), (
+        "_KNOWN_GOOD_SETTINGS_HASH is still present in security_gate.py. "
+        "FIX-115 removes it to prevent BUG-194: VS Code settings migrations "
+        "breaking the integrity check."
+    )
 
 
 def test_gate_self_hash_matches_actual_file():
@@ -78,16 +82,16 @@ def test_gate_self_hash_matches_actual_file():
 
 
 def test_hash_constants_are_64_char_hex():
-    """Both hash constants must be exactly 64 lowercase hex characters."""
+    """_KNOWN_GOOD_GATE_HASH must be exactly 64 lowercase hex characters.
+    _KNOWN_GOOD_SETTINGS_HASH must be absent (removed by FIX-115)."""
     mod = _load_security_gate()
     hex_re = re.compile(r"^[0-9a-f]{64}$")
-    assert hex_re.match(mod._KNOWN_GOOD_SETTINGS_HASH), (
-        f"_KNOWN_GOOD_SETTINGS_HASH is not a valid 64-char hex string: "
-        f"{mod._KNOWN_GOOD_SETTINGS_HASH!r}"
-    )
     assert hex_re.match(mod._KNOWN_GOOD_GATE_HASH), (
         f"_KNOWN_GOOD_GATE_HASH is not a valid 64-char hex string: "
         f"{mod._KNOWN_GOOD_GATE_HASH!r}"
+    )
+    assert not hasattr(mod, "_KNOWN_GOOD_SETTINGS_HASH"), (
+        "_KNOWN_GOOD_SETTINGS_HASH must NOT exist after FIX-115"
     )
 
 
@@ -96,12 +100,17 @@ def test_hash_constants_are_64_char_hex():
 # ---------------------------------------------------------------------------
 
 def test_two_hash_constants_are_distinct():
-    """_KNOWN_GOOD_SETTINGS_HASH and _KNOWN_GOOD_GATE_HASH protect different
-    files and must never collide; a collision would indicate one file was not
-    properly hashed."""
+    """After FIX-115, only _KNOWN_GOOD_GATE_HASH remains.
+    Verify it is present and non-zero (a degenerate all-zero hash
+    would indicate update_hashes.py was not run)."""
     mod = _load_security_gate()
-    assert mod._KNOWN_GOOD_SETTINGS_HASH != mod._KNOWN_GOOD_GATE_HASH, (
-        "Both hash constants are identical — at least one was not updated correctly."
+    assert mod._KNOWN_GOOD_GATE_HASH != "0" * 64, (
+        "_KNOWN_GOOD_GATE_HASH is the all-zeros placeholder — "
+        "run update_hashes.py to embed the real hash."
+    )
+    # _KNOWN_GOOD_SETTINGS_HASH must be absent (FIX-115)
+    assert not hasattr(mod, "_KNOWN_GOOD_SETTINGS_HASH"), (
+        "_KNOWN_GOOD_SETTINGS_HASH must not exist after FIX-115."
     )
 
 
@@ -124,14 +133,11 @@ def test_gate_hash_constant_is_not_placeholder():
 
 
 def test_settings_hash_constant_is_not_placeholder():
-    """_KNOWN_GOOD_SETTINGS_HASH must not be the old stub value (all-zeros or
-    all-same-digit) that would indicate an incomplete hash update."""
+    """After FIX-115, _KNOWN_GOOD_SETTINGS_HASH must not exist.
+    Verify it is absent from the module (not a placeholder, not present at all)."""
     mod = _load_security_gate()
-    # All-zeros is the canonical placeholder; all-same-char is a degenerate case
-    assert mod._KNOWN_GOOD_SETTINGS_HASH != "0" * 64
-    assert len(set(mod._KNOWN_GOOD_SETTINGS_HASH)) > 4, (
-        "_KNOWN_GOOD_SETTINGS_HASH looks like a stub/placeholder — too few unique "
-        f"hex digits: {mod._KNOWN_GOOD_SETTINGS_HASH!r}"
+    assert not hasattr(mod, "_KNOWN_GOOD_SETTINGS_HASH"), (
+        "_KNOWN_GOOD_SETTINGS_HASH is present — it was removed by FIX-115."
     )
 
 

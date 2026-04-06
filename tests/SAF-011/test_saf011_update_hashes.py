@@ -158,18 +158,17 @@ def test_canonical_hash_independent_of_gate_hash_value():
 
 
 # ===========================================================================
-# TST-632: _patch_hash replaces settings hash correctly
+# TST-632: _patch_hash replaces gate hash correctly (FIX-115: settings hash removed)
 # ===========================================================================
 
 def test_patch_hash_settings():
-    old_hash = "1" * 64
-    new_hash = "2" * 64
-    content = (
-        b'_KNOWN_GOOD_SETTINGS_HASH: str = "' + old_hash.encode() + b'"\n'
+    # TST-632 / FIX-115 - _SETTINGS_HASH_RE was removed from update_hashes.py.
+    # Verify the attribute is absent and update_hashes no longer has a
+    # settings hash pattern.
+    assert not hasattr(uh, "_SETTINGS_HASH_RE"), (
+        "_SETTINGS_HASH_RE must NOT exist in update_hashes.py after FIX-115. "
+        "Settings hash patching was removed to fix BUG-194."
     )
-    result = uh._patch_hash(content, uh._SETTINGS_HASH_RE, new_hash)
-    assert new_hash.encode() in result
-    assert old_hash.encode() not in result
 
 
 # ===========================================================================
@@ -188,13 +187,14 @@ def test_patch_hash_gate():
 
 
 # ===========================================================================
-# TST-634: _patch_hash raises ValueError when pattern not found
+# TST-634: _patch_hash raises ValueError when gate pattern not found
 # ===========================================================================
 
 def test_patch_hash_raises_when_pattern_missing():
+    # TST-634 - _patch_hash raises ValueError when the gate hash pattern is absent.
     content = b"no hash constant here\n"
     with pytest.raises(ValueError, match="Hash constant pattern not found"):
-        uh._patch_hash(content, uh._SETTINGS_HASH_RE, "a" * 64)
+        uh._patch_hash(content, uh._GATE_HASH_RE, "a" * 64)
 
 
 # ===========================================================================
@@ -202,7 +202,7 @@ def test_patch_hash_raises_when_pattern_missing():
 # ===========================================================================
 
 def test_full_update_on_real_files_integrity_passes(tmp_path):
-    # Make a temp copy of the scripts dir + settings to avoid mutating real files.
+    # Make a temp copy of the scripts dir to avoid mutating real files.
     temp_scripts = tmp_path / "scripts"
     temp_scripts.mkdir()
     # Copy gate and zone_classifier so import works
@@ -213,33 +213,25 @@ def test_full_update_on_real_files_integrity_passes(tmp_path):
     shutil.copy(_UPDATE_HASHES_PATH, temp_scripts / "update_hashes.py")
     # Construct workspace root structure
     workspace_root = tmp_path / "workspace"
-    vscode_dir = workspace_root / ".vscode"
-    vscode_dir.mkdir(parents=True)
     github_dir = workspace_root / ".github" / "hooks" / "scripts"
     github_dir.mkdir(parents=True)
-    shutil.copy(_SETTINGS_PATH, vscode_dir / "settings.json")
     shutil.copy(_GATE_PATH, github_dir / "security_gate.py")
     shutil.copy(zone_src, github_dir / "zone_classifier.py")
     update_script = github_dir / "update_hashes.py"
     shutil.copy(_UPDATE_HASHES_PATH, update_script)
 
-    # Corrupt both hashes so we know the script actually updates them.
+    # Corrupt the gate hash so we know the script actually updates it.
     gate_content = (github_dir / "security_gate.py").read_bytes()
-    corrupted = re.sub(
-        rb'(?<=_KNOWN_GOOD_SETTINGS_HASH: str = ")[0-9a-fA-F]{64}',
-        b"0" * 64,
-        gate_content,
-    )
     corrupted = re.sub(
         rb'(?<=_KNOWN_GOOD_GATE_HASH: str = ")[0-9a-fA-F]{64}',
         b"0" * 64,
-        corrupted,
+        gate_content,
     )
     (github_dir / "security_gate.py").write_bytes(corrupted)
 
     # Patch _resolve_paths in the module to point to our temp copies.
     def _mock_resolve_paths():
-        return (github_dir / "security_gate.py", vscode_dir / "settings.json")
+        return github_dir / "security_gate.py"
 
     # Re-import update_hashes from the temp location so __file__ is correct.
     spec = importlib.util.spec_from_file_location("update_hashes_tmp", update_script)
@@ -273,11 +265,8 @@ def test_full_update_on_real_files_integrity_passes(tmp_path):
 
 def test_update_is_idempotent(tmp_path):
     workspace_root = tmp_path / "workspace"
-    vscode_dir = workspace_root / ".vscode"
-    vscode_dir.mkdir(parents=True)
     github_dir = workspace_root / ".github" / "hooks" / "scripts"
     github_dir.mkdir(parents=True)
-    shutil.copy(_SETTINGS_PATH, vscode_dir / "settings.json")
     shutil.copy(_GATE_PATH, github_dir / "security_gate.py")
     zone_src = _SCRIPTS_DIR / "zone_classifier.py"
     shutil.copy(zone_src, github_dir / "zone_classifier.py")
@@ -289,7 +278,7 @@ def test_update_is_idempotent(tmp_path):
     spec.loader.exec_module(uh_i)
 
     def _mock_resolve_paths():
-        return (github_dir / "security_gate.py", vscode_dir / "settings.json")
+        return github_dir / "security_gate.py"
 
     uh_i._resolve_paths = _mock_resolve_paths
 
@@ -305,24 +294,25 @@ def test_update_is_idempotent(tmp_path):
 
 
 # ===========================================================================
-# TST-637: update_hashes exits with error when settings.json is missing
+# TST-637: update_hashes does NOT error when settings.json is missing (FIX-115)
 # ===========================================================================
 
-def test_update_error_missing_settings(tmp_path, capsys):
-    gate_path = tmp_path / "security_gate.py"
-    gate_path.write_bytes(_GATE_PATH.read_bytes())
-    missing_settings = tmp_path / "nonexistent" / "settings.json"
+def test_update_no_error_missing_settings(tmp_path, capsys):
+    # TST-637 / FIX-115 - settings.json is no longer required by update_hashes.
+    # Missing settings.json must NOT cause an error.
+    github_dir = tmp_path / ".github" / "hooks" / "scripts"
+    github_dir.mkdir(parents=True)
+    shutil.copy(_GATE_PATH, github_dir / "security_gate.py")
 
     def _mock_resolve_paths():
-        return (gate_path, missing_settings)
+        return github_dir / "security_gate.py"
 
     with patch.object(uh, "_resolve_paths", _mock_resolve_paths):
-        with pytest.raises(SystemExit) as exc_info:
-            uh.update_hashes()
-    assert exc_info.value.code == 1
+        # Should NOT raise SystemExit; settings.json is no longer checked
+        uh.update_hashes()
+
     captured = capsys.readouterr()
-    assert "settings.json" in captured.err
-    assert "ERROR" in captured.err
+    assert "updated successfully" in captured.out.lower()
 
 
 # ===========================================================================
@@ -330,12 +320,10 @@ def test_update_error_missing_settings(tmp_path, capsys):
 # ===========================================================================
 
 def test_update_error_missing_gate(tmp_path, capsys):
-    settings_path = tmp_path / "settings.json"
-    settings_path.write_bytes(_SETTINGS_PATH.read_bytes())
     missing_gate = tmp_path / "nonexistent" / "security_gate.py"
 
     def _mock_resolve_paths():
-        return (missing_gate, settings_path)
+        return missing_gate
 
     with patch.object(uh, "_resolve_paths", _mock_resolve_paths):
         with pytest.raises(SystemExit) as exc_info:
@@ -347,10 +335,13 @@ def test_update_error_missing_gate(tmp_path, capsys):
 
 
 # ===========================================================================
-# TST-639: Embedded hashes in real security_gate.py are 64 lowercase hex chars
+# TST-639: Gate hash in real security_gate.py is 64 lowercase hex chars (FIX-115)
 # ===========================================================================
 
 def test_embedded_hashes_are_64_lowercase_hex():
+    # TST-639 / FIX-115 - _KNOWN_GOOD_SETTINGS_HASH was removed; only
+    # _KNOWN_GOOD_GATE_HASH remains. Verify gate hash is 64 lowercase hex chars
+    # and that settings hash is absent.
     content = _GATE_PATH.read_text(encoding="utf-8")
     settings_match = re.search(
         r'_KNOWN_GOOD_SETTINGS_HASH: str = "([0-9a-f]{64})"', content
@@ -358,7 +349,9 @@ def test_embedded_hashes_are_64_lowercase_hex():
     gate_match = re.search(
         r'_KNOWN_GOOD_GATE_HASH: str = "([0-9a-f]{64})"', content
     )
-    assert settings_match, "_KNOWN_GOOD_SETTINGS_HASH not found or not 64 hex chars"
+    assert settings_match is None, (
+        "_KNOWN_GOOD_SETTINGS_HASH found in security_gate.py — FIX-115 should have removed it"
+    )
     assert gate_match, "_KNOWN_GOOD_GATE_HASH not found or not 64 hex chars"
 
 

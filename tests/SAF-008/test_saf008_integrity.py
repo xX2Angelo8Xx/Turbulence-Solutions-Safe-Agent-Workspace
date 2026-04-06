@@ -178,28 +178,20 @@ def test_verify_file_integrity_passes_with_good_hashes():
 
 
 # ===========================================================================
-# TST-453: verify_file_integrity - fails when settings.json is tampered
+# TST-453: verify_file_integrity - settings.json tamper does NOT fail (FIX-115)
 # ===========================================================================
 
-def test_verify_file_integrity_fails_on_settings_tamper(tmp_path, monkeypatch):
-    # TST-453 - tampered settings.json content causes False (protection test)
-    vscode_dir = tmp_path / ".vscode"
-    vscode_dir.mkdir()
-    real_settings = vscode_dir / "settings.json"
-    real_settings.write_bytes(b'{"chat.tools.global.autoApprove": false}')
-    settings_hash = hashlib.sha256(real_settings.read_bytes()).hexdigest()
-
-    def fake_verify():
-        try:
-            real_settings.write_bytes(b'{"chat.tools.global.autoApprove": true}')
-            s_hash = sg._compute_file_hash(str(real_settings))
-            if s_hash is None or s_hash != settings_hash:
-                return False
-            return True
-        except Exception:
-            return False
-
-    assert fake_verify() is False
+def test_verify_file_integrity_ignores_settings_tamper(monkeypatch):
+    # TST-453 / FIX-115 - settings.json changes must NOT fail the integrity
+    # check. VS Code auto-migrates settings keys; breaking on that would block
+    # all tool calls (BUG-194). Only security_gate.py hash is verified.
+    monkeypatch.setattr(sg, "_compute_gate_canonical_hash",
+                        lambda path: sg._KNOWN_GOOD_GATE_HASH)
+    result = sg.verify_file_integrity()
+    assert result is True, (
+        "verify_file_integrity() must return True regardless of settings.json state "
+        "(FIX-115: settings.json is no longer hash-checked)"
+    )
 
 
 # ===========================================================================
@@ -209,19 +201,14 @@ def test_verify_file_integrity_fails_on_settings_tamper(tmp_path, monkeypatch):
 def test_verify_file_integrity_fails_on_gate_tamper(tmp_path):
     # TST-454 - a gate file with injected code will not match its embedded
     # canonical hash (bypass-attempt test)
-    settings_content = b'{"autoApprove": false}'
-    settings_hash = hashlib.sha256(settings_content).hexdigest()
-
     original_gate_code = (
         b"# original security logic\n"
-        + b'_KNOWN_GOOD_SETTINGS_HASH: str = "' + settings_hash.encode() + b'"\n'
         + b'_KNOWN_GOOD_GATE_HASH: str = "' + b"0" * 64 + b'"\n'
     )
     canonical_original = hashlib.sha256(original_gate_code).hexdigest()
 
     tampered_gate_code = (
         b"# TAMPERED: removed security check\ndef verify(): return True\n"
-        + b'_KNOWN_GOOD_SETTINGS_HASH: str = "' + settings_hash.encode() + b'"\n'
         + b'_KNOWN_GOOD_GATE_HASH: str = "' + canonical_original.encode() + b'"\n'
     )
 
@@ -233,30 +220,29 @@ def test_verify_file_integrity_fails_on_gate_tamper(tmp_path):
 
 
 # ===========================================================================
-# TST-455: verify_file_integrity - fails when settings.json is missing
+# TST-455: verify_file_integrity - missing settings.json does NOT fail (FIX-115)
 # ===========================================================================
 
-def test_verify_file_integrity_fails_on_missing_settings(monkeypatch):
-    # TST-455 - missing settings.json causes False (fail-closed)
-    def fake_compute_file_hash(path: str):
-        if "settings.json" in path:
-            return None
-        return sg._compute_file_hash(path)
-
-    monkeypatch.setattr(sg, "_compute_file_hash", fake_compute_file_hash)
+def test_verify_file_integrity_passes_on_missing_settings(monkeypatch):
+    # TST-455 / FIX-115 - missing settings.json must NOT cause False.
+    # Settings are no longer hash-checked; only security_gate.py is verified.
+    monkeypatch.setattr(sg, "_compute_gate_canonical_hash",
+                        lambda path: sg._KNOWN_GOOD_GATE_HASH)
     result = sg.verify_file_integrity()
-    assert result is False
+    assert result is True, (
+        "verify_file_integrity() must return True even when settings.json is "
+        "absent (FIX-115: settings.json is no longer part of the integrity check)"
+    )
 
 
 # ===========================================================================
-# TST-456: verify_file_integrity - fails when gate is missing
+# TST-456: verify_file_integrity - fails when gate hash cannot be computed
 # ===========================================================================
 
 def test_verify_file_integrity_fails_on_missing_gate(monkeypatch):
-    # TST-456 - missing security_gate.py causes False (fail-closed)
+    # TST-456 - if _compute_gate_canonical_hash returns None, verify_file_integrity
+    # returns False (fail-closed). This covers missing or unreadable gate file.
     monkeypatch.setattr(sg, "_compute_gate_canonical_hash", lambda path: None)
-    monkeypatch.setattr(sg, "_KNOWN_GOOD_SETTINGS_HASH",
-                        sg._compute_file_hash(_REAL_SETTINGS_FILE) or "x" * 64)
     result = sg.verify_file_integrity()
     assert result is False
 
@@ -358,21 +344,18 @@ def test_bypass_updating_gate_hash_to_match_tampered_file(tmp_path):
 # ===========================================================================
 
 def test_integrity_constants_are_valid_hex():
-    # TST-461 - after update_hashes.py has been run, both constants must be
-    # valid 64-char lowercase hex strings and NOT the all-zero placeholder
+    # TST-461 / FIX-115 - after update_hashes.py has been run, _KNOWN_GOOD_GATE_HASH
+    # must be a valid 64-char lowercase hex string and NOT the all-zero placeholder.
+    # _KNOWN_GOOD_SETTINGS_HASH was removed by FIX-115; verify it is absent.
     _hex_re = re.compile(r"^[0-9a-f]{64}$")
 
-    assert _hex_re.fullmatch(sg._KNOWN_GOOD_SETTINGS_HASH), (
-        f"_KNOWN_GOOD_SETTINGS_HASH is not a valid 64-char hex string: "
-        f"{sg._KNOWN_GOOD_SETTINGS_HASH!r}"
+    assert not hasattr(sg, "_KNOWN_GOOD_SETTINGS_HASH"), (
+        "_KNOWN_GOOD_SETTINGS_HASH must NOT exist in security_gate.py after FIX-115. "
+        "Settings hash checking was removed to fix BUG-194."
     )
     assert _hex_re.fullmatch(sg._KNOWN_GOOD_GATE_HASH), (
         f"_KNOWN_GOOD_GATE_HASH is not a valid 64-char hex string: "
         f"{sg._KNOWN_GOOD_GATE_HASH!r}"
-    )
-    assert sg._KNOWN_GOOD_SETTINGS_HASH != "0" * 64, (
-        "_KNOWN_GOOD_SETTINGS_HASH is still the placeholder 64-zero value; "
-        "run update_hashes.py to embed the real hash"
     )
     assert sg._KNOWN_GOOD_GATE_HASH != "0" * 64, (
         "_KNOWN_GOOD_GATE_HASH is still the placeholder 64-zero value; "
@@ -381,53 +364,31 @@ def test_integrity_constants_are_valid_hex():
 
 
 # ===========================================================================
-# TST-462: Cross-platform paths - verify path construction is OS-agnostic
+# TST-462: Cross-platform paths - gate canonical hash works on any OS
 # ===========================================================================
 
 def test_verify_file_integrity_cross_platform_paths(tmp_path):
-    # TST-462 - os.path.join is used throughout, so path construction works on
-    # Windows, macOS, and Linux alike.  We simulate a full layout in tmp_path.
+    # TST-462 / FIX-115 - verify_file_integrity() only checks security_gate.py.
+    # Confirm the canonical hash function works correctly on any OS using
+    # os.path.abspath for gate path resolution.
     scripts_dir = tmp_path / ".github" / "hooks" / "scripts"
     scripts_dir.mkdir(parents=True)
-    vscode_dir = tmp_path / ".vscode"
-    vscode_dir.mkdir()
-
-    settings_content = b'{"autoApprove": false}'
-    settings_file = vscode_dir / "settings.json"
-    settings_file.write_bytes(settings_content)
-    settings_hash = hashlib.sha256(settings_content).hexdigest()
 
     gate_base = (
         b"# minimal gate\n"
-        + b'_KNOWN_GOOD_SETTINGS_HASH: str = "' + settings_hash.encode() + b'"\n'
         + b'_KNOWN_GOOD_GATE_HASH: str = "' + b"0" * 64 + b'"\n'
     )
     canonical_gate_hash = hashlib.sha256(gate_base).hexdigest()
 
     final_gate = (
         b"# minimal gate\n"
-        + b'_KNOWN_GOOD_SETTINGS_HASH: str = "' + settings_hash.encode() + b'"\n'
         + b'_KNOWN_GOOD_GATE_HASH: str = "' + canonical_gate_hash.encode() + b'"\n'
     )
     gate_file = scripts_dir / "security_gate.py"
     gate_file.write_bytes(final_gate)
 
-    def fake_abspath(f):
-        return str(gate_file)
-
-    with mock.patch.object(os.path, "abspath", side_effect=fake_abspath):
-        s_dir = os.path.dirname(str(gate_file))
-        ws_root = os.path.dirname(os.path.dirname(os.path.dirname(s_dir)))
-        computed_settings_path = os.path.join(ws_root, ".vscode", "settings.json")
-        assert os.path.isfile(computed_settings_path), (
-            f"Path construction failed: {computed_settings_path}"
-        )
-
     computed_gate_hash = sg._compute_gate_canonical_hash(str(gate_file))
     assert computed_gate_hash == canonical_gate_hash
-
-    computed_settings_hash = sg._compute_file_hash(str(settings_file))
-    assert computed_settings_hash == settings_hash
 
 
 # ===========================================================================
@@ -445,36 +406,27 @@ def test_compute_file_hash_empty_file(tmp_path):
 
 
 # ===========================================================================
-# TST-482: Canonical hash detects modification to _KNOWN_GOOD_SETTINGS_HASH
+# TST-482: FIX-115 — _KNOWN_GOOD_SETTINGS_HASH is absent from security_gate.py
 # ===========================================================================
 
-def test_canonical_hash_detects_settings_hash_tampering(tmp_path):
-    # TST-482 - bypass attempt: attacker changes _KNOWN_GOOD_SETTINGS_HASH in
-    # security_gate.py to match their tampered settings.json, then re-embeds
-    # a correct _KNOWN_GOOD_GATE_HASH.  Because _KNOWN_GOOD_SETTINGS_HASH is
-    # NOT zeroed, the canonical hash of the modified gate != original canonical
-    # hash → detected.
-    original_code = (
-        b"# security logic\n"
-        + b'_KNOWN_GOOD_SETTINGS_HASH: str = "' + b"a" * 64 + b'"\n'
-        + b'_KNOWN_GOOD_GATE_HASH: str = "' + b"0" * 64 + b'"\n'
+def test_settings_hash_constant_absent_from_module(tmp_path):
+    # TST-482 / FIX-115 - _KNOWN_GOOD_SETTINGS_HASH must NOT be present in
+    # the security_gate module after FIX-115.  Its presence would indicate the
+    # fix was not applied or was reverted.
+    assert not hasattr(sg, "_KNOWN_GOOD_SETTINGS_HASH"), (
+        "_KNOWN_GOOD_SETTINGS_HASH is still present in security_gate.py. "
+        "FIX-115 removes it to prevent BUG-194: VS Code settings migrations "
+        "breaking the integrity check."
     )
-    canonical_original = hashlib.sha256(original_code).hexdigest()
-
-    # Attacker writes canonical_original into _KNOWN_GOOD_GATE_HASH but also
-    # changes _KNOWN_GOOD_SETTINGS_HASH to cover their tampered settings.
-    tampered_code = (
-        b"# security logic\n"
-        + b'_KNOWN_GOOD_SETTINGS_HASH: str = "' + b"b" * 64 + b'"\n'
-        + b'_KNOWN_GOOD_GATE_HASH: str = "' + canonical_original.encode() + b'"\n'
+    # Also verify the gate source file itself does not contain the constant
+    gate_source = open(_REAL_GATE_FILE, encoding="utf-8").read()
+    assert "_KNOWN_GOOD_SETTINGS_HASH" not in gate_source or (
+        "_KNOWN_GOOD_SETTINGS_HASH was removed" in gate_source
+        or "removed by FIX-115" in gate_source
+    ), (
+        "_KNOWN_GOOD_SETTINGS_HASH found as an active constant in security_gate.py source. "
+        "FIX-115 should have removed it."
     )
-
-    gate_file = tmp_path / "security_gate.py"
-    gate_file.write_bytes(tampered_code)
-
-    canonical_tampered = sg._compute_gate_canonical_hash(str(gate_file))
-    # canonical_tampered != canonical_original because settings hash line changed
-    assert canonical_tampered != canonical_original
 
 
 # ===========================================================================
@@ -532,11 +484,13 @@ def test_main_stdin_not_consumed_on_integrity_failure(monkeypatch, capsys):
 
 def test_verify_file_integrity_returns_false_on_exception(monkeypatch):
     # TST-485 - any unexpected exception inside verify_file_integrity is
-    # caught and causes a fail-closed False return
+    # caught and causes a fail-closed False return.
+    # FIX-115: verify_file_integrity no longer calls _compute_file_hash;
+    # it calls _compute_gate_canonical_hash. Patch that instead.
     def boom(path):
         raise RuntimeError("unexpected disk error")
 
-    monkeypatch.setattr(sg, "_compute_file_hash", boom)
+    monkeypatch.setattr(sg, "_compute_gate_canonical_hash", boom)
     result = sg.verify_file_integrity()
     assert result is False
 

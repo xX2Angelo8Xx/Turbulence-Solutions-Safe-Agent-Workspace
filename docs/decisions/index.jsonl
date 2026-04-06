@@ -8,3 +8,4 @@
 {"ADR-ID": "ADR-008", "Title": "Tests Must Track Current Codebase State", "Status": "Active", "Date": "2026-04-04", "Related WPs": ["FIX-103", "FIX-104", "FIX-105", "FIX-106", "FIX-107", "MNT-024", "DOC-059"], "Superseded By": ""}
 {"ADR-ID": "ADR-009", "Title": "Advisory Pre-Commit Hook for Cross-WP Test Impact Detection", "Status": "Active", "Date": "2026-04-05", "Related WPs": ["MNT-025", "MNT-026"], "Superseded By": ""}
 {"ADR-ID": "ADR-010", "Title": "Windows-Only CI Until Stable Release", "Status": "Active", "Date": "2026-04-05", "Related WPs": ["MNT-027", "MNT-028"], "Superseded By": ""}
+{"ADR-ID": "ADR-011", "Title": "Drop settings.json from Security Gate Integrity Hash", "Status": "Active", "Date": "2026-04-06", "Related WPs": ["FIX-115", "SAF-008", "SAF-075"], "Superseded By": ""}

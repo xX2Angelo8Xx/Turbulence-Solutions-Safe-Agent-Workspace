@@ -147,23 +147,23 @@ def test_settings_files_are_in_sync():
 # ---------------------------------------------------------------------------
 
 def test_security_gate_hashes_valid():
-    """SHA256 integrity hashes in security_gate.py must match actual files."""
-    for gate_path, settings_path, label in [
-        (TEMPLATE_GATE, TEMPLATE_SETTINGS, "templates/agent-workbench"),
+    """SHA256 integrity hash (gate hash) in security_gate.py must match actual file."""
+    for gate_path, label in [
+        (TEMPLATE_GATE, "templates/agent-workbench"),
     ]:
-        # Verify settings hash
-        embedded_settings_hash = _extract_hash(gate_path, "_KNOWN_GOOD_SETTINGS_HASH")
-        actual_settings_hash = _sha256_file(settings_path)
-        assert embedded_settings_hash == actual_settings_hash, (
-            f"[{label}] _KNOWN_GOOD_SETTINGS_HASH mismatch: "
-            f"embedded={embedded_settings_hash}, actual={actual_settings_hash}"
-        )
-
-        # Verify gate canonical hash
+        # FIX-115: settings hash is no longer checked; only verify gate canonical hash
         embedded_gate_hash = _extract_hash(gate_path, "_KNOWN_GOOD_GATE_HASH")
         gate_bytes = gate_path.read_bytes()
         actual_gate_hash = _compute_canonical_gate_hash(gate_bytes)
         assert embedded_gate_hash == actual_gate_hash, (
             f"[{label}] _KNOWN_GOOD_GATE_HASH mismatch: "
             f"embedded={embedded_gate_hash}, actual={actual_gate_hash}"
+        )
+
+        # FIX-115: _KNOWN_GOOD_SETTINGS_HASH must be absent from security_gate.py
+        content = gate_path.read_text(encoding="utf-8")
+        import re as _re
+        assert not _re.search(r'_KNOWN_GOOD_SETTINGS_HASH: str = "[0-9a-fA-F]{64}"', content), (
+            f"[{label}] _KNOWN_GOOD_SETTINGS_HASH still present in security_gate.py — "
+            f"FIX-115 should have removed it (fixes BUG-194)"
         )

@@ -1,7 +1,10 @@
-"""update_hashes.py — SAF-011 Hash Update Tool
+"""update_hashes.py — SAF-011 / FIX-115 Hash Update Tool
 
-Recomputes the SHA256 hashes of security_gate.py and settings.json and
-re-embeds them into security_gate.py.
+Recomputes the SHA256 canonical hash of security_gate.py and re-embeds it.
+
+Note: settings.json is intentionally NOT hashed here (ADR-011).  VS Code
+auto-migrates deprecated settings keys on workspace open, which would
+invalidate any stored settings hash.
 
 Run from any directory:
     python .github/hooks/scripts/update_hashes.py
@@ -21,14 +24,11 @@ from pathlib import Path
 # Path resolution
 # ---------------------------------------------------------------------------
 
-def _resolve_paths() -> tuple[Path, Path]:
-    """Return (gate_path, settings_path) relative to this script's location."""
+def _resolve_paths() -> Path:
+    """Return gate_path (this script's sibling security_gate.py)."""
     scripts_dir = Path(__file__).resolve().parent
-    # Layout: scripts/ -> hooks/ -> .github/ -> workspace_root/
-    workspace_root = scripts_dir.parent.parent.parent
     gate_path = scripts_dir / "security_gate.py"
-    settings_path = workspace_root / ".vscode" / "settings.json"
-    return gate_path, settings_path
+    return gate_path
 
 
 # ---------------------------------------------------------------------------
@@ -64,9 +64,6 @@ def _compute_canonical_gate_hash(content_bytes: bytes) -> str:
 # Content patching
 # ---------------------------------------------------------------------------
 
-_SETTINGS_HASH_RE = re.compile(
-    rb'(?<=_KNOWN_GOOD_SETTINGS_HASH: str = ")[0-9a-fA-F]{64}'
-)
 _GATE_HASH_RE = re.compile(
     rb'(?<=_KNOWN_GOOD_GATE_HASH: str = ")[0-9a-fA-F]{64}'
 )
@@ -92,16 +89,10 @@ def _patch_hash(content: bytes, pattern: re.Pattern[bytes], new_hash: str) -> by
 # ---------------------------------------------------------------------------
 
 def update_hashes() -> None:
-    """Recompute and re-embed both hash constants into security_gate.py."""
-    gate_path, settings_path = _resolve_paths()
+    """Recompute and re-embed the gate hash constant into security_gate.py."""
+    gate_path = _resolve_paths()
 
-    # Validate both files exist before touching anything.
-    if not settings_path.is_file():
-        print(
-            f"ERROR: settings.json not found at {settings_path}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    # Validate the gate file exists before touching anything.
     if not gate_path.is_file():
         print(
             f"ERROR: security_gate.py not found at {gate_path}",
@@ -109,26 +100,19 @@ def update_hashes() -> None:
         )
         sys.exit(1)
 
-    # Step 1: Compute new settings hash from the file on disk.
-    new_settings_hash = _sha256_file(settings_path)
-
-    # Step 2: Read security_gate.py.
+    # Step 1: Read security_gate.py.
     content = gate_path.read_bytes()
 
-    # Step 3: Patch the settings hash constant (in memory).
-    content = _patch_hash(content, _SETTINGS_HASH_RE, new_settings_hash)
-
-    # Step 4: Compute the canonical gate hash from the settings-updated content.
+    # Step 2: Compute the canonical gate hash from content.
     # (Canonical form: _KNOWN_GOOD_GATE_HASH value zeroed before hashing.)
     new_gate_hash = _compute_canonical_gate_hash(content)
 
-    # Step 5: Patch the gate hash constant.
+    # Step 3: Patch the gate hash constant.
     content = _patch_hash(content, _GATE_HASH_RE, new_gate_hash)
 
-    # Step 6: Write the updated content back to disk.
+    # Step 4: Write the updated content back to disk.
     gate_path.write_bytes(content)
 
-    print(f"Updated _KNOWN_GOOD_SETTINGS_HASH → {new_settings_hash}")
     print(f"Updated _KNOWN_GOOD_GATE_HASH      → {new_gate_hash}")
     print("security_gate.py updated successfully.")
 

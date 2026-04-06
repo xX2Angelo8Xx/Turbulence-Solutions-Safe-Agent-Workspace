@@ -149,22 +149,18 @@ def test_require_approval_sh_files_are_identical():
 
 
 # ===========================================================================
-# TST-1639: Embedded settings hash matches actual settings.json
+# TST-1639: _KNOWN_GOOD_SETTINGS_HASH is absent from security_gate.py (FIX-115)
 # ===========================================================================
 
-def test_embedded_settings_hash_matches_actual_file():
-    # TST-1639 — The _KNOWN_GOOD_SETTINGS_HASH constant in security_gate.py
-    # must equal the SHA256 of the actual settings.json on disk.
+def test_settings_hash_absent_from_security_gate():
+    # TST-1639 / FIX-115 — _KNOWN_GOOD_SETTINGS_HASH must NOT exist in
+    # security_gate.py. It was removed to prevent BUG-194 (VS Code settings
+    # migrations breaking the integrity check). Verify it is absent.
     content = _TC_GATE.read_bytes()
     m = re.search(rb'_KNOWN_GOOD_SETTINGS_HASH: str = "([0-9a-f]{64})"', content)
-    assert m is not None, "_KNOWN_GOOD_SETTINGS_HASH constant not found in security_gate.py"
-    embedded = m.group(1).decode()
-
-    actual = hashlib.sha256(_TC_SETTINGS.read_bytes()).hexdigest()
-    assert embedded == actual, (
-        f"Embedded settings hash ({embedded[:16]}…) does not match "
-        f"actual settings.json hash ({actual[:16]}…). "
-        "Run update_hashes.py to fix."
+    assert m is None, (
+        "_KNOWN_GOOD_SETTINGS_HASH constant still present in security_gate.py. "
+        "FIX-115 removed it to fix BUG-194. Check that the fix was not reverted."
     )
 
 
@@ -213,47 +209,37 @@ def test_verify_file_integrity_passes_default_project():
 
 
 # ===========================================================================
-# TST-1642: templates/coding security_gate.py has correct embedded hashes
+# TST-1642: templates/coding security_gate.py has correct embedded gate hash
 # ===========================================================================
 
 def test_verify_file_integrity_passes_templates_copy():
-    # TST-1642 — The templates/coding security_gate.py must contain the same
-    # hash constants are present in the templates/coding copy.
-    # files are byte-for-byte identical, we verify the hash constants are present
-    # and non-zero in the templates copy, avoiding any importlib side effects
-    # (no __pycache__ must be written into templates/coding).
+    # TST-1642 / FIX-115 — The templates/coding security_gate.py must contain
+    # a valid _KNOWN_GOOD_GATE_HASH constant. _KNOWN_GOOD_SETTINGS_HASH must
+    # be absent (removed by FIX-115).
     content = _TC_GATE.read_bytes()
 
-    m_settings = re.search(
-        rb'_KNOWN_GOOD_SETTINGS_HASH: str = "([0-9a-f]{64})"', content
-    )
     m_gate = re.search(
         rb'_KNOWN_GOOD_GATE_HASH: str = "([0-9a-f]{64})"', content
     )
 
-    assert m_settings is not None, (
-        "_KNOWN_GOOD_SETTINGS_HASH not found in templates/coding security_gate.py"
-    )
     assert m_gate is not None, (
         "_KNOWN_GOOD_GATE_HASH not found in templates/coding security_gate.py"
     )
 
-    embedded_settings = m_settings.group(1).decode()
     embedded_gate = m_gate.group(1).decode()
 
-    # Hashes must not be all-zeros (placeholder value)
-    assert embedded_settings != "0" * 64, (
-        "templates/coding security_gate.py has placeholder settings hash (all zeros)"
-    )
+    # Gate hash must not be all-zeros (placeholder value)
     assert embedded_gate != "0" * 64, (
         "templates/coding security_gate.py has placeholder gate hash (all zeros)"
     )
 
-    # Verify settings hash matches actual settings.json
-    actual_settings = hashlib.sha256(_TC_SETTINGS.read_bytes()).hexdigest()
-    assert embedded_settings == actual_settings, (
-        f"templates/coding embedded settings hash does not match "
-        f"templates/coding settings.json"
+    # _KNOWN_GOOD_SETTINGS_HASH must be absent (FIX-115)
+    m_settings = re.search(
+        rb'_KNOWN_GOOD_SETTINGS_HASH: str = "([0-9a-f]{64})"', content
+    )
+    assert m_settings is None, (
+        "_KNOWN_GOOD_SETTINGS_HASH is still present in security_gate.py — "
+        "FIX-115 should have removed it (fixes BUG-194)"
     )
 
     # Verify gate hash matches canonical gate hash
@@ -281,9 +267,9 @@ def test_hash_constants_appear_exactly_once():
     settings_occurrences = len(re.findall(rb'_KNOWN_GOOD_SETTINGS_HASH: str = "[0-9a-fA-F]{64}"', content))
     gate_occurrences = len(re.findall(rb'_KNOWN_GOOD_GATE_HASH: str = "[0-9a-fA-F]{64}"', content))
 
-    assert settings_occurrences == 1, (
+    assert settings_occurrences == 0, (
         f"_KNOWN_GOOD_SETTINGS_HASH constant appears {settings_occurrences} times "
-        f"in security_gate.py — expected exactly 1"
+        f"in security_gate.py — FIX-115 removes it (expected 0 occurrences)"
     )
     assert gate_occurrences == 1, (
         f"_KNOWN_GOOD_GATE_HASH constant appears {gate_occurrences} times "
@@ -296,42 +282,27 @@ def test_hash_constants_appear_exactly_once():
 # ===========================================================================
 
 def test_canonical_hash_independent_of_settings_hash():
-    # TST-1646 (Tester edge-case) — The canonical hash computation only zeros
-    # _KNOWN_GOOD_GATE_HASH, not _KNOWN_GOOD_SETTINGS_HASH. If settings hash were
-    # also zeroed, the canonical computation would be wrong.
+    # TST-1646 / FIX-115 — After FIX-115, only _KNOWN_GOOD_GATE_HASH exists.
+    # The canonical hash zeroes _KNOWN_GOOD_GATE_HASH and hashes the whole file.
+    # Verify the embedded gate hash equals the canonical hash computation.
     content = _TC_GATE.read_bytes()
 
-    # Compute canonical hash using the standard (gate-only zeroing) approach
-    canonical_standard = re.sub(
+    # Compute canonical hash (gate-only zeroing)
+    canonical = re.sub(
         rb'(?<=_KNOWN_GOOD_GATE_HASH: str = ")[0-9a-fA-F]{64}',
         b"0" * 64,
         content,
     )
-    hash_standard = hashlib.sha256(canonical_standard).hexdigest()
+    hash_canonical = hashlib.sha256(canonical).hexdigest()
 
-    # Compute with BOTH constants zeroed out
-    canonical_both = re.sub(
-        rb'(?<=_KNOWN_GOOD_SETTINGS_HASH: str = ")[0-9a-fA-F]{64}',
-        b"0" * 64,
-        canonical_standard,
-    )
-    hash_both = hashlib.sha256(canonical_both).hexdigest()
-
-    # The two hashes MUST differ — if they are equal, the settings hash constant
-    # does not appear in the file at all, which is a bug.
-    assert hash_standard != hash_both, (
-        "Canonical hash is identical whether or not settings hash is zeroed. "
-        "_KNOWN_GOOD_SETTINGS_HASH may be absent from security_gate.py."
-    )
-
-    # The embedded gate hash must match the STANDARD (gate-only) approach, not
-    # the both-zeroed approach.
+    # Extract embedded gate hash
     m = re.search(rb'_KNOWN_GOOD_GATE_HASH: str = "([0-9a-f]{64})"', content)
     assert m is not None, "_KNOWN_GOOD_GATE_HASH not found"
     embedded = m.group(1).decode()
-    assert embedded == hash_standard, (
-        "Embedded gate hash does not match gate-only canonical hash. "
-        "update_hashes.py may be zeroing too many constants."
+
+    assert embedded == hash_canonical, (
+        "Embedded gate hash does not match canonical gate hash. "
+        "Run update_hashes.py to fix."
     )
 
 

@@ -149,54 +149,32 @@ def test_compute_gate_canonical_hash_zeroes_constant(tmp_path):
 # ===========================================================================
 
 def test_verify_integrity_lf_variant(tmp_path):
-    """verify_file_integrity() must succeed when settings.json uses LF endings."""
-    # Create a settings.json with LF endings.
-    settings_lf = tmp_path / ".vscode" / "settings.json"
-    settings_lf.parent.mkdir(parents=True)
-    settings_content_lf = b'{\n    "key": "value"\n}\n'
-    settings_lf.write_bytes(settings_content_lf)
-
-    # Compute the hash as security_gate will (normalized).
-    expected_settings_hash = hashlib.sha256(
-        settings_content_lf.replace(b"\r\n", b"\n")
-    ).hexdigest()
-
-    # Create a gate file with LF endings and the matching hash.
+    """verify_file_integrity() succeeds when gate file uses LF endings (FIX-115).
+    settings.json is no longer part of the integrity check (ADR-011)."""
+    # Create a gate file with LF endings and the canonical gate hash.
     gate_template = (
         b'_KNOWN_GOOD_GATE_HASH: str = "'
         + b"0" * 64
         + b'"\n'
-        b'_KNOWN_GOOD_SETTINGS_HASH: str = "PLACEHOLDER"\n'
         b"def verify_file_integrity(): pass\n"
     )
-    gate_content = gate_template.replace(b"PLACEHOLDER", expected_settings_hash.encode())
     gate_file = tmp_path / "security_gate.py"
-    gate_file.write_bytes(gate_content)
+    gate_file.write_bytes(gate_template)
 
     # Compute canonical gate hash.
     expected_gate_hash = sg._compute_gate_canonical_hash(str(gate_file))
 
-    # Patch the embedded constants and path resolution.
+    # Patch the embedded gate hash constant and path resolution.
     with (
-        patch.object(sg, "_KNOWN_GOOD_SETTINGS_HASH", expected_settings_hash),
         patch.object(sg, "_KNOWN_GOOD_GATE_HASH", expected_gate_hash),
-        patch("os.path.abspath", return_value=str(gate_file)),
-        patch("os.path.dirname", side_effect=os.path.dirname),
     ):
-        # Patch workspace_root computation: os.path.dirname called 3 times
-        # to walk up scripts/ -> hooks/ -> .github/ -> workspace_root
-        script_dir = str(tmp_path)
-        workspace_root = str(tmp_path)
-
         def _fake_abspath(p: str) -> str:  # type: ignore[override]
             return str(gate_file)
 
         with patch("security_gate.os.path.abspath", _fake_abspath):
             # Manually call the underlying hash functions to confirm they match.
-            actual_settings_hash = sg._compute_file_hash(str(settings_lf))
             actual_gate_hash = sg._compute_gate_canonical_hash(str(gate_file))
 
-    assert actual_settings_hash == expected_settings_hash
     assert actual_gate_hash == expected_gate_hash
 
 

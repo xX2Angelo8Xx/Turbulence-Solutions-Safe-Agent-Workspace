@@ -113,25 +113,26 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 
 
 # ---------------------------------------------------------------------------
-# SAF-008: File integrity verification constants
+# SAF-008 / FIX-115: File integrity verification constants
 # ---------------------------------------------------------------------------
-# Known-good SHA256 of templates/coding/.vscode/settings.json.
-# Updated by running .github/hooks/scripts/update_hashes.py after any
-# intentional admin change to settings.json.
-_KNOWN_GOOD_SETTINGS_HASH: str = "c9cd0834dd2e3f0e4061904d4015cc41777e766b94476c32aa3feef58c6aca5f"
+# _KNOWN_GOOD_SETTINGS_HASH was removed by FIX-115.
+# VS Code auto-migrates deprecated settings keys on workspace open, changing
+# settings.json and breaking its hash. settings.json only provides cosmetic
+# protection (search.exclude, files.exclude); zone enforcement is handled
+# entirely by security_gate.py. See ADR-011.
 
 # Known-good SHA256 of security_gate.py in canonical form.
 # Canonical form: the file content with the value portion of this constant
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "4a2a81289cc113b033946c069699b6dea3fe9dc2f74bd604b5ee4e924fde437c"
+_KNOWN_GOOD_GATE_HASH: str = "ebd08b12ac391da5f4cc8c75a69630cf7bbbd08ac736240ffd7f51f57bf1ac22"
 
 _INTEGRITY_WARNING: str = (
-    "SECURITY ALERT: Integrity verification failed. A safety-critical file "
-    "(.vscode/settings.json or security_gate.py) has been modified or "
-    "corrupted. All tool calls are blocked. An administrator must review the "
-    "changes and run update_hashes.py to re-approve the security files."
+    "SECURITY ALERT: Integrity verification failed. The safety-critical file "
+    "security_gate.py has been modified or corrupted. All tool calls are "
+    "blocked. An administrator must review the changes and run "
+    "update_hashes.py to re-approve the security file."
 )
 
 _DENY_REASON = "Access denied. This action has been blocked by the workspace security policy."
@@ -1304,27 +1305,21 @@ def _compute_gate_canonical_hash(gate_path: str) -> "Optional[str]":
 
 
 def verify_file_integrity() -> bool:
-    """SAF-008: Verify SHA256 hashes of security-critical files on startup.
+    """SAF-008 / FIX-115: Verify SHA256 hash of security_gate.py on startup.
 
-    Checks both .vscode/settings.json and this script against their
-    known-good hashes.  Returns True only when both match.  Fails closed -
-    returns False on any I/O error or unexpected exception.
+    Checks this script against its known-good canonical hash.  Returns True
+    only when the hash matches.  Fails closed - returns False on any I/O
+    error or unexpected exception.
+
+    Note: .vscode/settings.json is intentionally NOT checked here (ADR-011).
+    VS Code auto-migrates deprecated settings keys, which would cause false
+    failures. settings.json only provides cosmetic protection; zone
+    enforcement is handled entirely within security_gate.py.
     """
     try:
         gate_path = os.path.abspath(__file__)
-        scripts_dir = os.path.dirname(gate_path)
-        # Path layout: scripts/ -> hooks/ -> .github/ -> workspace_root/
-        workspace_root = os.path.dirname(
-            os.path.dirname(os.path.dirname(scripts_dir))
-        )
-        settings_path = os.path.join(workspace_root, ".vscode", "settings.json")
 
-        # 1. Verify settings.json
-        settings_hash = _compute_file_hash(settings_path)
-        if settings_hash is None or settings_hash != _KNOWN_GOOD_SETTINGS_HASH:
-            return False
-
-        # 2. Verify security_gate.py using canonical form
+        # Verify security_gate.py using canonical form
         gate_hash = _compute_gate_canonical_hash(gate_path)
         if gate_hash is None or gate_hash != _KNOWN_GOOD_GATE_HASH:
             return False
