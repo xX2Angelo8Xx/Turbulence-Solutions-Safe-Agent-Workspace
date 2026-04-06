@@ -128,7 +128,7 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "5e7e1bebefd5082b7124ae1fd12feab844978376666d216ab1363ccdaef9bf73"
+_KNOWN_GOOD_GATE_HASH: str = "21b42a67b77b298a904cc8daff5828bdd9a393a540eee120a6808a643eea5eec"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. The safety-critical file "
@@ -1641,11 +1641,14 @@ _PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
     "git",
 })
 
-# SAF-029: PowerShell delete cmdlets that receive project-folder fallback for
-# single-segment dot-prefix paths only (e.g. .venv, .git, .pytest_cache, .env).
-# Unix rm/del/erase/rmdir are intentionally excluded — FIX-033 requires
-# `rm .env` to be denied and the full rm family must not get path fallback.
-_DELETE_DOT_FALLBACK_VERBS: frozenset[str] = frozenset({"remove-item", "ri"})
+# FIX-118: All delete verbs receive project-folder fallback for multi-segment
+# paths (src/file.py) and single-segment dot-prefix paths (.venv, .env).
+# Single-segment non-dot names (e.g. MANIFEST.json) are excluded to avoid
+# ambiguity when the agent CWD is the workspace root rather than the project
+# folder.  _try_project_fallback() enforces deny-zone protection internally.
+_DELETE_PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
+    "remove-item", "ri", "rm", "del", "erase", "rmdir",
+})
 
 
 def _try_project_fallback(norm_relative: str, ws_root: str) -> bool:
@@ -1919,14 +1922,27 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                                 if _try_project_fallback(norm_fb, ws_root):
                                     _prev_was_flag = False
                                     continue
-                    elif verb.lower() in _DELETE_DOT_FALLBACK_VERBS:
-                        # SAF-029: allow single-segment dot-prefix non-deny-zone
-                        # paths (e.g. .venv, .git) via project-folder fallback.
-                        # Multi-segment paths remain denied (FIX-022 intact).
+                    elif verb.lower() in _DELETE_PROJECT_FALLBACK_VERBS:
+                        # FIX-118: Allow delete operations targeting the project folder.
+                        # Multi-segment paths (src/file.py) and single-segment dot-prefix
+                        # paths (.venv, .env) are tried via _try_project_fallback().
+                        # Single-segment non-dot paths without trailing slash are excluded
+                        # to stay conservative when the CWD is ambiguous.
+                        # _try_project_fallback() rejects deny zones and paths outside
+                        # the project folder, so .github/* and NoAgentZone/* remain denied.
                         if "*" not in stripped and "?" not in stripped and "[" not in stripped:
                             norm_fb = posixpath.normpath(stripped.replace("\\", "/"))
                             parts_fb = [p for p in norm_fb.split("/") if p and p not in (".", "..")]
-                            if len(parts_fb) == 1 and norm_fb.startswith("."):
+                            if (
+                                len(parts_fb) >= 2
+                                or (
+                                    len(parts_fb) == 1
+                                    and (
+                                        stripped.rstrip().endswith("/")
+                                        or norm_fb.startswith(".")
+                                    )
+                                )
+                            ):
                                 if _try_project_fallback(norm_fb, ws_root):
                                     _prev_was_flag = False
                                     continue

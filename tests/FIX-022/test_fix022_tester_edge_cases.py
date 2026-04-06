@@ -200,15 +200,16 @@ def test_ls_wildcard_github_prefix_deny():
     assert deny("ls -la .g*")
 
 
-def test_rm_family_never_get_fallback():
-    """TST-1751: rm/del/remove-item with project-relative path -> all deny.
+def test_rm_family_get_project_fallback():
+    """TST-1751: rm/del/remove-item with project-relative path -> all allow (FIX-118).
 
-    Destructive verbs are explicitly excluded from _PROJECT_FALLBACK_VERBS.
-    None of these should receive the project-folder fallback.
+    FIX-118 introduces _DELETE_PROJECT_FALLBACK_VERBS, superseding the old
+    _PROJECT_FALLBACK_VERBS exclusion of destructive commands.
+    Multi-segment paths inside the project folder are now allowed.
     """
-    assert deny("rm src/utils.py")
-    assert deny("del src/utils.py")
-    assert deny("remove-item src/utils.py")
+    assert allow("rm src/utils.py")
+    assert allow("del src/utils.py")
+    assert allow("remove-item src/utils.py")
 
 
 # ===========================================================================

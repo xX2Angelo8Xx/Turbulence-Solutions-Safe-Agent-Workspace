@@ -124,9 +124,9 @@ def test_get_content_src_app_allow():
 # Destructive commands — MUST DENY (no fallback)
 # ===========================================================================
 
-def test_rm_src_app_deny():
-    """TST-1701: rm src/app.py -> deny (rm not in fallback verbs)."""
-    assert deny("rm src/app.py")
+def test_rm_src_app_allow():
+    """TST-1701: rm src/app.py -> allow (FIX-118: rm added to _DELETE_PROJECT_FALLBACK_VERBS)."""
+    assert allow("rm src/app.py")
 
 
 def test_rm_dot_deny():
@@ -139,14 +139,14 @@ def test_rm_dot_slash_root_config_deny():
     assert deny("rm ./root_config.json")
 
 
-def test_del_src_app_deny():
-    """TST-1704: del src/app.py -> deny (del not in fallback verbs)."""
-    assert deny("del src/app.py")
+def test_del_src_app_allow():
+    """TST-1704: del src/app.py -> allow (FIX-118: del added to _DELETE_PROJECT_FALLBACK_VERBS)."""
+    assert allow("del src/app.py")
 
 
-def test_remove_item_src_app_deny():
-    """TST-1705: remove-item src/app.py -> deny (not in fallback verbs)."""
-    assert deny("remove-item src/app.py")
+def test_remove_item_src_app_allow():
+    """TST-1705: remove-item src/app.py -> allow (FIX-118: multi-segment delete fallback)."""
+    assert allow("remove-item src/app.py")
 
 
 def test_rm_rf_dot_deny():
@@ -196,9 +196,9 @@ def test_cat_noagentzone_deny():
 # Chained commands — safe verb + destructive verb
 # ===========================================================================
 
-def test_chain_python_and_rm_deny():
-    """TST-1713: python src/app.py; rm src/app.py -> deny."""
-    assert deny("python src/app.py; rm src/app.py")
+def test_chain_python_and_rm_allow():
+    """TST-1713: python src/app.py; rm src/app.py -> allow (FIX-118: both segments resolve inside project)."""
+    assert allow("python src/app.py; rm src/app.py")
 
 
 # ===========================================================================

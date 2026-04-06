@@ -1,0 +1,9 @@
+{
+  "description": "run_in_terminal Remove-Item multi-segment project path must be allowed",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "run_in_terminal",
+    "command": "Remove-Item src/oldfile.py"
+  },
+  "expected_decision": "allow"
+}

@@ -251,9 +251,9 @@ def test_dot_env_in_deny_zone_denied(sg):
     assert deny(sg, "cat .vscode/.env")
 
 
-def test_rm_dot_env_fallback_not_allowed(sg):
-    """TST-4132: rm .env must be denied — rm verb not in _PROJECT_FALLBACK_VERBS."""
-    assert deny(sg, "rm .env")
+def test_rm_dot_env_fallback_allowed(sg):
+    """TST-4132: rm .env must be allowed — FIX-118 adds rm to _DELETE_PROJECT_FALLBACK_VERBS."""
+    assert allow(sg, "rm .env")
 
 
 def test_env_assign_uppercase_var_name_allowed(sg):

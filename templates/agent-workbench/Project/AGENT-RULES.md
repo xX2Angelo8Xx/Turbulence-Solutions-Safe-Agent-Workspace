@@ -137,6 +137,14 @@ git status ; git add -A ; git commit -m "WP-ID: description" ; git push origin <
 # Read-only inspection
 Get-Content some_file.txt
 Get-ChildItem {{PROJECT_NAME}}/ -Name
+
+# Delete files inside the project folder (FIX-118)
+Remove-Item src/oldfile.py                   # delete by relative path (project-subfolder)
+Remove-Item -Recurse -Force .venv            # delete dot-prefix directories
+rm src/oldfile.py                            # Unix equivalent
+del src\oldfile.py                           # Windows CMD equivalent
+# NOTE: paths must be relative to or inside {{PROJECT_NAME}}/.
+# Deleting workspace root files or protected zones (.github/, .vscode/, NoAgentZone/) is denied.
 ```
 
 ### Blocked Commands

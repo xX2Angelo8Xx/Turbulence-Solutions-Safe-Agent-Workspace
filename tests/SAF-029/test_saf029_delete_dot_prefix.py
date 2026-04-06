@@ -178,30 +178,34 @@ class TestDeleteCommandsBoundary:
         """TST-5342: del c:/windows/system32/file.dll must be denied (outside workspace)."""
         assert _deny("del c:/windows/system32/file.dll")
 
-    def test_rm_dot_venv_denied(self):
-        """TST-5343: rm .venv must be denied.
+    def test_rm_dot_venv_allowed(self):
+        """TST-5343: rm .venv inside project folder must be allowed.
 
-        Unix rm is intentionally excluded from _DELETE_DOT_FALLBACK_VERBS.
-        FIX-033 requires `rm .env` to be denied; rm family gets no dot-prefix fallback.
+        FIX-118: rm is now in _DELETE_PROJECT_FALLBACK_VERBS; dot-prefix
+        paths resolve inside the project folder via _try_project_fallback().
         """
-        assert _deny("rm .venv")
+        assert _allow("rm .venv")
 
-    def test_rm_dot_git_denied(self):
-        """TST-5344: rm .git must be denied (rm excluded from dot-prefix fallback)."""
-        assert _deny("rm .git")
+    def test_rm_dot_git_allowed(self):
+        """TST-5344: rm .git inside project folder must be allowed (FIX-118)."""
+        assert _allow("rm .git")
 
-    def test_rm_dot_pytest_cache_denied(self):
-        """TST-5345: rm .pytest_cache must be denied (rm excluded from dot-prefix fallback)."""
-        assert _deny("rm .pytest_cache")
+    def test_rm_dot_pytest_cache_allowed(self):
+        """TST-5345: rm .pytest_cache inside project folder must be allowed (FIX-118)."""
+        assert _allow("rm .pytest_cache")
 
-    def test_rm_dot_env_denied(self):
-        """TST-5346: rm .env must be denied.
+    def test_rm_dot_env_allowed(self):
+        """TST-5346: rm .env inside project folder must be allowed (FIX-118).
 
-        Explicit regression: rm .env must be denied (FIX-033 requirement).
-        rm is not in _DELETE_DOT_FALLBACK_VERBS.
+        FIX-118 supersedes the FIX-033 restriction: rm now receives the
+        project-folder fallback, and .env resolves inside the project folder.
         """
-        assert _deny("rm .env")
+        assert _allow("rm .env")
 
-    def test_remove_item_multisegment_denied(self):
-        """TST-5347: Remove-Item src/app.py must be denied (multi-segment, FIX-022)."""
-        assert _deny("Remove-Item src/app.py")
+    def test_remove_item_multisegment_allowed(self):
+        """TST-5347: Remove-Item src/app.py inside project folder must be allowed (FIX-118).
+
+        Multi-segment paths now trigger _try_project_fallback() for all delete
+        verbs, allowing paths that resolve inside the project folder.
+        """
+        assert _allow("Remove-Item src/app.py")

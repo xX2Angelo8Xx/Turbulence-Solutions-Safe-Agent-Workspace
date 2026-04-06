@@ -1,0 +1,9 @@
+{
+  "description": "run_in_terminal Remove-Item targeting .github subpath must be denied",
+  "ws_root": "/workspace",
+  "input": {
+    "tool_name": "run_in_terminal",
+    "command": "Remove-Item .github/hooks/security_gate.py"
+  },
+  "expected_decision": "deny"
+}
