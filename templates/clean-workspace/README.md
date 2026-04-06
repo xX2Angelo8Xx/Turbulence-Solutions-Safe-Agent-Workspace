@@ -25,8 +25,13 @@ This workspace uses the Turbulence Solutions safe-agent framework. A **PreToolUs
 
 ## Getting Started
 
-Place your project files in `{{PROJECT_NAME}}/`. Open Copilot Chat and start a conversation — the AI agent will work within that folder.
+1. Place your project files in `{{PROJECT_NAME}}/`.
+2. Open Copilot Chat and start a conversation — the AI agent will work within that folder.
+3. If you want to store sensitive files (credentials, contracts, private data), put them in `NoAgentZone/` — agents are hard-blocked from reading or writing there.
+4. To adjust agent rules for your project, edit `{{PROJECT_NAME}}/AGENT-RULES.md`.
 
 ## About This Template
 
 This is a **clean workspace** — it includes only the security hook and essential settings, with no custom agents, prompts, or skills pre-configured. It gives you a minimal but secure starting point.
+
+There are no `.github/agents/`, `.github/skills/`, or `.github/prompts/` folders. AI agents in this workspace run with platform defaults, operating within the three-tier security model above.
