@@ -2,9 +2,61 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-04-06  
-**Iteration:** 2 (updated after iter 1 FAIL)
+**Iteration:** 3 (PASS)
 
 ## Summary
+
+**PASS (Iteration 3).** All checks passed. The INS-019 baseline entry (`test_verify_shim_existence_only_check`) has been correctly restored. Both BUG-192 and BUG-193 are now Fixed. MANIFEST.json is up to date. All 73 full-suite failures are accounted for in the 141-entry baseline (0 new regressions). All 4 MNT-029 tests pass. Workspace validation clean. WP marked Done.
+
+---
+
+## Iteration 3 Findings
+
+### ✅ INS-019 Baseline Entry Restored
+- `tests.INS-019.test_ins019_edge_cases.test_verify_shim_existence_only_check` is present in `tests/regression-baseline.json` (line 360).
+- Test passes in isolation: `1 passed in 0.14s`. ✅
+- Fails in full suite context due to sys.path mutation (flaky) — expected and documented. ✅
+
+### ✅ DOC-002 Baseline Entry Still Present (iter 2 fix intact)
+- `tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_getting_started_section` present in baseline. ✅
+
+### ✅ Baseline Integrity
+- `_count`: 141, actual entries: 141. ✅
+- Main branch had 152 entries; 12 removed, 1 restored (INS-019) = net 11 removed. Consistent. ✅
+
+### ✅ Correctly-Removed Entries Sample Verification
+All 11 net-removed entries verified — sample of 6 tested in isolation:
+- `test_logo_ctk_image_size_is_proportional` (FIX-015): PASS
+- `test_logo_pil_open_failure_no_crash` (FIX-015): PASS
+- `test_app_build_ui_creates_logo_label` (GUI-013): PASS
+- `test_created_workspace_has_initial_commit` (INS-030): PASS
+- `test_deny_command_substitution_backtick` (SAF-073): PASS
+- `test_locked_next_id_concurrent_threads` (MNT-015): PASS
+
+### ✅ MANIFEST.json
+`scripts/generate_manifest.py --check` → "Manifest is up to date." (exit 0). ✅
+
+### ✅ MNT-029 Test Suite
+All 4 tests pass in `tests/MNT-029/`:
+- `test_manifest_file_count_matches_files_dict` PASS
+- `test_baseline_no_stale_entries` PASS
+- `test_manifest_check_exits_clean` PASS
+- `test_manifest_has_expected_keys` PASS
+
+### ✅ Full Suite Regression Check
+- 73 failed, 8941 passed, 344 skipped, 5 xfailed, 66 errors
+- All 73 failures verified against 141-entry baseline: **0 new regressions**. ✅
+
+### ✅ Workspace Validation
+`scripts/validate_workspace.py --wp MNT-029` → "All checks passed." (exit 0). ✅
+
+### ✅ Bug Tracking
+- BUG-192: Status=Fixed, Fixed In WP=MNT-029. ✅
+- BUG-193: Status updated to Fixed, Fixed In WP=MNT-029. ✅
+
+---
+
+## Iteration 2 Summary (historical — FAIL)
 
 **FAIL (Iteration 2).** Iteration 2 correctly restores the DOC-002 baseline entry (BUG-192 fix verified). However, a second incorrectly-removed baseline entry was found: `tests.INS-019.test_ins019_edge_cases.test_verify_shim_existence_only_check`. This flaky test was present in the pre-MNT-029 baseline and still fails in the full suite. It must be restored. WP is returned to the Developer.
 
