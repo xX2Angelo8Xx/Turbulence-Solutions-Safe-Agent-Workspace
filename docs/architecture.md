@@ -757,6 +757,10 @@ Templates (bundled inside Launcher)
 │   │   ├── GUI-035/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── GUI-036/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── INS-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1482,6 +1486,7 @@ Templates (bundled inside Launcher)
 │   ├── GUI-033/
 │   ├── GUI-034/
 │   ├── GUI-035/
+│   ├── GUI-036/
 │   ├── INS-001/
 │   ├── INS-002/
 │   ├── INS-003/
