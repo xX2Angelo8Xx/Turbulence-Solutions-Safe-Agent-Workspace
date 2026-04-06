@@ -58,12 +58,9 @@ _SECURITY_CRITICAL_FILES = {
 
 
 def _sha256(file_path: Path) -> str:
-    """Compute SHA256 hex digest for a file."""
-    h = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            h.update(chunk)
-    return h.hexdigest()
+    """Compute SHA256 hex digest for a file (CRLF-normalized to LF)."""
+    data = file_path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def _is_security_critical(rel_path: str) -> bool:

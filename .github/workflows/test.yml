@@ -122,7 +122,7 @@ jobs:
               if not full_path.exists():
                   mismatches.append(f"MISSING: {rel_path}")
                   continue
-              current_hash = hashlib.sha256(full_path.read_bytes()).hexdigest()
+              current_hash = hashlib.sha256(full_path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
               if current_hash != entry.get("sha256"):
                   mismatches.append(f"CHANGED: {rel_path}")
           
