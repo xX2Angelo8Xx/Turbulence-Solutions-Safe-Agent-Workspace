@@ -355,7 +355,18 @@ def test_on_create_project_proceeds_when_shim_ok(tmp_path):
     fake_dest.mkdir()
     fake_project = fake_dest / "TS-SAE-TestProject"
 
+    class _SyncThread:
+        def __init__(self, target=None, daemon=False, **kwargs):
+            self._target = target
+        def start(self) -> None:
+            if self._target:
+                self._target()
+
+    mock_window = MagicMock()
+    mock_window.after.side_effect = lambda ms, cb: cb()
+
     instance = object.__new__(app_module.App)
+    instance._window = mock_window
     instance.project_name_entry = MagicMock()
     instance.project_name_entry.get.return_value = "TestProject"
     instance.project_type_dropdown = MagicMock()
@@ -376,6 +387,10 @@ def test_on_create_project_proceeds_when_shim_ok(tmp_path):
     # GUI-022: _on_create_project reads include_readmes from this attribute.
     instance.include_readmes_var = MagicMock()
     instance.include_readmes_var.get.return_value = True
+    # GUI-034: _set_creation_ui_state requires these widget attributes.
+    instance.create_button = MagicMock()
+    instance.browse_button = MagicMock()
+    instance.create_progress_bar = MagicMock()
 
     with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
          patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
@@ -383,6 +398,7 @@ def test_on_create_project_proceeds_when_shim_ok(tmp_path):
          patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
          patch("launcher.gui.app._format_template_name", return_value="Coding"), \
          patch("launcher.gui.app.verify_ts_python", return_value=(True, "3.11.0")), \
+         patch("launcher.gui.app.threading.Thread", _SyncThread), \
          patch("launcher.gui.app.create_project", return_value=fake_project) as mock_cp, \
          patch("launcher.gui.app.messagebox"):
         app_module.App._on_create_project(instance)
