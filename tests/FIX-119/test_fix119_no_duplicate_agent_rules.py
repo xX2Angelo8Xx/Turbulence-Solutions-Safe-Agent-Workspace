@@ -85,7 +85,7 @@ def test_project_readme_references_root():
 
 def test_manifest_no_agentdocs_entry():
     """MANIFEST.json must not contain an entry for Project/AgentDocs/AGENT-RULES.md."""
-    manifest = TEMPLATE_ROOT / "MANIFEST.json"
+    manifest = TEMPLATE_ROOT / ".github" / "hooks" / "scripts" / "MANIFEST.json"
     data = json.loads(manifest.read_text(encoding="utf-8"))
     files = data.get("files", data)
     assert "Project/AgentDocs/AGENT-RULES.md" not in files, (

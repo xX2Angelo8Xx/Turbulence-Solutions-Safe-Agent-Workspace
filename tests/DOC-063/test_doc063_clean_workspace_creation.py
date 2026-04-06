@@ -225,9 +225,15 @@ class TestSecurityGateFunctional:
 
     def test_security_gate_no_syntax_errors(self):
         """security_gate.py must compile without syntax errors."""
+        import os, tempfile
         sg_path = str(CLEAN_TEMPLATE / ".github" / "hooks" / "scripts" / "security_gate.py")
-        # py_compile.compile raises py_compile.PyCompileError on syntax errors.
-        py_compile.compile(sg_path, doraise=True)
+        # Write compiled output to a temp file to avoid creating __pycache__ in the template.
+        with tempfile.NamedTemporaryFile(suffix=".pyc", delete=False) as f:
+            tmp = f.name
+        try:
+            py_compile.compile(sg_path, cfile=tmp, doraise=True)
+        finally:
+            os.unlink(tmp)
 
     def test_security_gate_importable_and_decide_returns_action(self):
         """security_gate.decide() must return 'allow', 'ask', or 'deny' for a test event."""
@@ -271,6 +277,13 @@ class TestSecurityGateFunctional:
                 sys.modules["security_gate"] = _orig_sg
             if _orig_zc is not None:
                 sys.modules["zone_classifier"] = _orig_zc
+            # Remove any __pycache__ created by the importlib.import_module call
+            # to prevent polluting the template directory and failing GUI-035
+            # TestNoTemplatePollution tests (BUG-211).
+            import shutil
+            pycache = CLEAN_TEMPLATE / ".github" / "hooks" / "scripts" / "__pycache__"
+            if pycache.exists():
+                shutil.rmtree(pycache)
 
 
 # ===========================================================================

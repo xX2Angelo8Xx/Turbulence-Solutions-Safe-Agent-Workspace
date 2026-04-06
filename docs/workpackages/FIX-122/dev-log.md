@@ -1,6 +1,6 @@
 # Dev Log — FIX-122: Move MANIFEST.json inside .github/hooks/scripts/
 
-**Status:** In Progress  
+**Status:** Review  
 **Branch:** FIX-122/manifest-relocation  
 **Assigned To:** Developer Agent  
 **Bug Reference:** BUG-207
@@ -108,3 +108,36 @@ Removed `__pycache__` directory from `templates/clean-workspace/.github/hooks/sc
 ## Known Limitations
 
 None.
+
+---
+
+## Iteration 2 — Tester Findings (2026-04-07)
+
+**Tester verdict (Iteration 1):** FAIL — two blocking issues returned to developer.
+
+### Issue 1 Fixed — FIX-119 stale MANIFEST.json path
+
+`tests/FIX-119/test_fix119_no_duplicate_agent_rules.py` line 88 still referenced the old root-level `TEMPLATE_ROOT / "MANIFEST.json"`. Updated to `TEMPLATE_ROOT / ".github" / "hooks" / "scripts" / "MANIFEST.json"`.
+
+During verification, a deeper root cause was found: `GUI-034` had re-added `templates/agent-workbench/Project/AgentDocs/AGENT-RULES.md` (which FIX-119 was supposed to have deleted). This caused both `test_duplicate_file_does_not_exist` and `test_manifest_no_agentdocs_entry` to fail with content assertion errors after the path fix. The duplicate file was deleted and `MANIFEST.json` regenerated via `scripts/generate_manifest.py` to restore the FIX-119 invariant.
+
+### Issue 2 Fixed — DOC-063 pycache pollution (BUG-211)
+
+`tests/DOC-063/test_doc063_clean_workspace_creation.py::TestSecurityGateFunctional` was creating `__pycache__/` in the template directory. Fixed:
+- `test_security_gate_no_syntax_errors`: now uses `cfile=tmp` (NamedTemporaryFile) to redirect compiled output instead of letting `py_compile.compile()` write to the template `__pycache__/`.
+- `test_security_gate_importable_and_decide_returns_action`: `finally` block now calls `shutil.rmtree(pycache)` to clean up any `__pycache__/` created by `importlib.import_module()`.
+
+### Additional files changed in Iteration 2
+
+- `tests/FIX-119/test_fix119_no_duplicate_agent_rules.py` — path updated to new MANIFEST.json location.
+- `tests/DOC-063/test_doc063_clean_workspace_creation.py` — pycache pollution fixed in both security gate tests.
+- `templates/agent-workbench/Project/AgentDocs/AGENT-RULES.md` — DELETED (GUI-034 regression; FIX-119 invariant restored).
+- `templates/agent-workbench/.github/hooks/scripts/MANIFEST.json` — regenerated (entry for deleted file removed).
+
+### Iteration 2 Test Results
+
+- TST-2728: FIX-122 targeted suite — 32 passed (Windows 11 + Python 3.13)
+- TST-2729: FIX-122 targeted suite — 32 passed (Windows 11 + Python 3.13) [post-iteration-2]
+- FIX-119 full suite: 13 passed, 0 failed
+- GUI-035 TestNoTemplatePollution: 3 passed, 0 failed
+- DOC-063 TestSecurityGateFunctional: 2 passed, 0 failed
