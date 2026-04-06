@@ -1,4 +1,4 @@
-﻿---
+---
 name: Researcher
 description: "Investigates technologies, evaluates solutions, and delivers structured findings with mandatory source links — web-first, evidence-driven"
 tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, read, agent, edit, search, web, browser]

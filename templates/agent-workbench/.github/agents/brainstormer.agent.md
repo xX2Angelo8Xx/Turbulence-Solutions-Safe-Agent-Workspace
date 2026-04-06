@@ -1,4 +1,4 @@
-﻿---
+---
 name: Brainstormer
 description: "Explores ideas, surfaces trade-offs, and asks the hard questions — ideation only, no code"
 tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, read, agent, edit, search, web/fetch, browser]

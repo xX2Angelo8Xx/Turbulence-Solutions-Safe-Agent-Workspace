@@ -98,3 +98,49 @@ DOC-046 (12 tests) and DOC-047 (8 tests) assert that template files reference `A
 ### Files Changed in Iteration 2
 
 - `tests/regression-baseline.json`
+
+---
+
+## Iteration 3 — 2026-04-06
+
+**Triggered by:** Tester feedback (test-report.md Iteration 2) — BOM/CRLF regression in 8 agent files (BUG-203); 11+ path-deletion failures unregistered in baseline.
+
+### Issues Addressed
+
+1. **BOM + CRLF** — 8 agent files under `templates/agent-workbench/.github/agents/` were written with UTF-8 BOM and Windows CRLF line endings. This caused 236 test failures across DOC-019, DOC-020, DOC-021, DOC-022, DOC-025, DOC-029, DOC-030, DOC-031, DOC-039, DOC-041, DOC-042, DOC-043, DOC-044, FIX-073. Fixed by reading raw bytes, stripping `\xef\xbb\xbf` BOM, replacing `\r\n` → `\n`, writing back.
+
+2. **CRLF only** — 3 more files (`copilot-instructions.md`, `Project/README.md`, `README.md`) had CRLF. Fixed the same way.
+
+3. **Unregistered baseline entries** — After BOM fix, empirical test runs revealed 35 new failures not in the baseline: 5 DOC-018 failures, 27 DOC-045 failures/errors, 1 DOC-049 failure, 2 DOC-050 failures. All caused by FIX-119 deleting `AgentDocs/AGENT-RULES.md`. Registered all 35 as known test-suite contradictions. Note: Tester Iteration 2 report counted 11 because BOM was masking additional failures during their run; empirical count post-BOM-fix is 35.
+
+4. **MANIFEST regenerated** — `scripts/generate_manifest.py` run after file content changed (37 files tracked, 10 security-critical).
+
+### Changes Made
+
+- `templates/agent-workbench/.github/agents/programmer.agent.md` — BOM stripped, CRLF → LF
+- `templates/agent-workbench/.github/agents/brainstormer.agent.md` — BOM stripped, CRLF → LF
+- `templates/agent-workbench/.github/agents/coordinator.agent.md` — BOM stripped, CRLF → LF
+- `templates/agent-workbench/.github/agents/planner.agent.md` — BOM stripped, CRLF → LF
+- `templates/agent-workbench/.github/agents/researcher.agent.md` — BOM stripped, CRLF → LF
+- `templates/agent-workbench/.github/agents/tester.agent.md` — BOM stripped, CRLF → LF
+- `templates/agent-workbench/.github/agents/workspace-cleaner.agent.md` — BOM stripped, CRLF → LF
+- `templates/agent-workbench/.github/agents/README.md` — BOM stripped, CRLF → LF
+- `templates/agent-workbench/.github/instructions/copilot-instructions.md` — CRLF → LF
+- `templates/agent-workbench/Project/README.md` — CRLF → LF
+- `templates/agent-workbench/README.md` — CRLF → LF
+- `templates/agent-workbench/MANIFEST.json` — Regenerated (hashes updated after encoding fix)
+- `tests/regression-baseline.json` — Added 35 new entries; `_count` 175 → 210
+
+### Tests Re-run
+
+- `tests/FIX-119/` — 13/13 passed (TST-2688)
+- Workspace validator — passed with 2 warnings (BUG-202, BUG-203 referenced in test-report but filed by Tester, not Fix scope)
+
+### Files Changed in Iteration 3
+
+- `templates/agent-workbench/.github/agents/` (8 files) — BOM + CRLF fixed
+- `templates/agent-workbench/.github/instructions/copilot-instructions.md` — CRLF fixed
+- `templates/agent-workbench/Project/README.md` — CRLF fixed
+- `templates/agent-workbench/README.md` — CRLF fixed
+- `templates/agent-workbench/MANIFEST.json` — Regenerated
+- `tests/regression-baseline.json` — 35 new known-failure entries added

@@ -1,4 +1,4 @@
-﻿---
+---
 name: Coordinator
 description: "Orchestrates specialist agents to turn a goal into a working demonstrator. Delegates, monitors, and delivers."
 tools: [vscode, execute, read, agent, edit, search, web/githubRepo, todo]

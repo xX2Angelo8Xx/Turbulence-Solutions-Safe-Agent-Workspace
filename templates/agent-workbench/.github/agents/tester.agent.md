@@ -1,4 +1,4 @@
-﻿---
+---
 name: Tester
 description: "Writes tests, hunts edge cases, and validates behavior — quality-focused, edge-case-first"
 tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, execute, read, edit, search, todo]

@@ -1,4 +1,4 @@
-﻿---
+---
 name: Workspace-Cleaner
 description: "Checks that AgentDocs match the actual project state. Finds and fixes documentation drift — the cleanup crew."
 tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, execute, read, agent, edit, search, todo]

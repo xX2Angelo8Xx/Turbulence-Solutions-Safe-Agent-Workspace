@@ -1,4 +1,4 @@
-﻿# Specialist Agents
+# Specialist Agents
 
 Seven specialist agents are available in this workspace. Invoke any agent with `@<agent-name>` in VS Code Chat (e.g., `@Coordinator`, `@Programmer`, `@Tester`), or delegate to them via `runSubagent`.
 

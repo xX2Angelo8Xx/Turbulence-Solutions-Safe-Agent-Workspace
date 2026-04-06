@@ -11,3 +11,9 @@ templates/agent-workbench/.github/hooks/scripts/*.py text eol=lf
 templates/agent-workbench/.github/hooks/scripts/*.json text eol=lf
 templates/agent-workbench/.github/hooks/*.json text eol=lf
 templates/agent-workbench/.vscode/settings.json text eol=lf
+
+# Template agent files — enforce LF so BOM/CRLF tests pass on all platforms (FIX-119)
+templates/agent-workbench/.github/agents/*.md text eol=lf
+templates/agent-workbench/.github/instructions/*.md text eol=lf
+templates/agent-workbench/*.md text eol=lf
+templates/agent-workbench/Project/*.md text eol=lf

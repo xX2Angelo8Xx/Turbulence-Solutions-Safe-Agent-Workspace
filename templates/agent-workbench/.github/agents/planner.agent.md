@@ -1,4 +1,4 @@
-﻿---
+---
 name: Planner
 description: "Creates structured plans, maps dependencies, and produces actionable task lists — planning only, no implementation"
 tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, read, agent, edit, search]
