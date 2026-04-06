@@ -2,20 +2,23 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-04-06  
-**Iteration:** 1
+**Iteration:** 2
 
 ---
 
 ## Summary
 
-GUI-034 WP-specific tests (24) all pass. However, the change to `_on_create_project`
-(moving creation to a background thread with `_window.after()` for UI callbacks) breaks
-14 pre-existing tests in GUI-005, GUI-006, and GUI-012 that were written for the
-synchronous API. These failures are **not** in the regression baseline and are therefore
-genuine new regressions introduced by this WP.
+Iteration 2 fixes the 14 regressions identified in Iteration 1. The GUI-034 WP-specific tests
+(24) and all previously-failing GUI-005, GUI-006, and GUI-012 tests now pass (117 total, 0
+failed). However, regression analysis reveals 1 new failure not caught by the Developer:
 
-Per `testing-protocol.md` rule: "Any code change that alters externally-asserted behavior
-MUST update all affected test assertions in the same commit or PR."
+`tests/SAF-034/test_saf034.py::test_on_create_project_proceeds_when_shim_ok`
+
+This test creates a bare App instance to verify `create_project` is called when `verify_ts_python`
+returns `(True, ...)`. It fails with `AttributeError: 'App' object has no attribute 'create_button'`
+because GUI-034 added `_set_creation_ui_state(disabled=True)` to `_on_create_project()` before the
+background thread is started, but the SAF-034 test does not set up the widget attributes now
+required by `_set_creation_ui_state`.
 
 **Verdict: FAIL — return to Developer.**
 
@@ -23,125 +26,106 @@ MUST update all affected test assertions in the same commit or PR."
 
 ## Tests Executed
 
-| Test Suite | Type | Result | Notes |
-|-----------|------|--------|-------|
-| `tests/GUI-034/` (24 tests) | Unit | PASS | All 24 WP-specific tests pass |
-| `tests/FIX-072/` (17 tests) | Unit | PASS | No regression from make_browse_row removal |
-| Full regression suite | Regression | FAIL | 274 failures total; pre-existing failures match baseline; 14 new failures (below) |
+| Test Suite | Type | Logged As | Result | Notes |
+|-----------|------|-----------|--------|-------|
+| `tests/GUI-034/` (24 tests) | Unit | TST-2696 | PASS | All WP-specific tests pass |
+| `tests/GUI-034/ + GUI-005 + GUI-006 + GUI-012` (117 tests) | Unit | TST-2698 | PASS | All 14 Iteration 1 regressions now fixed |
+| Full regression suite | Regression | TST-2697 | FAIL | 1 new failure in SAF-034 (below) |
 
-### New regressions (not in regression-baseline.json)
+### New regression found in Iteration 2 (not in regression-baseline.json)
 
-| Test | File | Failure Reason |
-|------|------|----------------|
-| `TestOnCreateProjectSuccess::test_success_shows_info_dialog` | `tests/GUI-005/test_gui005_project_creation.py` | `showinfo` never called — it's now in `_on_creation_complete` which runs via `_window.after()` and is never invoked during the test |
-| `TestOnCreateProjectSuccess::test_success_info_dialog_mentions_project_name` | `tests/GUI-005/test_gui005_project_creation.py` | Same as above |
-| `TestOnCreateProjectCreationError::test_create_project_exception_shows_error_dialog` | `tests/GUI-005/test_gui005_project_creation.py` | `showerror` never called — same threading issue |
-| `TestOnCreateProjectCreationError::test_create_project_exception_message_passed_to_dialog` | `tests/GUI-005/test_gui005_project_creation.py` | Same as above |
-| `TestOnCreateProjectCreationError::test_create_project_oserror_shows_error_dialog` | `tests/GUI-005/test_gui005_project_creation.py` | Same as above |
-| `TestOnCreateProjectHandlerEdgeCases::test_generic_runtime_error_shows_error_dialog` | `tests/GUI-005/test_gui005_project_creation.py` | Same as above |
-| `TestOnCreateProjectHandlerEdgeCases::test_success_info_dialog_includes_created_path` | `tests/GUI-005/test_gui005_project_creation.py` | Same as above |
-| `TestOnCreateProjectHandlerEdgeCases::test_create_project_exception_does_not_show_success` | `tests/GUI-005/test_gui005_project_creation.py` | Same as above |
-| `TestVSCodeCallOrdering::test_success_message_shown_before_vscode_opened` | `tests/GUI-006/test_gui006_tester_edge_cases.py` | Callback never fires via `_window.after()` mock |
-| `TestOpenInVSCodeCalledExactlyOnce::test_called_exactly_once_on_success` | `tests/GUI-006/test_gui006_tester_edge_cases.py` | Same as above |
-| `TestSuccessMessageWithCheckboxUnchecked::test_success_info_shown_even_when_checkbox_unchecked` | `tests/GUI-006/test_gui006_tester_edge_cases.py` | Same as above |
-| `TestOpenInVSCodeCalledOnSuccess::test_open_in_vscode_called_when_checked` | `tests/GUI-006/test_gui006_vscode_auto_open.py` | `open_in_vscode` never called — same threading issue |
-| `TestOpenInVSCodeCalledOnSuccess::test_open_in_vscode_called_with_correct_path` | `tests/GUI-006/test_gui006_vscode_auto_open.py` | Same as above |
-| `TestWindowHeight::test_window_height_is_440` | `tests/GUI-012/test_gui012_spacing.py` | Asserts `"630" in geometry_call` but height is now 660 |
+| Test | File | Failure |
+|------|------|---------|
+| `test_on_create_project_proceeds_when_shim_ok` | `tests/SAF-034/test_saf034.py` | `AttributeError: 'App' object has no attribute 'create_button'` at `_set_creation_ui_state` |
 
 ---
 
 ## Root Cause Analysis
 
-### Issue 1 — Synchronous test assumptions broken by threading (GUI-005, GUI-006)
+`_on_create_project()` now calls `self._set_creation_ui_state(disabled=True)` immediately after
+all validations pass, before launching the background thread. `_set_creation_ui_state` accesses:
 
-`_on_create_project()` previously called `create_project()` and `messagebox` / `open_in_vscode`
-**synchronously** on the main thread. GUI-034 moved `create_project()` to a daemon thread and
-moved all post-creation UI calls (`showinfo`, `showerror`, `open_in_vscode`) into
-`_on_creation_complete()`, which is scheduled via `self._window.after(0, callback)`.
+- `self.create_button`
+- `self.browse_button`
+- `self.project_name_entry`
+- `self.destination_entry`
+- `self.project_type_dropdown`
+- `self.create_progress_bar`
 
-In tests, `self._window` is a `MagicMock`. Calling `.after(0, callback)` on a MagicMock simply
-records the call — **it never executes the callback**. So `_on_creation_complete` is never called,
-and none of the post-creation assertions (messagebox, VS Code) can ever be satisfied.
+Additionally, the background thread calls `self._window.after(0, callback)` — which requires a
+`_window` mock with an `.after` side-effect if the test wants to observe post-creation behavior.
 
-The Developer must update the affected GUI-005 and GUI-006 tests to match the new async API.
-
-**Recommended fix:** In the tests that assert post-completion behavior, patch `threading.Thread`
-so its target runs synchronously, AND patch `_window.after` to invoke the callback immediately.
-For example:
-
-```python
-def _sync_after(delay, callback):
-    callback()
-
-app._window.after = _sync_after
-
-with patch("launcher.gui.app.threading.Thread") as mock_thread:
-    def immediate_start(target, **kwargs): target()
-    mock_thread.return_value.start.side_effect = lambda: create_thread_target()
-    ...
-```
-
-Or more simply, test `_on_creation_complete` directly (it's a public-enough method):
-```python
-app._on_creation_complete(success=True, error_msg="", created_path=..., ...)
-```
-and separately test that `_on_create_project` starts a thread (already covered in GUI-034 tests).
-
-### Issue 2 — Window height assertion stale (GUI-012)
-
-`tests/GUI-012/test_gui012_spacing.py::TestWindowHeight::test_window_height_is_440` contains:
-```python
-assert "630" in geometry_call
-```
-The height was intentionally increased from 630 → 660 by GUI-034. This string check is now stale
-and must be updated to `"660"`.
+The SAF-034 test `test_on_create_project_proceeds_when_shim_ok` creates a bare App instance via
+`object.__new__` and sets up only the attributes that existed before GUI-034. The three newly
+required attributes (`create_button`, `browse_button`, `create_progress_bar`) and a `_window`
+mock with `.after` side-effects were never added.
 
 ---
 
 ## Bugs Found
 
-None. These are test maintenance failures caused by the Developer not updating existing tests
-alongside the behavioral change, as required by `testing-protocol.md`.
+- BUG-204: GUI-034: SAF-034 test_on_create_project_proceeds_when_shim_ok fails — missing widget
+  attrs after threading refactor (logged in `docs/bugs/bugs.jsonl`)
 
 ---
 
 ## TODOs for Developer
 
-- [ ] **Update `tests/GUI-012/test_gui012_spacing.py`** — change `assert "630" in geometry_call` to `assert "660" in geometry_call` in `test_window_height_is_440`.
+### Mandatory fix: update `tests/SAF-034/test_saf034.py`
 
-- [ ] **Update `tests/GUI-005/test_gui005_project_creation.py`** — the following 8 tests (in
-  `TestOnCreateProjectSuccess`, `TestOnCreateProjectCreationError`, `TestOnCreateProjectHandlerEdgeCases`)
-  assert that `messagebox.showinfo` / `messagebox.showerror` is called after `_on_create_project()`.
-  Since these calls are now asynchronous (via `_window.after()` in a thread callback), the tests
-  must be adapted. See recommendations in Root Cause Analysis above.
-  - `test_success_shows_info_dialog`
-  - `test_success_info_dialog_mentions_project_name`
-  - `test_create_project_exception_shows_error_dialog`
-  - `test_create_project_exception_message_passed_to_dialog`
-  - `test_create_project_oserror_shows_error_dialog`
-  - `test_generic_runtime_error_shows_error_dialog`
-  - `test_success_info_dialog_includes_created_path`
-  - `test_create_project_exception_does_not_show_success`
+In `test_on_create_project_proceeds_when_shim_ok`, add the missing attributes to the `instance`
+setup block (after the existing `include_readmes_var` lines):
 
-- [ ] **Update `tests/GUI-006/test_gui006_tester_edge_cases.py`** — the following 3 tests assert
-  VS Code / messagebox calls happen after `_on_create_project()`. Same threading fix needed.
-  - `TestVSCodeCallOrdering::test_success_message_shown_before_vscode_opened`
-  - `TestOpenInVSCodeCalledExactlyOnce::test_called_exactly_once_on_success`
-  - `TestSuccessMessageWithCheckboxUnchecked::test_success_info_shown_even_when_checkbox_unchecked`
+```python
+# GUI-034: _on_create_project calls _set_creation_ui_state which needs these.
+instance.create_button = MagicMock()
+instance.browse_button = MagicMock()
+instance.create_progress_bar = MagicMock()
+instance._window = MagicMock()
+instance._window.after.side_effect = lambda ms, cb: cb()
+```
 
-- [ ] **Update `tests/GUI-006/test_gui006_vscode_auto_open.py`** — the following 2 tests assert
-  `open_in_vscode` is called after `_on_create_project()`. Same threading fix needed.
-  - `TestOpenInVSCodeCalledOnSuccess::test_open_in_vscode_called_when_checked`
-  - `TestOpenInVSCodeCalledOnSuccess::test_open_in_vscode_called_with_correct_path`
+And add `patch("launcher.gui.app.threading.Thread", _SyncThread)` to the `with patch(...)` block
+so the background thread fires synchronously and `create_project` is actually called during the
+test. The `_SyncThread` class is already defined in `tests/GUI-005/test_gui005_project_creation.py`
+and `tests/GUI-006/` — replicate the same pattern here.
 
-- [ ] After all test fixes: run `scripts/run_tests.py --wp GUI-034 --type Regression --env "Windows 11 + Python 3.11" --full-suite` and confirm 0 new failures beyond the regression baseline.
+Full corrected `with patch(...)` context:
+
+```python
+with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
+     patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
+     patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
+     patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
+     patch("launcher.gui.app._format_template_name", return_value="Coding"), \
+     patch("launcher.gui.app.verify_ts_python", return_value=(True, "3.11.0")), \
+     patch("launcher.gui.app.threading.Thread", _SyncThread), \
+     patch("launcher.gui.app.create_project", return_value=fake_project) as mock_cp, \
+     patch("launcher.gui.app.messagebox"):
+    app_module.App._on_create_project(instance)
+
+mock_cp.assert_called_once()
+```
+
+- [ ] **Add missing widget mocks** (`create_button`, `browse_button`, `create_progress_bar`,
+  `_window` with `after` side-effect) to `test_on_create_project_proceeds_when_shim_ok` in
+  `tests/SAF-034/test_saf034.py`.
+- [ ] **Add** `patch("launcher.gui.app.threading.Thread", _SyncThread)` to the same test's
+  `with patch(...)` block so the background thread runs synchronously and `create_project` is called.
+- [ ] **Add** a `_SyncThread` class (or import equivalent) at the top of `tests/SAF-034/test_saf034.py`.
+- [ ] Re-run `scripts/run_tests.py --wp GUI-034 --type Regression --env "Windows 11 + Python 3.11" --full-suite`
+  and confirm 0 new failures beyond the established regression baseline.
 
 ---
 
 ## Verdict
 
-**FAIL — return to Developer.**
+**FAIL — return to Developer (Iteration 3).**
 
-The WP implementation is correct, but 14 pre-existing tests in GUI-005, GUI-006, and GUI-012
-were broken by the behavioral change and were not updated. Per testing-protocol.md, these must be
-fixed in the same commit. Address all TODOs above and re-submit for Tester review.
+The 14 Iteration-1 regressions are all fixed. However, 1 new regression in `tests/SAF-034/` was
+introduced by the same threading change and was not caught before handoff. The SAF-034 test
+`test_on_create_project_proceeds_when_shim_ok` raises `AttributeError` because the bare instance
+setup does not include the three new widget attributes now required by `_set_creation_ui_state`.
+
+Fix per the TODO above, confirm the test passes, re-run the full regression suite, and
+re-submit for Tester review.
