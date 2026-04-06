@@ -166,14 +166,16 @@ def test_af4_recursive_find_command():
 # ---------------------------------------------------------------------------
 
 def test_af5_integrity_constants_not_zeroed():
-    # TST-529 — regression AF-5: the embedded SHA256 constants must be valid
-    # 64-character hex strings and must not be the all-zeros placeholder used
-    # during canonical hashing.  An all-zeros value means the hashes were
-    # never properly computed.
+    # TST-529 — regression AF-5: _KNOWN_GOOD_SETTINGS_HASH was removed by
+    # FIX-115 (settings.json no longer verified by the gate).  Verify it is
+    # absent.  _KNOWN_GOOD_GATE_HASH must still be a valid non-zeroed 64-char
+    # hex string — that check is retained.
+    assert not hasattr(sg, "_KNOWN_GOOD_SETTINGS_HASH"), (
+        "_KNOWN_GOOD_SETTINGS_HASH should not be present in security_gate.py "
+        "after FIX-115 removed the settings.json hash check."
+    )
     zero_hash = "0" * 64
-    assert re.fullmatch(r"[0-9a-fA-F]{64}", sg._KNOWN_GOOD_SETTINGS_HASH)
     assert re.fullmatch(r"[0-9a-fA-F]{64}", sg._KNOWN_GOOD_GATE_HASH)
-    assert sg._KNOWN_GOOD_SETTINGS_HASH != zero_hash
     assert sg._KNOWN_GOOD_GATE_HASH != zero_hash
 
 

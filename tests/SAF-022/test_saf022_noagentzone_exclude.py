@@ -163,24 +163,40 @@ class TestSettingsSync:
 # ---------------------------------------------------------------------------
 
 class TestHashIntegrity:
-    """security_gate.py must embed the correct hash for settings.json."""
+    """FIX-115: _KNOWN_GOOD_SETTINGS_HASH was removed from security_gate.py.
+    Verify it is absent and that _KNOWN_GOOD_GATE_HASH is still valid.
+    """
 
     def test_default_gate_settings_hash_matches(self):
-        actual_hash = _sha256_file(DEFAULT_SETTINGS)
-        embedded_hash = _extract_settings_hash(DEFAULT_GATE)
-        assert actual_hash == embedded_hash, (
-            f"Default security_gate.py settings hash mismatch.\n"
-            f"  Actual   : {actual_hash}\n"
-            f"  Embedded : {embedded_hash}"
+        # FIX-115: settings.json is no longer hashed in security_gate.py.
+        # _KNOWN_GOOD_SETTINGS_HASH must be absent from the gate source.
+        content = DEFAULT_GATE.read_text(encoding="utf-8")
+        assert re.search(r'_KNOWN_GOOD_SETTINGS_HASH: str = "[0-9a-fA-F]{64}"', content) is None, (
+            f"_KNOWN_GOOD_SETTINGS_HASH still present in {DEFAULT_GATE} — "
+            "FIX-115 should have removed it."
+        )
+        gate_match = re.search(r'_KNOWN_GOOD_GATE_HASH: str = "([0-9a-fA-F]{64})"', content)
+        assert gate_match is not None, (
+            f"_KNOWN_GOOD_GATE_HASH not found in {DEFAULT_GATE}"
+        )
+        assert gate_match.group(1) != "0" * 64, (
+            "_KNOWN_GOOD_GATE_HASH must not be the all-zeros placeholder"
         )
 
     def test_template_gate_settings_hash_matches(self):
-        actual_hash = _sha256_file(TEMPLATE_SETTINGS)
-        embedded_hash = _extract_settings_hash(TEMPLATE_GATE)
-        assert actual_hash == embedded_hash, (
-            f"Template security_gate.py settings hash mismatch.\n"
-            f"  Actual   : {actual_hash}\n"
-            f"  Embedded : {embedded_hash}"
+        # FIX-115: settings.json is no longer hashed in security_gate.py.
+        # _KNOWN_GOOD_SETTINGS_HASH must be absent from the template gate.
+        content = TEMPLATE_GATE.read_text(encoding="utf-8")
+        assert re.search(r'_KNOWN_GOOD_SETTINGS_HASH: str = "[0-9a-fA-F]{64}"', content) is None, (
+            f"_KNOWN_GOOD_SETTINGS_HASH still present in {TEMPLATE_GATE} — "
+            "FIX-115 should have removed it."
+        )
+        gate_match = re.search(r'_KNOWN_GOOD_GATE_HASH: str = "([0-9a-fA-F]{64})"', content)
+        assert gate_match is not None, (
+            f"_KNOWN_GOOD_GATE_HASH not found in {TEMPLATE_GATE}"
+        )
+        assert gate_match.group(1) != "0" * 64, (
+            "_KNOWN_GOOD_GATE_HASH must not be the all-zeros placeholder"
         )
 
 

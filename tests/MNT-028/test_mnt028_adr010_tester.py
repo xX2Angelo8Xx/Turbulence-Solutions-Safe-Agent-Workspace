@@ -118,10 +118,16 @@ def test_adr010_index_related_wps_includes_mnt027_and_mnt028():
 
 
 def test_adr010_is_last_entry_in_index():
-    """ADR-010 must be the last (most recent) entry in index.jsonl."""
+    """ADR-010 must exist in index.jsonl, immediately followed by ADR-011."""
     rows = _load_adr_index()
     assert rows, "index.jsonl is empty"
-    last_id = rows[-1].get("ADR-ID")
-    assert last_id == "ADR-010", (
-        f"Expected ADR-010 to be the last entry, but last entry is '{last_id}'"
+    ids = [r.get("ADR-ID") for r in rows]
+    assert "ADR-010" in ids, "ADR-010 not found in ADR index"
+    idx = ids.index("ADR-010")
+    assert idx == len(ids) - 2, (
+        f"Expected ADR-010 to be second-to-last (before ADR-011), "
+        f"but it is at position {idx} of {len(ids) - 1}"
+    )
+    assert ids[idx + 1] == "ADR-011", (
+        f"Expected ADR-011 to follow ADR-010, but found '{ids[idx + 1]}'"
     )
