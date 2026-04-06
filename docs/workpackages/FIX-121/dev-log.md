@@ -73,6 +73,24 @@ change, `_set_creation_ui_state(disabled=True)` is called before validation, so 
 
 ---
 
-## Known Limitations
+## Iteration 2 (Tester Feedback)
 
-None. All existing SAF-034 tests updated to pass with new structure.
+### Issues Found by Tester
+
+1. **`tests/GUI-034/test_gui034_progress_bar.py::test_on_create_project_no_thread_on_invalid_name`** — Test asserted pre-FIX-121 behavior (no thread on invalid name). Updated to reflect new contract: thread always starts, UI always disabled before validation.
+
+2. **BUG-206 status** — `docs/bugs/bugs.jsonl` still showed `"Status": "Open"`. Updated to `"Status": "Fixed"`.
+
+3. **BUG-210** (filed by Tester) — Closed with `"Fixed In WP": "FIX-121"`.
+
+### Additional Changes (Iteration 2)
+
+- `tests/GUI-034/test_gui034_progress_bar.py` — `test_on_create_project_no_thread_on_invalid_name` updated
+- `docs/bugs/bugs.jsonl` — BUG-206 → Fixed, BUG-210 → Fixed (Fixed In WP: FIX-121)
+
+### Test Results (Iteration 2)
+
+- FIX-121 suite: 12/12 passed (TST-2722; includes 5 Tester edge-cases)
+- GUI-034 test: PASSED
+- Workspace validation: clean (exit 0)
+
