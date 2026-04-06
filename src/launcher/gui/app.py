@@ -466,67 +466,84 @@ class App:
             )
             return
 
-        # Clear previous inline errors before re-validating.
-        self.project_name_error_label.configure(text="")
-        self.destination_error_label.configure(text="")
-
-        name_valid, name_error = validate_folder_name(folder_name)
-        if not name_valid:
-            self.project_name_error_label.configure(text=name_error)
-            return
-
-        dest_valid, dest_error = validate_destination_path(destination_str)
-        if not dest_valid:
-            self.destination_error_label.configure(text=dest_error)
-            return
-
-        if check_duplicate_folder(f"SAE-{folder_name}", destination_str):
-            self.project_name_error_label.configure(
-                text=f'A folder named "SAE-{folder_name}" already exists at the destination.'
-            )
-            return
-
-        # Reverse-map the title-cased display name back to the raw template dir name.
-        raw_template = next(
-            (t for t in list_templates(TEMPLATES_DIR) if _format_template_name(t) == display_template),
-            None,
-        )
-        if raw_template is None:
-            messagebox.showerror(
-                "Template Not Found",
-                f'Could not find a template matching "{display_template}". '
-                "Please restart the application and try again.",
-            )
-            return
-
-        template_path = TEMPLATES_DIR / raw_template
-        # Pre-flight: verify ts-python is accessible before creating the workspace.
-        shim_ok, shim_msg = verify_ts_python()
-        if not shim_ok:
-            messagebox.showerror(
-                "Python Runtime Unavailable",
-                "The bundled Python runtime is not accessible. "
-                "Please reinstall the launcher or use Settings > Relocate Python Runtime.\n\n"
-                f"Details: {shim_msg}",
-            )
-            return
-
-        # Read counter config from GUI controls (GUI-020).
-        counter_enabled = self.counter_enabled_var.get()
-        try:
-            counter_threshold = self.get_counter_threshold()
-        except ValueError:
-            counter_threshold = 20
-
-        # Read include_readmes from GUI checkbox (GUI-022).
-        include_readmes = self.include_readmes_var.get()
         # Capture open_vscode flag before disabling the checkbox (GUI-034).
         open_vscode = self.open_in_vscode_var.get()
-
-        # GUI-034: disable UI and animate progress bar while creation runs in background.
+        # GUI-034/FIX-121: disable UI immediately so button greys out before validation.
         self._set_creation_ui_state(disabled=True)
 
         def _create() -> None:
+            # Clear previous inline errors before re-validating.
+            self._window.after(0, lambda: self.project_name_error_label.configure(text=""))
+            self._window.after(0, lambda: self.destination_error_label.configure(text=""))
+
+            name_valid, name_error = validate_folder_name(folder_name)
+            if not name_valid:
+                _name_err = name_error
+                def _show_name_error() -> None:
+                    self.project_name_error_label.configure(text=_name_err)
+                    self._set_creation_ui_state(disabled=False)
+                self._window.after(0, _show_name_error)
+                return
+
+            dest_valid, dest_error = validate_destination_path(destination_str)
+            if not dest_valid:
+                _dest_err = dest_error
+                def _show_dest_error() -> None:
+                    self.destination_error_label.configure(text=_dest_err)
+                    self._set_creation_ui_state(disabled=False)
+                self._window.after(0, _show_dest_error)
+                return
+
+            if check_duplicate_folder(f"SAE-{folder_name}", destination_str):
+                _dup_text = f'A folder named "SAE-{folder_name}" already exists at the destination.'
+                def _show_dup_error() -> None:
+                    self.project_name_error_label.configure(text=_dup_text)
+                    self._set_creation_ui_state(disabled=False)
+                self._window.after(0, _show_dup_error)
+                return
+
+            # Reverse-map the title-cased display name back to the raw template dir name.
+            raw_template = next(
+                (t for t in list_templates(TEMPLATES_DIR) if _format_template_name(t) == display_template),
+                None,
+            )
+            if raw_template is None:
+                def _show_template_error() -> None:
+                    messagebox.showerror(
+                        "Template Not Found",
+                        f'Could not find a template matching "{display_template}". '
+                        "Please restart the application and try again.",
+                    )
+                    self._set_creation_ui_state(disabled=False)
+                self._window.after(0, _show_template_error)
+                return
+
+            template_path = TEMPLATES_DIR / raw_template
+            # Pre-flight: verify ts-python is accessible before creating the workspace.
+            shim_ok, shim_msg = verify_ts_python()
+            if not shim_ok:
+                _shim_msg = shim_msg
+                def _show_shim_error() -> None:
+                    messagebox.showerror(
+                        "Python Runtime Unavailable",
+                        "The bundled Python runtime is not accessible. "
+                        "Please reinstall the launcher or use Settings > Relocate Python Runtime.\n\n"
+                        f"Details: {_shim_msg}",
+                    )
+                    self._set_creation_ui_state(disabled=False)
+                self._window.after(0, _show_shim_error)
+                return
+
+            # Read counter config from GUI controls (GUI-020).
+            counter_enabled = self.counter_enabled_var.get()
+            try:
+                counter_threshold = self.get_counter_threshold()
+            except ValueError:
+                counter_threshold = 20
+
+            # Read include_readmes from GUI checkbox (GUI-022).
+            include_readmes = self.include_readmes_var.get()
+
             try:
                 created_path = create_project(
                     template_path,

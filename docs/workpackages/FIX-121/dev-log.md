@@ -1,0 +1,78 @@
+# Dev Log — FIX-121
+
+**WP:** FIX-121 — Immediate button feedback on Create Project click  
+**Developer:** Developer Agent  
+**Date Started:** 2026-04-07  
+**Branch:** FIX-121/button-feedback  
+**Bug Reference:** BUG-206
+
+---
+
+## ADR Prior-Art Check
+
+Reviewed `docs/decisions/index.jsonl`. No ADRs directly address GUI threading patterns.  
+ADR-008 (Tests Must Track Current Codebase State) is noted — SAF-034 tests are updated to reflect
+the new `_on_create_project` structure.
+
+---
+
+## Objective
+
+Move `_set_creation_ui_state(disabled=True)` to immediately after the `_COMING_SOON_LABEL` guard
+so the button greys out and the progress bar starts *before* any validation runs. Move all
+validation logic (input checks, `verify_ts_python()`, counter config reads) into the background
+`_create()` thread. On validation failure, post UI updates back to the main thread via
+`self._window.after(0, callback)`.
+
+---
+
+## Implementation Summary
+
+### `src/launcher/gui/app.py` — `_on_create_project()`
+
+**Before (broken):** `_set_creation_ui_state(disabled=True)` was called at line 539, AFTER
+all synchronous validation and `verify_ts_python()` (line 510). This caused a 1–2 second UI
+freeze on click.
+
+**After (fixed):** 
+1. `open_vscode` flag is captured immediately after the COMING_SOON guard (main thread, before UI is disabled so the checkbox value is stable).
+2. `_set_creation_ui_state(disabled=True)` is called right after, immediately giving visual feedback.
+3. All validation (name, destination, duplicate check, template lookup, `verify_ts_python()`) and counter config reads move into `_create()`.
+4. Validation failures in `_create()` post UI updates via `self._window.after(0, callback)` to the main thread and call `self._set_creation_ui_state(disabled=False)` to re-enable the UI.
+
+### `tests/SAF-034/test_saf034.py` — Tests 11, 12, 14
+
+These tests construct a bare `App` instance and call `_on_create_project()` directly. After the
+change, `_set_creation_ui_state(disabled=True)` is called before validation, so the tests needed:
+- `create_button`, `browse_button`, `create_progress_bar` MagicMocks
+- `_window = MagicMock()` with `after.side_effect = lambda ms, cb: cb()` for synchronous dispatch
+- `threading.Thread` replaced with a `_SyncThread` helper to run `_create()` inline
+
+---
+
+## Files Changed
+
+- `src/launcher/gui/app.py`
+- `tests/SAF-034/test_saf034.py`
+- `tests/FIX-121/__init__.py` (new)
+- `tests/FIX-121/test_fix121_button_feedback.py` (new)
+- `docs/workpackages/workpackages.jsonl`
+
+---
+
+## Tests Written
+
+- `tests/FIX-121/test_fix121_button_feedback.py`
+  - `test_ui_disabled_before_validation` — Verifies `_set_creation_ui_state(disabled=True)` is called before any validation
+  - `test_ui_reenabled_on_invalid_name` — Validates that UI re-enables when name validation fails
+  - `test_ui_reenabled_on_invalid_dest` — Validates that UI re-enables when destination validation fails
+  - `test_ui_reenabled_on_duplicate_folder` — Validates that UI re-enables when duplicate check fails
+  - `test_ui_reenabled_on_shim_failure` — Validates that UI re-enables when verify_ts_python fails
+  - `test_error_message_shown_on_shim_failure` — Validates error dialog shown when shim fails
+  - `test_create_proceeds_on_valid_inputs` — Validates successful project creation flow
+
+---
+
+## Known Limitations
+
+None. All existing SAF-034 tests updated to pass with new structure.

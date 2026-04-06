@@ -143,7 +143,18 @@ def test_on_create_project_error_dialog_title(tmp_path):
     fake_dest = tmp_path / "dest"
     fake_dest.mkdir()
 
+    class _SyncThread:
+        def __init__(self, target=None, daemon=False, **kwargs):
+            self._target = target
+        def start(self) -> None:
+            if self._target:
+                self._target()
+
+    mock_window = MagicMock()
+    mock_window.after.side_effect = lambda ms, cb: cb()
+
     instance = object.__new__(app_module.App)
+    instance._window = mock_window
     instance.project_name_entry = MagicMock()
     instance.project_name_entry.get.return_value = "TestProject"
     instance.project_type_dropdown = MagicMock()
@@ -156,6 +167,10 @@ def test_on_create_project_error_dialog_title(tmp_path):
     instance.open_in_vscode_var.get.return_value = False
     instance._coming_soon_options = set()
     instance._current_template = "Coding"
+    # FIX-121: _set_creation_ui_state is now called before validation.
+    instance.create_button = MagicMock()
+    instance.browse_button = MagicMock()
+    instance.create_progress_bar = MagicMock()
 
     with patch("launcher.gui.app.validate_folder_name", return_value=(True, "")), \
          patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
@@ -163,6 +178,7 @@ def test_on_create_project_error_dialog_title(tmp_path):
          patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
          patch("launcher.gui.app._format_template_name", return_value="Coding"), \
          patch("launcher.gui.app.verify_ts_python", return_value=(False, "shim missing")), \
+         patch("launcher.gui.app.threading.Thread", _SyncThread), \
          patch("launcher.gui.app.create_project"), \
          patch("launcher.gui.app.messagebox") as mock_mb:
         app_module.App._on_create_project(instance)
