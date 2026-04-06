@@ -747,6 +747,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── GUI-035/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── INS-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1252,7 +1256,15 @@ Templates (bundled inside Launcher)
 │   │   ├── .gitignore
 │   │   ├── MANIFEST.json
 │   │   └── README.md
-│   └── certification-pipeline/
+│   ├── certification-pipeline/
+│   │   └── README.md
+│   └── clean-workspace/
+│       ├── .github/
+│       ├── .vscode/
+│       ├── NoAgentZone/
+│       ├── Project/
+│       ├── .gitignore
+│       ├── MANIFEST.json
 │       └── README.md
 ├── tests/
 │   ├── DOC-001/
@@ -1461,6 +1473,7 @@ Templates (bundled inside Launcher)
 │   ├── GUI-023/
 │   ├── GUI-033/
 │   ├── GUI-034/
+│   ├── GUI-035/
 │   ├── INS-001/
 │   ├── INS-002/
 │   ├── INS-003/
