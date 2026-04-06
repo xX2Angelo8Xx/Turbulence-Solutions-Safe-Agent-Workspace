@@ -129,3 +129,58 @@ def test_both_copies_section_6_are_identical():
         "§6 sections are out of sync between primary and mirror AGENT-RULES.md.\n"
         f"PRIMARY:\n{primary_s6}\n\nMIRROR:\n{mirror_s6}"
     )
+
+
+# --- Tester edge-case tests ---
+
+
+def test_primary_warning_mentions_bypass():
+    """Rule 2 must state that subagents cannot be used as a bypass."""
+    content = _load(PRIMARY_RULES)
+    assert "bypass" in content.lower()
+
+
+def test_mirror_warning_mentions_bypass():
+    content = _load(MIRROR_RULES)
+    assert "bypass" in content.lower()
+
+
+def test_primary_warning_mentions_specific_zones():
+    """The warning must name specific denied zones so agents know what to tell subagents."""
+    content = _load(PRIMARY_RULES)
+    assert ".github/hooks/" in content or "NoAgentZone" in content
+
+
+def test_mirror_warning_mentions_specific_zones():
+    content = _load(MIRROR_RULES)
+    assert ".github/hooks/" in content or "NoAgentZone" in content
+
+
+def test_primary_warning_mentions_runsubagent():
+    """Warning must reference the runSubagent tool so agents know which invocation path is affected."""
+    content = _load(PRIMARY_RULES)
+    assert "runSubagent" in content
+
+
+def test_mirror_warning_mentions_runsubagent():
+    content = _load(MIRROR_RULES)
+    assert "runSubagent" in content
+
+
+def test_subagent_warning_is_inside_section_6(tmp_path):
+    """The Subagent Budget Sharing heading must appear inside §6 (before §7 starts)."""
+    for path in (PRIMARY_RULES, MIRROR_RULES):
+        content = _load(path)
+        s6_start = content.find("## 6. Session-Scoped Denial Counter")
+        s7_start = content.find("## 7.")
+        subagent_pos = content.find("### Subagent Budget Sharing")
+        assert s6_start != -1, f"§6 not found in {path.name}"
+        assert subagent_pos != -1, f"Subagent Budget Sharing not found in {path.name}"
+        if s7_start != -1:
+            assert s6_start < subagent_pos < s7_start, (
+                f"Subagent Budget Sharing heading is not inside §6 in {path.name}"
+            )
+        else:
+            assert s6_start < subagent_pos, (
+                f"Subagent Budget Sharing heading appears before §6 in {path.name}"
+            )
