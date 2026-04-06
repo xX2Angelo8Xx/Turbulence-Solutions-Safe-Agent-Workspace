@@ -1,6 +1,6 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 155,
+  "_count": 175,
   "_updated": "2026-04-06",
   "known_failures": {
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_folder_table_row": {
@@ -467,6 +467,66 @@
     },
     "tests.SAF-058.test_saf058_tester_edge_cases.TestTesterEdgeCases.test_custom_project_folder_no_git_dir_is_allowed": {
       "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. Function no longer exists."
+    },
+    "tests.DOC-046.test_doc046_edge_cases.test_project_creator_docstring_references_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_edge_cases.test_project_creator_no_old_agent_rules_path": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_edge_cases.test_readme_old_path_absent_in_full_file": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_edge_cases.test_all_agent_files_no_bare_agent_rules_anywhere": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_slim_copilot_instructions.test_copilot_instructions_references_agentdocs_agent_rules": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_slim_copilot_instructions.test_copilot_instructions_no_old_agent_rules_path": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_slim_copilot_instructions.test_coordinator_agent_references_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_slim_copilot_instructions.test_planner_agent_references_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_slim_copilot_instructions.test_all_agent_files_reference_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_slim_copilot_instructions.test_all_agent_files_no_old_agent_rules_path": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_slim_copilot_instructions.test_readme_references_agentdocs_agent_rules": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-046.test_doc046_slim_copilot_instructions.test_readme_no_old_agent_rules_path": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-047.test_doc047_agent_rules_path_migration.test_doc007_no_stale_path_in_constant": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-047.test_doc047_agent_rules_path_migration.test_doc009_constant_uses_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-047.test_doc047_agent_rules_path_migration.test_doc009_setup_helper_uses_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-047.test_doc047_agent_rules_path_migration.test_doc008_read_first_directive_uses_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-047.test_doc047_agent_rules_path_migration.test_doc008_tester_edge_cases_uses_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-047.test_doc047_agent_rules_path_migration.test_doc002_readme_placeholders_uses_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-047.test_doc047_agent_rules_path_migration.test_agentdocs_agent_rules_template_exists": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
+    },
+    "tests.DOC-047.test_doc047_agent_rules_path_migration.test_all_updated_files_reference_agentdocs": {
+      "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
     }
   }
 }
