@@ -12,7 +12,7 @@ import pytest
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 _SCRIPT_PATH = _REPO_ROOT / "scripts" / "generate_manifest.py"
-_MANIFEST_PATH = _REPO_ROOT / "templates" / "agent-workbench" / "MANIFEST.json"
+_MANIFEST_PATH = _REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "MANIFEST.json"
 
 
 def test_module_docstring_mentions_agent_workbench():

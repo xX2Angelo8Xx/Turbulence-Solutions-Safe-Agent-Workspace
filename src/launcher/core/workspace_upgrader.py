@@ -17,7 +17,7 @@ from launcher.config import TEMPLATES_DIR, VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
-_MANIFEST_NAME = "MANIFEST.json"
+_MANIFEST_NAME = Path(".github") / "hooks" / "scripts" / "MANIFEST.json"
 _VERSION_FILE = Path(".github") / "version"
 
 # Paths that are NEVER upgraded (user content)

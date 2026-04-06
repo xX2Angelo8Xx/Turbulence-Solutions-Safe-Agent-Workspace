@@ -35,7 +35,7 @@ from pathlib import Path
 # Resolve the repository root relative to this script's location.
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _TEMPLATES_DIR = _REPO_ROOT / "templates"
-_MANIFEST_PATH = _TEMPLATES_DIR / "agent-workbench" / "MANIFEST.json"
+_MANIFEST_PATH = _TEMPLATES_DIR / "agent-workbench" / ".github" / "hooks" / "scripts" / "MANIFEST.json"
 
 # Sentinel written into security files to simulate an outdated workspace.
 _OLD_CONTENT_SENTINEL = b"__SAF077_OLD_CONTENT_SENTINEL__"

@@ -17,6 +17,7 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 _CLEAN_WORKSPACE = _REPO_ROOT / "templates" / "clean-workspace"
 _AGENT_WORKBENCH = _REPO_ROOT / "templates" / "agent-workbench"
 _TEMPLATES_DIR = _REPO_ROOT / "templates"
+_CLEAN_WORKSPACE_MANIFEST = _CLEAN_WORKSPACE / ".github" / "hooks" / "scripts" / "MANIFEST.json"
 
 
 def _sha256_normalized(path: Path) -> str:
@@ -53,7 +54,7 @@ class TestRequiredFiles:
         "Project/AGENT-RULES.md",
         "Project/README.md",
         ".gitignore",
-        "MANIFEST.json",
+        ".github/hooks/scripts/MANIFEST.json",
         "README.md",
     ])
     def test_required_file_present(self, rel_path: str):
@@ -207,14 +208,14 @@ class TestAgentRules:
 class TestManifestJson:
     def test_manifest_is_valid_json(self):
         """MANIFEST.json must be valid JSON."""
-        content = (_CLEAN_WORKSPACE / "MANIFEST.json").read_text(encoding="utf-8")
+        content = _CLEAN_WORKSPACE_MANIFEST.read_text(encoding="utf-8")
         data = json.loads(content)
         assert isinstance(data, dict)
 
     def test_manifest_template_field(self):
         """MANIFEST.json must have template field set to 'clean-workspace'."""
         data = json.loads(
-            (_CLEAN_WORKSPACE / "MANIFEST.json").read_text(encoding="utf-8")
+            _CLEAN_WORKSPACE_MANIFEST.read_text(encoding="utf-8")
         )
         assert data.get("template") == "clean-workspace", (
             "MANIFEST.json template field must be 'clean-workspace'"
@@ -223,7 +224,7 @@ class TestManifestJson:
     def test_manifest_has_file_count(self):
         """MANIFEST.json must have a positive file_count."""
         data = json.loads(
-            (_CLEAN_WORKSPACE / "MANIFEST.json").read_text(encoding="utf-8")
+            _CLEAN_WORKSPACE_MANIFEST.read_text(encoding="utf-8")
         )
         assert data.get("file_count", 0) > 0, (
             "MANIFEST.json file_count must be positive"
@@ -232,7 +233,7 @@ class TestManifestJson:
     def test_manifest_tracks_security_gate(self):
         """MANIFEST.json must track security_gate.py."""
         data = json.loads(
-            (_CLEAN_WORKSPACE / "MANIFEST.json").read_text(encoding="utf-8")
+            _CLEAN_WORKSPACE_MANIFEST.read_text(encoding="utf-8")
         )
         files = data.get("files", {})
         assert ".github/hooks/scripts/security_gate.py" in files, (
@@ -242,7 +243,7 @@ class TestManifestJson:
     def test_manifest_security_gate_is_critical(self):
         """security_gate.py must be marked security_critical in MANIFEST.json."""
         data = json.loads(
-            (_CLEAN_WORKSPACE / "MANIFEST.json").read_text(encoding="utf-8")
+            _CLEAN_WORKSPACE_MANIFEST.read_text(encoding="utf-8")
         )
         entry = data.get("files", {}).get(".github/hooks/scripts/security_gate.py", {})
         assert entry.get("security_critical") is True, (

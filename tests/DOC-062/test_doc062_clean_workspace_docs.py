@@ -20,7 +20,7 @@ TEMPLATE_ROOT = Path(__file__).parents[2] / "templates" / "clean-workspace"
 COPILOT_INSTRUCTIONS = TEMPLATE_ROOT / ".github" / "instructions" / "copilot-instructions.md"
 README = TEMPLATE_ROOT / "README.md"
 PROJECT_README = TEMPLATE_ROOT / "Project" / "README.md"
-MANIFEST = TEMPLATE_ROOT / "MANIFEST.json"
+MANIFEST = TEMPLATE_ROOT / ".github" / "hooks" / "scripts" / "MANIFEST.json"
 
 
 def _read(path: Path) -> str:

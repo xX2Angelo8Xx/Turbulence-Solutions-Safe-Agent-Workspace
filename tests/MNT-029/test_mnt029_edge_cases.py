@@ -12,7 +12,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BASELINE_PATH = REPO_ROOT / "tests" / "regression-baseline.json"
-MANIFEST_PATH = REPO_ROOT / "templates" / "agent-workbench" / "MANIFEST.json"
+MANIFEST_PATH = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "MANIFEST.json"
 
 # Dotted-path format for a baseline key: tests.<WP-ID>.test_module.<test_name>
 # The module portion maps to tests/<WP-ID>/test_module.py on disk.

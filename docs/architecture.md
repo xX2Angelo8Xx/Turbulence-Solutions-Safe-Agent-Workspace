@@ -1270,7 +1270,6 @@ Templates (bundled inside Launcher)
 │   │   ├── NoAgentZone/
 │   │   ├── Project/
 │   │   ├── .gitignore
-│   │   ├── MANIFEST.json
 │   │   └── README.md
 │   ├── certification-pipeline/
 │   │   └── README.md
@@ -1280,7 +1279,6 @@ Templates (bundled inside Launcher)
 │       ├── NoAgentZone/
 │       ├── Project/
 │       ├── .gitignore
-│       ├── MANIFEST.json
 │       └── README.md
 ├── tests/
 │   ├── DOC-001/

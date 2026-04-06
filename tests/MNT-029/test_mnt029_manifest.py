@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-MANIFEST_PATH = REPO_ROOT / "templates" / "agent-workbench" / "MANIFEST.json"
+MANIFEST_PATH = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "MANIFEST.json"
 GENERATE_SCRIPT = REPO_ROOT / "scripts" / "generate_manifest.py"
 
 

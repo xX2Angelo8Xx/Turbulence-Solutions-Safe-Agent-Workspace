@@ -41,7 +41,7 @@ class TestManifestHashIntegrity:
     """
 
     def _load_manifest(self) -> dict:
-        return json.loads((_CLEAN_WORKSPACE / "MANIFEST.json").read_text(encoding="utf-8"))
+        return json.loads((_CLEAN_WORKSPACE / ".github" / "hooks" / "scripts" / "MANIFEST.json").read_text(encoding="utf-8"))
 
     def test_all_manifest_hashes_match_files(self):
         """Every SHA256 in MANIFEST.json must match the actual file on disk."""

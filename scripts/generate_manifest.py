@@ -24,7 +24,8 @@ from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _TEMPLATE_DIR = _REPO_ROOT / "templates" / "agent-workbench"
-_MANIFEST_PATH = _TEMPLATE_DIR / "MANIFEST.json"
+_MANIFEST_SUBPATH = Path(".github") / "hooks" / "scripts" / "MANIFEST.json"
+_MANIFEST_PATH = _TEMPLATE_DIR / _MANIFEST_SUBPATH
 
 # Supported templates and their directories (GUI-035: added clean-workspace)
 _SUPPORTED_TEMPLATES = {
@@ -34,8 +35,9 @@ _SUPPORTED_TEMPLATES = {
 
 # Files to skip in the manifest (generated or user-specific)
 # FIX-102: Also skip gitignored runtime files that won't exist in CI
+# FIX-122: MANIFEST.json is now at .github/hooks/scripts/MANIFEST.json
 _SKIP_FILES = {
-    "MANIFEST.json",
+    ".github/hooks/scripts/MANIFEST.json",
     ".github/hooks/scripts/audit.jsonl",
     ".github/hooks/scripts/copilot-otel.jsonl",
     ".github/hooks/scripts/.hook_state.json",
@@ -111,7 +113,8 @@ def generate_manifest(template: str = "agent-workbench") -> dict:
 
 def write_manifest(manifest: dict, template: str = "agent-workbench") -> None:
     """Write manifest to MANIFEST.json."""
-    manifest_path = _SUPPORTED_TEMPLATES[template] / "MANIFEST.json"
+    manifest_path = _SUPPORTED_TEMPLATES[template] / _MANIFEST_SUBPATH
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
@@ -126,7 +129,7 @@ def write_manifest(manifest: dict, template: str = "agent-workbench") -> None:
 
 def check_manifest(template: str = "agent-workbench") -> bool:
     """Verify existing manifest matches current template files. Returns True if OK."""
-    manifest_path = _SUPPORTED_TEMPLATES[template] / "MANIFEST.json"
+    manifest_path = _SUPPORTED_TEMPLATES[template] / _MANIFEST_SUBPATH
     if not manifest_path.exists():
         print("ERROR: MANIFEST.json does not exist. Run without --check to generate.")
         return False

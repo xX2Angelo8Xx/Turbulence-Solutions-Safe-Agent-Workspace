@@ -25,7 +25,7 @@ import pytest
 # ---------------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = REPO_ROOT / "scripts"
-MANIFEST_PATH = REPO_ROOT / "templates" / "agent-workbench" / "MANIFEST.json"
+MANIFEST_PATH = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "hooks" / "scripts" / "MANIFEST.json"
 
 # Ensure scripts/ is importable
 if str(SCRIPTS_DIR) not in sys.path:

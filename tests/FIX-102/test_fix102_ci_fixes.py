@@ -14,7 +14,7 @@ import pathlib
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TEMPLATES_ROOT = REPO_ROOT / "templates" / "agent-workbench"
 TEMPLATES_HOOKS_SCRIPTS = TEMPLATES_ROOT / ".github" / "hooks" / "scripts"
-MANIFEST_PATH = TEMPLATES_ROOT / "MANIFEST.json"
+MANIFEST_PATH = TEMPLATES_HOOKS_SCRIPTS / "MANIFEST.json"
 GITIGNORE_PATH = TEMPLATES_ROOT / ".gitignore"
 BASELINE_PATH = REPO_ROOT / "tests" / "regression-baseline.json"
 
@@ -64,7 +64,7 @@ def test_pycache_is_git_ignored():
 
 
 def test_manifest_json_exists():
-    """MANIFEST.json must exist in templates/agent-workbench/."""
+    """MANIFEST.json must exist in templates/agent-workbench/.github/hooks/scripts/."""
     assert MANIFEST_PATH.exists(), f"MANIFEST.json not found at {MANIFEST_PATH}"
 
 

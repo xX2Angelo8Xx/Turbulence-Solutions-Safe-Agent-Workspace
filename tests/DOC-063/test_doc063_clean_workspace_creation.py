@@ -288,10 +288,10 @@ class TestMissingACCoverage:
         self.workspace = create_project(CLEAN_TEMPLATE, dest, "TesterProject")
 
     def test_manifest_json_exists(self):
-        """MANIFEST.json must exist at the workspace root (US-078 AC 2)."""
-        manifest = self.workspace / "MANIFEST.json"
+        """MANIFEST.json must exist at .github/hooks/scripts/MANIFEST.json (FIX-122: moved from root)."""
+        manifest = self.workspace / ".github" / "hooks" / "scripts" / "MANIFEST.json"
         assert manifest.is_file(), (
-            "MANIFEST.json must exist at the workspace root (US-078 AC 2)"
+            "MANIFEST.json must exist at .github/hooks/scripts/MANIFEST.json (FIX-122)"
         )
 
     def test_copilot_instructions_exists(self):
