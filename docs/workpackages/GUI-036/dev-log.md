@@ -52,3 +52,19 @@ Add a "Danger Zone" section to `SettingsDialog._build_ui()` with a red "Uninstal
 ## Known Limitations
 
 - Only `unins000.exe` in the same directory as `sys.executable` is checked. Advanced Inno Setup custom install paths are not searched.
+
+---
+
+## Iteration 2 — Tester Feedback Resolution (2026-04-06)
+
+### Tester Findings
+- BUG-205: `tests/GUI-018/test_gui018_edge_cases.py::TestDialogGeometry::test_dialog_geometry_is_480x480` failed because GUI-036 increased SettingsDialog height from 480 to 620, but the GUI-018 edge-case test still asserted the old geometry string.
+
+### Changes Made
+- `tests/GUI-018/test_gui018_edge_cases.py` — renamed `test_dialog_geometry_is_480x480` → `test_dialog_geometry_is_480x620`; updated `assert_called_with("480x480")` → `assert_called_with("480x620")`
+- `docs/bugs/bugs.jsonl` — set `"Status": "Closed"` and `"Fixed In WP": "GUI-036"` on BUG-205
+
+### Test Results
+- `tests/GUI-036/` — 13 passed
+- `tests/GUI-018/` — 37 passed (including renamed geometry test)
+- Full regression suite — 200 pre-existing failures (matches regression baseline of 261); no new failures introduced by GUI-036
