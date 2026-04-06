@@ -231,10 +231,16 @@ class TestSecurityGateFunctional:
 
     def test_security_gate_importable_and_decide_returns_action(self):
         """security_gate.decide() must return 'allow', 'ask', or 'deny' for a test event."""
+        import importlib
+
+        # Save any pre-existing security_gate / zone_classifier module objects so
+        # that other tests (e.g. snapshot tests) are not affected by this import.
+        # The clean-workspace versions are loaded only for the duration of this test.
+        _orig_sg = sys.modules.pop("security_gate", None)
+        _orig_zc = sys.modules.pop("zone_classifier", None)
         if _SCRIPTS_DIR not in sys.path:
             sys.path.insert(0, _SCRIPTS_DIR)
         try:
-            import importlib
             sg = importlib.import_module("security_gate")
             # Use a harmless always-allow tool event (TodoWrite bypasses zone checks).
             hook_input = {
@@ -251,7 +257,96 @@ class TestSecurityGateFunctional:
             # Clean up sys.path to avoid polluting other tests.
             if _SCRIPTS_DIR in sys.path:
                 sys.path.remove(_SCRIPTS_DIR)
-            # Unload the module to avoid cross-test contamination.
+            # Remove the clean-workspace modules loaded during this test.
             for mod_name in list(sys.modules.keys()):
                 if mod_name in ("security_gate", "zone_classifier"):
                     del sys.modules[mod_name]
+            # Restore the original modules so other tests (e.g. snapshot tests)
+            # continue to reference the same module objects they imported at
+            # collection time.  Without this restore, the snapshot conftest
+            # fixture patches a different zone_classifier instance than the one
+            # held by the snapshot test module's 'sg' import, which causes the
+            # _patch_detect_project_folder fixture to have no effect.
+            if _orig_sg is not None:
+                sys.modules["security_gate"] = _orig_sg
+            if _orig_zc is not None:
+                sys.modules["zone_classifier"] = _orig_zc
+
+
+# ===========================================================================
+# 5. Edge cases — missing acceptance-criteria coverage (added by Tester)
+# ===========================================================================
+
+
+class TestMissingACCoverage:
+    """Tester-added tests for US-078 acceptance-criteria items not covered by Developer."""
+
+    @pytest.fixture(autouse=True)
+    def _workspace(self, tmp_path):
+        dest = tmp_path / "dest"
+        dest.mkdir()
+        self.workspace = create_project(CLEAN_TEMPLATE, dest, "TesterProject")
+
+    def test_manifest_json_exists(self):
+        """MANIFEST.json must exist at the workspace root (US-078 AC 2)."""
+        manifest = self.workspace / "MANIFEST.json"
+        assert manifest.is_file(), (
+            "MANIFEST.json must exist at the workspace root (US-078 AC 2)"
+        )
+
+    def test_copilot_instructions_exists(self):
+        """copilot-instructions.md must exist in .github/instructions/ (US-078 AC 5)."""
+        ci = self.workspace / ".github" / "instructions" / "copilot-instructions.md"
+        assert ci.is_file(), (
+            ".github/instructions/copilot-instructions.md must exist in the created workspace"
+        )
+
+    def test_copilot_instructions_no_agents_dir_reference(self):
+        """copilot-instructions.md must not reference .github/agents/ (US-078 AC 5 — simplified)."""
+        ci = self.workspace / ".github" / "instructions" / "copilot-instructions.md"
+        content = ci.read_text(encoding="utf-8")
+        assert ".github/agents" not in content, (
+            "copilot-instructions.md must not reference .github/agents/ "
+            "(clean-workspace has no custom agents — US-078 AC 5)"
+        )
+
+    def test_create_project_hyphenated_name(self, tmp_path):
+        """create_project() must handle a hyphenated project name correctly."""
+        dest = tmp_path / "dest_hyph"
+        dest.mkdir()
+        ws = create_project(CLEAN_TEMPLATE, dest, "My-Project")
+        assert ws.is_dir(), "Workspace directory must be created for hyphenated name"
+        assert ws.name == "SAE-My-Project", (
+            "Workspace must be named SAE-My-Project for input 'My-Project'"
+        )
+        assert (ws / "My-Project").is_dir(), (
+            "Project subfolder must be named 'My-Project'"
+        )
+
+    def test_security_gate_denies_noagentzone(self):
+        """security_gate.decide() must deny access to NoAgentZone/ (US-078 AC 6)."""
+        _orig_sg = sys.modules.pop("security_gate", None)
+        _orig_zc = sys.modules.pop("zone_classifier", None)
+        if _SCRIPTS_DIR not in sys.path:
+            sys.path.insert(0, _SCRIPTS_DIR)
+        try:
+            import importlib
+            sg = importlib.import_module("security_gate")
+            hook_input = {
+                "tool_name": "read_file",
+                "filePath": "/workspace/SAE-TestProject/NoAgentZone/secret.txt",
+            }
+            result = sg.decide(hook_input, "/workspace/SAE-TestProject")
+            assert result == "deny", (
+                f"security_gate must deny access to NoAgentZone/; got: {result!r}"
+            )
+        finally:
+            if _SCRIPTS_DIR in sys.path:
+                sys.path.remove(_SCRIPTS_DIR)
+            for mod_name in list(sys.modules.keys()):
+                if mod_name in ("security_gate", "zone_classifier"):
+                    del sys.modules[mod_name]
+            if _orig_sg is not None:
+                sys.modules["security_gate"] = _orig_sg
+            if _orig_zc is not None:
+                sys.modules["zone_classifier"] = _orig_zc
