@@ -1,11 +1,8 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 152,
-  "_updated": "2026-04-05",
+  "_count": 139,
+  "_updated": "2026-04-06",
   "known_failures": {
-    "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_getting_started_section": {
-      "reason": "DOC-002 requires exact placeholder strings that would require 6+ total {{PROJECT_NAME}} occurrences; FIX-086 requires exactly 4. Contradiction between test suites; FIX-086 takes precedence as it documents the current README design."
-    },
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_agent_rules_section": {
       "reason": "DOC-002 requires exact placeholder strings that would require 6+ total {{PROJECT_NAME}} occurrences; FIX-086 requires exactly 4. Contradiction between test suites; FIX-086 takes precedence as it documents the current README design."
     },
@@ -32,30 +29,6 @@
     },
     "tests.FIX-009.test_fix009_edge_cases.test_tst_ids_sequential_no_gaps_in_renumbered_range": {
       "reason": "test_tst_ids_sequential_no_gaps_in_renumbered_range: 106 TST IDs are missing in the expected sequential range due to test result records being archived to separate files. Gaps are permanent and intentional; test cannot be satisfied without reversing the archiving."
-    },
-    "tests.FIX-015.test_fix015_logo_aspect_ratio.test_logo_ctk_image_size_is_proportional": {
-      "reason": "Requires Pillow (PIL) which is not installed in the CI environment. Install with: .venv/Scripts/pip install pillow"
-    },
-    "tests.FIX-015.test_fix015_logo_aspect_ratio.test_logo_zero_height_no_crash": {
-      "reason": "Requires Pillow (PIL) which is not installed in the CI environment. Install with: .venv/Scripts/pip install pillow"
-    },
-    "tests.FIX-015.test_fix015_logo_aspect_ratio.test_logo_pil_open_failure_no_crash": {
-      "reason": "Requires Pillow (PIL) which is not installed in the CI environment. Install with: .venv/Scripts/pip install pillow"
-    },
-    "tests.FIX-015.test_fix015_logo_aspect_ratio.test_logo_very_wide_image_ctk_called_with_large_width": {
-      "reason": "Requires Pillow (PIL) which is not installed in the CI environment. Install with: .venv/Scripts/pip install pillow"
-    },
-    "tests.FIX-016.test_fix016_ico_icon.test_app_uses_iconphoto_on_non_windows": {
-      "reason": "Requires Pillow (PIL) which is not installed in the CI environment. Install with: .venv/Scripts/pip install pillow"
-    },
-    "tests.GUI-013.test_gui013_logo.test_app_init_sets_icon_photo": {
-      "reason": "Requires Pillow (PIL) which is not installed. Additionally, test_app_build_ui_creates_logo_label and test_logo_label_placed_at_row_zero_columnspan_3 fail because logo_label attribute was removed from the app class in a subsequent refactor."
-    },
-    "tests.GUI-013.test_gui013_logo.test_app_build_ui_creates_logo_label": {
-      "reason": "Requires Pillow (PIL) which is not installed. Additionally, test_app_build_ui_creates_logo_label and test_logo_label_placed_at_row_zero_columnspan_3 fail because logo_label attribute was removed from the app class in a subsequent refactor."
-    },
-    "tests.GUI-013.test_gui013_tester_edge_cases.test_logo_label_placed_at_row_zero_columnspan_3": {
-      "reason": "Requires Pillow (PIL) which is not installed. Additionally, test_app_build_ui_creates_logo_label and test_logo_label_placed_at_row_zero_columnspan_3 fail because logo_label attribute was removed from the app class in a subsequent refactor."
     },
     "tests.INS-019.test_ins019_edge_cases.test_read_python_path_traversal_returned_as_is": {
       "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
@@ -123,20 +96,8 @@
     "tests.SAF-072.test_saf072_edge_cases.test_concurrent_writes_no_corruption": {
       "reason": "Flaky test: passes when run in isolation but sporadically fails in the full test suite due to threading/file-locking race conditions in the test setup."
     },
-    "tests.INS-019.test_ins019_edge_cases.test_verify_shim_existence_only_check": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.MNT-015.test_mnt015_tester_edge_cases.test_locked_next_id_concurrent_threads": {
-      "reason": "Flaky test: passes when run in isolation but sporadically fails in the full test suite due to threading race conditions in the test setup (same pattern as SAF-072)."
-    },
     "tests.INS-029.test_ins029_edge_cases.test_egg_info_pkg_info_version_not_future": {
       "reason": "Test hardcodes EXPECTED_VERSION=3.2.4 but current version is 3.3.11. On CI where egg-info exists, assertion fails."
-    },
-    "tests.INS-030.test_ins030_git_init.TestCreateProjectGitInit.test_created_workspace_has_initial_commit": {
-      "reason": "CI environment-specific: git user.name/user.email not configured, causing git commit to fail during create_project."
-    },
-    "tests.SAF-073.test_saf073.test_deny_command_substitution_backtick": {
-      "reason": "CI environment-specific: bash regex behavior for backtick command substitution differs between local bash and CI runner bash."
     },
     "tests.INS-013.test_ins013_ci_workflow.test_all_5_jobs_defined": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
