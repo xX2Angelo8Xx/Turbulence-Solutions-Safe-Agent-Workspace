@@ -100,3 +100,49 @@ def test_copilot_instructions_semantic_search_recommends_grep_search():
     assert "grep_search" in content, (
         "copilot-instructions.md must recommend grep_search as semantic_search fallback"
     )
+
+
+# ---------------------------------------------------------------------------
+# Edge cases added by Tester
+# ---------------------------------------------------------------------------
+
+
+def test_agent_rules_semantic_search_workaround_mentions_include_pattern():
+    """The workaround must teach agents to scope grep_search with includePattern."""
+    content = _read(AGENT_RULES)
+    assert "includePattern" in content, (
+        "AGENT-RULES.md semantic_search workaround must mention includePattern "
+        "so agents know how to scope grep_search correctly"
+    )
+
+
+def test_copilot_instructions_semantic_search_workaround_mentions_include_pattern():
+    """The Known Tool Limitations row must specify includePattern as the fallback detail."""
+    content = _read(COPILOT_INSTRUCTIONS)
+    assert "includePattern" in content, (
+        "copilot-instructions.md semantic_search row must mention includePattern"
+    )
+
+
+def test_agent_rules_semantic_search_in_table_row():
+    """The semantic_search workaround must live inside a Markdown table row (pipe-delimited)."""
+    content = _read(AGENT_RULES)
+    table_rows = [
+        line for line in content.splitlines()
+        if line.startswith("|") and "semantic_search" in line
+    ]
+    assert table_rows, (
+        "AGENT-RULES.md semantic_search entry must be in a Markdown table row (|...| format)"
+    )
+
+
+def test_copilot_instructions_semantic_search_in_table_row():
+    """The semantic_search limitation must be a table row in Known Tool Limitations."""
+    content = _read(COPILOT_INSTRUCTIONS)
+    table_rows = [
+        line for line in content.splitlines()
+        if line.startswith("|") and "semantic_search" in line
+    ]
+    assert table_rows, (
+        "copilot-instructions.md semantic_search entry must be in a Markdown table row (|...| format)"
+    )
