@@ -3,7 +3,7 @@
 **WP ID:** FIX-119  
 **Tester:** Tester Agent  
 **Date:** 2026-04-06  
-**Verdict:** ❌ FAIL — 20 new regressions not registered in baseline  
+**Verdict:** ❌ FAIL (Iteration 2) — BOM/CRLF regression in 8 agent files; 11 path-deletion failures unregistered in baseline  
 
 ---
 
@@ -121,12 +121,125 @@ After updating the baseline:
 
 ---
 
-## 7. Pre-Done Checklist
+## Iteration 2 — 2026-04-06
+
+### Iteration 2 Summary
+
+Developer correctly added 20 DOC-046/DOC-047 baseline entries, bringing `_count` from 155 to 175. The FIX-119 suite still passes 7/7. However, the full suite reveals **two new issues**:
+
+---
+
+## 2. Test Runs (Iteration 2)
+
+| Run | Scope | Result | Reference |
+|-----|-------|--------|-----------|
+| Full suite | All tests | **FAIL** — 363 failed, 8783 passed, 344 skipped | TST-2687 |
+| FIX-119 WP suite | `tests/FIX-119/` | 7 pass, 2 tester edge-case FAIL | TST-2687 |
+
+---
+
+## 3. Critical Regression: BOM and CRLF Introduced (BLOCKER)
+
+FIX-119 used an editor that wrote files with **UTF-8 BOM (`\xef\xbb\xbf`)** and **Windows CRLF (`\r\n`) line endings**. The following 8 agent files were BOM-corrupted:
+
+- `templates/agent-workbench/.github/agents/programmer.agent.md`
+- `templates/agent-workbench/.github/agents/brainstormer.agent.md`
+- `templates/agent-workbench/.github/agents/coordinator.agent.md`
+- `templates/agent-workbench/.github/agents/planner.agent.md`
+- `templates/agent-workbench/.github/agents/researcher.agent.md`
+- `templates/agent-workbench/.github/agents/tester.agent.md`
+- `templates/agent-workbench/.github/agents/workspace-cleaner.agent.md`
+- `templates/agent-workbench/.github/agents/README.md`
+
+Additionally, CRLF line endings were introduced in all 8 files above PLUS:
+- `templates/agent-workbench/.github/instructions/copilot-instructions.md`
+- `templates/agent-workbench/Project/README.md`
+- `templates/agent-workbench/README.md`
+
+**Impact:** 236 test failures across DOC-019, DOC-020, DOC-021, DOC-022, DOC-025, DOC-029, DOC-030, DOC-031, DOC-039, DOC-041, DOC-042, DOC-043, DOC-044, FIX-073. These tests use `startswith("---")` or `test_no_bom` checks that now fail because `\ufeff---` ≠ `---`.
+
+Tester-added tests confirm the regression:
+- `test_no_bom_in_modified_agent_files` — **FAILS**
+- `test_no_crlf_in_modified_agent_files` — **FAILS**
+
+**Logged as BUG-203.**
+
+---
+
+## 4. Additional Unregistered Failures: Path Deletion (BLOCKER)
+
+11 tests in DOC-018, DOC-045, DOC-049, DOC-050 fail because they hardcode the old `Project/AgentDocs/AGENT-RULES.md` path that was deleted by FIX-119. These were not registered in the regression baseline (unlike DOC-046/DOC-047 which were added in Iteration 1).
+
+| WP | Test Count |
+|----|-----------|
+| DOC-018 | 2 (test_agent_rules_has_available_agents_section, test_agent_rules_lists_all_agents) |
+| DOC-045 | 2 |
+| DOC-049 | 1 |
+| DOC-050 | 6 |
+
+**Total Blockers: 247 new untracked failures (236 BOM + 11 path)**
+
+---
+
+## 5. Pre-existing Failures (Not FIX-119's fault)
+
+17 failures in FIX-004, FIX-028, FIX-062, FIX-063, FIX-103, FIX-105, INS-006, INS-007, INS-013, INS-019, SAF-010 are pre-existing (FIX-119 made no changes to those test files and didn't touch those template areas). These do NOT block FIX-119.
+
+---
+
+## 6. Return-to-Developer TODOs (Iteration 3)
+
+### TODO-1 (CRITICAL): Remove BOM from 8 agent files
+
+Strip the `\xef\xbb\xbf` BOM from the start of these files:
+```
+templates/agent-workbench/.github/agents/programmer.agent.md
+templates/agent-workbench/.github/agents/brainstormer.agent.md
+templates/agent-workbench/.github/agents/coordinator.agent.md
+templates/agent-workbench/.github/agents/planner.agent.md
+templates/agent-workbench/.github/agents/researcher.agent.md
+templates/agent-workbench/.github/agents/tester.agent.md
+templates/agent-workbench/.github/agents/workspace-cleaner.agent.md
+templates/agent-workbench/.github/agents/README.md
+```
+
+Python snippet to verify after fix:
+```python
+BOM = b"\xef\xbb\xbf"
+files = [...above list...]
+for f in files:
+    assert not open(f, 'rb').read(3) == BOM, f"{f} still has BOM"
+```
+
+### TODO-2 (CRITICAL): Normalize CRLF → LF in 11 files
+
+Fix line endings in all 11 files listed in Section 3 above. All should use LF (`\n`) not CRLF (`\r\n`). Use `git config --global core.autocrlf false` or save files with LF encoding.
+
+### TODO-3 (HIGH): Register 11 path-deletion failures as known baseline entries
+
+Add these 11 tests to `tests/regression-baseline.json` with reason: "Test suite contradiction — checks for AgentDocs/AGENT-RULES.md which was deleted by FIX-119. Test expects old location, FIX-119 keeps only Project/AGENT-RULES.md." Update `_count` to 186 and `_updated` to `2026-04-06`.
+
+Affected tests:
+- `tests.DOC-018.test_doc018_agents_directory.test_agent_rules_has_available_agents_section`
+- `tests.DOC-018.test_doc018_agents_directory.test_agent_rules_lists_all_agents`
+- Plus 9 more in DOC-045, DOC-049, DOC-050 (Developer must identify exact test IDs by running those suites)
+
+### Verification After Fixes
+
+After applying all 3 TODOs:
+1. `pytest tests/FIX-119/ -v` → all 13 tests pass (7 dev + 6 tester edge-case)
+2. `pytest tests/DOC-019/ tests/DOC-025/ tests/FIX-073/ --tb=no -q` → 0 new failures
+3. Full suite failure count ≤ 175 + 11 = 186 (accounting for the newly registered baseline entries)
+
+---
+
+## 7. Pre-Done Checklist (Iteration 2)
 
 - [x] `docs/workpackages/FIX-119/dev-log.md` exists and is non-empty
-- [x] `docs/workpackages/FIX-119/test-report.md` written
-- [x] Test files exist in `tests/FIX-119/` (7 tests)
-- [x] Test results logged (TST-2684, TST-2685)
-- [x] Bugs logged via `scripts/add_bug.py` (BUG-202)
-- [x] `scripts/validate_workspace.py --wp FIX-119` returns clean
-- [ ] **BLOCKED**: 20 new failures not in regression baseline → WP returned to Developer
+- [x] `docs/workpackages/FIX-119/test-report.md` written (Iteration 2)
+- [x] Test files exist in `tests/FIX-119/` (7 dev + 6 tester edge-case = 13 tests)
+- [x] Test results logged (TST-2687)
+- [x] Bugs logged via `scripts/add_bug.py` (BUG-202, BUG-203)
+- [ ] **BLOCKED TODO-1**: BOM in 8 agent files (causes 236 failures)
+- [ ] **BLOCKED TODO-2**: CRLF in 11 files (causes 236 failures overlapping with TODO-1)
+- [ ] **BLOCKED TODO-3**: 11 path-deletion failures not in baseline
