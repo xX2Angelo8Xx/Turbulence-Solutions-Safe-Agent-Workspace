@@ -1,12 +1,15 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 139,
+  "_count": 140,
   "_updated": "2026-04-06",
   "known_failures": {
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_agent_rules_section": {
       "reason": "DOC-002 requires exact placeholder strings that would require 6+ total {{PROJECT_NAME}} occurrences; FIX-086 requires exactly 4. Contradiction between test suites; FIX-086 takes precedence as it documents the current README design."
     },
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_folder_table_row": {
+      "reason": "DOC-002 requires exact placeholder strings that would require 6+ total {{PROJECT_NAME}} occurrences; FIX-086 requires exactly 4. Contradiction between test suites; FIX-086 takes precedence as it documents the current README design."
+    },
+    "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_getting_started_section": {
       "reason": "DOC-002 requires exact placeholder strings that would require 6+ total {{PROJECT_NAME}} occurrences; FIX-086 requires exactly 4. Contradiction between test suites; FIX-086 takes precedence as it documents the current README design."
     },
     "tests.DOC-045.test_doc045_agent_rules_consolidation.TestDeletedFilesAbsent.test_old_agent_rules_deleted": {
