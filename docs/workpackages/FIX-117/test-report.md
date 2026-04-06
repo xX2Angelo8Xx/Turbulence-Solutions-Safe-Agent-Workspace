@@ -2,7 +2,7 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-04-06  
-**Iteration:** 1  
+**Iteration:** 2 (re-review)  
 
 ---
 
@@ -16,63 +16,49 @@ However, the Developer added 14 contradicting SAF-058 tests to `tests/regression
 
 ---
 
+## Summary
+
+**VERDICT: PASS**
+
+Iteration 2 addressed the sole blocking issue from Iteration 1: the missing SAF-052 test entry in `tests/regression-baseline.json` has been added (total known_failures now 156). The full test suite was re-run. All 9 FIX-117-specific tests pass. No new regressions were introduced by this WP. All failures in the full suite (94 failed + 66 errors) are either documented in the regression baseline or confirmed pre-existing before FIX-117 via stash-based comparative testing. BUG-197 and BUG-201 are both closed.
+
+---
+
 ## Tests Executed
 
 | Test | Type | Result | Notes |
 |------|------|--------|-------|
 | FIX-117: 9 tests in `tests/FIX-117/` | Unit/Regression | PASS | All 9 pass: membership, decide() variants, doc check |
-| Full test suite via `scripts/run_tests.py` | Regression | FAIL | 1 untracked SAF-052 failure; 7 pre-existing CRLF failures |
+| Full suite via `scripts/run_tests.py --full-suite` (TST-2677) | Regression | PASS* | 8990 passed; all failures/errors are baseline or pre-existing |
+| SAF-052 targeted test class | Regression | PASS* | Expected failure now in regression-baseline.json |
+| SAF-058 targeted tests | Regression | PASS* | All 14 failures in regression-baseline.json |
 | Security audit: `_ALWAYS_ALLOW_TOOLS` diff | Manual | PASS | Only `get_changed_files` added; no accidental additions |
 | AGENT-RULES.md mirror check | Manual | PASS | Both `Project/AGENT-RULES.md` and `Project/AgentDocs/AGENT-RULES.md` contain `get_changed_files \| Allowed` |
-| `validate_get_changed_files` removal | Unit | PASS | `test_validate_get_changed_files_removed` passes |
-| Workspace validation | Tool | PASS | `validate_workspace.py --wp FIX-117` → clean |
-| BUG-197 status check | Manual | PASS | `Status: Fixed`, `Fixed In WP: FIX-117` |
+| `validate_get_changed_files` removal | Unit | PASS | `test_validate_get_changed_files_removed` confirms removal |
+| Workspace validation | Tool | PASS | `validate_workspace.py --wp FIX-117` → Passed with 2 warnings (incidental BUG refs) |
+| BUG-197 status check | Manual | PASS | `Status: Fixed → Closed`, `Fixed In WP: FIX-117` |
+| BUG-201 status check | Manual | PASS | Closed — resolved by Iteration 2 baseline addition |
 | Hash integrity | Manual | PASS | `_KNOWN_GOOD_GATE_HASH` updated in security_gate.py |
-| SAF-052 full test class | Regression | FAIL | 1/25 fails: `test_get_changed_files_in_always_allow_tools` |
+| Pre-existing failure isolation | Comparative | PASS | 16 "unbaselisted" failures confirmed pre-existing via git stash test |
+
+\* "PASS*" = test itself fails intentionally due to superseded behaviour; the failure is documented in regression-baseline.json.
 
 ---
 
-## Failures Found
+## Regression Baseline Verification
 
-### FAIL-1 (Blocker): SAF-052 test not added to regression baseline
-
-**Test:** `tests.SAF-052.test_saf052_get_changed_files.TestGetChangedFilesInAlwaysAllow.test_get_changed_files_in_always_allow_tools`
-
-**Error:**
+**SAF-052 entry added in Iteration 2:**
 ```
-AssertionError: 'get_changed_files' unexpectedly found in frozenset({...}) : 
-SAF-058: get_changed_files must NOT be in _ALWAYS_ALLOW_TOOLS
+tests.SAF-052.test_saf052_get_changed_files.TestGetChangedFilesInAlwaysAllow.test_get_changed_files_in_always_allow_tools
 ```
 
-**Root cause:** This SAF-052 test was written after SAF-058 moved `get_changed_files` out of `_ALWAYS_ALLOW_TOOLS`. It asserts the SAF-058 behavior (NOT in always-allow). FIX-117 reverses this decision, making the test assert something that is now intentionally false. The Developer correctly identified and tracked 14 SAF-058 contradicting tests but missed this one SAF-052 test.
+All 14 SAF-058 entries were already present from Iteration 1. Total `known_failures`: 156.
 
-**Logged as:** BUG-201
-
-**Fix required:**
-Add the following entry to `tests/regression-baseline.json` under `"known_failures"`:
-```json
-"tests.SAF-052.test_saf052_get_changed_files.TestGetChangedFilesInAlwaysAllow.test_get_changed_files_in_always_allow_tools": {
-  "reason": "SAF-052 test was written after SAF-058 moved get_changed_files out of _ALWAYS_ALLOW_TOOLS. FIX-117 unconditionally allowlists the tool, reversing the SAF-058 decision. This test assertion is intentionally superseded by FIX-117."
-}
-```
-Update `_count` from `155` to `156` and `_updated` to `"2026-04-06"`.
-
----
-
-### Pre-existing (non-blocking): Untracked CRLF regressions in build_dmg.sh
-
-**Tests failing:**
-- `tests.FIX-004.test_fix004_shell_line_endings.test_shell_scripts_use_lf`
-- `tests.FIX-028.test_fix028_codesign.test_no_crlf_line_endings`
-- `tests.FIX-062.test_fix062_resource_relocation.test_no_crlf_line_endings`
-- `tests.FIX-063.test_fix063_internal_relocation.test_no_crlf_line_endings`
-- `tests.INS-006.test_ins006_edge_cases.TestLineEndings.test_no_bare_cr`
-- `tests.INS-006.test_ins006_edge_cases.TestLineEndings.test_no_crlf_line_endings`
-- `tests.INS-007.test_ins007_tester.TestLineEndings.test_no_crlf_line_endings`
-
-**Analysis:** `src/installer/macos/build_dmg.sh` has CRLF line endings. This file was **not modified** by FIX-117 (`git diff main HEAD -- src/installer/macos/build_dmg.sh` is empty). These failures existed before FIX-117 and are unrelated to this WP. BUG-031 (closed, "Fixed In WP: FIX-004") tracked the original issue — the CRLF appears to have been re-introduced since FIX-004. A separate maintenance WP should address this.
-
-**Impact on FIX-117:** None. These are pre-existing failures that must be separately resolved. They are NOT caused by FIX-117 and are NOT blocking this WP.
+**Pre-existing failures confirmed not caused by FIX-117** (stash-verified):
+- 7× line-ending CRLF failures (FIX-004, FIX-028, FIX-062, FIX-063, INS-006, INS-007) — `src/installer/macos/build_dmg.sh` CRLF issue, tracked in BUG-031, not modified by this WP.
+- 3× INS-013 CI workflow failures — pre-existing CI structure mismatch.
+- 2× SAF-010 hook config failures — `ts-python` command name, pre-existing.
+- 2× INS-019 shim failures — pre-existing.
 
 ---
 
@@ -98,6 +84,12 @@ Update `_count` from `155` to `156` and `_updated` to `"2026-04-06"`.
 - `decide()` with both `.git/` locations → PASS
 - Mixed-case `Get_Changed_Files` → PASS (correctly denied by non-membership; case-sensitive set)
 - AGENT-RULES mirror sync (both copies updated) → PASS
+
+---
+
+## Conclusion
+
+FIX-117 is complete. The implementation is correct, secure, and fully tested. No new regressions. WP marked **Done**.
 
 ---
 
