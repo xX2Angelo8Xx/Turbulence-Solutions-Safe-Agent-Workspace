@@ -36,7 +36,9 @@ _ALWAYS_ALLOW_TOOLS: frozenset = frozenset({
     "TodoWrite", "TodoRead", "todo_write", "manage_todo_list",
     # SAF-044: search_subagent removed — validated by validate_search_subagent() in decide()
     "runSubagent", "Agent", "agent",
-    # SAF-058: get_changed_files removed — validated by validate_get_changed_files() in decide()
+    # FIX-117: get_changed_files — read-only git inspection tool (equivalent to git status).
+    # Returns only changed file metadata; does not read file content.
+    "get_changed_files",
     # SAF-063: read-only terminal introspection tools — no filesystem writes
     "get_terminal_output", "terminal_last_command", "terminal_selection",
     # SAF-063: meta/VS Code-managed tools with no filesystem access
@@ -126,7 +128,7 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "22009061097c6de648943f915eae5e272239a144daf7665e5845be4dedc28d9e"
+_KNOWN_GOOD_GATE_HASH: str = "5e7e1bebefd5082b7124ae1fd12feab844978376666d216ab1363ccdaef9bf73"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. The safety-critical file "
@@ -3169,50 +3171,6 @@ def _has_recursive_flag(verb_lower: str, tokens: list[str]) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# SAF-058: get_changed_files — conditional .git/ placement check
-# ---------------------------------------------------------------------------
-
-def validate_get_changed_files(ws_root: str) -> str:
-    """SAF-058: Validate get_changed_files tool calls.
-
-    get_changed_files returns git diff output.  When a git repository exists at
-    the workspace root level (outside the project folder), it tracks all files
-    in the workspace — including denied zones.  In that case the tool must be
-    denied to prevent zone bypass.
-
-    Logic:
-    - .git/ exists at workspace root → deny (whole-workspace git, denied zones exposed)
-    - .git/ exists inside the project folder → allow (scoped to project only)
-    - No .git/ found anywhere → allow (tool returns a harmless "no repo" message)
-
-    Fails closed — returns "deny" on any OS error during the filesystem check.
-    """
-    try:
-        # Check for .git/ at workspace root (outside project folder)
-        ws_git = os.path.join(ws_root.replace("/", os.sep), ".git")
-        if os.path.isdir(ws_git):
-            return "deny"
-
-        # Check for .git/ inside the detected project folder
-        try:
-            project_dir = zone_classifier.detect_project_folder(Path(ws_root))
-            project_git = os.path.join(
-                ws_root.replace("/", os.sep), project_dir, ".git"
-            )
-            if os.path.isdir(project_git):
-                return "allow"
-        except RuntimeError:
-            # No project folder found — no .git/ to check
-            pass
-
-        # No .git/ found at all — tool returns harmless "no repo" message
-        return "allow"
-    except OSError:
-        # Fail closed on any filesystem access error
-        return "deny"
-
-
-# ---------------------------------------------------------------------------
 # Decision engine
 # ---------------------------------------------------------------------------
 
@@ -3257,13 +3215,6 @@ def decide(data: dict, ws_root: str) -> str:
         _dec = validate_search_subagent(data, ws_root)
         if _dec == "deny":
             _audit_deny(tool_name, "zone_violation", "search_query")
-        return _dec
-
-    # SAF-058: get_changed_files — conditional .git/ placement check.
-    if tool_name == "get_changed_files":
-        _dec = validate_get_changed_files(ws_root)
-        if _dec == "deny":
-            _audit_deny(tool_name, "zone_violation", "repo_root")
         return _dec
 
     # SAF-023: get_errors carries an optional filePaths array; each path must
