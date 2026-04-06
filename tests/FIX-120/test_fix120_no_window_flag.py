@@ -169,3 +169,68 @@ class TestGitInitBehaviour:
             for c in mock_run.call_args_list:
                 kwargs = c.kwargs if c.kwargs else c[1]
                 assert kwargs["cwd"] == str(tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests (added by Tester Agent)
+# ---------------------------------------------------------------------------
+
+class TestTesterEdgeCases:
+    """Additional edge-case tests added during Tester review."""
+
+    def test_platform_check_is_case_sensitive(self, tmp_path: Path) -> None:
+        """'WIN32' (uppercase) must NOT set creationflags — check is exact equality."""
+        with (
+            patch("launcher.core.project_creator.sys.platform", "WIN32"),
+            patch("launcher.core.project_creator.subprocess.run") as mock_run,
+        ):
+            mock_run.return_value = _make_success_result()
+            from launcher.core.project_creator import _init_git_repository
+
+            _init_git_repository(tmp_path)
+
+            for c in mock_run.call_args_list:
+                kwargs = c.kwargs if c.kwargs else c[1]
+                assert "creationflags" not in kwargs, (
+                    "'WIN32' (uppercase) incorrectly triggered CREATE_NO_WINDOW"
+                )
+
+    def test_all_five_git_commands_called(self, tmp_path: Path) -> None:
+        """All five git subcommands (init, config×2, add, commit) must be called."""
+        with (
+            patch("launcher.core.project_creator.sys.platform", "linux"),
+            patch("launcher.core.project_creator.subprocess.run") as mock_run,
+        ):
+            mock_run.return_value = _make_success_result()
+            from launcher.core.project_creator import _init_git_repository
+
+            _init_git_repository(tmp_path)
+
+            assert mock_run.call_count == 5, (
+                f"Expected 5 git subprocess calls, got {mock_run.call_count}"
+            )
+            first_args = [c[0][0] for c in mock_run.call_args_list]
+            assert first_args[0] == ["git", "init"]
+            assert first_args[1] == ["git", "config", "user.name", "Launcher"]
+            assert first_args[2] == ["git", "config", "user.email", "launcher@localhost"]
+            assert first_args[3] == ["git", "add", "-A"]
+            assert first_args[4] == ["git", "commit", "-m", "Initial commit"]
+
+    def test_base_kwargs_always_present_on_windows(self, tmp_path: Path) -> None:
+        """cwd, capture_output, and timeout must always be set (including on Windows)."""
+        with (
+            patch("launcher.core.project_creator.sys.platform", "win32"),
+            patch("launcher.core.project_creator.subprocess.run") as mock_run,
+        ):
+            mock_run.return_value = _make_success_result()
+            from launcher.core.project_creator import _init_git_repository
+
+            _init_git_repository(tmp_path)
+
+            for c in mock_run.call_args_list:
+                kwargs = c.kwargs if c.kwargs else c[1]
+                assert "cwd" in kwargs, "cwd missing on Windows"
+                assert "capture_output" in kwargs, "capture_output missing on Windows"
+                assert kwargs["capture_output"] is True
+                assert "timeout" in kwargs, "timeout missing on Windows"
+                assert kwargs["timeout"] == 30
