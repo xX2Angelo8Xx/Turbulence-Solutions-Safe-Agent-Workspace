@@ -96,7 +96,9 @@ these firing during an automated test run can destabilise or crash the system.
    ```
    .venv\Scripts\python -m pytest tests/ --tb=short -q
    ```
-   - Never use `--timeout` (requires `pytest-timeout` which is not installed).
+   - A 30-second per-test timeout is enforced via `pytest-timeout` (configured
+     in `pyproject.toml`). If a test legitimately needs more time, add
+     `@pytest.mark.timeout(60)` to that specific test with a comment explaining why.
    - Never redirect pytest output to files in the repository root
      (use `docs/workpackages/<WP-ID>/` if a log file is needed).
    - Never run pytest with `-s` or `--capture=no` in shared CI environments —
@@ -107,6 +109,16 @@ these firing during an automated test run can destabilise or crash the system.
    it before proceeding with any other action. Prevention via conftest fixtures is
    always preferred over cleanup. If prevention failed, treat it as a critical bug
    and open a new FIX workpackage before continuing.
+
+8. **Subprocess and recursion safety.**
+   - Tests MUST NOT spawn a full `pytest` run via `subprocess.run()` or any
+     equivalent. This causes infinite recursion (the inner pytest discovers
+     and runs the same test, which spawns another pytest, forever).
+   - All `subprocess.run()` calls in test code MUST include a `timeout=`
+     parameter. The maximum allowed timeout is 60 seconds.
+   - If a test needs to verify pytest behaviour, use `pytest`'s built-in
+     `pytester` fixture or parse static file content instead of launching
+     a subprocess.
 
 ## Testing Workflow
 
