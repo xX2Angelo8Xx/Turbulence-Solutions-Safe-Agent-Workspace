@@ -10,6 +10,7 @@ import os
 import shutil
 import stat
 import subprocess
+import sys
 from pathlib import Path
 
 from launcher.config import VERSION
@@ -122,6 +123,10 @@ def _init_git_repository(workspace: Path) -> bool:
     """
     _GIT_TIMEOUT = 30  # seconds per git subprocess call
     common = {"cwd": str(workspace), "capture_output": True, "timeout": _GIT_TIMEOUT}
+    if sys.platform == "win32":
+        # Suppress console windows that flash during git subprocesses on Windows.
+        # Mirrors the pattern established in vscode.py (FIX-092).
+        common["creationflags"] = subprocess.CREATE_NO_WINDOW
     try:
         result = subprocess.run(["git", "init"], **common)
         if result.returncode != 0:
