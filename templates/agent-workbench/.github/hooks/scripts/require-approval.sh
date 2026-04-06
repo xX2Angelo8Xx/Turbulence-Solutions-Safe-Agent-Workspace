@@ -150,7 +150,7 @@ if echo "$TOOL" | grep -qiE '^(run_in_terminal|terminal|run_command)$'; then
     exit 0
   fi
   # SAF-073: Command substitution — backtick `cmd`
-  if echo "$INPUT_NORM" | grep -qP '`\w'; then
+  if echo "$INPUT_NORM" | grep -qE '`[a-zA-Z_0-9]'; then
     printf '%s\n' "$DENY"
     exit 0
   fi

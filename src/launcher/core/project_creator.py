@@ -126,6 +126,8 @@ def _init_git_repository(workspace: Path) -> bool:
         result = subprocess.run(["git", "init"], **common)
         if result.returncode != 0:
             return False
+        subprocess.run(["git", "config", "user.name", "Launcher"], **common)
+        subprocess.run(["git", "config", "user.email", "launcher@localhost"], **common)
         subprocess.run(["git", "add", "-A"], **common)
         subprocess.run(
             ["git", "commit", "-m", "Initial commit"],
