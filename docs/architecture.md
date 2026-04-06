@@ -638,6 +638,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── FIX-113/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── GUI-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1355,6 +1359,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-110/
 │   ├── FIX-111/
 │   ├── FIX-112/
+│   ├── FIX-113/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
@@ -1434,6 +1439,7 @@ Templates (bundled inside Launcher)
 │   ├── MNT-026/
 │   ├── MNT-027/
 │   ├── MNT-028/
+│   ├── MNT-029/
 │   ├── SAF-001/
 │   ├── SAF-002/
 │   ├── SAF-003/
@@ -1516,6 +1522,7 @@ Templates (bundled inside Launcher)
 ├── launcher.spec
 ├── Makefile
 ├── pyproject.toml
+├── tmp_old_baseline.json
 ├── TS-Logo.ico
 └── TS-Logo.png
 ```
