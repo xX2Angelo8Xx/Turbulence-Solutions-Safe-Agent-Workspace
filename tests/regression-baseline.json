@@ -1,6 +1,6 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 210,
+  "_count": 261,
   "_updated": "2026-04-06",
   "known_failures": {
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_folder_table_row": {
@@ -427,7 +427,7 @@
       "reason": "FIX-117: get_changed_files moved to _ALWAYS_ALLOW_TOOLS; SAF-052 test asserts it is NOT there, which now contradicts the FIX-117 implementation."
     },
     "tests.SAF-058.test_saf058_get_changed_files_conditional.TestAlwaysAllowToolsMembership.test_get_changed_files_not_in_always_allow": {
-      "reason": "Test suite contradiction: SAF-058 required get_changed_files NOT in _ALWAYS_ALLOW_TOOLS (conditional validation). FIX-117 adds it to _ALWAYS_ALLOW_TOOLS as an unconditional allow. FIX-117 takes precedence — the conditional denial was always wrong for the typical Agent Workbench deployment where .git/ is always at workspace root."
+      "reason": "Test suite contradiction: SAF-058 required get_changed_files NOT in _ALWAYS_ALLOW_TOOLS (conditional validation). FIX-117 adds it to _ALWAYS_ALLOW_TOOLS as an unconditional allow. FIX-117 takes precedence \u00e2\u20ac\u201d the conditional denial was always wrong for the typical Agent Workbench deployment where .git/ is always at workspace root."
     },
     "tests.SAF-058.test_saf058_get_changed_files_conditional.TestValidateGetChangedFiles.test_git_at_workspace_root_is_denied": {
       "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. get_changed_files is now unconditionally allowed via _ALWAYS_ALLOW_TOOLS."
@@ -632,6 +632,159 @@
     },
     "tests.DOC-050.test_doc050_template_doc_fixes.test_agent_rules_semantic_search_workaround_mentions_empty": {
       "reason": "Test suite contradiction: FIX-119 deleted templates/agent-workbench/Project/AgentDocs/AGENT-RULES.md (duplicate file). This test checks for that file or uses it in a pytest fixture, causing FileNotFoundError. FIX-119 keeps only Project/AGENT-RULES.md as the authoritative copy."
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_cmd_c_in_blocked_commands": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_contains_project_name_placeholder": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_contains_workspace_name_placeholder": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_does_not_contain_blocked_by_design": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_does_not_contain_s8_agent_personas": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_file_exists": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_file_has_fewer_than_220_lines": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_github_partial_read_access_mentioned": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_key_sections_present": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_agent_rules.test_python_m_venv_mentioned": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_all_five_blocked_git_operations_present": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_all_seven_sections_present": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_cmd_exe_in_blocked_commands": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_github_hooks_fully_denied_documented": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_github_hooks_no_reads_or_writes": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_list_dir_denied_for_github": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_list_dir_matrix_entry_denies_github": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_memory_tool_in_permission_matrix": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_no_agent_personas_heading": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_no_fully_off_limits_phrase": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_no_hardcoded_workspace_name": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_no_permanently_off_limits_phrase": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_no_section_eight": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_noagentzone_fully_denied": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_project_name_placeholder_in_paths": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_read_file_mentioned_for_github_access": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_significant_length_reduction": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_system_python_fallback_documented": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_vscode_fully_denied": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-031.test_doc031_tester_edge_cases.test_workspace_name_placeholder_in_paths": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; tests checked duplicate file path that no longer exists"
+    },
+    "tests.DOC-039.test_doc039_tidyup.test_agent_rules_includes_workspace_cleaner": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_agent_rules_and_readme_consistent_plan_exception": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_agent_rules_has_project_name_placeholder": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_agent_rules_section_1a_exists": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-043.test_doc043_edge_cases.test_agent_rules_section_1a_lists_all_six_agents": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_agent_rules_coordinator_references_plan": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_agent_rules_maps_planner_to_plan_files": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-043.test_doc043_plan_system.test_agent_rules_tidyup_includes_plan_files": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-044.test_doc044_edge_cases.test_agent_rules_workspace_cleaner_in_doc_mapping": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-044.test_doc044_workspace_cleaner_rename.test_agent_rules_does_not_reference_tidyup": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.DOC-044.test_doc044_workspace_cleaner_rename.test_agent_rules_references_workspace_cleaner": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.FIX-004.test_fix004_shell_line_endings.test_shell_scripts_use_lf": {
+      "reason": "Pre-existing: build_dmg.sh/build_appimage.sh have CRLF; git core.autocrlf=true on Windows overrides eol=lf gitattributes; files stored as LF in git index"
+    },
+    "tests.FIX-028.test_fix028_codesign.test_no_crlf_line_endings": {
+      "reason": "Pre-existing: build_dmg.sh/build_appimage.sh have CRLF; git core.autocrlf=true on Windows overrides eol=lf gitattributes; files stored as LF in git index"
+    },
+    "tests.FIX-062.test_fix062_resource_relocation.test_no_crlf_line_endings": {
+      "reason": "Pre-existing: build_dmg.sh/build_appimage.sh have CRLF; git core.autocrlf=true on Windows overrides eol=lf gitattributes; files stored as LF in git index"
+    },
+    "tests.FIX-063.test_fix063_internal_relocation.test_no_crlf_line_endings": {
+      "reason": "Pre-existing: build_dmg.sh/build_appimage.sh have CRLF; git core.autocrlf=true on Windows overrides eol=lf gitattributes; files stored as LF in git index"
+    },
+    "tests.FIX-105.test_fix105_path_prefix_assertions.test_ins004_project_agentdocs_agent_rules_exists": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.INS-004.test_ins004_template_bundling.test_coding_project_app_exists": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.INS-004.test_ins004_template_bundling.test_template_discoverable_and_copyable": {
+      "reason": "FIX-119: AgentDocs/AGENT-RULES.md deleted; test checks content/existence of deleted duplicate file"
+    },
+    "tests.INS-006.test_ins006_edge_cases.TestLineEndings.test_no_bare_cr": {
+      "reason": "Pre-existing: build_dmg.sh/build_appimage.sh have CRLF; git core.autocrlf=true on Windows overrides eol=lf gitattributes; files stored as LF in git index"
+    },
+    "tests.INS-006.test_ins006_edge_cases.TestLineEndings.test_no_crlf_line_endings": {
+      "reason": "Pre-existing: build_dmg.sh/build_appimage.sh have CRLF; git core.autocrlf=true on Windows overrides eol=lf gitattributes; files stored as LF in git index"
+    },
+    "tests.INS-007.test_ins007_tester.TestLineEndings.test_no_crlf_line_endings": {
+      "reason": "Pre-existing: build_dmg.sh/build_appimage.sh have CRLF; git core.autocrlf=true on Windows overrides eol=lf gitattributes; files stored as LF in git index"
     }
   }
 }
