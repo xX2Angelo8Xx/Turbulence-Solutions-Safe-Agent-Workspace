@@ -141,3 +141,67 @@ class TestManifest:
         """MANIFEST.json must have an entry for Project/README.md."""
         manifest = json.loads(_read(MANIFEST))
         assert "Project/README.md" in manifest["files"]
+
+    def test_manifest_hashes_are_64_hex_chars(self):
+        """Every MANIFEST.json file entry must have a 64-character hex sha256 hash."""
+        manifest = json.loads(_read(MANIFEST))
+        for file_path, entry in manifest["files"].items():
+            sha = entry.get("sha256", "")
+            assert re.fullmatch(r"[0-9a-f]{64}", sha), (
+                f"{file_path}: sha256 '{sha}' is not a valid 64-char hex string"
+            )
+
+    def test_manifest_copilot_instructions_hash_matches_file(self):
+        """The MANIFEST.json sha256 for copilot-instructions.md must match the actual file.
+
+        generate_manifest.py normalizes CRLF→LF before hashing, so this test does the same.
+        """
+        import hashlib
+        manifest = json.loads(_read(MANIFEST))
+        recorded_hash = manifest["files"][".github/instructions/copilot-instructions.md"]["sha256"]
+        # Normalize CRLF→LF before hashing, matching generate_manifest.py behaviour
+        data = COPILOT_INSTRUCTIONS.read_bytes().replace(b"\r\n", b"\n")
+        actual_hash = hashlib.sha256(data).hexdigest()
+        assert recorded_hash == actual_hash, (
+            "MANIFEST hash for copilot-instructions.md does not match file content — regenerate MANIFEST.json"
+        )
+
+
+class TestEdgeCases:
+    def test_template_variables_preserved_in_copilot_instructions(self):
+        """copilot-instructions.md must preserve template placeholders (not accidentally replaced)."""
+        content = _read(COPILOT_INSTRUCTIONS)
+        assert "{{WORKSPACE_NAME}}" in content, "{{WORKSPACE_NAME}} placeholder must be present"
+        assert "{{PROJECT_NAME}}" in content, "{{PROJECT_NAME}} placeholder must be present"
+
+    def test_template_variables_preserved_in_readme(self):
+        """README.md must preserve template placeholders."""
+        content = _read(README)
+        assert "{{WORKSPACE_NAME}}" in content, "{{WORKSPACE_NAME}} placeholder must be present in README"
+        assert "{{PROJECT_NAME}}" in content, "{{PROJECT_NAME}} placeholder must be present in README"
+
+    def test_no_absolute_paths_in_copilot_instructions(self):
+        """copilot-instructions.md must not contain absolute Windows or Unix paths from the developer's machine."""
+        content = _read(COPILOT_INSTRUCTIONS)
+        # Windows-style absolute paths (e.g. C:\Users\... or E:\Projekte\...)
+        assert not re.search(r"[A-Z]:\\", content), (
+            "copilot-instructions.md must not contain Windows absolute paths"
+        )
+        # Unix-style absolute paths to home or root (e.g. /home/, /Users/)
+        assert not re.search(r"/(home|Users)/\w", content), (
+            "copilot-instructions.md must not contain Unix home directory paths"
+        )
+
+    def test_noagentzone_mentioned_in_copilot_instructions(self):
+        """copilot-instructions.md must reference NoAgentZone as a Hard Block zone."""
+        content = _read(COPILOT_INSTRUCTIONS)
+        assert "NoAgentZone" in content, (
+            "copilot-instructions.md must mention NoAgentZone as the Hard Block zone"
+        )
+
+    def test_copilot_instructions_mentions_hooks_denied(self):
+        """copilot-instructions.md must state that .github/hooks/ is denied (not readable)."""
+        content = _read(COPILOT_INSTRUCTIONS)
+        assert "hooks" in content.lower(), (
+            "copilot-instructions.md must mention hooks/ in the access restrictions"
+        )
