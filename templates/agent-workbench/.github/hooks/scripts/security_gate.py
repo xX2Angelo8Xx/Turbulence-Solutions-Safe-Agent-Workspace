@@ -126,7 +126,7 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "ebd08b12ac391da5f4cc8c75a69630cf7bbbd08ac736240ffd7f51f57bf1ac22"
+_KNOWN_GOOD_GATE_HASH: str = "22009061097c6de648943f915eae5e272239a144daf7665e5845be4dedc28d9e"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. The safety-critical file "
@@ -2671,8 +2671,12 @@ def validate_file_search(data: dict, ws_root: str) -> str:
 
     Inspects the ``query`` parameter for unsafe path scope:
 
-    - Deny if the query contains deny-zone directory names (``.github``,
-      ``.vscode``, ``NoAgentZone``), checked case-insensitively.
+    - Deny if the query contains ``.vscode`` or ``NoAgentZone``, checked
+      case-insensitively.
+    - FIX-116: Deny ``.github/`` queries unless they target a whitelisted
+      subdirectory (``.github/agents/``, ``.github/skills/``,
+      ``.github/prompts/``, ``.github/instructions/``), consistent with
+      the read_file permission model established by SAF-055.
     - Deny if the query contains path traversal sequences (``..``).
     - Deny if the query contains a wildcard that could expand to a deny zone
       (reuses ``_wildcard_prefix_matches_deny_zone``).
@@ -2699,9 +2703,16 @@ def validate_file_search(data: dict, ws_root: str) -> str:
 
     query_lower = query.lower()
 
-    # Deny references to deny-zone directory names (case-insensitive).
-    for zone_name in (".github", ".vscode", "noagentzone"):
+    # Deny references to unconditional deny-zone names (case-insensitive).
+    for zone_name in (".vscode", "noagentzone"):
         if zone_name in query_lower:
+            return "deny"
+
+    # FIX-116: .github/ — allow queries targeting the same whitelisted
+    # subdirectories that read_file/list_dir may access (SAF-055).
+    # .github/hooks/ and all other .github/ paths remain denied.
+    if ".github" in query_lower:
+        if not _GITHUB_READ_ALLOWED_RE.search(zone_classifier.normalize_path(query)):
             return "deny"
 
     # Deny path traversal sequences.
@@ -2730,7 +2741,10 @@ def validate_file_search(data: dict, ws_root: str) -> str:
         or path_prefix.startswith("/")                      # Unix/POSIX
     ):
         if zone_classifier.classify(path_prefix, ws_root) == "deny":
-            return "deny"
+            # FIX-116: absolute paths to whitelisted .github/ subdirectories are
+            # permitted for file_search, consistent with the read_file model.
+            if not _GITHUB_READ_ALLOWED_RE.search(path_prefix):
+                return "deny"
 
     # Allow — VS Code search.exclude settings prevent deny-zone files from appearing.
     return "allow"

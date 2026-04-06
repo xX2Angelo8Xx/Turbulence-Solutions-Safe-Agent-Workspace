@@ -29,6 +29,10 @@ venv/
 # VS Code workspace-level settings (developer local)
 .vscode/
 
+# Retired CSV data files (migrated to JSONL in MNT-018; prevent re-staging)
+docs/workpackages/workpackages.csv
+docs/decisions/index.csv
+
 # OS artifacts
 .DS_Store
 Thumbs.db

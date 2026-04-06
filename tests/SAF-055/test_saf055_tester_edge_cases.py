@@ -164,10 +164,15 @@ class TestNonReadOnlyToolsDenied(unittest.TestCase):
         result = _decide("grep_search", ".github/agents/foo.md")
         self.assertEqual(result, "deny")
 
-    def test_file_search_query_github_denied(self):
-        """file_search uses 'query' not 'filePath'. validate_file_search detects
-        '.github' in query and denies — no SAF-055 path needed."""
+    def test_file_search_query_github_agents_allowed(self):
+        """FIX-116: file_search may query whitelisted .github/ subdirectories.
+        .github/agents/ is explicitly whitelisted — must now return allow."""
         data = {"tool_name": "file_search", "tool_input": {"query": ".github/agents/foo.md"}}
+        self.assertEqual(_decide_raw(data), "allow")
+
+    def test_file_search_query_github_hooks_denied(self):
+        """file_search for .github/hooks/ (non-whitelisted) must remain denied."""
+        data = {"tool_name": "file_search", "tool_input": {"query": ".github/hooks/security_gate.py"}}
         self.assertEqual(_decide_raw(data), "deny")
 
     def test_get_errors_file_paths_github_denied(self):
