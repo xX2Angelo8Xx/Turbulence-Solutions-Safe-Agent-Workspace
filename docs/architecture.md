@@ -885,6 +885,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── MNT-029/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── SAF-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1522,7 +1526,6 @@ Templates (bundled inside Launcher)
 ├── launcher.spec
 ├── Makefile
 ├── pyproject.toml
-├── tmp_old_baseline.json
 ├── TS-Logo.ico
 └── TS-Logo.png
 ```
