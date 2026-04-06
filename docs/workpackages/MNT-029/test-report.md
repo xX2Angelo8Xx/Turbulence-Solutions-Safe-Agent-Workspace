@@ -2,11 +2,21 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-04-06  
-**Iteration:** 1
+**Iteration:** 2 (updated after iter 1 FAIL)
 
 ## Summary
 
-**FAIL.** MNT-029 introduced 1 new regression by incorrectly removing a still-failing test from `tests/regression-baseline.json`. Additionally, `docs/workpackages/MNT-029/dev-log.md` is missing. The WP is returned to the Developer.
+**FAIL (Iteration 2).** Iteration 2 correctly restores the DOC-002 baseline entry (BUG-192 fix verified). However, a second incorrectly-removed baseline entry was found: `tests.INS-019.test_ins019_edge_cases.test_verify_shim_existence_only_check`. This flaky test was present in the pre-MNT-029 baseline and still fails in the full suite. It must be restored. WP is returned to the Developer.
+
+---
+
+## Iteration 1 Summary (historical)
+
+**FAIL.** MNT-029 introduced 1 new regression by incorrectly removing a still-failing test from `tests/regression-baseline.json`. Additionally, `docs/workpackages/MNT-029/dev-log.md` was missing. Returned to Developer as BUG-192.
+
+---
+
+## Iteration 2 Detailed Findings
 
 ## Tests Executed
 
@@ -70,8 +80,93 @@ The 12 other removed baseline entries all now pass. ✓
 
 - [ ] **Rerun `scripts/run_tests.py --wp MNT-029 --full-suite`** and confirm 0 new regressions.
 
-## Verdict
+## Verdict (Iteration 1)
 
 **FAIL — return to Developer.**
 
-See TODOs above. Do not advance to Done until all items are resolved.
+---
+
+## Iteration 2 Checks
+
+### BUG-192 Fix Verification ✅
+
+- `tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_getting_started_section` present in baseline at line 12.
+- Ran targeted pytest → **1 FAILED** (test still fails; baseline entry justified).
+- BUG-192 in `docs/bugs/bugs.jsonl` → `"Status": "Fixed"`, `"Fixed In WP": "MNT-029"`. ✅
+
+### Baseline Count ✅
+
+`_count` = 140, `len(known_failures)` = 140. Match confirmed.
+
+### Manifest Check ✅
+
+`generate_manifest.py --check` → "Manifest is up to date." (exit 0).
+
+### MNT-029 Test Suite ✅
+
+All 4 tests pass (`test_manifest_file_count_matches_files_dict`, `test_baseline_no_stale_entries`, `test_manifest_check_exits_clean`, `test_manifest_has_expected_keys`).
+
+### Workspace Validation ✅
+
+`scripts/validate_workspace.py --wp MNT-029` → "All checks passed." (exit 0).
+
+### Full Suite Regression Analysis ❌
+
+Run: `pytest --tb=no -q`  
+Result: `73 failed, 8941 passed, 344 skipped, 5 xfailed, 66 errors` (exit 1).
+
+Of 137 total failures+errors: **136 in baseline**, **1 new regression**.
+
+#### New Regression: `tests.INS-019.test_ins019_edge_cases.test_verify_shim_existence_only_check`
+
+- **Status:** FAILED in full suite, PASSES in isolation (`pytest tests/INS-019/` → 59 passed).
+- **Pre-MNT-029:** Entry WAS in baseline (commit `100dc6f`) with reason: *"Flaky test: passes when run in isolation but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."*
+- **Post-MNT-029:** Entry was removed during the 152→140 cleanup. Removal was incorrect — the test still fails in full-suite context.
+- This is the same category of error as BUG-192 from Iteration 1.
+
+#### INS-019 Flaky Entries Note (informational)
+
+4 other INS-019 baseline entries did not fire on this run. They are all confirmed flaky tests (INS-019 sys.path issue) and their baseline retention is **correct**.
+
+---
+
+## Iteration 2 TODOs for Developer
+
+### TODO-1 (Blocking): Restore Missing Baseline Entry
+
+Restore the following entry to `tests/regression-baseline.json` (place in alphabetical order among INS-019 entries):
+
+```json
+"tests.INS-019.test_ins019_edge_cases.test_verify_shim_existence_only_check": {
+  "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+},
+```
+
+Update `_count` from 140 → 141 and `_updated` to 2026-04-06.
+
+### TODO-2 (Blocking): Log Bug via `scripts/add_bug.py`
+
+Log a new bug for the incorrectly-removed `test_verify_shim_existence_only_check` baseline entry. Direct editing of `docs/bugs/bugs.jsonl` is prohibited — use `scripts/add_bug.py`.
+
+### TODO-3 (Verification): Confirm No Other INS-019 Entries Were Incorrectly Removed
+
+Compare pre-MNT-029 INS-019 entries (`git show 100dc6f:tests/regression-baseline.json | Select-String "INS-019"`) against current baseline to ensure `test_verify_shim_existence_only_check` is the only missing entry.
+
+---
+
+## Iteration 2 Test Execution Log
+
+| Test Run | Command | Result |
+|----------|---------|--------|
+| DOC-002 targeted | `pytest tests/DOC-002/...::test_placeholder_present_in_getting_started_section` | 1 FAILED (expected) |
+| MNT-029 suite | `pytest tests/MNT-029/ -v --tb=short` | 4 PASSED |
+| Full suite | `pytest --tb=no -q` | 73 failed, 8941 passed, 344 skipped, 66 errors |
+| INS-019 isolated | `pytest tests/INS-019/ -v -q` | 59 PASSED |
+| Workspace validation | `scripts/validate_workspace.py --wp MNT-029` | PASSED |
+| Manifest check | `scripts/generate_manifest.py --check` | PASSED (exit 0) |
+
+## Verdict (Iteration 2)
+
+**FAIL — return to Developer.**
+
+One additional incorrectly-removed baseline entry found (`test_verify_shim_existence_only_check`). Restore it, log the bug, and resubmit.
