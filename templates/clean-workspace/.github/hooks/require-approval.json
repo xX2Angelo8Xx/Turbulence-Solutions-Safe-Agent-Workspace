@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "ts-python .github/hooks/scripts/security_gate.py",
+        "windows": "ts-python .github/hooks/scripts/security_gate.py",
+        "timeout": 15
+      }
+    ]
+  }
+}
