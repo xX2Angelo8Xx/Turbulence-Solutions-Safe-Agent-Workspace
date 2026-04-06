@@ -65,6 +65,7 @@ Templates (bundled inside Launcher)
 │   │   ├── ADR-008-tests-track-code.md
 │   │   ├── ADR-009-cross-wp-test-impact.md
 │   │   ├── ADR-010-windows-only-ci.md
+│   │   ├── ADR-011.md
 │   │   ├── ADR-TEMPLATE.md
 │   │   └── index.jsonl
 │   ├── maintenance/
@@ -640,6 +641,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── FIX-115/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── GUI-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1108,6 +1113,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
+│   │   ├── workpackages.csv
 │   │   └── workpackages.jsonl
 │   ├── architecture.md
 │   ├── macos-installation-guide.md
@@ -1147,12 +1153,47 @@ Templates (bundled inside Launcher)
 │   │   │   ├── entitlements.plist
 │   │   │   └── README.md
 │   │   ├── python-embed/
-│   │   │   └── README.md
+│   │   │   ├── _asyncio.pyd
+│   │   │   ├── _bz2.pyd
+│   │   │   ├── _ctypes.pyd
+│   │   │   ├── _decimal.pyd
+│   │   │   ├── _elementtree.pyd
+│   │   │   ├── _hashlib.pyd
+│   │   │   ├── _lzma.pyd
+│   │   │   ├── _msi.pyd
+│   │   │   ├── _multiprocessing.pyd
+│   │   │   ├── _overlapped.pyd
+│   │   │   ├── _queue.pyd
+│   │   │   ├── _socket.pyd
+│   │   │   ├── _sqlite3.pyd
+│   │   │   ├── _ssl.pyd
+│   │   │   ├── _uuid.pyd
+│   │   │   ├── _zoneinfo.pyd
+│   │   │   ├── libcrypto-3.dll
+│   │   │   ├── libffi-8.dll
+│   │   │   ├── libssl-3.dll
+│   │   │   ├── LICENSE.txt
+│   │   │   ├── pyexpat.pyd
+│   │   │   ├── python.cat
+│   │   │   ├── python.exe
+│   │   │   ├── python3.dll
+│   │   │   ├── python311._pth
+│   │   │   ├── python311.dll
+│   │   │   ├── python311.zip
+│   │   │   ├── pythonw.exe
+│   │   │   ├── README.md
+│   │   │   ├── select.pyd
+│   │   │   ├── sqlite3.dll
+│   │   │   ├── unicodedata.pyd
+│   │   │   ├── vcruntime140.dll
+│   │   │   ├── vcruntime140_1.dll
+│   │   │   └── winsound.pyd
 │   │   ├── shims/
 │   │   │   ├── README.md
 │   │   │   ├── ts-python
 │   │   │   └── ts-python.cmd
 │   │   └── windows/
+│   │       ├── Output/
 │   │       ├── README.md
 │   │       └── setup.iss
 │   └── launcher/
@@ -1347,6 +1388,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-098/
 │   ├── FIX-099/
 │   ├── FIX-100/
+│   ├── FIX-101/
 │   ├── FIX-102/
 │   ├── FIX-103/
 │   ├── FIX-104/
@@ -1360,6 +1402,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-112/
 │   ├── FIX-113/
 │   ├── FIX-114/
+│   ├── FIX-115/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
@@ -1522,6 +1565,7 @@ Templates (bundled inside Launcher)
 ├── launcher.spec
 ├── Makefile
 ├── pyproject.toml
+├── python-embed.zip
 ├── TS-Logo.ico
 └── TS-Logo.png
 ```
