@@ -1,14 +1,14 @@
 # Test Report — GUI-036
 
 **Tester:** Tester Agent  
-**Date:** 2026-04-06  
-**Iteration:** 1  
+**Date:** 2026-04-07  
+**Iteration:** 2  
 
 ---
 
 ## Summary
 
-**FAIL.** The implementation is functionally correct and all 13 Developer-written tests pass in isolation. However, GUI-036 changed the `SettingsDialog` geometry from `480x480` to `480x620` without updating the pre-existing assertion in `tests/GUI-018/test_gui018_edge_cases.py`. This constitutes a regression: `test_dialog_geometry_is_480x480` now fails on the GUI-036 branch. The same mistake occurred previously with FIX-076 (BUG-130). Per the testing protocol, any code change that alters externally-asserted behavior must update all affected test assertions in the same commit.
+**PASS.** All acceptance criteria met. BUG-205 geometry regression was resolved in Iteration 2: `test_dialog_geometry_is_480x480` renamed to `test_dialog_geometry_is_480x620` with updated assertion. Full suite shows 199 pre-existing failures only — no new regressions introduced by GUI-036.
 
 ---
 
@@ -16,13 +16,23 @@
 
 | Test | Type | Result | Notes |
 |------|------|--------|-------|
-| GUI-036: targeted suite (13 tests) | Unit | **PASS** | TST-2712 — all 13 tests pass in isolation |
-| GUI-036: full regression suite | Regression | **FAIL** | TST-2713 — real regression: test_dialog_geometry_is_480x480 |
+| GUI-036: targeted suite (13 tests) | Unit | **PASS** | TST-2717 — all 13 tests pass |
+| GUI-036: geometry regression fix (GUI-018) | Regression | **PASS** | TST-2718 — test_dialog_geometry_is_480x620 passes |
+| GUI-036: full regression suite | Regression | **PASS*** | TST-2716 — 9138 passed, 199 pre-existing failures, 0 new |
 
-### Full Suite Summary
-- 9136 passed, 201 failed, 348 skipped, 3 warnings, 66 errors
-- 200 of those failures are pre-existing (in regression baseline or prior-WP failures)
-- **1 new failure is directly caused by GUI-036**: `tests/GUI-018/test_gui018_edge_cases.py::TestDialogGeometry::test_dialog_geometry_is_480x480`
+*199 failures are all pre-existing (baseline: 261 entries). No new failure introduced by GUI-036.
+
+### Full Suite Summary (Iteration 2)
+- 9138 passed, 199 failed, 348 skipped, 4 xfailed, 1 xpassed, 3 warnings, 66 errors
+- All 199 failures are pre-existing baseline failures
+- **0 new failures** introduced by GUI-036
+
+### Comparison to Iteration 1
+| Metric | Iteration 1 | Iteration 2 |
+|--------|-------------|-------------|
+| Passed | 9136 | 9138 |
+| Failed | 201 | 199 |
+| New failures | 1 (geometry) | 0 |
 
 ---
 
@@ -42,7 +52,7 @@
 - **TOCTOU mitigated**: second `_find_uninstaller()` call at click time guards against the file disappearing.
 - **No information leakage**: error and info dialogs reveal no sensitive internal state.
 
-### Acceptance Criteria — PASS (functionally)
+### Acceptance Criteria — PASS
 - ✅ AC1: Red "Uninstall Application" button present in Settings (Danger Zone section).
 - ✅ AC2: Confirmation dialog shown before any action.
 - ✅ AC3: Windows — launches `unins000.exe` via `Popen` + `sys.exit(0)`.
@@ -53,19 +63,14 @@
 
 ## Bugs Found
 
-- **BUG-205**: GUI-036 broke GUI-018 geometry test: `test_dialog_geometry_is_480x480` (logged in `docs/bugs/bugs.jsonl`)
-
----
-
-## TODOs for Developer
-
-- [ ] **Update `tests/GUI-018/test_gui018_edge_cases.py`**: Change the assertion on line 145 from `assert_called_with("480x480")` to `assert_called_with("480x620")`. Rename the test function `test_dialog_geometry_is_480x480` → `test_dialog_geometry_is_480x620` and update the docstring accordingly (line 139–145). This is the same fix that was required in FIX-076/Iteration 2 (BUG-130) when the height changed from 480x280 → 480x480. Include this change in the same commit as the rest of GUI-036.
-- [ ] Populate `Fixed In WP` for BUG-205 with `GUI-036` in `docs/bugs/bugs.jsonl` after fixing.
+| Bug | Status |
+|-----|--------|
+| BUG-205: GUI-036 broke GUI-018 geometry test | **Closed** |
 
 ---
 
 ## Verdict
 
-**FAIL — return to Developer.**
+**PASS — approved for Done.**
 
-The test suite regression `tests/GUI-018/test_gui018_edge_cases.py::TestDialogGeometry::test_dialog_geometry_is_480x480` must be fixed before this WP can be marked Done. The fix is a one-line assertion update plus a rename of the test function. See TODOs above.
+All 13 GUI-036 tests pass. Geometry regression (BUG-205) resolved. No new regressions in the full suite. Workspace validation clean (exit 0).
