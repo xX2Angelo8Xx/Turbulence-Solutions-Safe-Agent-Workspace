@@ -1,4 +1,4 @@
----
+﻿---
 name: Workspace-Cleaner
 description: "Checks that AgentDocs match the actual project state. Finds and fixes documentation drift — the cleanup crew."
 tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, execute, read, agent, edit, search, todo]
@@ -90,4 +90,4 @@ The following paths are permanently off-limits:
 | `.vscode/` | Editor settings |
 | `NoAgentZone/` | Hard-denied sensitive files |
 
-Read `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` at the start of every session.
+Read `{{PROJECT_NAME}}/AGENT-RULES.md` at the start of every session.

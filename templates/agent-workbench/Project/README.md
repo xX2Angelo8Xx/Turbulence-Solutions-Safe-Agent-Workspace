@@ -2,7 +2,7 @@
 
 Welcome to your project folder. AI agents work inside this folder.
 
-See `AgentDocs/AGENT-RULES.md` for the full agent rules, permissions, and guidelines.
+See `AGENT-RULES.md` for the full agent rules, permissions, and guidelines.
 
 ## Getting Started
 

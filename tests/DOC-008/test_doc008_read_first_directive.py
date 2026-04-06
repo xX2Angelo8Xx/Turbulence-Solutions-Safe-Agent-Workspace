@@ -60,7 +60,7 @@ def test_directive_uses_project_name_placeholder():
             return
     raise AssertionError(
         "{{PROJECT_NAME}} and AGENT-RULES.md do not appear together on the same line. "
-        "The path reference should be '{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md'."
+        "The path reference should be '{{PROJECT_NAME}}/AGENT-RULES.md'."
     )
 
 

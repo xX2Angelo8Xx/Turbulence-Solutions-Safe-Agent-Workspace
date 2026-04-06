@@ -67,12 +67,12 @@ class TestPlaceholderUsage:
     """Verify {{PROJECT_NAME}} placeholder is used correctly and consistently."""
 
     def test_placeholder_count_is_exactly_four(self):
-        """README must contain exactly 4 occurrences of {{PROJECT_NAME}} (required by DOC-002)."""
+        """README must contain exactly 5 occurrences of {{PROJECT_NAME}} (DOC-002 + FIX-119)."""
         content = _README.read_text(encoding="utf-8")
         count = content.count("{{PROJECT_NAME}}")
-        assert count == 4, (
-            f"README must have exactly 4 {{{{PROJECT_NAME}}}} occurrences "
-            f"(DOC-002 compatibility), found {count}"
+        assert count == 5, (
+            f"README must have exactly 5 {{{{PROJECT_NAME}}}} occurrences "
+            f"(FIX-119 added orientation line with {{{{PROJECT_NAME}}}}/AGENT-RULES.md), found {count}"
         )
 
     def test_placeholder_appears_in_tier1_section(self):

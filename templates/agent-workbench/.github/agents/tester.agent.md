@@ -1,4 +1,4 @@
----
+﻿---
 name: Tester
 description: "Writes tests, hunts edge cases, and validates behavior — quality-focused, edge-case-first"
 tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, execute, read, edit, search, todo]
@@ -44,4 +44,4 @@ The following paths are permanently off-limits:
 | `.vscode/` | Editor settings |
 | `NoAgentZone/` | Hard-denied sensitive files |
 
-Read `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` at the start of every session.
+Read `{{PROJECT_NAME}}/AGENT-RULES.md` at the start of every session.

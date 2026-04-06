@@ -1,4 +1,4 @@
----
+﻿---
 name: Researcher
 description: "Investigates technologies, evaluates solutions, and delivers structured findings with mandatory source links — web-first, evidence-driven"
 tools: [vscode/memory, vscode/vscodeAPI, vscode/askQuestions, read, agent, edit, search, web, browser]
@@ -44,4 +44,4 @@ The following paths are permanently off-limits:
 | `.vscode/` | Editor settings |
 | `NoAgentZone/` | Hard-denied sensitive files |
 
-Read `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` at the start of every session.
+Read `{{PROJECT_NAME}}/AGENT-RULES.md` at the start of every session.

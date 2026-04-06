@@ -1,4 +1,4 @@
----
+﻿---
 name: Coordinator
 description: "Orchestrates specialist agents to turn a goal into a working demonstrator. Delegates, monitors, and delivers."
 tools: [vscode, execute, read, agent, edit, search, web/githubRepo, todo]
@@ -51,4 +51,4 @@ The following paths are permanently off-limits:
 | `.vscode/` | Editor settings |
 | `NoAgentZone/` | Hard-denied sensitive files |
 
-Read `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` at the start of every session.
+Read `{{PROJECT_NAME}}/AGENT-RULES.md` at the start of every session.

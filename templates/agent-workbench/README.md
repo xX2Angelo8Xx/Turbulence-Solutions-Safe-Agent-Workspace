@@ -2,7 +2,7 @@
 
 AI agents work inside `{{PROJECT_NAME}}/` — your project folder, fully accessible to agents by default.
 
-> **Agent orientation:** See `AgentDocs/AGENT-RULES.md` in your project folder for the full agent rules.
+> **Agent orientation:** See `{{PROJECT_NAME}}/AGENT-RULES.md` for the full agent rules.
 
 This workspace uses the Turbulence Solutions safe-agent framework. A **PreToolUse hook** enforces three security tiers that control where AI agents can read and write files.
 

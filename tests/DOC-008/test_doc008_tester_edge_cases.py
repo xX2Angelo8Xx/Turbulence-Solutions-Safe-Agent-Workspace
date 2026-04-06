@@ -151,12 +151,12 @@ def test_directive_body_is_blockquote():
 
 def test_agent_rules_path_format():
     """
-    The path reference must be '{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md' — using
+    The path reference must be '{{PROJECT_NAME}}/AGENT-RULES.md' — using
     forward slash separators. A backslash or missing slash would produce an
     invalid path on POSIX systems.
     """
     content = _read_file()
-    assert "{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md" in content, (
-        "Expected path '{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md' (forward slash) not found.\n"
+    assert "{{PROJECT_NAME}}/AGENT-RULES.md" in content, (
+        "Expected path '{{PROJECT_NAME}}/AGENT-RULES.md' (forward slash) not found.\n"
         "Check for backslash separators or missing slash in the directive."
     )
