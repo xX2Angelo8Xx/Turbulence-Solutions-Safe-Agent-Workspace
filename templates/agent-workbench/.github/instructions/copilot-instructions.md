@@ -29,6 +29,7 @@ Read `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` for your complete permissions, 
 | `pip install` via terminal | `install_python_packages` tool |
 | Venv activation (`.\venv\Scripts\activate`) | Run `.venv\Scripts\python.exe` directly |
 | Venv python (`venv\Scripts\python.exe -c "..."`) | Use system `python` command |
+| `semantic_search` in a fresh workspace (no results before VS Code indexing completes) | Use `grep_search` with `includePattern: "{{PROJECT_NAME}}/**"` until indexing finishes |
 
 ## AgentDocs
 

@@ -197,5 +197,5 @@ If you see `Block 1 of M`, stop and reassess — do not retry the same denied ac
 | Long-running commands time out | Use `isBackground=true` and poll with `get_terminal_output` |
 | `csv` module misparsing multi-line quoted fields | Use `csv.reader` with `quoting=csv.QUOTE_ALL` |
 | Temp files pollute workspace | Prefix with `tmp_`; delete in `finally` block or pytest fixture teardown |
-| `semantic_search` returns empty or stale results | Workspace may not be indexed yet — fall back to `grep_search` with a specific `includePattern` scoped to your project folder (e.g. `includePattern: "project/**"`) |
+| `semantic_search` returns empty results (fresh workspace or indexing not yet complete) | VS Code must finish indexing before semantic search returns results. In fresh workspaces this may take a few minutes. Fall back to `grep_search` with a specific `includePattern` scoped to your project folder (e.g. `includePattern: "{{PROJECT_NAME}}/**"`) until indexing completes. |
 | `grep_search` denied with "requires includePattern" | Always provide `includePattern` scoped to your project folder; bare queries without `includePattern` are denied by the security gate |
