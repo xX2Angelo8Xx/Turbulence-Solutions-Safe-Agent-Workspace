@@ -316,7 +316,12 @@ def test_on_create_project_disables_ui_on_valid_input():
 
 
 def test_on_create_project_no_thread_on_invalid_name():
-    """No thread is started when folder name validation fails."""
+    """Thread always starts and UI is always disabled on click (FIX-121).
+
+    Pre-FIX-121: no thread started when validation failed.
+    Post-FIX-121: thread always starts so the button greys out immediately;
+    validation runs inside the background thread.
+    """
     import launcher.gui.app as app_mod
 
     app, mock_thread_cls = _make_full_app()
@@ -329,8 +334,10 @@ def test_on_create_project_no_thread_on_invalid_name():
         app_mod.threading.Thread = MagicMock(return_value=mock_thread_instance)
         app._on_create_project()
 
-    mock_thread_instance.start.assert_not_called()
-    mock_set_state.assert_not_called()
+    # FIX-121: thread always starts so the button greys out immediately on click.
+    mock_thread_instance.start.assert_called_once()
+    # UI is always disabled before the thread runs.
+    mock_set_state.assert_called_with(disabled=True)
 
 
 # ---------------------------------------------------------------------------
