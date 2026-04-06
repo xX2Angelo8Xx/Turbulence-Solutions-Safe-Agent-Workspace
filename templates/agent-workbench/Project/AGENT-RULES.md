@@ -184,6 +184,19 @@ The security gate tracks denials per session.
 
 If you see `Block 1 of M`, stop and reassess — do not retry the same denied action.
 
+### Subagent Budget Sharing
+
+> **Warning:** Subagent denials consume blocks from the **parent session's** denial budget, not a separate counter.
+
+When you spawn a subagent (e.g. via `runSubagent`), any zone violations the subagent triggers are charged to the same session budget shared with the parent.
+
+**Rules for agents that spawn subagents:**
+
+1. **Explicitly instruct subagents not to probe denied zones.** Include a reminder in the subagent prompt that `.github/hooks/`, `.vscode/`, and `NoAgentZone/` are fully denied.
+2. **Do not use subagents as a bypass.** Delegating a task to a subagent does not change zone restrictions — the denial still counts against your session budget.
+3. **Monitor budget before spawning.** If the parent session is approaching the threshold, avoid spawning subagents for tasks that may involve denied zones.
+4. **Coordinator/Orchestrator patterns are high risk.** Patterns that spawn multiple subagents in sequence can exhaust the shared budget rapidly if any subagent probes denied zones.
+
 ---
 
 ## 7. Known Workarounds
