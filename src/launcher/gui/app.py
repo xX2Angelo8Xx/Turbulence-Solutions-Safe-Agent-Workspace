@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import threading
@@ -744,7 +745,7 @@ class SettingsDialog:
     def __init__(self, parent: ctk.CTk) -> None:
         self._dialog = ctk.CTkToplevel(parent)
         self._dialog.title("Settings")
-        self._dialog.geometry("480x480")
+        self._dialog.geometry("480x620")
         self._dialog.resizable(False, False)
         self._dialog.configure(fg_color=COLOR_PRIMARY)
         self._dialog.grab_set()
@@ -862,6 +863,83 @@ class SettingsDialog:
         self.reset_agent_blocks_button.grid(
             row=6, column=0, columnspan=3, padx=20, pady=(4, 12), sticky="ew"
         )
+
+        # Danger Zone — Uninstall (GUI-036)
+        ctk.CTkLabel(
+            self._dialog,
+            text="Danger Zone",
+            text_color="#CC3333",
+            font=("", 14, "bold"),
+            anchor="w",
+        ).grid(row=7, column=0, columnspan=3, padx=20, pady=(12, 4), sticky="w")
+
+        ctk.CTkLabel(
+            self._dialog,
+            text="Permanently remove the application from this machine.",
+            text_color=COLOR_TEXT,
+            anchor="w",
+            wraplength=420,
+        ).grid(row=8, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="w")
+
+        uninstaller = self._find_uninstaller()
+        self._uninstall_button = ctk.CTkButton(
+            self._dialog,
+            text="Uninstall Application",
+            command=self._on_uninstall,
+            fg_color="#CC3333",
+            hover_color="#AA2222",
+            text_color=COLOR_TEXT,
+            height=36,
+            state="normal" if uninstaller is not None else "disabled",
+        )
+        self._uninstall_button.grid(row=9, column=0, columnspan=3, padx=20, pady=(4, 16), sticky="ew")
+
+    def _find_uninstaller(self) -> "Path | None":
+        """Return the path to unins000.exe if the installed uninstaller is found.
+
+        Only applicable on Windows. Checks the directory containing sys.executable.
+        Returns None on non-Windows platforms and in dev/source mode.
+        """
+        if sys.platform != "win32":
+            return None
+        candidate = Path(sys.executable).parent / "unins000.exe"
+        if candidate.is_file():
+            return candidate
+        return None
+
+    def _on_uninstall(self) -> None:
+        """Handle Uninstall Application button click (GUI-036).
+
+        Shows a confirmation dialog. On Windows, runs unins000.exe and closes
+        the launcher. On other platforms, shows manual removal instructions.
+        """
+        if sys.platform == "win32":
+            uninstaller = self._find_uninstaller()
+            if uninstaller is None:
+                messagebox.showerror(
+                    "Uninstaller Not Found",
+                    "The uninstaller (unins000.exe) could not be located.\n"
+                    "Please use Windows Settings > Apps to uninstall manually.",
+                    parent=self._dialog,
+                )
+                return
+            confirmed = messagebox.askyesno(
+                "Confirm Uninstall",
+                "This will permanently remove the application from your computer.\n\n"
+                "Are you sure you want to uninstall?",
+                parent=self._dialog,
+            )
+            if not confirmed:
+                return
+            subprocess.Popen([str(uninstaller)])
+            sys.exit(0)
+        else:
+            messagebox.showinfo(
+                "Manual Uninstall Required",
+                "To uninstall on macOS or Linux, remove the application folder\n"
+                "and any associated launcher scripts you created during installation.",
+                parent=self._dialog,
+            )
 
     def _on_auto_detect(self) -> None:
         """Auto-detect the python-embed directory from the launcher's install location."""
