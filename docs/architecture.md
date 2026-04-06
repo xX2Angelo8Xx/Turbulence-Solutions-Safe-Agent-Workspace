@@ -1113,7 +1113,6 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── validation-exceptions.json
-│   │   ├── workpackages.csv
 │   │   └── workpackages.jsonl
 │   ├── architecture.md
 │   ├── macos-installation-guide.md
