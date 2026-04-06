@@ -1,6 +1,6 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 140,
+  "_count": 141,
   "_updated": "2026-04-06",
   "known_failures": {
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_agent_rules_section": {
@@ -21,274 +21,28 @@
     "tests.DOC-047.test_doc047_agent_rules_path_migration.test_old_root_agent_rules_does_not_exist": {
       "reason": "Test suite contradiction: DOC-045/DOC-047/FIX-103 require Project/AGENT-RULES.md to NOT exist (post-migration), but FIX-091/SAF-049/SAF-056/DOC-004 require it TO exist. Resolved in favour of FIX-091 which has more tests and reflects the current template design."
     },
-    "tests.FIX-103.test_fix103_agent_spec_tests.test_agent_rules_in_agentdocs": {
-      "reason": "Test suite contradiction: DOC-045/DOC-047/FIX-103 require Project/AGENT-RULES.md to NOT exist (post-migration), but FIX-091/SAF-049/SAF-056/DOC-004 require it TO exist. Resolved in favour of FIX-091 which has more tests and reflects the current template design."
-    },
-    "tests.FIX-007.test_fix007_mock_pattern.TestGUI012WindowHeight.test_window_height_assertion_matches_app": {
+    "tests.FIX-007.test_fix007_mock_pattern.TestGUI012WindowHeight.test_app_window_height_is_590": {
       "reason": "App window height is 630px; tests expect 590px. The window height was intentionally increased after these tests were written. Changing the app to match the old value would regress a deliberate UI improvement."
     },
-    "tests.FIX-007.test_fix007_mock_pattern.TestGUI012WindowHeight.test_app_window_height_is_590": {
+    "tests.FIX-007.test_fix007_mock_pattern.TestGUI012WindowHeight.test_window_height_assertion_matches_app": {
       "reason": "App window height is 630px; tests expect 590px. The window height was intentionally increased after these tests were written. Changing the app to match the old value would regress a deliberate UI improvement."
     },
     "tests.FIX-009.test_fix009_edge_cases.test_tst_ids_sequential_no_gaps_in_renumbered_range": {
       "reason": "test_tst_ids_sequential_no_gaps_in_renumbered_range: 106 TST IDs are missing in the expected sequential range due to test result records being archived to separate files. Gaps are permanent and intentional; test cannot be satisfied without reversing the archiving."
     },
-    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_traversal_returned_as_is": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_edge_cases.test_verify_shim_traversal_path_returns_false": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_crlf_stripped": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_bom_causes_fail_closed": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_unicode_path": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_embedded_newline_safe": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_very_long_path": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_edge_cases.test_write_python_path_overwrites_existing": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_shims.test_get_python_path_config": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_shims.test_write_python_path_creates_file": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_shims.test_write_python_path_creates_parent_dirs": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_path": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_none_missing": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_none_empty": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_none_whitespace_only": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.INS-019.test_ins019_shims.test_verify_shim_ok": {
-      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
-    },
-    "tests.MNT-002.test_mnt002_action_tracker.test_initial_action_count": {
-      "reason": "test_initial_action_count hardcodes expected count as 11, but actual action log has grown to 39 entries. Test needs to be updated when the action tracker stabilizes."
-    },
-    "tests.SAF-010.test_saf010_hook_config.test_command_uses_python": {
-      "reason": "Hook config uses 'ts-python' command (the shim); tests expect raw 'python'. The shim was introduced after these tests were written to ensure the correct Python environment."
-    },
-    "tests.SAF-010.test_saf010_hook_config.test_windows_command_uses_python": {
-      "reason": "Hook config uses 'ts-python' command (the shim); tests expect raw 'python'. The shim was introduced after these tests were written to ensure the correct Python environment."
-    },
-    "tests.SAF-047.test_saf047_tester_edge_cases.test_venv_single_backslash_python_denied": {
-      "reason": "Security gate backslash path handling: tests expect specific allow/deny behaviour for single-backslash and double-backslash venv paths, but the gate normalises paths differently. Actual gate behaviour does not match test assumptions for these variants."
-    },
-    "tests.SAF-047.test_saf047_tester_edge_cases.test_venv_double_backslash_python_allowed": {
-      "reason": "Security gate backslash path handling: tests expect specific allow/deny behaviour for single-backslash and double-backslash venv paths, but the gate normalises paths differently. Actual gate behaviour does not match test assumptions for these variants."
-    },
-    "tests.SAF-072.test_saf072_edge_cases.test_concurrent_writes_no_corruption": {
-      "reason": "Flaky test: passes when run in isolation but sporadically fails in the full test suite due to threading/file-locking race conditions in the test setup."
-    },
-    "tests.INS-029.test_ins029_edge_cases.test_egg_info_pkg_info_version_not_future": {
-      "reason": "Test hardcodes EXPECTED_VERSION=3.2.4 but current version is 3.3.11. On CI where egg-info exists, assertion fails."
-    },
-    "tests.INS-013.test_ins013_ci_workflow.test_all_5_jobs_defined": {
+    "tests.FIX-010.test_fix010_cicd_pipeline.test_linux_build_has_no_standalone_pyinstaller_step": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.INS-013.test_ins013_ci_workflow.test_macos_arm_runs_on": {
+    "tests.FIX-010.test_fix010_cicd_pipeline.test_macos_arm_has_no_standalone_pyinstaller_step": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.INS-013.test_ins013_ci_workflow.test_linux_build_runs_on": {
+    "tests.FIX-010.test_fix010_cicd_pipeline.test_macos_arm_runner_is_still_macos14": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.INS-013.test_ins013_ci_workflow.test_release_needs_all_builds": {
+    "tests.FIX-010.test_fix010_edge_cases.test_linux_artifact_upload_path_is_appimage": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.INS-013.test_ins013_tester_edge_cases.test_no_duplicate_job_names": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-013.test_ins013_tester_edge_cases.test_release_needs_exactly_the_4_build_jobs": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-013.test_ins013_tester_edge_cases.test_release_needs_count_is_exactly_4": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_job_exists": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_linux_build_job_still_exists": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_runs_on_macos14": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_has_5_steps": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_checkout": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_python_setup": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_python_version": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_install_deps": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_no_standalone_pyinstaller_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_build_dmg_step_exists": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_build_dmg_chmod": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_build_dmg_arch_arg": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_upload_artifact_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_artifact_name": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_artifact_path_contains_dmg": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_edge_cases.test_arm_job_does_not_pass_x86_64": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_exact_script_path": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_chmod_before_script_invocation": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_no_shell_override": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_no_secrets_in_run": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_no_tokens_in_env": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_edge_cases.test_macos_runners_are_distinct": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_artifact_path_exact_glob": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_no_windows_references": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_job_exists": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_release_job_needs_linux_build": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_runs_on_ubuntu_latest": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_job_has_6_steps": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_checkout_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_python_setup_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_python_version_is_311": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_install_dependencies_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_pip_install_command": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_install_libfuse2_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_command_uses_sudo": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_command_uses_apt_get": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_command_installs_libfuse2": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_command_is_noninteractive": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_apt_get_update_before_install": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_no_standalone_pyinstaller_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_script_handles_pyinstaller": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_script_path": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_arch_argument_is_x86_64": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_chmod_present": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_chmod_before_script": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_upload_artifact_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_artifact_name_is_linux_appimage": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_artifact_path_is_dist_appimage_glob": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_before_pyinstaller": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_pyinstaller_before_appimage": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_upload_is_last_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-017.test_ins017_edge_cases.test_release_needs_exactly_four_jobs": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-017.test_ins017_release_job.test_release_needs_all_four_build_jobs": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-017.test_ins017_release_job.test_release_needs_macos_arm_build": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.INS-017.test_ins017_release_job.test_release_needs_linux_build": {
+    "tests.FIX-010.test_fix010_edge_cases.test_macos_arm_does_not_have_x64_architecture": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
     "tests.FIX-010.test_fix010_edge_cases.test_release_job_needs_all_four_build_jobs": {
@@ -297,58 +51,22 @@
     "tests.FIX-010.test_fix010_edge_cases.test_release_job_needs_exact_four": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-010.test_fix010_edge_cases.test_linux_artifact_upload_path_is_appimage": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-010.test_fix010_cicd_pipeline.test_macos_arm_runner_is_still_macos14": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-010.test_fix010_cicd_pipeline.test_macos_arm_has_no_standalone_pyinstaller_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-010.test_fix010_cicd_pipeline.test_linux_build_has_no_standalone_pyinstaller_step": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-010.test_fix010_edge_cases.test_macos_arm_does_not_have_x64_architecture": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
     "tests.FIX-011.test_fix011_edge_cases.test_macos_arm_build_runner_unchanged": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-011.test_fix011_spec_tracking.test_release_job_needs_exact": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
     "tests.FIX-011.test_fix011_spec_tracking.test_release_job_needs_count": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestWorkflowFileValidity.test_macos_arm_build_job_exists": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestOtherJobsUnchanged.test_linux_build_job_present": {
+    "tests.FIX-011.test_fix011_spec_tracking.test_release_job_needs_exact": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
     "tests.FIX-029.test_fix029_ci_codesign_verify.TestOtherJobsUnchanged.test_linux_build_has_no_codesign_step": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyStepSafeguards.test_only_one_codesign_verify_step_in_entire_workflow": {
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestOtherJobsUnchanged.test_linux_build_job_present": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_present": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_has_run_command": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_contains_codesign_verify": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_targets_correct_app": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_contains_echo_pass_message": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_full_command": {
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestStepOrdering.test_no_upload_step_between_build_and_verify": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
     "tests.FIX-029.test_fix029_ci_codesign_verify.TestStepOrdering.test_verify_step_after_build_dmg": {
@@ -357,7 +75,25 @@
     "tests.FIX-029.test_fix029_ci_codesign_verify.TestStepOrdering.test_verify_step_before_upload_artifact": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestStepOrdering.test_no_upload_step_between_build_and_verify": {
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_has_run_command": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_present": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_contains_codesign_verify": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_contains_echo_pass_message": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_full_command": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyCodeSigningStepExists.test_step_run_targets_correct_app": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyStepSafeguards.test_only_one_codesign_verify_step_in_entire_workflow": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
     "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyStepSafeguards.test_step_has_no_continue_on_error": {
@@ -369,10 +105,13 @@
     "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyStepSafeguards.test_step_has_no_shell_override": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyStepSafeguards.test_step_run_contains_deep_flag": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
     "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyStepSafeguards.test_step_run_contains_strict_flag": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-029.test_fix029_ci_codesign_verify.TestVerifyStepSafeguards.test_step_run_contains_deep_flag": {
+    "tests.FIX-029.test_fix029_ci_codesign_verify.TestWorkflowFileValidity.test_macos_arm_build_job_exists": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
     "tests.FIX-038.test_fix038_component_codesign.test_release_yml_checks_launcher": {
@@ -381,10 +120,10 @@
     "tests.FIX-038.test_fix038_component_codesign.test_release_yml_checks_python_framework": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-038.test_fix038_edge_cases.test_release_yml_verify_step_uses_multiline_yaml": {
+    "tests.FIX-038.test_fix038_edge_cases.test_release_yml_verify_step_has_two_codesign_calls": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-038.test_fix038_edge_cases.test_release_yml_verify_step_has_two_codesign_calls": {
+    "tests.FIX-038.test_fix038_edge_cases.test_release_yml_verify_step_uses_multiline_yaml": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
     "tests.FIX-039.test_fix039_edge_cases.test_release_yml_verify_step_no_app_path": {
@@ -393,14 +132,14 @@
     "tests.FIX-039.test_fix039_edge_cases.test_release_yml_verify_step_uses_pre_bundle_launcher": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-039.test_fix039_skip_launcher_resign.test_release_yml_verifies_pre_bundle_binary": {
-      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
-    },
     "tests.FIX-039.test_fix039_skip_launcher_resign.test_release_yml_still_verifies_python_framework": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.FIX-106.test_fix106_stale_assertions.test_release_yml_verify_uses_pre_bundle_path": {
+    "tests.FIX-039.test_fix039_skip_launcher_resign.test_release_yml_verifies_pre_bundle_binary": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.FIX-103.test_fix103_agent_spec_tests.test_agent_rules_in_agentdocs": {
+      "reason": "Test suite contradiction: DOC-045/DOC-047/FIX-103 require Project/AGENT-RULES.md to NOT exist (post-migration), but FIX-091/SAF-049/SAF-056/DOC-004 require it TO exist. Resolved in favour of FIX-091 which has more tests and reflects the current template design."
     },
     "tests.FIX-106.test_fix106_stale_assertions.test_release_yml_has_six_jobs": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
@@ -408,10 +147,259 @@
     "tests.FIX-106.test_fix106_stale_assertions.test_release_yml_verify_step_echo_confirmation": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
-    "tests.MNT-005.test_mnt005_ci_version_validation.test_macos_arm_build_needs_validate_version": {
+    "tests.FIX-106.test_fix106_stale_assertions.test_release_yml_verify_uses_pre_bundle_path": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
+    "tests.INS-013.test_ins013_ci_workflow.test_all_5_jobs_defined": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-013.test_ins013_ci_workflow.test_linux_build_runs_on": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-013.test_ins013_ci_workflow.test_macos_arm_runs_on": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-013.test_ins013_ci_workflow.test_release_needs_all_builds": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-013.test_ins013_tester_edge_cases.test_no_duplicate_job_names": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-013.test_ins013_tester_edge_cases.test_release_needs_count_is_exactly_4": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-013.test_ins013_tester_edge_cases.test_release_needs_exactly_the_4_build_jobs": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_edge_cases.test_arm_job_does_not_pass_x86_64": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_artifact_path_exact_glob": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_chmod_before_script_invocation": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_exact_script_path": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_no_secrets_in_run": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_no_shell_override": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_no_tokens_in_env": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_edge_cases.test_macos_arm_no_windows_references": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_edge_cases.test_macos_runners_are_distinct": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_linux_build_job_still_exists": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_artifact_name": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_artifact_path_contains_dmg": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_build_dmg_arch_arg": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_build_dmg_chmod": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_build_dmg_step_exists": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_checkout": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_has_5_steps": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_install_deps": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_job_exists": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_no_standalone_pyinstaller_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_python_setup": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_python_version": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_runs_on_macos14": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-015.test_ins015_macos_build_jobs.test_macos_arm_upload_artifact_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_arch_argument_is_x86_64": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_chmod_before_script": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_chmod_present": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_script_handles_pyinstaller": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_script_path": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_appimage_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_artifact_name_is_linux_appimage": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_artifact_path_is_dist_appimage_glob": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_checkout_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_install_dependencies_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_install_libfuse2_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_job_exists": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_job_has_6_steps": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_apt_get_update_before_install": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_before_pyinstaller": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_command_installs_libfuse2": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_command_is_noninteractive": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_command_uses_apt_get": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_libfuse2_command_uses_sudo": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_no_standalone_pyinstaller_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_pip_install_command": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_pyinstaller_before_appimage": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_python_setup_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_python_version_is_311": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_runs_on_ubuntu_latest": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_upload_artifact_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_linux_build_upload_is_last_step": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-016.test_ins016_linux_build_job.test_release_job_needs_linux_build": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-017.test_ins017_edge_cases.test_release_needs_exactly_four_jobs": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-017.test_ins017_release_job.test_release_needs_all_four_build_jobs": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-017.test_ins017_release_job.test_release_needs_linux_build": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-017.test_ins017_release_job.test_release_needs_macos_arm_build": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_bom_causes_fail_closed": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_crlf_stripped": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_embedded_newline_safe": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_traversal_returned_as_is": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_unicode_path": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_read_python_path_very_long_path": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_verify_shim_existence_only_check": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_verify_shim_traversal_path_returns_false": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_edge_cases.test_write_python_path_overwrites_existing": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_shims.test_get_python_path_config": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_none_empty": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_none_missing": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_none_whitespace_only": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_shims.test_read_python_path_returns_path": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_shims.test_verify_shim_ok": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_shims.test_write_python_path_creates_file": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-019.test_ins019_shims.test_write_python_path_creates_parent_dirs": {
+      "reason": "Flaky test: passes when run in isolation (python -m pytest tests/INS-019/) but fails in full suite due to sys.path mutation by other test modules. The INS-019 test file uses a module-level sys.path.insert() that is sensitive to import ordering."
+    },
+    "tests.INS-029.test_ins029_edge_cases.test_egg_info_pkg_info_version_not_future": {
+      "reason": "Test hardcodes EXPECTED_VERSION=3.2.4 but current version is 3.3.11. On CI where egg-info exists, assertion fails."
+    },
+    "tests.MNT-002.test_mnt002_action_tracker.test_initial_action_count": {
+      "reason": "test_initial_action_count hardcodes expected count as 11, but actual action log has grown to 39 entries. Test needs to be updated when the action tracker stabilizes."
+    },
     "tests.MNT-005.test_mnt005_ci_version_validation.test_linux_build_needs_validate_version": {
+      "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
+    },
+    "tests.MNT-005.test_mnt005_ci_version_validation.test_macos_arm_build_needs_validate_version": {
       "reason": "Disabled per MNT-027/ADR-010: macOS/Linux CI jobs removed; Windows-only until v4.0 stable"
     },
     "tests.MNT-005.test_mnt005_ci_version_validation.test_release_job_unchanged": {
@@ -422,6 +410,21 @@
     },
     "tests.MNT-024.test_mnt024_baseline_reset.test_baseline_count_reduced_from_original": {
       "reason": "MNT-027 expanded the regression baseline to 184 entries to account for 106 tests that fail because macOS/Linux CI jobs were removed per ADR-010; baseline count now exceeds MNT-024's original target of <100."
+    },
+    "tests.SAF-010.test_saf010_hook_config.test_command_uses_python": {
+      "reason": "Hook config uses 'ts-python' command (the shim); tests expect raw 'python'. The shim was introduced after these tests were written to ensure the correct Python environment."
+    },
+    "tests.SAF-010.test_saf010_hook_config.test_windows_command_uses_python": {
+      "reason": "Hook config uses 'ts-python' command (the shim); tests expect raw 'python'. The shim was introduced after these tests were written to ensure the correct Python environment."
+    },
+    "tests.SAF-047.test_saf047_tester_edge_cases.test_venv_double_backslash_python_allowed": {
+      "reason": "Security gate backslash path handling: tests expect specific allow/deny behaviour for single-backslash and double-backslash venv paths, but the gate normalises paths differently. Actual gate behaviour does not match test assumptions for these variants."
+    },
+    "tests.SAF-047.test_saf047_tester_edge_cases.test_venv_single_backslash_python_denied": {
+      "reason": "Security gate backslash path handling: tests expect specific allow/deny behaviour for single-backslash and double-backslash venv paths, but the gate normalises paths differently. Actual gate behaviour does not match test assumptions for these variants."
+    },
+    "tests.SAF-072.test_saf072_edge_cases.test_concurrent_writes_no_corruption": {
+      "reason": "Flaky test: passes when run in isolation but sporadically fails in the full test suite due to threading/file-locking race conditions in the test setup."
     }
   }
 }
