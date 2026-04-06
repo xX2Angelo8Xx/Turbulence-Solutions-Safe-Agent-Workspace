@@ -37,7 +37,7 @@ class TestWindowHeight:
     def test_window_height_is_440(self):
         app = _fresh_app()
         geometry_call = app._window.geometry.call_args[0][0]
-        assert "630" in geometry_call
+        assert "660" in geometry_call
 
 
 # ---------------------------------------------------------------------------

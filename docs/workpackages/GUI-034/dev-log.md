@@ -64,3 +64,19 @@ Located in `tests/GUI-034/`:
 
 - The progress bar is indeterminate — no percentage completion is shown (create_project is opaque).
 - The VS Code open call happens on the main thread after re-enabling the UI (consistent with prior behavior).
+
+---
+
+## Iteration 2 (Tester Feedback)
+
+### Issues Found
+1. **GUI-005, GUI-006 regressions (13 tests)**: Tests written for synchronous `_on_create_project` used `_window.after` implicitly (MagicMock) — callbacks never fired, so `messagebox` and `open_in_vscode` assertions failed.
+2. **GUI-012 regression (1 test)**: Height assertion checked for `"630"` — now `"660"`.
+
+### Fixes Applied
+- Added `_SyncThread` helper class to `tests/GUI-005/test_gui005_project_creation.py`, `tests/GUI-006/test_gui006_vscode_auto_open.py`, `tests/GUI-006/test_gui006_tester_edge_cases.py`.
+- Set `app._window.after.side_effect = lambda ms, cb: cb()` in `_make_app` helpers so `_on_creation_complete` fires synchronously in tests.
+- Added `patch("launcher.gui.app.threading.Thread", _SyncThread)` to 12 tests that assert post-completion behavior.
+- Updated `test_window_height_is_440` in GUI-012 from `"630"` → `"660"`.
+- All 134 affected tests now pass.
+

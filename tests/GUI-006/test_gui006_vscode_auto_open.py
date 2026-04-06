@@ -34,6 +34,19 @@ from launcher.gui.app import App  # noqa: E402
 # Helper – build a minimal App instance with independent widget mocks.
 # ---------------------------------------------------------------------------
 
+class _SyncThread:
+    """Stand-in for threading.Thread that runs the target on the calling thread.
+
+    Used in GUI-034+ tests so that _on_create_project's background thread fires
+    its _window.after() callback synchronously, enabling post-completion assertions.
+    """
+    def __init__(self, target=None, daemon=False, **kwargs):
+        self._target = target
+    def start(self) -> None:
+        if self._target:
+            self._target()
+
+
 def _make_app(
     project_name: str = "my-project",
     template_display: str = "Agent Workbench",
@@ -49,6 +62,8 @@ def _make_app(
     _CTK_MOCK.reset_mock()
     with patch("launcher.gui.app.find_vscode", return_value=vscode_path):
         app = App()
+    # GUI-034: fire _window.after() callbacks synchronously so _on_creation_complete runs inline.
+    app._window.after.side_effect = lambda ms, cb: cb()
 
     # Replace shared mock widgets with independent ones.
     app.project_name_entry = MagicMock()
@@ -155,6 +170,7 @@ class TestOpenInVSCodeCalledOnSuccess:
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
              patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
+             patch("launcher.gui.app.threading.Thread", _SyncThread), \
              patch("launcher.gui.app.create_project", return_value=created), \
              patch("launcher.gui.app.messagebox"), \
              patch("launcher.gui.app.open_in_vscode") as mock_open:
@@ -173,6 +189,7 @@ class TestOpenInVSCodeCalledOnSuccess:
              patch("launcher.gui.app.validate_destination_path", return_value=(True, "")), \
              patch("launcher.gui.app.check_duplicate_folder", return_value=False), \
              patch("launcher.gui.app.list_templates", return_value=["agent-workbench"]), \
+             patch("launcher.gui.app.threading.Thread", _SyncThread), \
              patch("launcher.gui.app.create_project", return_value=expected_path), \
              patch("launcher.gui.app.messagebox"), \
              patch("launcher.gui.app.open_in_vscode") as mock_open:
