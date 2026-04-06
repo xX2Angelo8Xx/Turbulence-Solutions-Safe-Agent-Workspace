@@ -209,3 +209,60 @@ class TestEdgeCases:
         """Path traversal inside whitelisted subdir — denied by .. check."""
         data = {"query": ".github/agents/../hooks/security_gate.py"}
         assert sg.validate_file_search(data, WS) == "deny"
+
+
+# ===========================================================================
+# Tester-added edge cases — boundary and normalization scenarios
+# ===========================================================================
+
+class TestTesterEdgeCases:
+    """Additional edge cases added by Tester (FIX-116 review).
+
+    Probes normalization boundaries, deep nesting, double-slash bypass attempts,
+    and the bare directory name (no trailing slash) boundary condition.
+    """
+
+    def test_agents_bare_name_no_trailing_slash_allowed(self):
+        """.github/agents with no trailing slash matches regex via '$' — allowed."""
+        data = {"query": ".github/agents"}
+        assert sg.validate_file_search(data, WS) == "allow"
+
+    def test_instructions_bare_name_allowed(self):
+        """.github/instructions bare name (no slash) — allowed."""
+        data = {"query": ".github/instructions"}
+        assert sg.validate_file_search(data, WS) == "allow"
+
+    def test_double_slash_in_github_agents_normalized_allowed(self):
+        """Double slash .github//agents/foo.md — normpath collapses it → allowed."""
+        data = {"query": ".github//agents/foo.md"}
+        assert sg.validate_file_search(data, WS) == "allow"
+
+    def test_deeply_nested_agents_path_allowed(self):
+        """Deep nested path .github/agents/a/b/c/d/file.md — allowed."""
+        data = {"query": ".github/agents/a/b/c/d/file.md"}
+        assert sg.validate_file_search(data, WS) == "allow"
+
+    def test_github_trailing_slash_only_denied(self):
+        """.github/ alone (only the .github directory) — denied."""
+        data = {"query": ".github/"}
+        assert sg.validate_file_search(data, WS) == "deny"
+
+    def test_backslash_path_agents_allowed(self):
+        """Windows backslash path .github\\agents\\foo.md — normalize_path converts → allowed."""
+        data = {"query": r".github\agents\foo.md"}
+        assert sg.validate_file_search(data, WS) == "allow"
+
+    def test_backslash_path_hooks_denied(self):
+        """Windows backslash path .github\\hooks\\sg.py — normalize_path converts → denied."""
+        data = {"query": r".github\hooks\security_gate.py"}
+        assert sg.validate_file_search(data, WS) == "deny"
+
+    def test_none_query_value_allowed(self):
+        """If query is None (tool_input key present but None) — allow (no query = allow)."""
+        data = {"query": None}
+        assert sg.validate_file_search(data, WS) == "allow"
+
+    def test_empty_string_query_allowed(self):
+        """Empty query string — no deny-zone names present → allow."""
+        data = {"query": ""}
+        assert sg.validate_file_search(data, WS) == "allow"
