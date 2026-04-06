@@ -128,14 +128,11 @@ def test_noagentzone_in_search_exclude():
 # ---------------------------------------------------------------------------
 
 
-def test_security_gate_settings_hash_valid():
-    """_KNOWN_GOOD_SETTINGS_HASH in security_gate.py must match the actual settings.json."""
-    embedded = _extract_hash("_KNOWN_GOOD_SETTINGS_HASH")
-    actual = _sha256_file(SETTINGS)
-    assert embedded == actual, (
-        f"_KNOWN_GOOD_SETTINGS_HASH mismatch — run update_hashes.py\n"
-        f"  embedded: {embedded}\n"
-        f"  actual:   {actual}"
+def test_security_gate_settings_hash_absent():
+    """_KNOWN_GOOD_SETTINGS_HASH constant must NOT be declared in security_gate.py (removed by FIX-115)."""
+    content = GATE.read_text(encoding="utf-8")
+    assert "_KNOWN_GOOD_SETTINGS_HASH: str =" not in content, (
+        "_KNOWN_GOOD_SETTINGS_HASH constant still declared in security_gate.py — it should have been removed by FIX-115"
     )
 
 
