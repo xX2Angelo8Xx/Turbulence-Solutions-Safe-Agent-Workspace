@@ -94,6 +94,153 @@ class TestFindIscc:
 
 
 # ---------------------------------------------------------------------------
+# Tester edge-case additions (MNT-031)
+# ---------------------------------------------------------------------------
+
+
+class TestTesterEdgeCases:
+    def test_dry_run_with_iscc_missing_still_exits(self, capsys):
+        """`--dry-run` calls find_iscc() and exits if ISCC is absent.
+
+        Documented behaviour: find_iscc() is invoked before the dry_run guard
+        inside step_inno_setup(), so even dry-run fails when ISCC is not found.
+        This test pins that behaviour so a future bugfix shows up as a diff.
+        """
+        original_fallbacks = build_windows._ISCC_FALLBACK_PATHS
+        try:
+            build_windows._ISCC_FALLBACK_PATHS = [
+                Path("no_iscc_dry_1.exe"),
+                Path("no_iscc_dry_2.exe"),
+            ]
+            with (
+                patch("build_windows.shutil.which", return_value=None),
+                patch.object(
+                    build_windows,
+                    "PYTHON_EMBED_DIR",
+                    Path("nonexistent_embed_dry"),
+                ),
+            ):
+                with patch("sys.argv", ["build_windows.py", "--dry-run"]):
+                    with pytest.raises(SystemExit) as exc_info:
+                        build_windows.main()
+        finally:
+            build_windows._ISCC_FALLBACK_PATHS = original_fallbacks
+
+        assert exc_info.value.code == 1
+        captured = capsys.readouterr()
+        assert "ISCC.exe not found" in captured.err
+
+    def test_all_skip_flags_combined(self, tmp_path, capsys):
+        """`--skip-pyinstaller --skip-embed` together still runs ISCC exactly once."""
+        embed_dir = tmp_path / "python-embed"
+        embed_dir.mkdir()
+        (embed_dir / "file.txt").touch()
+
+        with (
+            patch("build_windows.subprocess.run") as mock_run,
+            patch("build_windows.shutil.which", return_value=r"C:\ISCC.exe"),
+            patch.object(build_windows, "PYTHON_EMBED_DIR", embed_dir),
+        ):
+            with patch(
+                "sys.argv",
+                ["build_windows.py", "--skip-pyinstaller", "--skip-embed"],
+            ):
+                build_windows.main()
+
+        assert mock_run.call_count == 1
+        called_cmd = mock_run.call_args[0][0]
+        assert "ISCC" in str(called_cmd) or "iscc" in str(called_cmd).lower()
+        captured = capsys.readouterr()
+        assert "skipped (--skip-pyinstaller)" in captured.out
+        assert "skipped (--skip-embed)" in captured.out
+
+    def test_urlretrieve_exception_does_not_leave_zip(self, tmp_path):
+        """If urlretrieve raises, the zip file at zip_path must not persist."""
+        embed_dir = tmp_path / "python-embed"
+        # No existing files — triggers download attempt.
+
+        with (
+            patch(
+                "build_windows.urllib.request.urlretrieve",
+                side_effect=OSError("Network error"),
+            ),
+            patch.object(build_windows, "PYTHON_EMBED_DIR", embed_dir),
+            patch.object(build_windows, "REPO_ROOT", tmp_path),
+        ):
+            with pytest.raises(OSError, match="Network error"):
+                build_windows.step_python_embed(dry_run=False)
+
+        # Zip was never successfully written so should not exist at all.
+        zip_path = tmp_path / "python-embed.zip"
+        assert not zip_path.exists()
+
+    def test_corrupted_zip_cleanup(self, tmp_path):
+        """If the downloaded zip is corrupt, the zip file is removed by the finally block."""
+        embed_dir = tmp_path / "python-embed"
+        zip_path = tmp_path / "python-embed.zip"
+
+        def fake_urlretrieve(url, dest):
+            # Write an invalid (non-zip) file.
+            Path(dest).write_text("not a zip")
+
+        with (
+            patch(
+                "build_windows.urllib.request.urlretrieve",
+                side_effect=fake_urlretrieve,
+            ),
+            patch.object(build_windows, "PYTHON_EMBED_DIR", embed_dir),
+            patch.object(build_windows, "REPO_ROOT", tmp_path),
+        ):
+            with pytest.raises(Exception):  # BadZipFile or similar
+                build_windows.step_python_embed(dry_run=False)
+
+        # The finally block in step_python_embed must have deleted the bad zip.
+        assert not zip_path.exists()
+
+    def test_step_pyinstaller_calls_subprocess_with_check_true(self):
+        """step_pyinstaller passes check=True so CalledProcessError propagates."""
+        with patch("build_windows.subprocess.run") as mock_run:
+            build_windows.step_pyinstaller(dry_run=False)
+
+        mock_run.assert_called_once()
+        _, kwargs = mock_run.call_args
+        assert kwargs.get("check") is True
+
+    def test_step_inno_setup_calls_subprocess_with_check_true(self):
+        """step_inno_setup passes check=True so build failures propagate."""
+        with (
+            patch("build_windows.subprocess.run") as mock_run,
+            patch("build_windows.shutil.which", return_value=r"C:\ISCC.exe"),
+        ):
+            build_windows.step_inno_setup(dry_run=False)
+
+        mock_run.assert_called_once()
+        _, kwargs = mock_run.call_args
+        assert kwargs.get("check") is True
+
+    def test_success_message_printed_after_non_dry_build(self, tmp_path, capsys):
+        """main() prints the output EXE path on success when not in dry-run."""
+        embed_dir = tmp_path / "python-embed"
+        embed_dir.mkdir()
+        (embed_dir / "dummy.txt").touch()
+
+        with (
+            patch("build_windows.subprocess.run"),
+            patch("build_windows.shutil.which", return_value=r"C:\ISCC.exe"),
+            patch.object(build_windows, "PYTHON_EMBED_DIR", embed_dir),
+        ):
+            with patch(
+                "sys.argv",
+                ["build_windows.py", "--skip-pyinstaller"],
+            ):
+                build_windows.main()
+
+        captured = capsys.readouterr()
+        assert "SUCCESS" in captured.out
+        assert "AgentEnvironmentLauncher-Setup.exe" in captured.out
+
+
+# ---------------------------------------------------------------------------
 # Tests: --dry-run
 # ---------------------------------------------------------------------------
 
