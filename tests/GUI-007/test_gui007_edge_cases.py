@@ -56,7 +56,7 @@ def _make_app(
     app.destination_error_label = MagicMock()
     # FIX-124: make _window.after execute callbacks synchronously so threaded
     # UI updates complete before test assertions run.
-    app._window.after = lambda ms, fn: fn()
+    app._window.after.side_effect = lambda ms, fn: fn()
     # FIX-124: stub _set_creation_ui_state to prevent widget manipulation errors.
     app._set_creation_ui_state = MagicMock()
     return app

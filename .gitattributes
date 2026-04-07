@@ -17,3 +17,12 @@ templates/agent-workbench/.github/agents/*.md text eol=lf
 templates/agent-workbench/.github/instructions/*.md text eol=lf
 templates/agent-workbench/*.md text eol=lf
 templates/agent-workbench/Project/*.md text eol=lf
+
+# Clean-workspace template — enforce consistent line endings (FIX-130)
+templates/clean-workspace/.github/hooks/scripts/*.py text eol=lf
+templates/clean-workspace/.github/hooks/scripts/*.json text eol=lf
+templates/clean-workspace/.github/hooks/*.json text eol=lf
+templates/clean-workspace/.vscode/settings.json text eol=lf
+templates/clean-workspace/.github/instructions/*.md text eol=lf
+templates/clean-workspace/Project/*.md text eol=lf
+templates/clean-workspace/*.md text eol=lf

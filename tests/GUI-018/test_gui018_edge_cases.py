@@ -136,13 +136,13 @@ class TestMultipleDialogOpens:
 # ---------------------------------------------------------------------------
 
 class TestDialogGeometry:
-    def test_dialog_geometry_is_480x620(self) -> None:
-        """The settings dialog must request a 480×620 geometry (increased from 480 to fit Danger Zone section added in GUI-036)."""
+    def test_dialog_geometry_is_480x720(self) -> None:
+        """The settings dialog must request a 480×720 geometry (increased from 480 to fit Danger Zone section added in GUI-036)."""
         parent = MagicMock()
         with patch("launcher.gui.app.read_python_path", return_value=None):
             from launcher.gui.app import SettingsDialog
             dlg = SettingsDialog(parent)
-        dlg._dialog.geometry.assert_called_with("480x620")
+        dlg._dialog.geometry.assert_called_with("480x720")
 
     def test_dialog_is_not_resizable(self) -> None:
         """The dialog must be non-resizable on both axes."""
