@@ -62,11 +62,11 @@ def test_fix047_uses_standard_import() -> None:
 
 
 def test_fix070_updated_version_assertion() -> None:
-    """FIX-070 must assert CURRENT_VERSION == '3.3.11', not '3.2.3'."""
+    """FIX-070 must assert CURRENT_VERSION == '3.4.0', not '3.2.3'."""
     path = REPO_ROOT / "tests/FIX-070/test_fix070_version_bump.py"
     content = path.read_text(encoding="utf-8")
     assert "== \"3.2.3\"" not in content, "FIX-070 still hardcodes '3.2.3'"
-    assert "3.3.11" in content, "FIX-070 doesn't reference 3.3.11"
+    assert "3.4.0" in content, "FIX-070 doesn't reference 3.4.0"
 
 
 def test_fix019_no_minor_zero_assertion() -> None:

@@ -97,3 +97,29 @@ Ran `python scripts/generate_manifest.py` and `python scripts/generate_manifest.
 ## Known Limitations
 
 None.
+
+---
+
+## Iteration 2 — 2026-04-07
+
+### Tester Feedback
+
+Tester found BUG-213: `tests/FIX-104/test_fix104_version_assertions.py::test_fix070_updated_version_assertion` was failing because iteration 1 updated `tests/FIX-070/test_fix070_version_bump.py` to reference `"3.4.0"` instead of `"3.3.11"`, but the FIX-104 guard test still asserted `"3.3.11" in content`.
+
+### Fix Applied
+
+Updated `tests/FIX-104/test_fix104_version_assertions.py`:
+- Changed `assert "3.3.11" in content` → `assert "3.4.0" in content`
+- Updated docstring from `"3.3.11"` to `"3.4.0"`
+- Updated `bugs.jsonl`: BUG-213 status → Fixed, Fixed In WP → FIX-124
+
+### Test Results
+
+- Targeted suite (FIX-104, FIX-124, GUI-007, GUI-014, GUI-015, DOC-035, FIX-070, FIX-052): **245 passed, 1 skipped**
+- `scripts/run_tests.py --wp FIX-124`: **5 passed**
+- `scripts/validate_workspace.py --wp FIX-124`: **All checks passed**
+
+### Files Changed
+
+- `tests/FIX-104/test_fix104_version_assertions.py` — updated `test_fix070_updated_version_assertion` docstring and assertion for v3.4.0
+- `docs/bugs/bugs.jsonl` — BUG-213 marked Fixed, Fixed In WP = FIX-124
