@@ -160,3 +160,22 @@ During verification, a deeper root cause was found: `GUI-034` had re-added `temp
 
 - TST-2731: FIX-122 targeted suite — 32 passed (Windows 11 + Python 3.13)
 - DOC-063 full suite + GUI-035 TestNoTemplatePollution in sequence: 28 passed, 0 failed
+
+---
+
+## Iteration 4 — Tester Findings (2026-04-07)
+
+**Tester verdict (Iteration 3):** FAIL — one additional sys.path duplicate removal issue.
+
+### Issue Fixed — test_security_gate_importable_and_decide_returns_action used `if` not `while`
+
+`security_gate.py` contains a module-level `sys.path.insert(0, ...)` (added by FIX-069). When DOC-063 tests import this file, a second copy of `_SCRIPTS_DIR` is inserted into `sys.path`. The cleanup code used `if _SCRIPTS_DIR in sys.path: sys.path.remove(_SCRIPTS_DIR)` which only removes the first copy. Changed to `while _SCRIPTS_DIR in sys.path: sys.path.remove(_SCRIPTS_DIR)` in `test_security_gate_importable_and_decide_returns_action`. (Iteration 3 already fixed `test_security_gate_denies_noagentzone` with `while`.)
+
+### File changed in Iteration 4
+
+- `tests/DOC-063/test_doc063_clean_workspace_creation.py` — `if` → `while` in `test_security_gate_importable_and_decide_returns_action` finally block sys.path cleanup.
+
+### Iteration 4 Test Results
+
+- TST-2734: FIX-122 targeted suite — 32 passed (Windows 11 + Python 3.13)
+- `pytest tests/DOC-063/ tests/FIX-069/ tests/GUI-035/test_gui035_edge_cases.py::TestNoTemplatePollution` in full sequence: 38 passed, 0 failed

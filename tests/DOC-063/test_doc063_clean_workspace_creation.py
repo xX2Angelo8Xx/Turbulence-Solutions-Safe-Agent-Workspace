@@ -261,7 +261,9 @@ class TestSecurityGateFunctional:
             )
         finally:
             # Clean up sys.path to avoid polluting other tests.
-            if _SCRIPTS_DIR in sys.path:
+            # Use while loop to remove ALL copies — security_gate.py inserts a
+            # second copy at module level via sys.path.insert(0, ...) (FIX-069).
+            while _SCRIPTS_DIR in sys.path:
                 sys.path.remove(_SCRIPTS_DIR)
             # Remove the clean-workspace modules loaded during this test.
             for mod_name in list(sys.modules.keys()):
@@ -354,7 +356,9 @@ class TestMissingACCoverage:
                 f"security_gate must deny access to NoAgentZone/; got: {result!r}"
             )
         finally:
-            if _SCRIPTS_DIR in sys.path:
+            # Use while loop to remove ALL copies — security_gate.py inserts a
+            # second copy at module level via sys.path.insert(0, ...) (FIX-069).
+            while _SCRIPTS_DIR in sys.path:
                 sys.path.remove(_SCRIPTS_DIR)
             for mod_name in list(sys.modules.keys()):
                 if mod_name in ("security_gate", "zone_classifier"):
