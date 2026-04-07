@@ -100,7 +100,7 @@ The following paths enforce permanent restrictions. No workpackage, exception, o
 | `create_file` | Zone-checked | Allowed in project folder only |
 | `replace_string_in_file` | Zone-checked | Allowed in project folder; verify edit persisted after every use |
 | `multi_replace_string_in_file` | Zone-checked | Allowed in project folder; verify all edits persisted |
-| `list_dir` | Zone-checked | Allowed in project folder and workspace root; denied in `.github/`, `.vscode/`, `NoAgentZone/` |
+| `list_dir` | Zone-checked | Allowed in project folder and workspace root; top-level `.github/` listing is denied (protects hook scripts from casual browsing); subdirectory listings (e.g., `.github/instructions/`, `.github/skills/`) are allowed; `.vscode/` and `NoAgentZone/` fully denied |
 | `create_directory` | Zone-checked | Allowed in project folder only |
 | **Search Tools** | | |
 | `grep_search` | Zone-checked | Allowed for general pattern search; `includePattern` is required (searches without it are denied); `includePattern` targeting `NoAgentZone/**` blocked; `includeIgnoredFiles: true` blocked |
@@ -158,7 +158,7 @@ del src\oldfile.py                           # Windows CMD equivalent
 | `git filter-branch` | Rewrites commit history globally |
 | `git gc --force` | Can corrupt the object store |
 | `git clean -f` | Permanently deletes untracked files |
-| `run_in_terminal` (`isBackground:true`) | Security gate cannot validate background command streams — use foreground terminal; set `timeout` parameter for long-running commands |
+| `cd ..` / `Set-Location ..` / `Push-Location ..` (outward navigation) | Directory navigation above the workspace root is denied by the security gate — always stay within `{{WORKSPACE_NAME}}/` |
 | Any command targeting paths outside the workspace | Out of scope |
 
 ---
