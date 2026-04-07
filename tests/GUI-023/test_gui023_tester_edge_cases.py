@@ -92,9 +92,9 @@ def test_list_templates_not_a_path_object():
 
 
 def test_list_templates_real_count():
-    """Exactly two template directories should exist after the rename."""
+    """Exactly three template directories should exist (agent-workbench, certification-pipeline, clean-workspace)."""
     names = list_templates(TEMPLATES_DIR)
-    assert len(names) == 2, f"Expected 2 templates, found {len(names)}: {names}"
+    assert len(names) == 3, f"Expected 3 templates, found {len(names)}: {names}"
 
 
 # ---------------------------------------------------------------------------

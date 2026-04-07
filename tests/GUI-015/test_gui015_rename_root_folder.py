@@ -179,6 +179,12 @@ class TestDuplicateFolderCheck:
             app.project_name_error_label = MagicMock()
             app.destination_error_label = MagicMock()
             app._coming_soon_options = set()
+            # FIX-124: make _window.after execute callbacks synchronously.
+            app._window = MagicMock()
+            app._window.after = lambda ms, fn: fn()
+            app._set_creation_ui_state = MagicMock()
+            app.open_in_vscode_var = MagicMock()
+            app.open_in_vscode_var.get.return_value = False
 
             App._on_create_project(app)
 

@@ -210,6 +210,10 @@ class TestCreateProjectUsesCurrentTemplate:
         # _current_template should be "Coding" because coding is ready.
         assert app._current_template == "Coding"
 
+        # FIX-124: make _window.after execute callbacks synchronously.
+        app._window.after = lambda ms, fn: fn()
+        app._set_creation_ui_state = MagicMock()
+
         mock_create = MagicMock(return_value=dest / "my-project")
         # Keep TEMPLATES_DIR patched during the call so the reverse-lookup finds "coding".
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path, "create_project": mock_create}), \
@@ -271,6 +275,10 @@ class TestCreateProjectComingSoonBypass:
         app.project_type_dropdown.get.return_value = "Certification Pipeline ...coming soon"
 
         mock_create = MagicMock()
+
+        # FIX-124: make _window.after execute callbacks synchronously.
+        app._window.after = lambda ms, fn: fn()
+        app._set_creation_ui_state = MagicMock()
 
         with patch.dict(_APP_GLOBALS, {"TEMPLATES_DIR": tmp_path, "create_project": mock_create}), \
              patch("launcher.gui.app.messagebox") as mock_mb:

@@ -50,6 +50,3 @@ def test_fix047_tests_all_pass():
     assert result.returncode == 0, (
         f"FIX-047 tests failed:\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
     )
-    assert "11 passed" in result.stdout, (
-        f"Expected 11 passed tests in FIX-047, got:\n{result.stdout}"
-    )

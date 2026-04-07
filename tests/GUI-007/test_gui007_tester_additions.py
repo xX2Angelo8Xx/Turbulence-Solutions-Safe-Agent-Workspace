@@ -62,6 +62,11 @@ def _make_app(
     # Wire the open_in_vscode_var so it behaves like a BooleanVar mock
     app.open_in_vscode_var = MagicMock()
     app.open_in_vscode_var.get.return_value = False
+    # FIX-124: make _window.after execute callbacks synchronously so threaded
+    # UI updates complete before test assertions run.
+    app._window.after = lambda ms, fn: fn()
+    # FIX-124: stub _set_creation_ui_state to prevent widget manipulation errors.
+    app._set_creation_ui_state = MagicMock()
     return app
 
 
