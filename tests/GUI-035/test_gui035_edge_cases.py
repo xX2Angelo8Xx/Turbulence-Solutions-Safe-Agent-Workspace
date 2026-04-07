@@ -89,7 +89,6 @@ class TestManifestHashIntegrity:
             ".github/hooks/scripts/require-approval.ps1",
             ".github/hooks/scripts/require-approval.sh",
             ".github/hooks/scripts/reset_hook_counter.py",
-            ".github/hooks/scripts/counter_config.json",
             ".github/hooks/require-approval.json",
         ]
         for f in security_files:
@@ -97,6 +96,19 @@ class TestManifestHashIntegrity:
             assert files[f].get("security_critical") is True, (
                 f"{f} must be marked security_critical=true in MANIFEST.json"
             )
+
+    def test_counter_config_is_not_security_critical(self):
+        """counter_config.json is user configuration, not security enforcement code.
+        FIX-127 intentionally marks it security_critical=false so the upgrader
+        never overwrites the user's custom threshold.
+        """
+        manifest = self._load_manifest()
+        files = manifest.get("files", {})
+        key = ".github/hooks/scripts/counter_config.json"
+        assert key in files, f"MANIFEST.json must track {key}"
+        assert files[key].get("security_critical") is False, (
+            f"{key} must be marked security_critical=false in MANIFEST.json"
+        )
 
 
 # ---------------------------------------------------------------------------

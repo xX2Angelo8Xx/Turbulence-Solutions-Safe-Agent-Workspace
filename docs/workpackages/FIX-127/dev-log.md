@@ -89,3 +89,23 @@ Two upgrade parity issues:
 
 All 13 tests pass. Logged as TST-2760.
 
+---
+
+## Iteration 2 — Tester Feedback Resolution
+
+**Date:** 2026-04-07  
+**Tester Finding:** Blocking regression in `tests/GUI-035/test_gui035_edge_cases.py::TestManifestHashIntegrity::test_all_security_critical_files_marked`. The GUI-035 test explicitly asserted `counter_config.json` must be `security_critical=true`. FIX-127 intentionally changed it to `false` but did not update the pre-existing GUI-035 assertion.
+
+### Fix Applied
+
+**File:** `tests/GUI-035/test_gui035_edge_cases.py` — class `TestManifestHashIntegrity`
+
+1. Removed `".github/hooks/scripts/counter_config.json"` from the `security_files` list in `test_all_security_critical_files_marked`.
+2. Added new test method `test_counter_config_is_not_security_critical` that loads the manifest and asserts `counter_config.json` has `security_critical: False`.
+
+### Test Results (Iteration 2)
+
+- `tests/FIX-127/` — 16 passed (TST-2763)
+- `tests/GUI-035/test_gui035_edge_cases.py::TestManifestHashIntegrity` — 4 passed (all 4 methods including new `test_counter_config_is_not_security_critical`)
+- `validate_workspace.py --wp FIX-127` — clean (exit code 0)
+
