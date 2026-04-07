@@ -1,6 +1,6 @@
 # Dev Log — GUI-037: Move workspace upgrade to Settings dialog
 
-**Status:** In Progress  
+**Status:** Review  
 **Assigned To:** Developer Agent  
 **Date Started:** 2026-04-07
 
