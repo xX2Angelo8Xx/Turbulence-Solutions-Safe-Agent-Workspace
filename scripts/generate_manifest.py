@@ -71,8 +71,17 @@ def _sha256(file_path: Path) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+# FIX-127: counter_config.json is user configuration (threshold, enabled flag) — not a
+# security control. Upgrading it would silently overwrite user-configured thresholds.
+_NEVER_SECURITY_CRITICAL = {
+    ".github/hooks/scripts/counter_config.json",
+}
+
+
 def _is_security_critical(rel_path: str) -> bool:
     """Check if a relative path is a security-critical file."""
+    if rel_path in _NEVER_SECURITY_CRITICAL:
+        return False
     if rel_path in _SECURITY_CRITICAL_FILES:
         return True
     return any(rel_path.startswith(p) for p in _SECURITY_CRITICAL_PREFIXES)

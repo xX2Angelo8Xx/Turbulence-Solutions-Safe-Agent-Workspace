@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from launcher.config import TEMPLATES_DIR, VERSION
+from launcher.core.project_creator import replace_template_placeholders
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,6 +25,9 @@ _VERSION_FILE = Path(".github") / "version"
 _NEVER_TOUCH_PATTERNS = (
     "Project/",
     "NoAgentZone/",
+    # FIX-127: counter_config.json stores user-specific threshold/enabled settings.
+    # It must never be overwritten by the upgrader, even if somehow marked critical.
+    ".github/hooks/scripts/counter_config.json",
 )
 
 
@@ -70,6 +74,18 @@ def _load_manifest() -> dict | None:
 def _is_user_content(rel_path: str) -> bool:
     """Check if a path is user content that should never be touched."""
     return any(rel_path.startswith(p) for p in _NEVER_TOUCH_PATTERNS)
+
+
+def _detect_project_name(workspace_path: Path) -> str:
+    """Derive the project name from the workspace folder name.
+
+    Workspace folders are named SAE-{project_name} by convention.
+    Strips the SAE- prefix; returns the folder name as-is if the prefix is absent.
+    """
+    folder = workspace_path.name
+    if folder.startswith("SAE-"):
+        return folder[len("SAE-"):]
+    return folder
 
 
 def get_workspace_version(workspace_path: Path) -> str:
@@ -180,7 +196,8 @@ def upgrade_workspace(workspace_path: Path, dry_run: bool = False) -> UpgradeRep
         except OSError as exc:
             report.errors.append(f"Failed to update version file: {exc}")
 
-    # Verification pass
+    # Verification pass (must run before placeholder resolution so the hash
+    # comparison is against the freshly copied template content, not the resolved copy)
     if not dry_run and not report.errors:
         verify_report = check_workspace(workspace_path)
         if verify_report.needs_upgrade:
@@ -188,5 +205,18 @@ def upgrade_workspace(workspace_path: Path, dry_run: bool = False) -> UpgradeRep
                 f"Post-upgrade verification failed: {len(verify_report.outdated_files)} "
                 f"files still outdated"
             )
+
+    # FIX-127: After verifying the upgrade, re-resolve template placeholders in .md files.
+    # The template copy of copilot-instructions.md contains {{PROJECT_NAME}} and
+    # {{WORKSPACE_NAME}} tokens. These must be replaced with the actual project name
+    # so the upgraded workspace behaves identically to a freshly created one.
+    # Runs after the verification pass so the hash check compares raw template content.
+    if not dry_run and not report.errors:
+        project_name = _detect_project_name(workspace_path)
+        try:
+            replace_template_placeholders(workspace_path, project_name)
+            _LOGGER.info("Resolved template placeholders for project '%s'", project_name)
+        except OSError as exc:
+            report.errors.append(f"Failed to resolve template placeholders: {exc}")
 
     return report
