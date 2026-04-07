@@ -165,3 +165,61 @@ The only failure directly introduced by FIX-122 is the FIX-119 stale path (Failu
 **FAIL — return to Developer (Iteration 1)**
 
 Two existing tests fail due to issues that FIX-122 must address: one genuine regression (FIX-119 stale MANIFEST.json path) and one inadequate pycache fix (DOC-063 contaminates GUI-035). Both are actionable and narrowly scoped. The core FIX-122 implementation is correct.
+
+---
+
+# Iteration 2 Review — 2026-04-07
+
+**Tester:** Tester Agent  
+**Test Result:** TST-2730
+
+## Iteration 2 Verification
+
+### Issue 1 — FIX-119 stale MANIFEST.json path
+- `tests/FIX-119/test_fix119_no_duplicate_agent_rules.py` line 88 is now correctly updated to `TEMPLATE_ROOT / ".github" / "hooks" / "scripts" / "MANIFEST.json"`. ✓
+- `templates/agent-workbench/Project/AgentDocs/AGENT-RULES.md` deleted. ✓
+- `MANIFEST.json` regenerated — `Project/AgentDocs/AGENT-RULES.md` entry absent. ✓
+- All 13 FIX-119 tests pass. ✓
+
+### Issue 2 — DOC-063 pycache pollution (BUG-211) — PARTIALLY FIXED
+- `TestSecurityGateFunctional::test_security_gate_no_syntax_errors`: uses `cfile=tmp` — pycache prevention confirmed. ✓
+- `TestSecurityGateFunctional::test_security_gate_importable_and_decide_returns_action`: `shutil.rmtree(pycache)` in finally — confirmed. ✓
+- **NEW BLOCKER**: `TestMissingACCoverage::test_security_gate_denies_noagentzone` (added by Tester in Iteration 1) also calls `importlib.import_module("security_gate")` in its `finally` block — it restores sys.path and modules but **does not call `shutil.rmtree(pycache)`**. Running this test in isolation confirms `__pycache__` persists in `templates/clean-workspace/.github/hooks/scripts/` after it runs.
+
+**Reproduction:**
+```
+pytest tests/DOC-063/test_doc063_clean_workspace_creation.py::TestMissingACCoverage::test_security_gate_denies_noagentzone -v
+# Check: templates/clean-workspace/.github/hooks/scripts/__pycache__ EXISTS
+```
+
+**Result with broader consumer suite (DOC-063 + GUI-035):** 2 GUI-035 TestNoTemplatePollution tests fail — same root cause as BUG-211.
+
+## Tests Executed — Iteration 2
+
+| Test | Type | Status | Notes |
+|------|------|--------|-------|
+| FIX-122 + FIX-119 + DOC-063::TestSecurityGateFunctional + GUI-035 (111 tests, TST-2728) | Regression | PASS | All pass when DOC-063 is scoped to TestSecurityGateFunctional class only |
+| Broader consumer suite: DOC-063 full + GUI-035 + all consumers (TST-2730) | Regression | FAIL | 2 GUI-035 pollution tests fail due to `test_security_gate_denies_noagentzone` pycache |
+
+## ADR Compliance — Iteration 2
+
+- **ADR-003** — Compliant. ✓
+- **ADR-008** — Iteration 1 violation resolved (FIX-119 path updated). ✓
+
+## TODO for Developer — Iteration 3
+
+- [ ] **REQUIRED**: In `tests/DOC-063/test_doc063_clean_workspace_creation.py`, add `__pycache__` cleanup to `TestMissingACCoverage::test_security_gate_denies_noagentzone`. In the `finally` block, after restoring sys.modules, add:
+  ```python
+  import shutil
+  pycache = CLEAN_TEMPLATE / ".github" / "hooks" / "scripts" / "__pycache__"
+  if pycache.exists():
+      shutil.rmtree(pycache)
+  ```
+  This is the same pattern already applied to `TestSecurityGateFunctional::test_security_gate_importable_and_decide_returns_action`. The `shutil` import can be moved to the module level if preferred.
+- [ ] After the fix, run: `pytest tests/DOC-063/ tests/GUI-035/ -v` and confirm both `TestNoTemplatePollution::test_no_pycache_directories` and `TestNoTemplatePollution::test_no_pyc_files` **PASS** in sequence (do not run the classes in isolation).
+
+## Verdict — Iteration 2
+
+**FAIL — return to Developer (Iteration 2)**
+
+One remaining blocker: `TestMissingACCoverage::test_security_gate_denies_noagentzone` (Tester-added in Iteration 1) creates `__pycache__` in the clean-workspace template without cleanup, causing GUI-035 `TestNoTemplatePollution` to fail when the full DOC-063 suite runs. All other Iteration 1 issues are resolved. The fix is a one-block addition identical to the pattern already applied in `TestSecurityGateFunctional`.
