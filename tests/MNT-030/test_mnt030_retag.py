@@ -311,3 +311,71 @@ def test_retag_both_tags_missing_is_fine(tmp_path: Path, capsys) -> None:
     assert out.count("did not exist") == 2
     assert "[ABORT]" not in out
     assert "Retag v3.5.0 complete." in out
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests
+# ---------------------------------------------------------------------------
+
+
+def test_main_invalid_version_with_retag_aborts(capsys) -> None:
+    """main() must reject an invalid version format even when --retag is set."""
+    with patch("sys.argv", ["release.py", "not.a.valid.version", "--retag"]):
+        with pytest.raises(SystemExit) as exc_info:
+            release.main()
+    assert exc_info.value.code == 1
+    out = capsys.readouterr().out
+    assert "[ERROR]" in out
+    assert "Invalid version" in out
+
+
+def test_retag_tag_creation_failure_exits(tmp_path: Path, capsys) -> None:
+    """retag_release() must exit(1) cleanly if git tag creation fails."""
+    version = "3.5.0"
+    fake_files = _make_fake_version_files(tmp_path, version)
+
+    def tag_create_fails(args, cwd):
+        if args[:2] == ["tag", "-a"]:
+            raise RuntimeError("tag already exists")
+        return MagicMock()
+
+    with patch.dict(release.VERSION_FILES, fake_files, clear=True):
+        with (
+            patch.object(release, "check_on_main_branch"),
+            patch.object(release, "check_clean_working_tree"),
+            patch.object(release, "_run_git_optional", return_value=MagicMock()),
+            patch.object(release, "_run_git", side_effect=tag_create_fails),
+        ):
+            with pytest.raises(SystemExit) as exc_info:
+                release.retag_release(version, dry_run=False, repo_root=tmp_path)
+
+    assert exc_info.value.code == 1
+    out = capsys.readouterr().out
+    assert "[ABORT]" in out
+    assert "Tag creation failed" in out
+
+
+def test_retag_tag_push_failure_exits(tmp_path: Path, capsys) -> None:
+    """retag_release() must exit(1) cleanly if pushing the tag fails."""
+    version = "3.5.0"
+    fake_files = _make_fake_version_files(tmp_path, version)
+
+    def push_fails(args, cwd):
+        if args[:2] == ["push", "origin"] and not args[2].startswith(":"):
+            raise RuntimeError("push rejected")
+        return MagicMock()
+
+    with patch.dict(release.VERSION_FILES, fake_files, clear=True):
+        with (
+            patch.object(release, "check_on_main_branch"),
+            patch.object(release, "check_clean_working_tree"),
+            patch.object(release, "_run_git_optional", return_value=MagicMock()),
+            patch.object(release, "_run_git", side_effect=push_fails),
+        ):
+            with pytest.raises(SystemExit) as exc_info:
+                release.retag_release(version, dry_run=False, repo_root=tmp_path)
+
+    assert exc_info.value.code == 1
+    out = capsys.readouterr().out
+    assert "[ABORT]" in out
+    assert "Tag push failed" in out
