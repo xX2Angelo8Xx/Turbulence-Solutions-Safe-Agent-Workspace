@@ -120,6 +120,106 @@ def validate_version_file(key: str, expected_version: str) -> bool:
     return expected_version in content
 
 
+def _run_git_optional(args: list[str], cwd: Path) -> subprocess.CompletedProcess | None:
+    """Run a git command, returning None (instead of raising) if it fails."""
+    result = subprocess.run(
+        ["git"] + args,
+        cwd=str(cwd),
+        capture_output=True,
+        text=True,
+    )
+    return result if result.returncode == 0 else None
+
+
+def retag_release(version: str, dry_run: bool, repo_root: Path) -> None:
+    """Delete the existing local/remote tag for version and create a fresh annotated tag on HEAD."""
+    tag = f"v{version}"
+    print(f"{'[DRY-RUN] ' if dry_run else ''}Retag {tag}")
+    print()
+
+    # --- Pre-flight checks (skip in dry-run) ---
+    if not dry_run:
+        print("Checking branch...")
+        check_on_main_branch(repo_root)
+        print("  [OK]    On main branch.")
+
+        print("Checking working tree...")
+        check_clean_working_tree(repo_root)
+        print("  [OK]    Working tree is clean.")
+        print()
+
+    # --- Verify all 5 version files already contain the target version ---
+    print("Verifying version files already match target version...")
+    mismatched = []
+    for key in VERSION_FILES:
+        if validate_version_file(key, version):
+            print(f"  [OK]    {VERSION_FILES[key].name} contains {version}")
+        else:
+            print(f"  [FAIL]  {VERSION_FILES[key].name} does NOT contain {version}")
+            mismatched.append(key)
+
+    if mismatched:
+        print()
+        print(
+            f"[ABORT] {len(mismatched)} version file(s) do not match '{version}'. "
+            "Use normal release mode (without --retag) to bump version files first."
+        )
+        sys.exit(1)
+
+    print()
+
+    if dry_run:
+        print(f"[DRY-RUN] Would delete local tag '{tag}' (if it exists).")
+        print(f"[DRY-RUN] Would delete remote tag '{tag}' (if it exists).")
+        print(f"[DRY-RUN] Would create annotated tag '{tag}' on HEAD.")
+        print(f"[DRY-RUN] Would push tag '{tag}' to origin.")
+        print()
+        print("[DRY-RUN] No changes were made.")
+        return
+
+    # --- Delete existing local tag (tolerate absence) ---
+    print(f"Deleting local tag '{tag}' (if present)...")
+    result = _run_git_optional(["tag", "-d", tag], repo_root)
+    if result is not None:
+        print(f"  [OK]    Local tag deleted.")
+    else:
+        print(f"  [INFO]  Local tag '{tag}' did not exist — skipping.")
+
+    # --- Delete existing remote tag (tolerate absence) ---
+    print(f"Deleting remote tag '{tag}' (if present)...")
+    result = _run_git_optional(["push", "origin", f":refs/tags/{tag}"], repo_root)
+    if result is not None:
+        print(f"  [OK]    Remote tag deleted.")
+    else:
+        print(f"  [INFO]  Remote tag '{tag}' did not exist — skipping.")
+
+    # --- Create new annotated tag on HEAD ---
+    tag_message = f"Release {tag}"
+    print(f"Creating annotated tag '{tag}'...")
+    try:
+        _run_git(["tag", "-a", tag, "-m", tag_message], repo_root)
+    except RuntimeError as exc:
+        print(f"[ABORT] Tag creation failed: {exc}")
+        sys.exit(1)
+    print("  [OK]    Tag created.")
+
+    # --- Push new tag ---
+    print(f"Pushing tag '{tag}' to origin...")
+    try:
+        _run_git(["push", "origin", tag], repo_root)
+    except RuntimeError as exc:
+        print(f"[ABORT] Tag push failed: {exc}")
+        sys.exit(1)
+    print("  [OK]    Tag pushed.")
+
+    print()
+    print(f"Retag {tag} complete.")
+    print()
+    print("NOTE: GitHub Release will be created as a DRAFT (enforced by CI/CD).")
+    print("Draft releases are not visible to the auto-updater until manually published.")
+    print("Go to GitHub Releases and publish the draft when ready.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
@@ -134,6 +234,16 @@ def main() -> None:
         action="store_true",
         help="Print what would be done without making any changes.",
     )
+    parser.add_argument(
+        "--retag",
+        action="store_true",
+        help=(
+            "Re-tag mode: skip version file updates. "
+            "Verifies all version files already match the target version, "
+            "then deletes and recreates the tag on HEAD. "
+            "Use this after fixing bugs post-tag without bumping the version."
+        ),
+    )
     args = parser.parse_args()
 
     version = args.version
@@ -144,11 +254,16 @@ def main() -> None:
         print(f"[ERROR] Invalid version '{version}'. Expected format: X.Y.Z (e.g. 3.2.7)")
         sys.exit(1)
 
+    repo_root = _REPO_ROOT
+
+    # --- Dispatch to retag mode if requested ---
+    if args.retag:
+        retag_release(version, dry_run, repo_root)
+        return
+
     tag = f"v{version}"
     print(f"{'[DRY-RUN] ' if dry_run else ''}Release {tag}")
     print()
-
-    repo_root = _REPO_ROOT
 
     # --- Pre-flight checks (skip in dry-run so the script can be tested off main) ---
     if not dry_run:
