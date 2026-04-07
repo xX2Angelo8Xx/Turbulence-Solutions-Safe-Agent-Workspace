@@ -158,6 +158,7 @@ del src\oldfile.py                           # Windows CMD equivalent
 | `git filter-branch` | Rewrites commit history globally |
 | `git gc --force` | Can corrupt the object store |
 | `git clean -f` | Permanently deletes untracked files |
+| `run_in_terminal` (`isBackground:true`) | Security gate cannot validate background command streams — use foreground terminal; set `timeout` parameter for long-running commands |
 | Any command targeting paths outside the workspace | Out of scope |
 
 ---

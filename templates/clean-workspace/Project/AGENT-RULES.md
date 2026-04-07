@@ -92,3 +92,4 @@ Standard git operations are allowed from the workspace root. Follow these constr
 | `Get-ChildItem -Recurse` (no path) | `file_search` or `list_dir` with path |
 | `pip install` via terminal | `install_python_packages` tool |
 | Venv activation | Run `.venv\Scripts\python.exe` directly |
+| `run_in_terminal` (`isBackground:true`) | Security gate cannot validate background command streams — run in foreground terminal; set `timeout` parameter for long-running commands |
