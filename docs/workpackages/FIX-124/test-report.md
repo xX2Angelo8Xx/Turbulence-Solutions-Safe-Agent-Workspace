@@ -122,3 +122,46 @@ One new regression was introduced by FIX-124 that is not in the regression basel
 - `tests/FIX-104/test_fix104_version_assertions.py::test_fix070_updated_version_assertion`
 
 Fix TODO-1 above, re-run `pytest tests/FIX-104/ tests/FIX-124/`, confirm pass, re-handoff.
+
+---
+
+# Iteration 2 — 2026-04-07
+
+**Tester:** Tester Agent  
+**Iteration:** 2  
+**Scope:** BUG-213 fix verification
+
+## Fix Verification
+
+Developer updated `tests/FIX-104/test_fix104_version_assertions.py::test_fix070_updated_version_assertion`:
+- Docstring updated: "FIX-070 must assert CURRENT_VERSION == '3.4.0', not '3.2.3'." ✓
+- Assertion updated: `assert "3.4.0" in content` (was `"3.3.11"`) ✓
+- Precondition satisfied: `tests/FIX-070/test_fix070_version_bump.py` contains "3.4.0" (in `test_current_version_is_3_4_0` and its assertion text) ✓
+
+## Tests Executed (Iteration 2)
+
+| ID | Test | Type | Result | Notes |
+|----|------|------|--------|-------|
+| TST-2746 | FIX-124: full regression suite | Regression | Pass (baseline) | 248 failed, 9149 passed, 91 errors — all failures are baseline entries; 0 new regressions |
+| TST-2747 | FIX-124 iteration 2: targeted suites | Regression | Pass | 342 passed, 0 failed, 1 skipped — FIX-104 now fully green |
+| MANIFEST --check (agent-workbench) | Integration | Pass | Exits 0 |
+| MANIFEST --check (clean-workspace) | Integration | Pass | Exits 0 |
+| `validate_workspace.py --wp FIX-124` | Integration | Pass | Exits 0 |
+
+## Regression Analysis
+
+- **Iteration 1 failures:** 249 (248 baseline + 1 new BUG-213 regression)
+- **Iteration 2 failures:** 248 (all baseline — BUG-213 regression eliminated)
+- **New regressions introduced:** 0
+
+The 248 failures are all ≤ 250 baseline entries — no new regressions beyond what was in the baseline before FIX-124 started.
+
+## Findings
+
+No new issues. BUG-213 is resolved. All positive findings from iteration 1 still hold.
+
+---
+
+## Verdict: PASS
+
+**WP status set to:** `Done`
