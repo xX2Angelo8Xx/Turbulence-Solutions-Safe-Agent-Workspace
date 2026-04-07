@@ -20,6 +20,7 @@ Usage:
 # MNT-031
 
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -48,6 +49,8 @@ OUTPUT_EXE = (
 _ISCC_FALLBACK_PATHS = [
     Path(r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"),
     Path(r"C:\Program Files\Inno Setup 6\ISCC.exe"),
+    # Per-user install path (Inno Setup can be installed without admin rights)
+    Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Inno Setup 6" / "ISCC.exe",
 ]
 
 
@@ -72,7 +75,10 @@ def find_iscc() -> Path:
 
 def step_pyinstaller(dry_run: bool) -> None:
     """Run PyInstaller using launcher.spec."""
-    cmd = ["pyinstaller", "launcher.spec"]
+    # Use sys.executable to invoke PyInstaller as a module so it works even
+    # when pyinstaller is not on the system PATH (e.g. installed only in .venv).
+    # The -y flag overwrites existing dist/ output without prompting.
+    cmd = [sys.executable, "-m", "PyInstaller", "launcher.spec", "-y"]
     print(f"[build] PyInstaller: {' '.join(cmd)}")
     if dry_run:
         return

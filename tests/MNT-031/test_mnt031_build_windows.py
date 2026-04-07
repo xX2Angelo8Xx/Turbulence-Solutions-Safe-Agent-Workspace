@@ -288,7 +288,8 @@ class TestDryRun:
                 build_windows.main()
 
         captured = capsys.readouterr()
-        assert "pyinstaller" in captured.out
+        # FIX-125: command is now sys.executable -m PyInstaller (capital I), not bare pyinstaller
+        assert "PyInstaller" in captured.out
         assert "launcher.spec" in captured.out
 
 
