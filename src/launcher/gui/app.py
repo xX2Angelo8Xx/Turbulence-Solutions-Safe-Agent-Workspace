@@ -341,21 +341,6 @@ class App:
             row=12, column=0, columnspan=2, padx=20, pady=(0, 4), sticky="w"
         )
 
-        # Check Workspace Health button -- surfaces security-critical file drift (Phase 1).
-        self.workspace_health_button = ctk.CTkButton(
-            self._window,
-            text="Check Workspace Health",
-            command=self._on_check_workspace_health,
-            fg_color="transparent",
-            hover_color=COLOR_PRIMARY,
-            text_color=COLOR_SECONDARY,
-            height=24,
-            border_width=0,
-        )
-        self.workspace_health_button.grid(
-            row=12, column=2, padx=(0, 20), pady=(0, 4), sticky="e"
-        )
-
         # Update notification banner (GUI-009) -- hidden until an update is detected.
         self.update_banner = ctk.CTkLabel(
             self._window,
@@ -688,64 +673,6 @@ class App:
         )
         messagebox.showerror("Update Failed", message)
 
-    def _on_check_workspace_health(self) -> None:
-        """Browse to a workspace folder and check its security-critical files."""
-        folder = filedialog.askdirectory(title="Select Workspace Folder to Check")
-        if not folder:
-            return
-        workspace = Path(folder)
-        self.workspace_health_button.configure(state="disabled", text="Checking...")
-        try:
-            report = check_workspace(workspace)
-        except Exception as exc:
-            messagebox.showerror("Health Check Failed", str(exc))
-            self.workspace_health_button.configure(state="normal", text="Check Workspace Health")
-            return
-        finally:
-            self.workspace_health_button.configure(state="normal", text="Check Workspace Health")
-
-        if report.errors:
-            messagebox.showerror(
-                "Workspace Health Check",
-                "Could not complete the check:\n\n" + "\n".join(report.errors),
-            )
-            return
-
-        if report.up_to_date:
-            messagebox.showinfo(
-                "Workspace Health Check",
-                f"All security-critical files are up to date.\n(workspace v{report.workspace_version})",
-            )
-            return
-
-        lines = []
-        if report.outdated_files:
-            lines.append("Outdated files:")
-            lines.extend(f"  • {f}" for f in report.outdated_files)
-        if report.missing_files:
-            lines.append("Missing files:")
-            lines.extend(f"  • {f}" for f in report.missing_files)
-        lines.append("")
-        lines.append(f"Workspace: v{report.workspace_version}  →  Launcher: v{report.launcher_version}")
-        lines.append("\nUpgrade now? (Only security-critical files will be updated)")
-
-        if messagebox.askyesno("Workspace Needs Update", "\n".join(lines)):
-            try:
-                result = upgrade_workspace(workspace)
-            except Exception as exc:
-                messagebox.showerror("Upgrade Failed", str(exc))
-                return
-            if result.errors:
-                messagebox.showerror(
-                    "Upgrade Partially Failed",
-                    "Some files could not be updated:\n\n" + "\n".join(result.errors),
-                )
-            else:
-                messagebox.showinfo(
-                    "Upgrade Complete",
-                    f"Updated {len(result.upgraded_files)} file(s) to v{result.launcher_version}.",
-                )
-
     def _open_settings_dialog(self) -> None:
         """Open the Settings dialog (GUI-018)."""
         SettingsDialog(self._window)
@@ -766,7 +693,7 @@ class SettingsDialog:
     def __init__(self, parent: ctk.CTk) -> None:
         self._dialog = ctk.CTkToplevel(parent)
         self._dialog.title("Settings")
-        self._dialog.geometry("480x620")
+        self._dialog.geometry("480x720")
         self._dialog.resizable(False, False)
         self._dialog.configure(fg_color=COLOR_PRIMARY)
         self._dialog.grab_set()
@@ -827,20 +754,6 @@ class SettingsDialog:
         )
         self._browse_button.grid(row=2, column=1, padx=(0, 8), pady=(12, 4), sticky="ew")
 
-        # Close button
-        self._close_button = ctk.CTkButton(
-            self._dialog,
-            text="Close",
-            command=self._dialog.destroy,
-            fg_color="transparent",
-            hover_color=COLOR_PRIMARY,
-            text_color=COLOR_SECONDARY,
-            height=36,
-            border_width=1,
-            border_color=COLOR_SECONDARY,
-        )
-        self._close_button.grid(row=3, column=0, columnspan=3, padx=20, pady=(16, 12), sticky="ew")
-
         # Reset Agent Blocks section (GUI-021) -- clear workspace hook state.
         ctk.CTkLabel(
             self._dialog,
@@ -858,7 +771,7 @@ class SettingsDialog:
         ).grid(row=5, column=0, padx=(20, 8), pady=4, sticky="w")
         self.workspace_entry = ctk.CTkEntry(
             self._dialog,
-            placeholder_text="Select workspace folder to reset",
+            placeholder_text="Select workspace folder",
         )
         self.workspace_entry.grid(row=5, column=1, padx=(0, 4), pady=4, sticky="ew")
         self.browse_workspace_button = ctk.CTkButton(
@@ -885,6 +798,40 @@ class SettingsDialog:
             row=6, column=0, columnspan=3, padx=20, pady=(4, 12), sticky="ew"
         )
 
+        # Repair / Upgrade Workspace section (GUI-037)
+        ctk.CTkLabel(
+            self._dialog,
+            text="Repair / Upgrade Workspace",
+            text_color=COLOR_TEXT,
+            font=("", 14, "bold"),
+            anchor="w",
+        ).grid(row=7, column=0, columnspan=3, padx=20, pady=(12, 4), sticky="w")
+
+        # Read-only label showing the selected workspace version.
+        self._workspace_version_label = ctk.CTkLabel(
+            self._dialog,
+            text="Select a workspace above",
+            text_color=COLOR_SECONDARY,
+            anchor="w",
+            wraplength=420,
+        )
+        self._workspace_version_label.grid(
+            row=8, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="w"
+        )
+
+        self._check_upgrade_button = ctk.CTkButton(
+            self._dialog,
+            text="Check & Upgrade",
+            command=self._on_check_and_upgrade,
+            fg_color=COLOR_SECONDARY,
+            hover_color="#4AA8D4",
+            text_color=COLOR_TEXT,
+            height=36,
+        )
+        self._check_upgrade_button.grid(
+            row=9, column=0, columnspan=3, padx=20, pady=(4, 12), sticky="ew"
+        )
+
         # Danger Zone — Uninstall (GUI-036)
         ctk.CTkLabel(
             self._dialog,
@@ -892,7 +839,7 @@ class SettingsDialog:
             text_color="#CC3333",
             font=("", 14, "bold"),
             anchor="w",
-        ).grid(row=7, column=0, columnspan=3, padx=20, pady=(12, 4), sticky="w")
+        ).grid(row=10, column=0, columnspan=3, padx=20, pady=(12, 4), sticky="w")
 
         ctk.CTkLabel(
             self._dialog,
@@ -900,7 +847,7 @@ class SettingsDialog:
             text_color=COLOR_TEXT,
             anchor="w",
             wraplength=420,
-        ).grid(row=8, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="w")
+        ).grid(row=11, column=0, columnspan=3, padx=20, pady=(0, 4), sticky="w")
 
         uninstaller = self._find_uninstaller()
         self._uninstall_button = ctk.CTkButton(
@@ -913,7 +860,21 @@ class SettingsDialog:
             height=36,
             state="normal" if uninstaller is not None else "disabled",
         )
-        self._uninstall_button.grid(row=9, column=0, columnspan=3, padx=20, pady=(4, 16), sticky="ew")
+        self._uninstall_button.grid(row=12, column=0, columnspan=3, padx=20, pady=(4, 12), sticky="ew")
+
+        # Close button at the bottom of the dialog.
+        self._close_button = ctk.CTkButton(
+            self._dialog,
+            text="Close",
+            command=self._dialog.destroy,
+            fg_color="transparent",
+            hover_color=COLOR_PRIMARY,
+            text_color=COLOR_SECONDARY,
+            height=36,
+            border_width=1,
+            border_color=COLOR_SECONDARY,
+        )
+        self._close_button.grid(row=13, column=0, columnspan=3, padx=20, pady=(8, 16), sticky="ew")
 
     def _find_uninstaller(self) -> "Path | None":
         """Return the path to unins000.exe if the installed uninstaller is found.
@@ -1026,10 +987,12 @@ class SettingsDialog:
 
     def _browse_workspace(self) -> None:
         """Open a folder browser and populate the workspace entry (GUI-021)."""
-        folder = filedialog.askdirectory(title="Select Workspace Folder to Reset")
+        folder = filedialog.askdirectory(title="Select Workspace Folder")
         if folder:
             self.workspace_entry.delete(0, "end")
             self.workspace_entry.insert(0, folder)
+            # Show version immediately from file, then refine via background check.
+            self._update_version_label(Path(folder))
             # Auto health check on workspace selection.
             threading.Thread(
                 target=self._auto_health_check,
@@ -1038,21 +1001,117 @@ class SettingsDialog:
             ).start()
 
     def _auto_health_check(self, workspace: Path) -> None:
-        """Run workspace health check in background and warn if outdated."""
+        """Run workspace health check in background and update version label."""
         try:
             report = check_workspace(workspace)
         except Exception:
             return  # Silently skip — manual button still available.
-        if report.errors or report.up_to_date:
+        if report.errors:
             return
-        # Workspace has outdated/missing security files — warn on main thread.
+        if report.up_to_date:
+            self._dialog.after(
+                0,
+                lambda: self._workspace_version_label.configure(
+                    text=f"v{report.workspace_version} — up to date"
+                ),
+            )
+        else:
+            count = len(report.outdated_files) + len(report.missing_files)
+            self._dialog.after(
+                0,
+                lambda: self._workspace_version_label.configure(
+                    text=f"v{report.workspace_version} — {count} file(s) need updating"
+                ),
+            )
+
+    def _update_version_label(self, workspace_path: Path) -> None:
+        """Update the version label with workspace version from .github/version."""
+        version_file = workspace_path / ".github" / "version"
+        try:
+            version = version_file.read_text(encoding="utf-8").strip()
+            self._workspace_version_label.configure(text=f"v{version}")
+        except OSError:
+            self._workspace_version_label.configure(text="Version file not found")
+
+    def _on_check_and_upgrade(self) -> None:
+        """Check workspace security files and offer to upgrade if needed (GUI-037)."""
+        workspace_str = self.workspace_entry.get().strip()
+        if not workspace_str:
+            messagebox.showerror(
+                "No Workspace Selected",
+                "Please select a workspace folder first.",
+                parent=self._dialog,
+            )
+            return
+        workspace = Path(workspace_str)
+        self._check_upgrade_button.configure(state="disabled", text="Checking...")
+        try:
+            report = check_workspace(workspace)
+        except Exception as exc:
+            messagebox.showerror("Health Check Failed", str(exc), parent=self._dialog)
+            self._check_upgrade_button.configure(state="normal", text="Check & Upgrade")
+            return
+        finally:
+            self._check_upgrade_button.configure(state="normal", text="Check & Upgrade")
+
+        if report.errors:
+            messagebox.showerror(
+                "Workspace Health Check",
+                "Could not complete the check:\n\n" + "\n".join(report.errors),
+                parent=self._dialog,
+            )
+            return
+
+        if report.up_to_date:
+            self._workspace_version_label.configure(
+                text=f"v{report.workspace_version} — up to date"
+            )
+            messagebox.showinfo(
+                "Workspace Health Check",
+                "All security-critical files are up to date.",
+                parent=self._dialog,
+            )
+            return
+
+        # Build the outdated/missing summary.
+        lines = []
+        if report.outdated_files:
+            lines.append("Outdated files:")
+            lines.extend(f"  \u2022 {f}" for f in report.outdated_files)
+        if report.missing_files:
+            lines.append("Missing files:")
+            lines.extend(f"  \u2022 {f}" for f in report.missing_files)
         count = len(report.outdated_files) + len(report.missing_files)
-        self.after(0, lambda: messagebox.showwarning(
-            "Workspace Security Files Outdated",
-            f"This workspace has {count} outdated or missing security-critical file(s).\n\n"
-            f"Workspace: v{report.workspace_version}  \u2192  Launcher: v{report.launcher_version}\n\n"
-            "Use 'Check Workspace Health' to review and upgrade.",
-        ))
+        self._workspace_version_label.configure(
+            text=f"v{report.workspace_version} — {count} file(s) need updating"
+        )
+        lines.append("")
+        lines.append(
+            f"Workspace: v{report.workspace_version}  \u2192  Launcher: v{report.launcher_version}"
+        )
+        lines.append("\nUpgrade now? (Only security-critical files will be updated)")
+
+        if messagebox.askyesno("Workspace Needs Update", "\n".join(lines), parent=self._dialog):
+            try:
+                result = upgrade_workspace(workspace)
+            except Exception as exc:
+                messagebox.showerror("Upgrade Failed", str(exc), parent=self._dialog)
+                return
+            if result.errors:
+                messagebox.showerror(
+                    "Upgrade Partially Failed",
+                    "Some files could not be updated:\n\n" + "\n".join(result.errors),
+                    parent=self._dialog,
+                )
+            else:
+                self._workspace_version_label.configure(
+                    text=f"v{result.launcher_version} — up to date"
+                )
+                messagebox.showinfo(
+                    "Upgrade Complete",
+                    f"Updated {len(result.upgraded_files)} file(s) to v{result.launcher_version}.",
+                    parent=self._dialog,
+                )
 
     def _on_reset_agent_blocks(self) -> None:
         """Handle Reset Agent Blocks button click (GUI-021).
