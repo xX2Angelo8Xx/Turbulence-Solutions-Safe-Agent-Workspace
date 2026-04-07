@@ -3,6 +3,7 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -91,12 +92,17 @@ def verify_ts_python() -> "tuple[bool, str]":
 
     # Step 3: Execute the Python runtime directly (bypass cmd.exe entirely).
     try:
+        extra_kwargs: dict = {}
+        if sys.platform == "win32":
+            # Prevent a console window from flashing on Windows (FIX-126).
+            extra_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
         result = subprocess.run(
             [str(python_path), "-c", "import sys; print(sys.version)"],
             capture_output=True,
             text=True,
             timeout=30,
             stdin=subprocess.DEVNULL,
+            **extra_kwargs,
         )
         if result.returncode == 0:
             return True, result.stdout.strip()

@@ -519,6 +519,10 @@ class App:
                 return
 
             template_path = TEMPLATES_DIR / raw_template
+            # Re-validate python path before every workspace creation (FIX-126).
+            # This catches cases where python-path.txt was deleted or corrupted
+            # after launcher startup but before the user clicked Create.
+            ensure_python_path_valid()
             # Pre-flight: verify ts-python is accessible before creating the workspace.
             shim_ok, shim_msg = verify_ts_python()
             if not shim_ok:
