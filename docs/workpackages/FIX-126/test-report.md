@@ -1,7 +1,8 @@
 # Test Report — FIX-126: Harden Python runtime path persistence
 
-**Verdict: FAIL**
+**Verdict: PASS**
 **Date:** 2026-04-07
+**Iteration:** 2
 **Tester:** Tester Agent
 **Environment:** Windows 11 / Python 3.11.9
 
@@ -182,3 +183,54 @@ After applying TODO-1 and TODO-2, run:
 .venv\Scripts\python.exe -m pytest tests/FIX-050/ tests/GUI-020/ tests/FIX-126/ -v
 ```
 All tests must pass. Then run `scripts/validate_workspace.py --wp FIX-126`.
+
+---
+
+## Iteration 2 — Review (2026-04-07)
+
+### Regression Verification
+
+Both regressions from Iteration 1 are resolved:
+
+**TODO-1 — FIX-050 guard assertion:**
+`tests/FIX-050/test_fix050.py::test_cmd_has_not_defined_check` now accepts either
+`if not defined PYTHON_PATH` or `if defined PYTHON_PATH`. A detailed comment
+explains the equivalence. Test: **PASS**.
+
+**TODO-2 — conftest.py ensure_python_path_valid mock:**
+`_mock_ensure_python_path_valid` autouse fixture added to `tests/conftest.py`,
+patching `launcher.gui.app.ensure_python_path_valid` to return `True`. This is
+structurally identical to the existing `_mock_verify_ts_python` fixture. All 8
+previously-failing GUI-020 tests: **PASS**.
+
+**FIX-085 isolation check:** The new autouse mock patches only the `app.py`
+binding (`launcher.gui.app.ensure_python_path_valid`). The FIX-085 tests call
+`launcher.core.shim_config.ensure_python_path_valid` directly and are unaffected.
+All 26 FIX-085 tests: **PASS**.
+
+### Test Execution (Iteration 2)
+
+| Test Suite | Count | Result |
+|---|---|---|
+| `tests/FIX-126/` (dedicated) | 12 | ✅ All pass |
+| `tests/FIX-050/test_fix050.py::test_cmd_has_not_defined_check` | 1 | ✅ PASS (was failing in Iter 1) |
+| `tests/GUI-020/` (all) | 50 | ✅ All pass (8 were failing in Iter 1) |
+| `tests/FIX-085/` (ensure_python_path_valid source tests) | 26 | ✅ All pass |
+| Full suite (excl. DOC-002) | 9175 | 248 failed / 91 errored (all in baseline) |
+
+Full suite baseline comparison:
+- Baseline known failures (excl. DOC-002): 248 (250 − 2)
+- Actual failures: 248 — **exact match, zero new regressions**
+- Errors (91): INS-015, INS-016, FIX-029 — all in baseline
+- `scripts/validate_workspace.py --wp FIX-126` — clean, exit 0
+
+### Security Re-check
+
+No new attack surface introduced by iteration 2 changes. The autouse mock
+(`return_value=True`) is strictly more conservative than allowing real I/O,
+and it affects only the test environment. The production behavior is unchanged.
+
+### Verdict: PASS
+
+All TODOs resolved. No new regressions. Workspace validation clean.
+WP status → Done.
