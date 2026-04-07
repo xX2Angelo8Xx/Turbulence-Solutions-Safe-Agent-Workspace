@@ -19,13 +19,6 @@ BASELINE_PATH = REPO_ROOT / "tests" / "regression-baseline.json"
 def test_clean_workspace_vscode_settings_is_git_tracked():
     """settings.json must be tracked by git (not just present on disk)."""
     result = subprocess.run(
-        [sys.executable, "-m", "git", "ls-files", "--error-unmatch", SETTINGS_PATH],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-    )
-    # Use git directly, not through Python wrapper
-    result = subprocess.run(
         ["git", "ls-files", "--error-unmatch", SETTINGS_PATH],
         cwd=str(REPO_ROOT),
         capture_output=True,
@@ -95,3 +88,65 @@ def test_regression_baseline_count_matches_entries():
         f"actual number of known_failures entries ({actual_count}). "
         f"Update _count to fix."
     )
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests (added by Tester Agent)
+# ---------------------------------------------------------------------------
+
+MANIFEST_PATH = REPO_ROOT / "templates" / "clean-workspace" / ".github" / "hooks" / "scripts" / "MANIFEST.json"
+
+
+def test_gitignore_still_excludes_vscode():
+    """Root .gitignore must still exclude .vscode/ (force-add approach, not gitignore removal)."""
+    gitignore = REPO_ROOT / ".gitignore"
+    assert gitignore.exists(), ".gitignore must exist at repo root"
+    content = gitignore.read_text(encoding="utf-8")
+    assert ".vscode" in content, (
+        "Root .gitignore no longer excludes .vscode — the fix should use "
+        "'git add -f' (force-track), never modify .gitignore"
+    )
+
+
+def test_clean_workspace_settings_security_critical_in_manifest():
+    """settings.json must be marked security_critical=True in MANIFEST.json."""
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    entry = manifest.get("files", {}).get(".vscode/settings.json")
+    assert entry is not None, ".vscode/settings.json is missing from MANIFEST.json"
+    assert entry.get("security_critical") is True, (
+        ".vscode/settings.json must be marked security_critical=True in MANIFEST.json"
+    )
+
+
+def test_clean_workspace_settings_sha256_matches_disk():
+    """SHA256 in MANIFEST.json must match the actual settings.json on disk."""
+    import hashlib
+    settings_file = REPO_ROOT / SETTINGS_PATH
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    manifest_hash = manifest.get("files", {}).get(".vscode/settings.json", {}).get("sha256", "")
+    actual_hash = hashlib.sha256(settings_file.read_bytes()).hexdigest()
+    assert manifest_hash == actual_hash, (
+        f"MANIFEST.json SHA256 ({manifest_hash!r}) does not match "
+        f"actual settings.json hash ({actual_hash!r}). Run: python scripts/generate_manifest.py --template clean-workspace"
+    )
+
+
+def test_clean_workspace_settings_terminal_sandbox_enabled():
+    """settings.json must have terminal sandbox enabled (security requirement)."""
+    settings_file = REPO_ROOT / SETTINGS_PATH
+    data = json.loads(settings_file.read_text(encoding="utf-8"))
+    sandbox = data.get("chat.tools.terminal.sandbox.enabled")
+    assert sandbox is True, (
+        "settings.json must set chat.tools.terminal.sandbox.enabled=true"
+    )
+
+
+def test_clean_workspace_settings_no_plain_text_secrets():
+    """settings.json must not contain obvious secret patterns (keys, tokens, passwords)."""
+    settings_file = REPO_ROOT / SETTINGS_PATH
+    content = settings_file.read_text(encoding="utf-8").lower()
+    forbidden_patterns = ["password", "api_key", "apikey", "secret", "token", "Bearer "]
+    for pattern in forbidden_patterns:
+        assert pattern.lower() not in content, (
+            f"settings.json appears to contain a secret/credential pattern: '{pattern}'"
+        )
