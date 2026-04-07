@@ -363,3 +363,10 @@ class TestMissingACCoverage:
                 sys.modules["security_gate"] = _orig_sg
             if _orig_zc is not None:
                 sys.modules["zone_classifier"] = _orig_zc
+            # Remove any __pycache__ created by the importlib.import_module call
+            # to prevent polluting the template directory and failing GUI-035
+            # TestNoTemplatePollution tests (BUG-211).
+            import shutil
+            pycache = CLEAN_TEMPLATE / ".github" / "hooks" / "scripts" / "__pycache__"
+            if pycache.exists():
+                shutil.rmtree(pycache)

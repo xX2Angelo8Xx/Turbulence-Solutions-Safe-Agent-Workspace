@@ -141,3 +141,22 @@ During verification, a deeper root cause was found: `GUI-034` had re-added `temp
 - FIX-119 full suite: 13 passed, 0 failed
 - GUI-035 TestNoTemplatePollution: 3 passed, 0 failed
 - DOC-063 TestSecurityGateFunctional: 2 passed, 0 failed
+
+---
+
+## Iteration 3 — Tester Findings (2026-04-07)
+
+**Tester verdict (Iteration 2):** FAIL — one additional pycache issue returned to developer.
+
+### Issue Fixed — TestMissingACCoverage::test_security_gate_denies_noagentzone also pollutes pycache
+
+`test_security_gate_denies_noagentzone` in `TestMissingACCoverage` imports `security_gate` via `importlib.import_module()` but its `finally` block did not clean up `__pycache__`. Added identical `shutil.rmtree(pycache)` cleanup at end of `finally` block (matching fix already applied to `TestSecurityGateFunctional::test_security_gate_importable_and_decide_returns_action`).
+
+### Additional file changed in Iteration 3
+
+- `tests/DOC-063/test_doc063_clean_workspace_creation.py` — pycache cleanup added to `test_security_gate_denies_noagentzone` finally block.
+
+### Iteration 3 Test Results
+
+- TST-2731: FIX-122 targeted suite — 32 passed (Windows 11 + Python 3.13)
+- DOC-063 full suite + GUI-035 TestNoTemplatePollution in sequence: 28 passed, 0 failed
