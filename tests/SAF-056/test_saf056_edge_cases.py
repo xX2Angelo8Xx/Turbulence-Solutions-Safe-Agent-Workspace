@@ -14,7 +14,7 @@ import re
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 AGENT_RULES = (
-    REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
+    REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
 )
 COPILOT_INSTRUCTIONS = (
     REPO_ROOT

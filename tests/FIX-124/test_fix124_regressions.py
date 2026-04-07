@@ -40,16 +40,16 @@ def test_three_template_directories_exist() -> None:
 # ===========================================================================
 
 def test_agent_rules_at_correct_path() -> None:
-    """AGENT-RULES.md must be at Project/AGENT-RULES.md, NOT Project/AgentDocs/AGENT-RULES.md."""
-    correct_path = TEMPLATES_DIR / "agent-workbench" / "Project" / "AGENT-RULES.md"
-    wrong_path = TEMPLATES_DIR / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
+    """AGENT-RULES.md must be at Project/AgentDocs/AGENT-RULES.md, NOT Project/AGENT-RULES.md."""
+    correct_path = TEMPLATES_DIR / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
+    wrong_path = TEMPLATES_DIR / "agent-workbench" / "Project" / "AGENT-RULES.md"
 
     assert correct_path.is_file(), (
         f"AGENT-RULES.md missing at expected location: {correct_path}"
     )
     assert not wrong_path.exists(), (
         f"AGENT-RULES.md unexpectedly found at old path: {wrong_path}. "
-        "Update tests/DOC-035/test_doc035_agentdocs.py if the file was intentionally moved."
+        "File should be at Project/AgentDocs/AGENT-RULES.md after FIX-128."
     )
 
 

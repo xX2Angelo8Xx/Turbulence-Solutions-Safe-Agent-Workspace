@@ -39,8 +39,8 @@ def test_directive_in_first_5_lines():
     """
     lines = _read_lines()
     first_twenty = "\n".join(lines[:20])
-    assert "AGENT-RULES.md" in first_twenty, (
-        "AGENT-RULES.md directive not found within the first 20 lines.\n"
+    assert "AgentDocs/AGENT-RULES.md" in first_twenty, (
+        "AgentDocs/AGENT-RULES.md directive not found within the first 20 lines.\n"
         f"First 20 lines:\n{first_twenty}"
     )
 
@@ -54,7 +54,7 @@ def test_directive_is_very_first_content():
     content = _read_file()
     assert "## First Action" in content, (
         "Expected a '## First Action' section in copilot-instructions.md. "
-        "This section must contain the AGENT-RULES.md read directive."
+        "This section must contain the AgentDocs/AGENT-RULES.md read directive."
     )
     # Verify the section contains the AGENT-RULES.md reference
     lines = _read_file().splitlines()
@@ -65,11 +65,11 @@ def test_directive_is_very_first_content():
             in_first_action = True
         elif in_first_action and line.startswith("## "):
             break
-        elif in_first_action and "AGENT-RULES.md" in line:
+        elif in_first_action and "AgentDocs/AGENT-RULES.md" in line:
             found = True
             break
     assert found, (
-        "'## First Action' section found but does not reference AGENT-RULES.md."
+        "'## First Action' section found but does not reference AgentDocs/AGENT-RULES.md."
     )
 
 
@@ -156,7 +156,7 @@ def test_agent_rules_path_format():
     invalid path on POSIX systems.
     """
     content = _read_file()
-    assert "{{PROJECT_NAME}}/AGENT-RULES.md" in content, (
-        "Expected path '{{PROJECT_NAME}}/AGENT-RULES.md' (forward slash) not found.\n"
+    assert "{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md" in content, (
+        "Expected path '{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md' (forward slash) not found.\n"
         "Check for backslash separators or missing slash in the directive."
     )

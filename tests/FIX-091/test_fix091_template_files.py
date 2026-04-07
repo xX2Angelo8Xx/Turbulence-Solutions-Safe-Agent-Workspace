@@ -31,9 +31,9 @@ def test_readme_still_exists():
 
 
 def test_agent_rules_still_exists():
-    """AGENT-RULES.md must still exist in the template Project directory."""
-    path = os.path.join(PROJECT_DIR, "AGENT-RULES.md")
-    assert os.path.isfile(path), f"AGENT-RULES.md is missing from: {PROJECT_DIR}"
+    """AGENT-RULES.md must still exist in the template Project/AgentDocs directory."""
+    path = os.path.join(PROJECT_DIR, "AgentDocs", "AGENT-RULES.md")
+    assert os.path.isfile(path), f"AGENT-RULES.md is missing from: {os.path.join(PROJECT_DIR, 'AgentDocs')}"
 
 
 def test_agentdocs_dir_still_exists():

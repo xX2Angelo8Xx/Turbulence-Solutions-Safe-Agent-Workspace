@@ -8,7 +8,7 @@ import pathlib
 
 REPO_ROOT = pathlib.Path(__file__).parent.parent.parent
 
-AW_AGENT_RULES = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
+AW_AGENT_RULES = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
 CW_AGENT_RULES = REPO_ROOT / "templates" / "clean-workspace" / "Project" / "AGENT-RULES.md"
 AW_COPILOT = REPO_ROOT / "templates" / "agent-workbench" / ".github" / "instructions" / "copilot-instructions.md"
 CW_COPILOT = REPO_ROOT / "templates" / "clean-workspace" / ".github" / "instructions" / "copilot-instructions.md"

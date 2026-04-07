@@ -27,8 +27,8 @@ def _read_lines():
 def test_read_first_directive_present():
     """copilot-instructions.md must contain a read-first directive."""
     content = _read_file()
-    assert "AGENT-RULES.md" in content, (
-        "No read-first directive mentioning AGENT-RULES.md found in copilot-instructions.md"
+    assert "AgentDocs/AGENT-RULES.md" in content, (
+        "No read-first directive mentioning AgentDocs/AGENT-RULES.md found in copilot-instructions.md"
     )
     # Check for common directive keywords indicating it's instructional
     directive_keywords = ["before any work", "first action", "read"]
@@ -40,10 +40,10 @@ def test_read_first_directive_present():
 
 
 def test_directive_mentions_agent_rules():
-    """The directive must reference AGENT-RULES.md by exact filename."""
+    """The directive must reference AgentDocs/AGENT-RULES.md by exact filename."""
     content = _read_file()
-    assert "AGENT-RULES.md" in content, (
-        "AGENT-RULES.md is not referenced in copilot-instructions.md"
+    assert "AgentDocs/AGENT-RULES.md" in content, (
+        "AgentDocs/AGENT-RULES.md is not referenced in copilot-instructions.md"
     )
 
 

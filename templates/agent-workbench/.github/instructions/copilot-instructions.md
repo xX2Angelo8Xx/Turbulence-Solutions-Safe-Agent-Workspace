@@ -11,7 +11,7 @@ You work inside `{{PROJECT_NAME}}/` — one layer below the workspace root `{{WO
 
 ## First Action
 
-Read `{{PROJECT_NAME}}/AGENT-RULES.md` for your complete permissions, tool rules, and boundaries.
+Read `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` for your complete permissions, tool rules, and boundaries.
 
 ## Security
 

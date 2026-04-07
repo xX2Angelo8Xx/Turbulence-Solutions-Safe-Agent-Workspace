@@ -65,9 +65,9 @@ class TestTemplateFilesContainPlaceholder:
         assert "Place your project files in `{{PROJECT_NAME}}/`." in content
 
     def test_placeholder_present_in_agent_rules_section(self):
-        """Agent Rules section references {{PROJECT_NAME}}/ path to AGENT-RULES.md."""
+        """Agent Rules section references {{PROJECT_NAME}}/ path to AgentDocs/AGENT-RULES.md."""
         content = _DEFAULT_README.read_text(encoding="utf-8")
-        assert "`{{PROJECT_NAME}}/AGENT-RULES.md`" in content
+        assert "`{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md`" in content
 
     def test_placeholder_present_in_folder_table_row(self):
         """Workspace structure table row uses {{PROJECT_NAME}}/ as the project folder entry."""

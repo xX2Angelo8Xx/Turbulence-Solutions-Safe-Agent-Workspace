@@ -1,7 +1,7 @@
 ﻿"""
 Tests for DOC-007: AGENT-RULES.md template.
 
-Verifies that templates/agent-workbench/Project/AGENT-RULES.md exists and contains
+Verifies that templates/agent-workbench/Project/AgentDocs/AGENT-RULES.md exists and contains
 all 7 required sections as defined in US-033 ACs 2-7, plus the read-first
 directive and required placeholders.
 """
@@ -10,7 +10,7 @@ from pathlib import Path
 
 AGENT_RULES_PATH = (
     Path(__file__).parent.parent.parent
-    / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
+    / "templates" / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
 )
 
 

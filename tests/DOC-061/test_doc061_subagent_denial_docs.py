@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PRIMARY_RULES = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
+PRIMARY_RULES = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
 
 
 def _load(path: Path) -> str:

@@ -63,18 +63,18 @@ def test_no_crlf_in_modified_agent_files():
 
 
 def test_primary_agent_rules_has_no_bom():
-    """templates/agent-workbench/Project/AGENT-RULES.md must not have a UTF-8 BOM."""
-    primary = TEMPLATE_ROOT / "Project" / "AGENT-RULES.md"
+    """templates/agent-workbench/Project/AgentDocs/AGENT-RULES.md must not have a UTF-8 BOM."""
+    primary = TEMPLATE_ROOT / "Project" / "AgentDocs" / "AGENT-RULES.md"
     assert primary.exists(), "Primary AGENT-RULES.md must exist"
     raw = primary.read_bytes()
     assert not raw.startswith(BOM), (
-        "Project/AGENT-RULES.md has a UTF-8 BOM. Remove it."
+        "Project/AgentDocs/AGENT-RULES.md has a UTF-8 BOM. Remove it."
     )
 
 
 def test_primary_agent_rules_is_valid_utf8():
-    """templates/agent-workbench/Project/AGENT-RULES.md must be valid UTF-8."""
-    primary = TEMPLATE_ROOT / "Project" / "AGENT-RULES.md"
+    """templates/agent-workbench/Project/AgentDocs/AGENT-RULES.md must be valid UTF-8."""
+    primary = TEMPLATE_ROOT / "Project" / "AgentDocs" / "AGENT-RULES.md"
     assert primary.exists(), "Primary AGENT-RULES.md must exist"
     raw = primary.read_bytes()
     if raw.startswith(BOM):
@@ -82,11 +82,11 @@ def test_primary_agent_rules_is_valid_utf8():
     try:
         raw.decode("utf-8")
     except UnicodeDecodeError as e:
-        raise AssertionError(f"Project/AGENT-RULES.md is not valid UTF-8: {e}") from e
+        raise AssertionError(f"Project/AgentDocs/AGENT-RULES.md is not valid UTF-8: {e}") from e
 
 
-def test_agent_files_reference_root_agent_rules():
-    """All modified .agent.md files must reference {{PROJECT_NAME}}/AGENT-RULES.md at root."""
+def test_agent_files_reference_agentdocs_agent_rules():
+    """All modified .agent.md files must reference {{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md."""
     missing_ref = []
     for path in MODIFIED_AGENT_FILES:
         if not path.exists():
@@ -97,13 +97,10 @@ def test_agent_files_reference_root_agent_rules():
         if not name.endswith(".agent.md"):
             continue
         content = path.read_text(encoding="utf-8-sig")  # strip BOM if present
-        if "AGENT-RULES.md" in content and "AgentDocs/AGENT-RULES.md" not in content:
-            # References root path — OK
-            pass
-        elif "AgentDocs/AGENT-RULES.md" in content:
+        if "AgentDocs/AGENT-RULES.md" not in content:
             missing_ref.append(str(path.relative_to(REPO_ROOT)))
     assert not missing_ref, (
-        f"These agent files still reference AgentDocs/AGENT-RULES.md: {missing_ref}"
+        f"These agent files do not reference AgentDocs/AGENT-RULES.md: {missing_ref}"
     )
 
 

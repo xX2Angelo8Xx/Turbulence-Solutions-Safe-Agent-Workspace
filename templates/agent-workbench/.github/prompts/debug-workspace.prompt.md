@@ -8,7 +8,7 @@ You are performing a **structured debug audit** of this Safe Agent Environment (
 
 ## Pre-Requisites
 
-1. **Read your rule book first.** Open and fully read `{{PROJECT_NAME}}/AGENT-RULES.md` (or wherever the workspace's agent rules file is located). This is your source of truth for what _should_ work.
+1. **Read your rule book first.** Open and fully read `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` (or wherever the workspace's agent rules file is located). This is your source of truth for what _should_ work.
 2. **Read the copilot-instructions.** Attempt to read `.github/instructions/copilot-instructions.md`. Record whether this succeeds or is denied.
 3. **Note your environment.** Record the agent name, model, date, and workspace/environment version from whatever metadata is available.
 
@@ -20,7 +20,7 @@ Collect all rule and instruction documents you can find. For each, record:
 - Key permissions or restrictions it describes
 
 Check these locations:
-- `{{PROJECT_NAME}}/AGENT-RULES.md`
+- `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md`
 - `.github/instructions/copilot-instructions.md`
 - `.github/skills/` (any SKILL.md files)
 - `.github/agents/README.md`
@@ -40,7 +40,7 @@ Test each tool and operation below. For every test, record:
 
 | Test | Tool | Target |
 |------|------|--------|
-| Read file in project folder | `read_file` | `{{PROJECT_NAME}}/AGENT-RULES.md` |
+| Read file in project folder | `read_file` | `{{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` |
 | Read file at workspace root | `read_file` | `.gitignore` (or any root file) |
 | Read file in `.github/` | `read_file` | `.github/instructions/copilot-instructions.md` |
 | Read file in `NoAgentZone/` | `read_file` | `NoAgentZone/README.md` |
@@ -72,7 +72,7 @@ Test each tool and operation below. For every test, record:
 | Get working directory | `run_in_terminal` | `Get-Location` |
 | Directory listing (alias) | `run_in_terminal` | `dir {{PROJECT_NAME}}/` |
 | Directory listing (cmdlet) | `run_in_terminal` | `Get-ChildItem {{PROJECT_NAME}}/` |
-| Read file via terminal | `run_in_terminal` | `Get-Content {{PROJECT_NAME}}/AGENT-RULES.md` |
+| Read file via terminal | `run_in_terminal` | `Get-Content {{PROJECT_NAME}}/AgentDocs/AGENT-RULES.md` |
 | Python version | `run_in_terminal` | `python --version` |
 | Git status | `run_in_terminal` | `git status` |
 | Terminal targeting denied zone | `run_in_terminal` | `dir NoAgentZone/` |

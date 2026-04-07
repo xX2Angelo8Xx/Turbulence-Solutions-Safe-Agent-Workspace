@@ -8,7 +8,7 @@ which contradicted the actual enforcement behavior.
 
 import pathlib
 
-AGENT_RULES_PATH = pathlib.Path(__file__).parents[2] / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
+AGENT_RULES_PATH = pathlib.Path(__file__).parents[2] / "templates" / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
 
 
 def _load_agent_rules() -> str:

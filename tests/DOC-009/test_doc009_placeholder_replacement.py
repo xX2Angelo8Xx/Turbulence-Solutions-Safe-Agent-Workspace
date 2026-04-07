@@ -19,7 +19,7 @@ from launcher.core.project_creator import replace_template_placeholders
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).parent.parent.parent
-AGENT_RULES_TEMPLATE = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AGENT-RULES.md"
+AGENT_RULES_TEMPLATE = REPO_ROOT / "templates" / "agent-workbench" / "Project" / "AgentDocs" / "AGENT-RULES.md"
 
 
 # ---------------------------------------------------------------------------

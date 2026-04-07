@@ -14,7 +14,7 @@ import pytest
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 PROJECT_DIR = os.path.join(REPO_ROOT, "templates", "agent-workbench", "Project")
 
-EXPECTED_ENTRIES = {"README.md", "AGENT-RULES.md", "AgentDocs"}
+EXPECTED_ENTRIES = {"README.md", "AgentDocs"}
 
 
 def test_project_dir_exists():
@@ -50,7 +50,7 @@ def test_readme_is_regular_file():
 
 def test_agent_rules_is_regular_file():
     """AGENT-RULES.md must be a regular file, not a directory or symlink."""
-    path = os.path.join(PROJECT_DIR, "AGENT-RULES.md")
+    path = os.path.join(PROJECT_DIR, "AgentDocs", "AGENT-RULES.md")
     assert os.path.isfile(path) and not os.path.islink(path), (
         "AGENT-RULES.md is not a regular file"
     )
