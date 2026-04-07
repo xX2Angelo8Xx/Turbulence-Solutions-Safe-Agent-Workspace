@@ -2,16 +2,37 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-04-07  
-**Verdict:** FAIL  
-**Test Log:** TST-2761
+**Verdict (Iteration 1):** FAIL — TST-2761  
+**Verdict (Iteration 2):** PASS — TST-2764, TST-2765  
+**Final Verdict:** PASS
 
 ---
 
-## Summary
+## Iteration 2 Summary (2026-04-07)
+
+The blocking issue from Iteration 1 has been fully resolved. The Developer:
+1. Removed `counter_config.json` from the `security_files` list in `test_all_security_critical_files_marked`
+2. Added `test_counter_config_is_not_security_critical` which asserts `security_critical=false`
+
+**Full test suite (FIX-127 branch vs main):**
+- main: 250 failed, 9220 passed, 353 skipped, 91 errors
+- FIX-127: 250 failed, 9220 passed, 353 skipped, 91 errors
+- **Identical counts — no new regressions introduced by FIX-127**
+
+**Targeted suite (tests/FIX-127/ + tests/GUI-035/):**
+- 79 passed, 2 failed (pycache pollution — pre-existing on main)
+- `test_all_security_critical_files_marked` → **PASS** (was FAIL in Iteration 1)
+- `test_counter_config_is_not_security_critical` → **PASS** (new test)
+- All 16 FIX-127 tests → **PASS**
+- `validate_workspace.py --wp FIX-127` → **clean (exit code 0)**
+
+---
+
+## Iteration 1 Summary
 
 FIX-127's core implementation is correct and well-tested. All 16 FIX-127-specific tests pass. However, the Developer introduced a **regression in `tests/GUI-035/test_gui035_edge_cases.py`** by changing `counter_config.json` from `security_critical=true` to `security_critical=false` in the MANIFEST without updating the pre-existing GUI-035 assertion that explicitly expects it to remain `security_critical=true`.
 
-**Blocking issue:** `tests/GUI-035/test_gui035_edge_cases.py::TestManifestHashIntegrity::test_all_security_critical_files_marked` — FAIL
+**Blocking issue (now resolved):** `tests/GUI-035/test_gui035_edge_cases.py::TestManifestHashIntegrity::test_all_security_critical_files_marked` — was FAIL, now PASS
 
 ---
 
