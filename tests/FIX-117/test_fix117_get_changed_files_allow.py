@@ -96,6 +96,7 @@ class TestAgentRulesDocumentation:
             / "templates"
             / "agent-workbench"
             / "Project"
+            / "AgentDocs"
             / "AGENT-RULES.md"
         )
 
