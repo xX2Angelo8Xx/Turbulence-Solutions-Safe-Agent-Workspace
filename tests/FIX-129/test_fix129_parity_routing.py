@@ -72,6 +72,18 @@ class TestDetectTemplate:
         (tmp_path / ".github" / "template").write_text("  clean-workspace\n", encoding="utf-8")
         assert _detect_template(tmp_path) == "clean-workspace"
 
+    def test_empty_file_defaults_to_agent_workbench(self, tmp_path: Path) -> None:
+        """Returns 'agent-workbench' when .github/template is empty (strip() yields '')."""
+        (tmp_path / ".github").mkdir()
+        (tmp_path / ".github" / "template").write_text("", encoding="utf-8")
+        assert _detect_template(tmp_path) == "agent-workbench"
+
+    def test_whitespace_only_defaults_to_agent_workbench(self, tmp_path: Path) -> None:
+        """Returns 'agent-workbench' when .github/template contains only whitespace."""
+        (tmp_path / ".github").mkdir()
+        (tmp_path / ".github" / "template").write_text("   \n\t  ", encoding="utf-8")
+        assert _detect_template(tmp_path) == "agent-workbench"
+
 
 # ---------------------------------------------------------------------------
 # _load_manifest() tests
@@ -101,6 +113,11 @@ class TestLoadManifest:
     def test_nonexistent_template_returns_none(self) -> None:
         """Returns None for a template directory that does not exist."""
         result = _load_manifest("does-not-exist")
+        assert result is None
+
+    def test_empty_string_template_returns_none(self) -> None:
+        """Returns None for an empty string template name (no such directory)."""
+        result = _load_manifest("")
         assert result is None
 
 
@@ -146,6 +163,22 @@ class TestNeverTouchPatterns:
         assert ".github/template" in _NEVER_TOUCH_PATTERNS, (
             ".github/template must be in _NEVER_TOUCH_PATTERNS to prevent the upgrader "
             "from overwriting the routing file"
+        )
+
+    def test_github_template_not_upgraded_in_check_workspace(self, tmp_path: Path) -> None:
+        """check_workspace() never lists .github/template as an outdated/missing file."""
+        from launcher.core.workspace_upgrader import check_workspace
+
+        # Create a minimal workspace: copy agent-workbench template
+        _TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
+        import shutil
+        workspace = tmp_path / "test_ws"
+        shutil.copytree(str(_TEMPLATES_DIR / "agent-workbench"), str(workspace))
+
+        report = check_workspace(workspace)
+        all_flagged = report.outdated_files + report.missing_files
+        assert ".github/template" not in all_flagged, (
+            ".github/template must never be flagged as outdated or missing by check_workspace()"
         )
 
 
