@@ -1,7 +1,7 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 219,
-  "_updated": "2026-04-07",
+  "_count": 220,
+  "_updated": "2026-04-08",
   "known_failures": {
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_folder_table_row": {
       "reason": "DOC-002 requires exact placeholder strings that would require 6+ total {{PROJECT_NAME}} occurrences; FIX-086 requires exactly 5 (updated in FIX-119). Contradiction between test suites for folder-table-row test which requires additional placeholder that breaks current README design."
@@ -659,6 +659,9 @@
     },
     "tests.DOC-064.test_doc064_tester_edge_cases.test_agent_workbench_agent_rules_single_isBackground_entry": {
       "reason": "DOC-065 supersedes DOC-064: isBackground:true removed from Blocked Commands (tool now works)"
+    },
+    "tests.FIX-125.test_fix125_build_fixes.TestFindIsccLocalAppData.test_find_iscc_localappdata_path_wins_over_absent_system_paths": {
+      "reason": "CI environment difference: CI runner has Inno Setup pre-installed at system path, test expects only LocalAppData fallback to match"
     }
   }
 }
