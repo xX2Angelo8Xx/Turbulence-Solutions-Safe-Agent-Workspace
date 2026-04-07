@@ -43,6 +43,7 @@ Templates (bundled inside Launcher)
 │   │   │   ├── AGENT_FEEDBACK_REPORT-v3.3.11.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT-v3.4.0-AgentWorkbench.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT-v3.4.0-Clean-Workspace.md
+│   │   │   ├── AGENT_FEEDBACK_REPORT-v3.4.0.-AgentWorbench-ITA2.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.1.md
 │   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.2.md
@@ -691,6 +692,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-124/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-125/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1491,6 +1496,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-122/
 │   ├── FIX-123/
 │   ├── FIX-124/
+│   ├── FIX-125/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
