@@ -10,6 +10,7 @@ All scripts are non-interactive, use file locking for parallel safety, and run v
 
 | Script | Purpose | Replaces |
 |--------|---------|----------|
+| `build_windows.py` | Build the Windows installer locally (mirrors CI) | Running each build step manually |
 | `run_tests.py` | **Mandatory.** Run pytest + auto-log results | Manual test execution + `add_test_result.py` |
 | `add_test_result.py` | Add test result row with auto TST-ID (fallback) | Manual JSONL editing for test results |
 | `add_workpackage.py` | Create WP with auto ID + US cross-ref | Manual JSONL editing + forgetting US Linked WPs update |
@@ -157,6 +158,38 @@ One-time utility to renumber duplicate TST-IDs in `test-results.jsonl`.
 ```
 
 Moves test result entries for Done WPs to `docs/test-results/archived-test-results.jsonl` to keep the active JSONL small.
+
+---
+
+### build_windows.py
+
+Builds the Windows installer locally by running the same three steps as the CI pipeline in `.github/workflows/release.yml`.
+
+**Steps performed:**
+1. PyInstaller — compiles `dist/launcher/launcher.exe` via `launcher.spec`
+2. Python embed — downloads `python-3.11.9-embed-amd64.zip` into `src/installer/python-embed/` (skipped if files already present)
+3. Inno Setup — locates `ISCC.exe` and compiles `src/installer/windows/setup.iss`
+
+**Output:** `src/installer/windows/Output/AgentEnvironmentLauncher-Setup.exe`
+
+```powershell
+# Full build (PyInstaller + embed download + Inno Setup)
+.venv\Scripts\python scripts/build_windows.py
+
+# Skip PyInstaller (only installer/template files changed)
+.venv\Scripts\python scripts/build_windows.py --skip-pyinstaller
+
+# Skip Python embed download (already present in src/installer/python-embed/)
+.venv\Scripts\python scripts/build_windows.py --skip-embed
+
+# Dry run — print all steps without executing anything
+.venv\Scripts\python scripts/build_windows.py --dry-run
+
+# Combined flags
+.venv\Scripts\python scripts/build_windows.py --skip-pyinstaller --skip-embed
+```
+
+**Prerequisites:** Inno Setup 6 must be installed. Download from https://jrsoftware.org/isdl.php (free). The script will print install instructions if `ISCC.exe` cannot be located.
 
 ---
 
