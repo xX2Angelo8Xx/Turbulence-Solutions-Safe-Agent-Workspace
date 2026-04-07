@@ -39,22 +39,10 @@ Templates (bundled inside Launcher)
 ├── docs/
 │   ├── bugs/
 │   │   ├── User-Bug-Reports/
-│   │   │   ├── 2026-03-20-workspace-review.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT-v3.3.11.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT-v3.4.0-AgentWorkbench.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT-v3.4.0-Clean-Workspace.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT-v3.4.0.-AgentWorbench-ITA2.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.1.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.2.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.3.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.4.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.5.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.2.6.md
-│   │   │   ├── AGENT_FEEDBACK_REPORT_v3.3.6.md
-│   │   │   ├── AgentExperienceReport_v3.1.2.md
-│   │   │   ├── BUG_REPORT-MacOS-2.0.0.md
-│   │   │   ├── Minimal_Agent_Feedback-3.3.8.md
+│   │   │   ├── Reports-PRE-v3.1.n/
+│   │   │   ├── Reports-v3.2.n/
+│   │   │   ├── Reports-v3.3.n/
+│   │   │   ├── Reports-v3.4.n/
 │   │   │   ├── SAE_macOS_Error_Report_v323.md
 │   │   │   └── security-hook-report.md
 │   │   └── bugs.jsonl
@@ -696,6 +684,9 @@ Templates (bundled inside Launcher)
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
 │   │   ├── FIX-125/
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
+│   │   ├── FIX-126/
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1497,6 +1488,7 @@ Templates (bundled inside Launcher)
 │   ├── FIX-123/
 │   ├── FIX-124/
 │   ├── FIX-125/
+│   ├── FIX-126/
 │   ├── GUI-001/
 │   ├── GUI-002/
 │   ├── GUI-003/
