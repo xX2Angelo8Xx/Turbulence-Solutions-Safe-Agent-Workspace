@@ -399,3 +399,144 @@ class TestCounterConfigManifestClassification:
             )
         finally:
             sys.path.pop(0)
+
+
+# ---------------------------------------------------------------------------
+# Test 5 (Tester additions): Edge-case handling
+# ---------------------------------------------------------------------------
+
+class TestTesterEdgeCases:
+    """Edge cases added by Tester: dry_run, OSError handling, non-SAE workspace names."""
+
+    def test_dry_run_skips_placeholder_resolution(self, tmp_path):
+        """upgrade_workspace(dry_run=True) must NOT resolve placeholders in copilot-instructions.md."""
+        from launcher.core.workspace_upgrader import upgrade_workspace
+
+        workspace = tmp_path / "SAE-DryTest"
+        copilot = workspace / ".github" / "instructions" / "copilot-instructions.md"
+        copilot.parent.mkdir(parents=True, exist_ok=True)
+        # File already matches template (hash will match) — no upgrade needed
+        template_content = "{{PROJECT_NAME}} template."
+        content_bytes = template_content.encode("utf-8")
+        copilot.write_bytes(content_bytes)
+
+        version_file = workspace / ".github" / "version"
+        version_file.parent.mkdir(parents=True, exist_ok=True)
+        version_file.write_text("0.0.0", encoding="utf-8")
+
+        fake_templates_dir = tmp_path / "fake_templates"
+        template_dir = fake_templates_dir / "agent-workbench"
+        tmpl_copilot = template_dir / ".github" / "instructions" / "copilot-instructions.md"
+        tmpl_copilot.parent.mkdir(parents=True, exist_ok=True)
+        import hashlib as _hl
+        import json as _json
+        tmpl_copilot.write_bytes(content_bytes)
+        manifest = {
+            "files": {
+                ".github/instructions/copilot-instructions.md": {
+                    "sha256": _hl.sha256(content_bytes).hexdigest(),
+                    "security_critical": True,
+                },
+            }
+        }
+        manifest_path = template_dir / _MANIFEST_SUBPATH
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        manifest_path.write_text(_json.dumps(manifest), encoding="utf-8")
+
+        with patch("launcher.core.workspace_upgrader.TEMPLATES_DIR", fake_templates_dir):
+            report = upgrade_workspace(workspace, dry_run=True)
+
+        # dry_run must not resolve placeholders
+        result = copilot.read_text(encoding="utf-8")
+        assert "{{PROJECT_NAME}}" in result, (
+            "dry_run=True must NOT resolve placeholders — copilot-instructions.md was modified"
+        )
+
+    def test_placeholder_resolution_oserror_adds_to_errors(self, tmp_path):
+        """If replace_template_placeholders raises OSError, the error must be captured in the report."""
+        from unittest.mock import patch
+        from launcher.core.workspace_upgrader import upgrade_workspace
+
+        workspace = tmp_path / "SAE-ErrTest"
+        copilot = workspace / ".github" / "instructions" / "copilot-instructions.md"
+        copilot.parent.mkdir(parents=True, exist_ok=True)
+        copilot.write_text("old content", encoding="utf-8")
+
+        version_file = workspace / ".github" / "version"
+        version_file.parent.mkdir(parents=True, exist_ok=True)
+        version_file.write_text("0.0.0", encoding="utf-8")
+
+        fake_templates_dir = tmp_path / "fake_templates"
+        template_dir = fake_templates_dir / "agent-workbench"
+        import hashlib as _hl
+        import json as _json
+        new_content_bytes = b"New {{PROJECT_NAME}} content."
+        tmpl_copilot = template_dir / ".github" / "instructions" / "copilot-instructions.md"
+        tmpl_copilot.parent.mkdir(parents=True, exist_ok=True)
+        tmpl_copilot.write_bytes(new_content_bytes)
+        manifest = {
+            "files": {
+                ".github/instructions/copilot-instructions.md": {
+                    "sha256": _hl.sha256(new_content_bytes).hexdigest(),
+                    "security_critical": True,
+                },
+            }
+        }
+        manifest_path = template_dir / _MANIFEST_SUBPATH
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        manifest_path.write_text(_json.dumps(manifest), encoding="utf-8")
+
+        with patch("launcher.core.workspace_upgrader.TEMPLATES_DIR", fake_templates_dir):
+            with patch(
+                "launcher.core.workspace_upgrader.replace_template_placeholders",
+                side_effect=OSError("disk full"),
+            ):
+                report = upgrade_workspace(workspace, dry_run=False)
+
+        assert any("Failed to resolve template placeholders" in e for e in report.errors), (
+            f"OSError in replace_template_placeholders must be captured in report.errors. "
+            f"Got: {report.errors}"
+        )
+
+    def test_non_sae_workspace_upgrade_resolves_full_folder_name(self, tmp_path):
+        """For workspaces not named SAE-xxx, the folder name itself is used as the project name."""
+        from launcher.core.workspace_upgrader import upgrade_workspace
+
+        workspace = tmp_path / "MyCustomWorkspace"
+        copilot = workspace / ".github" / "instructions" / "copilot-instructions.md"
+        copilot.parent.mkdir(parents=True, exist_ok=True)
+        copilot.write_text("old content", encoding="utf-8")
+
+        version_file = workspace / ".github" / "version"
+        version_file.parent.mkdir(parents=True, exist_ok=True)
+        version_file.write_text("0.0.0", encoding="utf-8")
+
+        fake_templates_dir = tmp_path / "fake_templates"
+        template_dir = fake_templates_dir / "agent-workbench"
+        import hashlib as _hl
+        import json as _json
+        new_content_bytes = b"Project: {{PROJECT_NAME}}, Workspace: {{WORKSPACE_NAME}}."
+        tmpl_copilot = template_dir / ".github" / "instructions" / "copilot-instructions.md"
+        tmpl_copilot.parent.mkdir(parents=True, exist_ok=True)
+        tmpl_copilot.write_bytes(new_content_bytes)
+        manifest = {
+            "files": {
+                ".github/instructions/copilot-instructions.md": {
+                    "sha256": _hl.sha256(new_content_bytes).hexdigest(),
+                    "security_critical": True,
+                },
+            }
+        }
+        manifest_path = template_dir / _MANIFEST_SUBPATH
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        manifest_path.write_text(_json.dumps(manifest), encoding="utf-8")
+
+        with patch("launcher.core.workspace_upgrader.TEMPLATES_DIR", fake_templates_dir):
+            report = upgrade_workspace(workspace)
+
+        assert not report.errors, f"Upgrade had errors: {report.errors}"
+        result = copilot.read_text(encoding="utf-8")
+        assert "{{PROJECT_NAME}}" not in result, "Placeholders must be resolved"
+        assert "MyCustomWorkspace" in result, (
+            "For non-SAE workspace, folder name itself should be used as project name"
+        )
