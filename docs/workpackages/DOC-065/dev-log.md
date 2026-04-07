@@ -32,3 +32,14 @@ Five documentation gaps closed across both agent-workbench and clean-workspace t
 - Change (3): Added to agent-workbench AGENT-RULES S4 Blocked Commands table + both copilot-instructions Known Tool Limitations tables; for clean-workspace added to Section 4 Security Rules
 - Change (4): Added to clean-workspace AGENT-RULES S6 Known Tool Workarounds table
 - Change (5): Clarified list_dir notes in both AGENT-RULES S3 Tool Permission Matrix tables
+
+## Iteration 2 — 2026-04-07
+
+**Tester verdict:** FAIL — 6 DOC-064 tests now fail because they asserted the presence of `isBackground:true` in the Blocked Commands table, which was intentionally removed by DOC-065.
+
+**Fix:** Added 6 superseded DOC-064 test IDs to `tests/regression-baseline.json` with reason "DOC-065 supersedes DOC-064: isBackground:true removed from Blocked Commands (tool now works)". Updated `_count` 213→219.
+
+**Files changed (iteration 2):**
+- `tests/regression-baseline.json` — 6 entries added, `_count` updated to 219
+
+**Test result:** 20/20 DOC-065 tests pass. Workspace validation clean.

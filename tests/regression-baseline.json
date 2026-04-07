@@ -1,6 +1,6 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 213,
+  "_count": 219,
   "_updated": "2026-04-07",
   "known_failures": {
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_folder_table_row": {
@@ -641,6 +641,24 @@
     },
     "tests.INS-007.test_ins007_tester.TestLineEndings.test_no_crlf_line_endings": {
       "reason": "Pre-existing: build_dmg.sh/build_appimage.sh have CRLF; git core.autocrlf=true on Windows overrides eol=lf gitattributes; files stored as LF in git index"
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_agent_workbench_agent_rules_has_isBackground": {
+      "reason": "DOC-065 supersedes DOC-064: isBackground:true removed from Blocked Commands (tool now works)"
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_agent_workbench_agent_rules_use_instead_guidance": {
+      "reason": "DOC-065 supersedes DOC-064: isBackground:true removed from Blocked Commands (tool now works)"
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_agent_workbench_agent_rules_blocked_commands_section": {
+      "reason": "DOC-065 supersedes DOC-064: isBackground:true removed from Blocked Commands (tool now works)"
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_agent_workbench_agent_rules_security_gate_reason": {
+      "reason": "DOC-065 supersedes DOC-064: isBackground:true removed from Blocked Commands (tool now works)"
+    },
+    "tests.DOC-064.test_doc064_tester_edge_cases.test_agent_workbench_agent_rules_isBackground_in_blocked_section": {
+      "reason": "DOC-065 supersedes DOC-064: isBackground:true removed from Blocked Commands (tool now works)"
+    },
+    "tests.DOC-064.test_doc064_tester_edge_cases.test_agent_workbench_agent_rules_single_isBackground_entry": {
+      "reason": "DOC-065 supersedes DOC-064: isBackground:true removed from Blocked Commands (tool now works)"
     }
   }
 }
