@@ -60,3 +60,27 @@ not just at launcher startup.
 ## Known Limitations
 - The fallback paths in ts-python.cmd are hard-coded to two common install locations. A custom install path is not discoverable without a registry query.
 - ts-python.cmd auto-heal writes back using `echo ... > file` which always adds a trailing CRLF; `read_python_path()` already strips whitespace so this is safe.
+
+---
+
+## Iteration 2 — Regression Fixes (2026-04-07)
+
+### Tester Findings
+Tester returned WP to In Progress with two regressions:
+1. `tests/FIX-050/test_fix050.py::test_cmd_has_not_defined_check` — FIX-126 restructured the empty-path guard from `if not defined PYTHON_PATH` (negative form) to `if defined PYTHON_PATH` (positive form). Both are behaviourally equivalent but the FIX-050 assertion checked for the literal negative form.
+2. 8 `tests/GUI-020/` failures — `ensure_python_path_valid()` added to `_create()` background thread with no autouse mock in `tests/conftest.py`, causing real filesystem I/O and a race condition against `mock_create.called` assertions.
+
+### Fixes Applied
+1. **`tests/FIX-050/test_fix050.py`** (`test_cmd_has_not_defined_check`): Relaxed assertion to accept either `if not defined PYTHON_PATH` or `if defined PYTHON_PATH`. Added a detailed comment explaining that FIX-126 restructured the guard and both forms are logically equivalent.
+2. **`tests/conftest.py`**: Added `_mock_ensure_python_path_valid` autouse fixture analogous to `_mock_verify_ts_python`, patching `launcher.gui.app.ensure_python_path_valid` to return `True`. This eliminates the I/O race condition in GUI-020 tests.
+
+### Test Results
+- `tests/FIX-050/test_fix050.py::test_cmd_has_not_defined_check` — PASS
+- All `tests/GUI-020/` (50 tests) — PASS
+- All `tests/FIX-126/` (12 tests) — PASS
+- `scripts/validate_workspace.py --wp FIX-126` — clean (exit 0)
+
+### Files Changed in Iteration 2
+- `tests/FIX-050/test_fix050.py`
+- `tests/conftest.py`
+- `docs/workpackages/FIX-126/dev-log.md`

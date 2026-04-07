@@ -64,15 +64,27 @@ def test_cmd_uses_exclamation_var_syntax():
 
 
 # ---------------------------------------------------------------------------
-# 3. ts-python.cmd has "if not defined PYTHON_PATH" guard
+# 3. ts-python.cmd guards against an undefined/empty PYTHON_PATH
 # ---------------------------------------------------------------------------
 
 def test_cmd_has_not_defined_check():
-    """ts-python.cmd must contain 'if not defined PYTHON_PATH' for empty-file guard."""
+    """ts-python.cmd must guard against an empty python-path.txt.
+
+    FIX-050 originally required the literal 'if not defined PYTHON_PATH'.
+    FIX-126 restructured the guard to the equivalent positive form
+    'if defined PYTHON_PATH (if exist "!PYTHON_PATH!" goto :run_python)'
+    which skips to fallback handling identically for an undefined var.
+    Both forms are logically equivalent: execution only reaches the fallback
+    block when PYTHON_PATH is not defined or the path does not exist.
+    This test now accepts either form so that the structural refactor does
+    not constitute a regression.
+    """
     content = CMD_SHIM.read_text(encoding="utf-8")
-    assert "if not defined PYTHON_PATH" in content, (
-        "ts-python.cmd must guard against an empty python-path.txt by checking "
-        "'if not defined PYTHON_PATH'."
+    has_negative_guard = "if not defined PYTHON_PATH" in content
+    has_positive_guard = "if defined PYTHON_PATH" in content
+    assert has_negative_guard or has_positive_guard, (
+        "ts-python.cmd must guard against an empty python-path.txt by using "
+        "either 'if not defined PYTHON_PATH' or 'if defined PYTHON_PATH'."
     )
 
 

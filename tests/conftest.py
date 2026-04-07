@@ -89,6 +89,19 @@ def _mock_verify_ts_python():
 
 
 @pytest.fixture(autouse=True)
+def _mock_ensure_python_path_valid():
+    """Prevent real filesystem access from ensure_python_path_valid() during tests (FIX-126).
+
+    FIX-126 added a call to ensure_python_path_valid() in the _create() background
+    thread before verify_ts_python(). Without this mock the function runs for real,
+    adding filesystem I/O latency that causes a race condition in GUI-020 tests which
+    assert mock_create.called immediately after the daemon thread is started.
+    """
+    with patch("launcher.gui.app.ensure_python_path_valid", return_value=True):
+        yield
+
+
+@pytest.fixture(autouse=True)
 def _prevent_vscode_detection():
     """Prevent shutil.which from finding a real VS Code installation.
 
