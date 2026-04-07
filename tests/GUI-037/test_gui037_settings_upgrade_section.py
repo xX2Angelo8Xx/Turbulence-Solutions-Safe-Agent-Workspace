@@ -425,3 +425,62 @@ class TestBrowseWorkspace:
              patch.object(dialog, "_update_version_label") as mock_update:
             dialog._browse_workspace()
         mock_update.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# Tester edge-case tests (GUI-037)
+# ---------------------------------------------------------------------------
+
+class TestTesterEdgeCases:
+    def test_close_button_is_at_row_13(self) -> None:
+        """Close button must be at row 13 — the bottom of the dialog (docstring item 23)."""
+        src = inspect.getsource(
+            sys.modules["launcher.gui.app"].SettingsDialog._build_ui
+        )
+        # Verify Close button grid call uses row=13
+        assert "row=13" in src, "Close button is not placed at row 13"
+
+    def test_version_label_initial_text_is_placeholder(self) -> None:
+        """_workspace_version_label must start with 'Select a workspace above'."""
+        from launcher.gui import app as app_mod
+        src = inspect.getsource(app_mod.SettingsDialog._build_ui)
+        assert "Select a workspace above" in src, (
+            "Version label placeholder text 'Select a workspace above' not found in _build_ui"
+        )
+
+    def test_check_upgrade_button_re_enabled_after_exception(self, tmp_path: Path) -> None:
+        """_check_upgrade_button must be re-enabled (state=normal) even when check_workspace raises."""
+        dialog = _make_settings_dialog()
+        dialog.workspace_entry.get.return_value = str(tmp_path)
+        with patch("launcher.gui.app.check_workspace", side_effect=RuntimeError("boom")), \
+             patch("launcher.gui.app.messagebox.showerror"):
+            dialog._on_check_and_upgrade()
+        # At least one call must restore state='normal' and text='Check & Upgrade'
+        restore_calls = [
+            c for c in dialog._check_upgrade_button.configure.call_args_list
+            if c == call(state="normal", text="Check & Upgrade")
+        ]
+        assert restore_calls, "Button was not re-enabled after exception in check_workspace"
+
+    def test_upgrade_not_called_when_user_declines(self, tmp_path: Path) -> None:
+        """upgrade_workspace must NOT be called when user declines the upgrade prompt."""
+        dialog = _make_settings_dialog()
+        dialog.workspace_entry.get.return_value = str(tmp_path)
+        report = _make_report(up_to_date=False, outdated_files=["security_gate.py"])
+        with patch("launcher.gui.app.check_workspace", return_value=report), \
+             patch("launcher.gui.app.messagebox.askyesno", return_value=False), \
+             patch("launcher.gui.app.upgrade_workspace") as mock_upgrade:
+            dialog._on_check_and_upgrade()
+        mock_upgrade.assert_not_called()
+
+    def test_danger_zone_at_row_10_not_overlapping_repair_section(self) -> None:
+        """Danger Zone header must be at row 10, not overlapping Repair/Upgrade section (rows 7-9)."""
+        src = inspect.getsource(
+            sys.modules["launcher.gui.app"].SettingsDialog._build_ui
+        )
+        # row=10 must appear for Danger Zone after the Repair section rows (7-9)
+        repair_pos = src.find("Repair / Upgrade Workspace")
+        danger_pos = src.find("Danger Zone")
+        assert repair_pos != -1, "Repair / Upgrade Workspace section not found"
+        assert danger_pos != -1, "Danger Zone section not found"
+        assert danger_pos > repair_pos, "Danger Zone must come after Repair section"
