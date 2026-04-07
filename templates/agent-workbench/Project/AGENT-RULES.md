@@ -108,7 +108,7 @@ The following paths enforce permanent restrictions. No workpackage, exception, o
 | `semantic_search` | Allowed | Read-only; no zone restriction |
 | **Terminal** | Zone-checked | See [Terminal Rules](#4-terminal-rules) |
 | **Git** | Zone-checked | See [Git Rules](#5-git-rules) |
-| `get_changed_files` | Allowed | Read-only git inspection tool; returns changed file names only (equivalent to `git status`); no content access |
+| `get_changed_files` | Zone-checked | Allowed only when `.git/` is **not** at workspace root; denied when the workspace IS a git repository (full diff content from denied zones would be exposed) |
 | **Memory** | Allowed | `/memories/` and `/memories/session/` are readable; session writes allowed |
 | **LSP Tools** | Zone-checked | `vscode_listCodeUsages`, `vscode_renameSymbol` — project folder only |
 

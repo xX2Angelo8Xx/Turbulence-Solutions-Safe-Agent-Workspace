@@ -36,9 +36,6 @@ _ALWAYS_ALLOW_TOOLS: frozenset = frozenset({
     "TodoWrite", "TodoRead", "todo_write", "manage_todo_list",
     # SAF-044: search_subagent removed — validated by validate_search_subagent() in decide()
     "runSubagent", "Agent", "agent",
-    # FIX-117: get_changed_files — read-only git inspection tool (equivalent to git status).
-    # Returns only changed file metadata; does not read file content.
-    "get_changed_files",
     # SAF-063: read-only terminal introspection tools — no filesystem writes
     "get_terminal_output", "terminal_last_command", "terminal_selection",
     # SAF-063: meta/VS Code-managed tools with no filesystem access
@@ -128,7 +125,7 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "21b42a67b77b298a904cc8daff5828bdd9a393a540eee120a6808a643eea5eec"
+_KNOWN_GOOD_GATE_HASH: str = "5e544143f554e87fe89e3834141c503bc67ee51c8ee984dd28748beca5a4679a"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. The safety-critical file "
@@ -3187,6 +3184,35 @@ def _has_recursive_flag(verb_lower: str, tokens: list[str]) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# SAF-058 / FIX-123: get_changed_files conditional zone check
+# ---------------------------------------------------------------------------
+
+def validate_get_changed_files(ws_root: str) -> str:
+    """SAF-058 / FIX-123: Deny get_changed_files when a .git directory exists at workspace root.
+
+    get_changed_files returns full diff content from ALL zones, including
+    NoAgentZone, .github/, and .vscode/.  When the agent's workspace root
+    IS a git repository (.git/ directory present at that level), all diff
+    content from denied zones is exposed — this is the BUG-136/BUG-208
+    vulnerability reintroduced by FIX-117.
+
+    Logic:
+    - .git directory (or symlink to directory) at workspace root → deny.
+    - .git file (worktree pointer) at workspace root → allow; os.path.isdir()
+      returns False for plain files, so only actual git repos are blocked.
+    - .git/ only inside the project subfolder → allow (scoped to that repo).
+    - No .git/ anywhere → allow (tool gives harmless 'no repo' message).
+    - OSError (e.g. permission denied) → deny (fail closed).
+    """
+    try:
+        if os.path.isdir(os.path.join(ws_root, ".git")):
+            return "deny"
+        return "allow"
+    except OSError:
+        return "deny"
+
+
+# ---------------------------------------------------------------------------
 # Decision engine
 # ---------------------------------------------------------------------------
 
@@ -3283,6 +3309,14 @@ def decide(data: dict, ws_root: str) -> str:
         _dec = validate_file_search(data, ws_root)
         if _dec == "deny":
             _audit_deny(tool_name, "zone_violation", "search_query")
+        return _dec
+
+    # SAF-058 / FIX-123: get_changed_files returns full diff content including denied zones;
+    # deny when .git/ exists at workspace root (repo whose diffs expose all zones).
+    if tool_name == "get_changed_files":
+        _dec = validate_get_changed_files(ws_root)
+        if _dec == "deny":
+            _audit_deny(tool_name, "zone_violation", ".git")
         return _dec
 
     # FIX-035: Deferred development tools — safe to allow unconditionally.

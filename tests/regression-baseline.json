@@ -1,7 +1,7 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 261,
-  "_updated": "2026-04-06",
+  "_count": 250,
+  "_updated": "2026-04-14",
   "known_failures": {
     "tests.DOC-002.test_doc002_readme_placeholders.TestTemplateFilesContainPlaceholder.test_placeholder_present_in_folder_table_row": {
       "reason": "DOC-002 requires exact placeholder strings that would require 6+ total {{PROJECT_NAME}} occurrences; FIX-086 requires exactly 5 (updated in FIX-119). Contradiction between test suites for folder-table-row test which requires additional placeholder that breaks current README design."
@@ -423,50 +423,17 @@
     "tests.SAF-072.test_saf072_edge_cases.test_concurrent_writes_no_corruption": {
       "reason": "Flaky test: passes when run in isolation but sporadically fails in the full test suite due to threading/file-locking race conditions in the test setup."
     },
-    "tests.SAF-052.test_saf052_get_changed_files.TestGetChangedFilesInAlwaysAllow.test_get_changed_files_in_always_allow_tools": {
-      "reason": "FIX-117: get_changed_files moved to _ALWAYS_ALLOW_TOOLS; SAF-052 test asserts it is NOT there, which now contradicts the FIX-117 implementation."
+    "tests.FIX-117.test_fix117_get_changed_files_allow.TestAlwaysAllowToolsMembership.test_get_changed_files_is_in_always_allow": {
+      "reason": "FIX-123 reverts FIX-117: get_changed_files removed from _ALWAYS_ALLOW_TOOLS. FIX-117 assertion that it is present now contradicts the FIX-123 implementation."
     },
-    "tests.SAF-058.test_saf058_get_changed_files_conditional.TestAlwaysAllowToolsMembership.test_get_changed_files_not_in_always_allow": {
-      "reason": "Test suite contradiction: SAF-058 required get_changed_files NOT in _ALWAYS_ALLOW_TOOLS (conditional validation). FIX-117 adds it to _ALWAYS_ALLOW_TOOLS as an unconditional allow. FIX-117 takes precedence \u00e2\u20ac\u201d the conditional denial was always wrong for the typical Agent Workbench deployment where .git/ is always at workspace root."
+    "tests.FIX-117.test_fix117_get_changed_files_allow.TestAlwaysAllowToolsMembership.test_validate_get_changed_files_removed": {
+      "reason": "FIX-123 re-adds validate_get_changed_files() which FIX-117 deleted. FIX-117 assertion that the function does not exist now contradicts the FIX-123 implementation."
     },
-    "tests.SAF-058.test_saf058_get_changed_files_conditional.TestValidateGetChangedFiles.test_git_at_workspace_root_is_denied": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. get_changed_files is now unconditionally allowed via _ALWAYS_ALLOW_TOOLS."
+    "tests.FIX-117.test_fix117_get_changed_files_allow.TestDecideGetChangedFiles.test_allowed_when_git_at_workspace_root": {
+      "reason": "FIX-123 reverts FIX-117: decide() now denies get_changed_files when .git/ is at workspace root. FIX-117 test expects unconditional allow."
     },
-    "tests.SAF-058.test_saf058_get_changed_files_conditional.TestValidateGetChangedFiles.test_git_inside_project_folder_is_allowed": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. get_changed_files is now unconditionally allowed via _ALWAYS_ALLOW_TOOLS."
-    },
-    "tests.SAF-058.test_saf058_get_changed_files_conditional.TestValidateGetChangedFiles.test_no_git_anywhere_is_allowed": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. get_changed_files is now unconditionally allowed via _ALWAYS_ALLOW_TOOLS."
-    },
-    "tests.SAF-058.test_saf058_get_changed_files_conditional.TestValidateGetChangedFiles.test_no_project_folder_no_git_is_allowed": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. get_changed_files is now unconditionally allowed via _ALWAYS_ALLOW_TOOLS."
-    },
-    "tests.SAF-058.test_saf058_get_changed_files_conditional.TestValidateGetChangedFiles.test_os_error_fails_closed": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. get_changed_files is now unconditionally allowed via _ALWAYS_ALLOW_TOOLS."
-    },
-    "tests.SAF-058.test_saf058_get_changed_files_conditional.TestValidateGetChangedFiles.test_git_at_root_takes_priority_over_project_git": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. get_changed_files is now unconditionally allowed via _ALWAYS_ALLOW_TOOLS."
-    },
-    "tests.SAF-058.test_saf058_get_changed_files_conditional.TestDecideRoutesGetChangedFiles.test_decide_denies_when_git_at_workspace_root": {
-      "reason": "Test suite contradiction: SAF-058 expected deny when .git/ is at workspace root. FIX-117 makes get_changed_files unconditionally allowed. FIX-117 takes precedence."
-    },
-    "tests.SAF-058.test_saf058_tester_edge_cases.TestTesterEdgeCases.test_git_file_at_workspace_root_is_allowed": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. Function no longer exists."
-    },
-    "tests.SAF-058.test_saf058_tester_edge_cases.TestTesterEdgeCases.test_git_file_inside_project_folder_is_allowed": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. Function no longer exists."
-    },
-    "tests.SAF-058.test_saf058_tester_edge_cases.TestTesterEdgeCases.test_permission_error_fails_closed": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. Function no longer exists."
-    },
-    "tests.SAF-058.test_saf058_tester_edge_cases.TestTesterEdgeCases.test_detect_project_folder_runtime_error_no_root_git_is_allowed": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. Function no longer exists."
-    },
-    "tests.SAF-058.test_saf058_tester_edge_cases.TestTesterEdgeCases.test_custom_project_folder_name_is_used_for_git_path": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. Function no longer exists."
-    },
-    "tests.SAF-058.test_saf058_tester_edge_cases.TestTesterEdgeCases.test_custom_project_folder_no_git_dir_is_allowed": {
-      "reason": "SAF-058 validate_get_changed_files() removed by FIX-117. Function no longer exists."
+    "tests.FIX-117.test_fix117_get_changed_files_allow.TestDecideGetChangedFiles.test_allowed_with_both_git_dirs": {
+      "reason": "FIX-123 reverts FIX-117: decide() denies when .git/ is at workspace root regardless of project .git/. FIX-117 test expects unconditional allow."
     },
     "tests.DOC-046.test_doc046_edge_cases.test_project_creator_docstring_references_agentdocs": {
       "reason": "Test suite contradiction: DOC-046/DOC-047 require AgentDocs/AGENT-RULES.md references, but FIX-119 moved all references to the root path. FIX-119 takes precedence."
