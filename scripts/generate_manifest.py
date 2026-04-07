@@ -73,8 +73,11 @@ def _sha256(file_path: Path) -> str:
 
 # FIX-127: counter_config.json is user configuration (threshold, enabled flag) — not a
 # security control. Upgrading it would silently overwrite user-configured thresholds.
+# FIX-129: .github/template is routing metadata written by create_project(); it is not
+# a security control and must never be overwritten by the upgrader.
 _NEVER_SECURITY_CRITICAL = {
     ".github/hooks/scripts/counter_config.json",
+    ".github/template",
 }
 
 

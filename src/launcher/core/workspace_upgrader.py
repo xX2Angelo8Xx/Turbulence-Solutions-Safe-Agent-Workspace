@@ -28,6 +28,9 @@ _NEVER_TOUCH_PATTERNS = (
     # FIX-127: counter_config.json stores user-specific threshold/enabled settings.
     # It must never be overwritten by the upgrader, even if somehow marked critical.
     ".github/hooks/scripts/counter_config.json",
+    # FIX-129: .github/template stores the template name used during create_project().
+    # Overwriting it would break template routing for subsequent upgrades.
+    ".github/template",
 )
 
 
@@ -58,9 +61,27 @@ def _sha256(file_path: Path) -> str:
     return h.hexdigest()
 
 
-def _load_manifest() -> dict | None:
-    """Load the shipped template MANIFEST.json."""
-    manifest_path = TEMPLATES_DIR / "agent-workbench" / _MANIFEST_NAME
+def _detect_template(workspace_path: Path) -> str:
+    """Detect which template was used to create this workspace.
+
+    Reads .github/template written by create_project() (FIX-129).  Falls back
+    to 'agent-workbench' for workspaces created before this feature existed.
+    """
+    template_file = workspace_path / ".github" / "template"
+    if template_file.exists():
+        try:
+            name = template_file.read_text(encoding="utf-8").strip()
+            if name in ("agent-workbench", "clean-workspace"):
+                return name
+        except OSError:
+            pass
+    # Workspaces created before FIX-129 have no .github/template — default to agent-workbench.
+    return "agent-workbench"
+
+
+def _load_manifest(template_name: str = "agent-workbench") -> dict | None:
+    """Load the shipped template MANIFEST.json for the given template."""
+    manifest_path = TEMPLATES_DIR / template_name / _MANIFEST_NAME
     if not manifest_path.exists():
         _LOGGER.warning("MANIFEST.json not found at %s", manifest_path)
         return None
@@ -114,7 +135,8 @@ def check_workspace(workspace_path: Path) -> UpgradeReport:
         launcher_version=VERSION,
     )
 
-    manifest = _load_manifest()
+    template_name = _detect_template(workspace_path)
+    manifest = _load_manifest(template_name)
     if manifest is None:
         report.errors.append("Could not load template MANIFEST.json")
         return report
@@ -162,7 +184,8 @@ def upgrade_workspace(workspace_path: Path, dry_run: bool = False) -> UpgradeRep
         _LOGGER.info("Workspace is up to date (v%s)", report.workspace_version)
         return report
 
-    template_dir = TEMPLATES_DIR / "agent-workbench"
+    template_name = _detect_template(workspace_path)
+    template_dir = TEMPLATES_DIR / template_name
     files_to_update = report.outdated_files + report.missing_files
 
     for rel_path in files_to_update:
