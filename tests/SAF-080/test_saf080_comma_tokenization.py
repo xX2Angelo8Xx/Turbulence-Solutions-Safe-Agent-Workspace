@@ -218,3 +218,59 @@ def test_remove_item_path_with_middle_comma_allowed():
 def test_remove_item_path_with_middle_comma_deny_zone_denied():
     """SAF-080: Remove-Item .github/file,name.py → middle comma, deny zone → denied."""
     assert deny("Remove-Item .github/file,name.py")
+
+
+# ===========================================================================
+# Tester edge cases — not covered by Developer's tests
+# ===========================================================================
+
+def test_remove_item_multiple_trailing_commas_github_denied():
+    """Tester: Remove-Item .github,,, → multiple trailing commas → still denied.
+
+    rstrip(',') removes ALL trailing commas, so '.github,,,' → '.github',
+    which must still be rejected by the deny-zone guard.
+    """
+    assert deny("Remove-Item .github,,,")
+
+
+def test_remove_item_multiple_trailing_commas_vscode_denied():
+    """Tester: Remove-Item .vscode,, → two trailing commas → still denied."""
+    assert deny("Remove-Item .vscode,,")
+
+
+def test_remove_item_github_mixed_case_with_trailing_comma_denied():
+    """Tester: Remove-Item .GitHub, → case-insensitive deny-zone match with trailing comma.
+
+    _try_project_fallback does p.lower() comparison, so '.GitHub' (after
+    comma strip) must be caught identically to '.github'.
+    """
+    assert deny("Remove-Item .GitHub,")
+
+
+def test_remove_item_quoted_path_with_trailing_comma_allowed():
+    """Tester: Remove-Item 'project/file.py', project/file2.py → quoted path, trailing comma
+    on first token 'project/file.py' (after quote stripping, then comma stripping) → allowed.
+
+    shlex: ["'project/file.py',", 'project/file2.py']
+    strip("\"'") → "project/file.py,"  then  rstrip(",") → "project/file.py" → allowed.
+    """
+    assert allow("Remove-Item 'project/file.py', project/file2.py")
+
+
+def test_remove_item_quoted_github_with_trailing_comma_denied():
+    """Tester: Remove-Item '.github', → quoted deny-zone bare name with trailing comma.
+
+    shlex: ["'.github',"]
+    strip("\"'") → ".github,"  then  rstrip(",") → ".github" → denied.
+    """
+    assert deny("Remove-Item '.github',")
+
+
+def test_remove_item_comma_only_token_no_crash():
+    """Tester: Remove-Item , project/file.py → lone comma token reduces to empty string.
+
+    rstrip(',') on ',' → '' (empty).  Empty string is not path-like, not a
+    flag, not env-assign, and contains no '$'/'*'/'?' → the loop skips it
+    cleanly.  The project path in the second arg is allowed.
+    """
+    assert allow("Remove-Item , project/file.py")
