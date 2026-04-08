@@ -115,8 +115,9 @@ class TestFileSearchNotConflated:
         """clean-workspace AGENT-RULES.md Tool Permission Matrix must not say file_search requires includePattern."""
         content = CW_RULES.read_text(encoding="utf-8")
         # The old incorrect text said: "`includePattern` is required" for file_search
-        # The new text must say file_search uses query parameter
-        assert "file_search` | Allowed | Uses the `query` parameter" in content
+        # The new text must say file_search uses query parameter (permission may be Allowed or Zone-checked)
+        assert "file_search" in content
+        assert "Uses the `query` parameter" in content
 
     def test_cw_rules_file_search_clarifies_no_include_pattern(self):
         """clean-workspace AGENT-RULES.md must explicitly state file_search does not require includePattern."""

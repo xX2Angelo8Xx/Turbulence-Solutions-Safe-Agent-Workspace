@@ -54,11 +54,15 @@ The following paths enforce permanent restrictions. No workpackage, exception, o
 | `list_dir` | Zone-checked | Allowed everywhere; only top-level `.github/` listing is denied; subdirectory listings (e.g., `.github/instructions/`) are allowed; `.vscode/` and `NoAgentZone/` fully denied |
 | `create_directory` | Zone-checked | Allowed in project folder only |
 | **Search Tools** | | |
-| `grep_search` | Allowed | `includePattern` is required — the tool is **not** auto-scoped to the project folder; always set `includePattern: "{{PROJECT_NAME}}/**"` (or narrower) explicitly; `includeIgnoredFiles: true` must not be used |
-| `file_search` | Allowed | Uses the `query` parameter as a glob pattern (e.g. `{{PROJECT_NAME}}/**/*.py`); works workspace-wide by default; does **not** require `includePattern` (that parameter applies to `grep_search` only); `includeIgnoredFiles: true` must not be used |
+| `grep_search` | Zone-checked | `includePattern` is required — the tool is **not** auto-scoped to the project folder; always set `includePattern: "{{PROJECT_NAME}}/**"` (or narrower) explicitly; `includePattern` targeting `NoAgentZone/**` is blocked; `includeIgnoredFiles: true` must not be used |
+| `file_search` | Zone-checked | Uses the `query` parameter as a glob pattern (e.g. `{{PROJECT_NAME}}/**/*.py`); works workspace-wide by default; does **not** require `includePattern` (that parameter applies to `grep_search` only); `query` targeting `NoAgentZone/**` is blocked; `includeIgnoredFiles: true` must not be used |
 | `semantic_search` | Allowed | — |
 | **Terminal** | | |
 | `run_in_terminal` | Zone-checked | Commands must not navigate outside `{{PROJECT_NAME}}/` without explicit scope |
+| **Git Tools** | | |
+| `get_changed_files` | Blocked | Unconditionally blocked when the workspace is a git repository (full diff content from denied zones would be exposed); use `git status` or `git diff --stat` via terminal instead |
+| **MCP Tools** | | |
+| `mcp_gitkraken_*` | Blocked | MCP git tools are unconditionally blocked by workspace security policy; use terminal `git` commands instead |
 
 ---
 
@@ -94,3 +98,6 @@ Standard git operations are allowed from the workspace root. Follow these constr
 | `pip install` via terminal | `install_python_packages` tool |
 | Venv activation | Run `.venv\Scripts\python.exe` directly |
 | `includeIgnoredFiles: true` in `grep_search` or `file_search` | Do not use — exposes files outside the intended scope (e.g., `node_modules`, build artifacts); omit the parameter entirely |
+| `get_changed_files` tool denied | Use `git status` or `git diff --stat` via terminal instead; the tool is unconditionally blocked in git-based workspaces |
+| `file_search` broad queries silently omit `NoAgentZone/` files | Results from blocked zones are filtered with no indication; always scope queries explicitly via glob pattern (e.g. `{{PROJECT_NAME}}/**/*.py`) to avoid confusion |
+| `Get-ChildItem .` (workspace root with explicit dot) blocked | Use `list_dir` tool pointed at the workspace root instead |
