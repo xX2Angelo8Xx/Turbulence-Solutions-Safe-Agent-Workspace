@@ -1,5 +1,81 @@
 # Test Report — SAF-079
 
+## Iteration 2
+
+**Tester:** Tester Agent
+**Date:** 2026-04-08
+**Iteration:** 2
+
+---
+
+## Summary
+
+**PASS.** BUG-219 (tilde bypass via project-folder fallback) was correctly fixed in `_check_nav_path_arg()` by adding an explicit tilde guard immediately after `norm` is computed, before the absolute-path check. Both `templates/agent-workbench` and `templates/clean-workspace` `security_gate.py` files are byte-identical. All 32 tests in `tests/SAF-079/` pass (26 original + 6 tester-added tilde edge cases). The SAF-030 regression test `test_cd_tilde_denied` passes. Full SAF security suite (284 tests) passes. Workspace validation is clean. The WP is marked **Done**.
+
+---
+
+## Tests Executed
+
+| Test | Type | Result | Notes |
+|------|------|--------|-------|
+| TST-2784 (Developer) | Unit | Pass | 32 SAF-079 tests — all pass (incl. 6 tester tilde edge cases) |
+| TST-2787 (Tester) | Security | Pass | 32 SAF-079 tests — Tester verification run |
+| SAF-030 tilde regression | Regression | Pass | `test_cd_tilde_denied` passes — SAF-030 no longer regressed |
+| Full SAF security suite | Security | Pass | SAF-030 through SAF-036 + SAF-079 — 284 passed |
+
+---
+
+## Regression Check
+
+No new regressions introduced. SAF-030 `test_cd_tilde_denied` — which was failing in iteration 1 — now passes. All other failures in the full test suite are confirmed pre-existing entries in `tests/regression-baseline.json` (221 known entries).
+
+---
+
+## Security Verification
+
+### Tilde Guard
+
+`_check_nav_path_arg()` now contains the guard:
+```python
+if norm == "~" or norm.startswith("~/") or re.match(r"^~[^/]", norm):
+    return False
+```
+This is placed after `norm = posixpath.normpath(token.replace("\\", "/"))` and before the absolute-path check. Mirrors the guard in `_check_workspace_path_arg()`.
+
+Verified manually: both template files contain the guard at line 1624+ and are byte-identical.
+
+### deny-zone coverage
+
+- `cd .github` → denied ✓
+- `cd .vscode` → denied ✓
+- `cd noagentzone` → denied ✓ (bare name, case-insensitive)
+- `push-location .github` → denied ✓
+- `cd ../..` (above workspace root) → denied ✓
+
+### workspace-scoped navigation
+
+- `cd ..` (from project folder → workspace root) → allowed ✓
+- `push-location project/src` → allowed ✓
+- `cd c:/workspace/project` (absolute inside workspace) → allowed ✓
+
+---
+
+## Bugs Found
+
+None in iteration 2. BUG-219 (logged in iteration 1) has been resolved; status updated to **Fixed**.
+
+---
+
+## Verdict
+
+**PASS** — WP marked as Done.
+
+---
+
+---
+
+## Iteration 1 (Historical)
+
 **Tester:** Tester Agent
 **Date:** 2026-04-08
 **Iteration:** 1
