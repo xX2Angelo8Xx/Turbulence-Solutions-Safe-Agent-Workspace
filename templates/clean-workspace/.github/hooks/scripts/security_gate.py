@@ -125,7 +125,7 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "4f2b0c9fe18694af4d0ad3f25259d4daaba8ec7ca018c58c653bc99aa15ff731"
+_KNOWN_GOOD_GATE_HASH: str = "3adf09c8da46ca621b157b4e5fdf43ed95d3c95a0c7e57fe5187048330341de6"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. The safety-critical file "
@@ -1650,6 +1650,13 @@ def _check_nav_path_arg(token: str, ws_root: str) -> bool:
         return True
     # Project-folder fallback for relative paths only
     norm = posixpath.normpath(token.replace("\\", "/"))
+    # SAF-030: Deny tilde — expands to HOME directory (outside workspace) at
+    # shell runtime.  _check_workspace_path_arg already denied it, but guard
+    # explicitly here to prevent the fallback from accepting ~-rooted tokens
+    # (e.g. "~/docs" normalises to "~/docs" which looks relative and has no
+    # leading letter-colon, so it would pass the absolute-path guard below).
+    if norm == "~" or norm.startswith("~/") or re.match(r"^~[^/]", norm):
+        return False
     # Absolute paths and URL-like tokens cannot benefit from the fallback
     if re.match(r"^[a-z]:", norm.lower()) or norm.startswith("/"):
         return False

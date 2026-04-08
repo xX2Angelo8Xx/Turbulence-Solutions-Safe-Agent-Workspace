@@ -127,3 +127,34 @@ Test run: 26 passed via `run_tests.py --wp SAF-079 --type Unit` → logged as TS
   names is out of scope.
 - `pop-location` (PowerShell) is not in the allowlist; it takes no path args
   and is a separate WP concern.
+
+---
+
+## Iteration 2 — BUG-219 Tilde Fix
+
+**Date:** 2026-04-08
+
+### Issue Found by Tester
+`_check_nav_path_arg()` project-folder fallback did not exclude tilde tokens.
+`_check_workspace_path_arg("~", ws_root)` correctly returned `False`, but then
+the fallback resolved `~` against `ws_root/project/~`, landing inside the
+workspace and incorrectly returning `True`. Affected: `cd ~`, `push-location ~`,
+`sl ~/path`, `Set-Location ~/anything`.
+
+### Fix Applied
+Added explicit tilde guard in `_check_nav_path_arg()` immediately after computing
+`norm`, before the absolute-path check:
+```python
+    if norm == "~" or norm.startswith("~/") or re.match(r"^~[^/]", norm):
+        return False
+```
+This mirrors the existing guard in `_check_workspace_path_arg()`.
+
+Both templates updated, hashes regenerated, manifests regenerated.
+
+### Tests
+- All 32 tests pass (26 original + 6 tester-added tilde edge cases).
+- SAF-030 regression test `test_cd_tilde_denied` passes.
+- Logged as TST-2784.
+- BUG-219 `Fixed In WP` set to SAF-079.
+
