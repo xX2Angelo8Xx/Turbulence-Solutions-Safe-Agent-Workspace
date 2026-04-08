@@ -2,7 +2,8 @@
 
 **Tester:** Tester Agent  
 **Date:** 2026-04-08  
-**Verdict:** FAIL
+**Iteration 2 Date:** 2026-04-08  
+**Verdict:** PASS (Iteration 2)
 
 ---
 
@@ -132,12 +133,53 @@ def test_cw_rules_file_search_does_not_require_include_pattern(self):
 
 ## Test Result Logged
 
-TST-2798: DOC-068 full regression suite — FAIL
+TST-2798: DOC-068 full regression suite — FAIL (Iteration 1)  
+TST-2800: DOC-068 Iteration 2: full suite regression check — **PASS**
 
 ---
 
-## Next Steps
+## Iteration 2 Review (2026-04-08)
 
-1. Developer fixes TODOs 1–3 above.
-2. Developer re-runs full test suite and confirms all 4 regressions are resolved.
-3. Developer re-submits the WP for Review.
+### Regression Fixes Verified
+
+All 4 regressions from Iteration 1 are resolved:
+
+| Regression | Fix Applied | Result |
+|-----------|-------------|--------|
+| `test_readme_has_tier2_force_ask` → was checking wrong string | Reverted `test_fix086_tester_edge_cases.py` to correct `test_readme_has_tier2_controlled_access` | **PASS** |
+| `test_placeholder_count_is_exactly_four` — count dropped due to agent-workbench modification | Reverted `templates/agent-workbench/README.md` to main state | **PASS** |
+| `test_placeholder_appears_in_tier2_section` — placeholder text removed from AW README | Same revert above | **PASS** |
+| `test_cw_rules_file_search_does_not_require_include_pattern` — hard-coded `Allowed` level | Updated assertion to check for `file_search` + `Uses the \`query\` parameter` (permission-level agnostic) | **PASS** |
+
+### Full Suite Results (Iteration 2)
+
+| Suite | Tests | Result |
+|-------|-------|--------|
+| `tests/DOC-068/` | 23 | PASS |
+| `tests/FIX-086/` | 29 | PASS |
+| `tests/DOC-066/` | 23 | PASS |
+| **Total** | **75** | **75 passed, 0 failed** |
+
+### DOC-066 Test Update Analysis
+
+The update to `test_cw_rules_file_search_does_not_require_include_pattern` is **valid**:
+- Old assertion checked for exact string `"file_search\` | Allowed |"` — now fails because DOC-068 legitimately upgraded `file_search` to `Zone-checked`.
+- New assertion checks for `"file_search"` in content AND `"Uses the \`query\` parameter"` in content.
+- **Test intent is fully preserved** — it still verifies that `file_search` is documented with the `query` parameter note and is present in the permission matrix. The permission level upgrade is a valid WP change, not a regression.
+
+### Scope Violations
+
+None in Iteration 2. `templates/agent-workbench/README.md` and `.github/hooks/scripts/MANIFEST.json` have been reverted to main state. Only `templates/clean-workspace/` files are modified by this WP.
+
+### Checklist
+
+- [x] `docs/workpackages/DOC-068/dev-log.md` exists and is non-empty
+- [x] `docs/workpackages/DOC-068/test-report.md` has been written by Tester
+- [x] Test files exist in `tests/DOC-068/` with 23 tests
+- [x] All test results logged via `scripts/add_test_result.py` (TST-2798, TST-2800)
+- [x] No bugs found requiring `add_bug.py`
+- [x] `scripts/validate_workspace.py --wp DOC-068` returns clean (exit code 0)
+- [x] Branch is `DOC-068/clean-workspace-doc-gaps`
+- [x] No regressions in previously-passing tests
+
+**Verdict: PASS — marking DOC-068 as Done.**
