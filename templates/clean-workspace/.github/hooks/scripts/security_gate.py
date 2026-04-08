@@ -125,7 +125,7 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "3adf09c8da46ca621b157b4e5fdf43ed95d3c95a0c7e57fe5187048330341de6"
+_KNOWN_GOOD_GATE_HASH: str = "55ad5395aabdcdcfe0f2cf894d18e17f725b89f681d4d2d9aa686edb0b1560e3"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. The safety-critical file "
@@ -1939,6 +1939,10 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
                 _prev_was_flag = False
                 continue  # already validated or inline code — skip zone check
             stripped = tok.strip("\"'")
+            # SAF-080: Strip trailing commas from PowerShell array operator syntax.
+            # "Remove-Item file1.py, file2.py" → shlex produces "file1.py," which
+            # bypasses _is_path_like() (no slash/dot prefix) and skips zone checks.
+            stripped = stripped.rstrip(",")
             # Skip pure flags; the token that follows is a flag argument, not a
             # standalone file glob — mark it so the wildcard check is skipped.
             if stripped.startswith("-"):
