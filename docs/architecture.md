@@ -312,6 +312,10 @@ Templates (bundled inside Launcher)
 │   │   │   ├── .finalization-state.json
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
+│   │   ├── DOC-067/
+│   │   │   ├── .finalization-state.json
+│   │   │   ├── dev-log.md
+│   │   │   └── test-report.md
 │   │   ├── FIX-001/
 │   │   │   ├── dev-log.md
 │   │   │   └── test-report.md
@@ -1386,6 +1390,8 @@ Templates (bundled inside Launcher)
 │   ├── DOC-064/
 │   ├── DOC-065/
 │   ├── DOC-066/
+│   ├── DOC-067/
+│   ├── DOC-068/
 │   ├── FIX-001/
 │   ├── FIX-002/
 │   ├── FIX-003/
@@ -1689,7 +1695,9 @@ Templates (bundled inside Launcher)
 ├── pyproject.toml
 ├── python-embed.zip
 ├── TS-Logo.ico
-└── TS-Logo.png
+├── TS-Logo.png
+├── WorkspacePhilosophy-Compact.md
+└── WorkspacePhilosophy.md
 ```
 
 ## Template System
