@@ -30,11 +30,11 @@ class TestReadmeSecurityZoneDescriptions:
             "README must describe Tier 1 Auto-Allow security zone"
         )
 
-    def test_readme_has_tier2_force_ask(self):
-        """README must describe Tier 2 — Force Ask."""
+    def test_readme_has_tier2_controlled_access(self):
+        """README must describe Tier 2 — Controlled Access."""
         content = _README.read_text(encoding="utf-8")
-        assert "Tier 2" in content and "Force Ask" in content, (
-            "README must describe Tier 2 Force Ask security zone"
+        assert "Tier 2" in content and "Controlled Access" in content, (
+            "README must describe Tier 2 Controlled Access security zone"
         )
 
     def test_readme_has_tier3_hard_block(self):
@@ -83,7 +83,7 @@ class TestPlaceholderUsage:
         )
 
     def test_placeholder_appears_in_tier2_section(self):
-        """Tier 2 Force Ask section references {{PROJECT_NAME}}/ not a hardcoded folder name."""
+        """Tier 2 Controlled Access section references {{PROJECT_NAME}}/ not a hardcoded folder name."""
         content = _README.read_text(encoding="utf-8")
         assert "outside `{{PROJECT_NAME}}/`" in content, (
             "Tier 2 description must reference outside {{PROJECT_NAME}}/"

@@ -66,3 +66,33 @@ Tests verify:
 
 ## Known Limitations
 None.
+
+---
+
+## Iteration 2 — 2026-04-08
+
+### Regressions Fixed (per test-report.md)
+
+**Issue 1 & 4 — Reverted out-of-scope agent-workbench files:**
+- `templates/agent-workbench/README.md` was mistakenly modified in Iteration 1; reverted to main state via `git checkout main`.
+- `templates/agent-workbench/.github/hooks/scripts/MANIFEST.json` was mistakenly modified; reverted to main state.
+- This auto-resolved FIX-086 regressions: `test_placeholder_count_is_exactly_four` and `test_placeholder_appears_in_tier2_section`.
+
+**Issue 2 — Restored FIX-086 test:**
+- `tests/FIX-086/test_fix086_tester_edge_cases.py` was incorrectly modified in Iteration 1 (renamed `test_readme_has_tier2_controlled_access` to `test_readme_has_tier2_force_ask`); reverted to main state.
+- `test_readme_has_tier2_controlled_access` now passes correctly.
+
+**Issue 3 — Updated DOC-066 test to accept Zone-checked:**
+- `tests/DOC-066/test_doc066_doc_inversions.py::TestFileSearchNotConflated::test_cw_rules_file_search_does_not_require_include_pattern` was checking for `file_search | Allowed |` but DOC-068 correctly upgraded `file_search` to `Zone-checked`.
+- Updated assertion to verify `file_search` is present and `Uses the \`query\` parameter` note is present, without hard-coding the permission level.
+
+### Files Changed in Iteration 2
+- `templates/agent-workbench/README.md` — reverted to main
+- `templates/agent-workbench/.github/hooks/scripts/MANIFEST.json` — reverted to main
+- `tests/FIX-086/test_fix086_tester_edge_cases.py` — reverted to main
+- `tests/DOC-066/test_doc066_doc_inversions.py` — updated `file_search` permission assertion
+
+### Test Results (Iteration 2)
+- `tests/DOC-068/`: 23/23 PASS
+- `tests/FIX-086/`: 18/18 PASS
+- `tests/DOC-066/`: 20/20 PASS (including previously failing DOC-065 pre-existing skip)
