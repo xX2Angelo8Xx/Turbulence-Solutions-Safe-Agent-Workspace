@@ -5,13 +5,14 @@
 **Branch:** DOC-067/agent-workbench-doc-gaps  
 **Tester:** Tester Agent  
 **Date:** 2026-04-08  
-**Verdict:** ❌ FAIL — Return to Developer
+**Iteration:** 2  
+**Verdict:** ✅ PASS
 
 ---
 
 ## Summary
 
-DOC-067's own 6 tests all pass. However, the README.md change introduced **6 new regression failures** in existing test suites (`FIX-086` and `DOC-002`) that are **not in the regression baseline**. The WP cannot be marked Done until these regressions are resolved.
+All iteration 2 fixes verified. DOC-067's 6 own tests pass. FIX-086 test suite fully passes (including the renamed `test_readme_has_tier2_controlled_access`). DOC-002 shows exactly 2 pre-existing baseline failures — no new regressions. Workspace validates cleanly.
 
 ---
 
@@ -28,47 +29,26 @@ DOC-067's own 6 tests all pass. However, the README.md change introduced **6 new
 | `test_readme_tier2_controlled_access` | PASS |
 | `test_get_childitem_dot_workaround_present` | PASS |
 
-### FIX-086 Regressions — 3/3 FAIL ❌ (New, not in baseline)
+### FIX-086 Tests — 29/29 PASS ✅
 
-| Test | Failure |
-|------|---------|
-| `tests/FIX-086/test_fix086_tester_edge_cases.py::TestReadmeSecurityZoneDescriptions::test_readme_has_tier2_force_ask` | `AssertionError: README must describe Tier 2 Force Ask security zone` — DOC-067 intentionally removed "Force Ask" but this test was not updated |
-| `tests/FIX-086/test_fix086_tester_edge_cases.py::TestPlaceholderUsage::test_placeholder_count_is_exactly_four` | `AssertionError: README must have exactly 5 {{PROJECT_NAME}} occurrences … found 4` — DOC-067 removed the only `{{PROJECT_NAME}}/` reference in Tier 2 description |
-| `tests/FIX-086/test_fix086_tester_edge_cases.py::TestPlaceholderUsage::test_placeholder_appears_in_tier2_section` | `AssertionError: Tier 2 description must reference outside \`{{PROJECT_NAME}}/\`` — DOC-067 removed this reference from the Tier 2 wording |
+All tests pass including the renamed `test_readme_has_tier2_controlled_access` (was `test_readme_has_tier2_force_ask`).
 
-### DOC-002 Regressions — 3/3 FAIL ❌ (New, not in baseline)
+### DOC-002 Tests — 57/59 (2 pre-existing baseline failures) ✅
 
-| Test | Failure |
-|------|---------|
-| `tests/DOC-002/test_doc002_tester_edge_cases.py::TestPlaceholderCount::test_default_readme_has_exactly_three_placeholder_occurrences` | `AssertionError: Expected 5 occurrences but found 4` |
-| `tests/DOC-002/test_doc002_tester_edge_cases.py::TestPlaceholderCount::test_coding_template_readme_has_exactly_three_placeholder_occurrences` | `AssertionError: Expected 5 occurrences but found 4` |
-| `tests/DOC-002/test_doc002_tester_edge_cases.py::TestAllOccurrencesInActualTemplate::test_all_three_actual_readme_occurrences_replaced` | `AssertionError: assert 4 == 5` — expected 5 substitutions in generated README, found 4 |
+| Failing Test | Baseline Entry |
+|---|---|
+| `test_placeholder_present_in_getting_started_section` | In `tests/regression-baseline.json` ✓ |
+| `test_placeholder_present_in_folder_table_row` | In `tests/regression-baseline.json` ✓ |
+
+No new DOC-002 failures introduced by this WP.
 
 ### Regression Baseline
 
-All failures above are **not in `tests/regression-baseline.json`** — they are new failures introduced by this WP. All other full-suite failures were confirmed as pre-existing baseline entries. No other new regressions found beyond these 6.
+Confirmed: the 2 DOC-002 failures are pre-existing entries in `tests/regression-baseline.json`. No new regressions introduced.
 
 ---
 
-## Root Cause
-
-The change to `templates/agent-workbench/README.md` line 14:
-
-```diff
--| **Tier 2 — Force Ask** | `.github/`, `.vscode/`, workspace root | Operations outside `{{PROJECT_NAME}}/` trigger an approval dialog |
-+| **Tier 2 — Controlled Access** | `.github/`, `.vscode/`, workspace root | Reads of authorized paths (e.g. workspace-root config files, `.github/instructions/`) auto-allow silently; writes and access to restricted zones are denied |
-```
-
-This change:
-1. Removed the string `"Force Ask"` — breaking `test_readme_has_tier2_force_ask` in FIX-086.
-2. Removed the `{{PROJECT_NAME}}/` placeholder from the Tier 2 cell — reducing the total number of `{{PROJECT_NAME}}` occurrences from 5 to 4, breaking three placeholder-count tests in FIX-086 and DOC-002.
-3. Removed the `outside \`{{PROJECT_NAME}}/\`` wording — breaking `test_placeholder_appears_in_tier2_section` in FIX-086.
-
-The Developer's own DOC-067 tests check what was *added* but do not guard against what was *removed* from existing contracts.
-
----
-
-## Checks Performed
+## Manual Verification Checks
 
 | Check | Result |
 |-------|--------|
@@ -79,49 +59,27 @@ The Developer's own DOC-067 tests check what was *added* but do not guard agains
 | README.md contains "Controlled Access" | ✅ |
 | README.md does NOT contain "Force Ask" | ✅ |
 | README.md does NOT contain "trigger an approval dialog" | ✅ |
+| README.md Tier 2 row contains `outside \`{{PROJECT_NAME}}/\`` | ✅ |
+| `{{PROJECT_NAME}}` placeholder count in README.md = 5 | ✅ |
 | MANIFEST.json regenerated | ✅ |
 | `scripts/validate_workspace.py --wp DOC-067` exits 0 | ✅ |
-| Full regression suite — no NEW failures | ❌ 6 new failures |
-| ADR conflicts | None found (ADR-003 properly acknowledged) |
-| Security scope | No security issues introduced |
+| Full regression suite — no NEW failures | ✅ |
+| ADR conflicts | None (ADR-003 acknowledged) |
+| Security scope | No security issues |
 
 ---
 
-## Required Fixes (TODOs for Developer)
+## Iteration 1 Issues — Resolved ✅
 
-### Option A — Fix the README.md (Recommended)
-
-Restore a `{{PROJECT_NAME}}/` reference in the Tier 2 `Behaviour` cell so the placeholder count remains 5 and the `outside \`{{PROJECT_NAME}}/\`` contract is preserved. For example:
-
-```markdown
-| **Tier 2 — Controlled Access** | `.github/`, `.vscode/`, workspace root | Reads of authorized paths auto-allow silently; writes outside `{{PROJECT_NAME}}/` and restricted zone access are denied |
-```
-
-Then update `tests/FIX-086/test_fix086_tester_edge_cases.py`:
-- `test_readme_has_tier2_force_ask`: Change assertion to check for `"Controlled Access"` instead of `"Force Ask"`. Rename the function to `test_readme_has_tier2_controlled_access`.
-
-This leaves DOC-002 tests unchanged (they will pass with 5 occurrences again).
-
-### Option B — Fix all 6 broken tests
-
-Update the test files directly to match the new README content (only if the README wording not including `{{PROJECT_NAME}}/` is intentional):
-
-**`tests/FIX-086/test_fix086_tester_edge_cases.py`:**
-1. `test_readme_has_tier2_force_ask` → Rename to `test_readme_has_tier2_controlled_access` and change assertion to check `"Controlled Access"`.
-2. `test_placeholder_count_is_exactly_four` → Change `assert count == 5` to `assert count == 4` and update the docstring.
-3. `test_placeholder_appears_in_tier2_section` → Update or remove the assertion for `outside \`{{PROJECT_NAME}}/\``.
-
-**`tests/DOC-002/test_doc002_tester_edge_cases.py`:**
-4. `test_default_readme_has_exactly_three_placeholder_occurrences` → Change `assert count == 5` to `assert count == 4`.
-5. `test_coding_template_readme_has_exactly_three_placeholder_occurrences` → Change `assert count == 5` to `assert count == 4`.
-6. `test_all_three_actual_readme_occurrences_replaced` → Change `assert result.count("Nimbus/") == 5` to `== 4`.
-
-> **Note:** The Tester cannot edit source files (`FIX-086`, `DOC-002` tests are outside `tests/DOC-067/`). These changes must be made by the Developer.
+| Iteration 1 Failure | Resolution |
+|---|---|
+| `test_readme_has_tier2_force_ask` (FIX-086) | Test renamed to `test_readme_has_tier2_controlled_access`; assertion updated to check "Controlled Access" |
+| `test_placeholder_count_is_exactly_four` (FIX-086) — found 4 instead of 5 | README.md Tier 2 wording updated to restore `outside \`{{PROJECT_NAME}}/\`` |
+| `test_placeholder_appears_in_tier2_section` (FIX-086) | Resolved by same README.md fix |
+| 3 DOC-002 placeholder count regressions | Resolved by same README.md fix (count restored to 5) |
 
 ---
 
 ## Verdict
 
-**FAIL** — Set WP status back to `In Progress`.
-
-The 6 regressions are new (not baseline), caused directly by the README.md change. The WP implementation is otherwise correct and complete. Once the Developer resolves the placeholder count and tier-label contract issues (via Option A or B), the WP should pass cleanly.
+**PASS** — WP set to Done.
