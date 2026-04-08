@@ -94,7 +94,7 @@ class TestWorkspaceReadme:
         assert "Tier 2" in content
         assert "Tier 3" in content
         assert "Auto-Allow" in content
-        assert "Force Ask" in content
+        assert "Controlled Access" in content
         assert "Hard Block" in content
 
     def test_about_template_section_present(self):
