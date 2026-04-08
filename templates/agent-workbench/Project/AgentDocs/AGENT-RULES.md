@@ -109,6 +109,8 @@ The following paths enforce permanent restrictions. No workpackage, exception, o
 | **Terminal** | Zone-checked | See [Terminal Rules](#4-terminal-rules) |
 | **Git** | Zone-checked | See [Git Rules](#5-git-rules) |
 | `get_changed_files` | Zone-checked | Allowed only when `.git/` is **not** at workspace root; denied when the workspace IS a git repository (full diff content from denied zones would be exposed) |
+| **MCP Tools** | | |
+| `mcp_gitkraken_*` | Blocked | MCP git tools are unconditionally blocked by workspace security policy; use terminal `git` commands instead (see [Git Rules](#5-git-rules)) |
 | **Memory** | Allowed | `/memories/` and `/memories/session/` are readable; session writes allowed |
 | **LSP Tools** | Zone-checked | `vscode_listCodeUsages`, `vscode_renameSymbol` — project folder only |
 
@@ -214,6 +216,7 @@ When you spawn a subagent (e.g. via `runSubagent`), any zone violations the suba
 |------------|---------------------|
 | `Out-File` creates BOM-encoded files | Use `Set-Content -Encoding UTF8` or `create_file` tool |
 | `Get-ChildItem` returns excessive output | Use `list_dir` tool or `Get-ChildItem -Name` |
+| `Get-ChildItem .` (workspace root with explicit dot) is blocked | Use `list_dir` tool pointed at the workspace root instead |
 | `git diff` truncates large file output | Pipe to `Out-String -Width 200` or use `git diff --stat` |
 | `pytest` hangs when tests spawn real subprocesses | Mock `subprocess.Popen` and `shutil.which`; rely on `conftest.py` autouse fixtures |
 | `replace_string_in_file` edits may not persist | Read back the file immediately after editing; verify with `git diff` |

@@ -11,7 +11,7 @@ This workspace uses the Turbulence Solutions safe-agent framework. A **PreToolUs
 | Tier | Zone | Behaviour |
 |------|------|-----------|
 | **Tier 1 — Auto-Allow** | Project folder | Read/write tools targeting `{{PROJECT_NAME}}/` proceed without a dialog |
-| **Tier 2 — Force Ask** | `.github/`, `.vscode/`, workspace root | Operations outside `{{PROJECT_NAME}}/` trigger an approval dialog |
+| **Tier 2 — Controlled Access** | `.github/`, `.vscode/`, workspace root | Reads of authorized paths (e.g. workspace-root config files, `.github/instructions/`) auto-allow silently; writes and access to restricted zones are denied |
 | **Tier 3 — Hard Block** | `NoAgentZone/` | All agent operations are blocked — no exceptions |
 
 ### Exempt Tools
