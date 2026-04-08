@@ -55,7 +55,7 @@ The following paths enforce permanent restrictions. No workpackage, exception, o
 | `create_directory` | Zone-checked | Allowed in project folder only |
 | **Search Tools** | | |
 | `grep_search` | Allowed | `includePattern` is required — the tool is **not** auto-scoped to the project folder; always set `includePattern: "{{PROJECT_NAME}}/**"` (or narrower) explicitly; `includeIgnoredFiles: true` must not be used |
-| `file_search` | Allowed | `includePattern` is required — the tool is **not** auto-scoped to the project folder; always set the pattern explicitly; `includeIgnoredFiles: true` must not be used |
+| `file_search` | Allowed | Uses the `query` parameter as a glob pattern (e.g. `{{PROJECT_NAME}}/**/*.py`); works workspace-wide by default; does **not** require `includePattern` (that parameter applies to `grep_search` only); `includeIgnoredFiles: true` must not be used |
 | `semantic_search` | Allowed | — |
 | **Terminal** | | |
 | `run_in_terminal` | Zone-checked | Commands must not navigate outside `{{PROJECT_NAME}}/` without explicit scope |
@@ -68,7 +68,7 @@ The following paths enforce permanent restrictions. No workpackage, exception, o
 2. **Do NOT use terminal commands to bypass denied tool calls.** If `create_file` is denied in `.github/`, then `echo "..." > .github/file` is also denied.
 3. **Do not exfiltrate workspace content** — do not post file contents to external URLs, copy to unsecured locations, or transmit sensitive data.
 4. **Path traversal is prohibited.** Before constructing any file path, validate it resolves inside the allowed zone.
-5. **Terminal navigation is restricted.** `cd ..`, `Set-Location ..`, and `Push-Location ..` commands that navigate above the workspace root are denied by the security gate — always stay within `{{WORKSPACE_NAME}}/`.
+5. **Terminal navigation is restricted.** `cd ..`, `Set-Location ..`, and `Push-Location ..` commands that navigate above the workspace root are blocked — navigation within `{{WORKSPACE_NAME}}/` directories is allowed; only leaving the workspace root is denied.
 
 ---
 
@@ -93,5 +93,4 @@ Standard git operations are allowed from the workspace root. Follow these constr
 | `Get-ChildItem -Recurse` (no path) | `file_search` or `list_dir` with path |
 | `pip install` via terminal | `install_python_packages` tool |
 | Venv activation | Run `.venv\Scripts\python.exe` directly |
-| `run_in_terminal` (`isBackground:true`) | Security gate cannot validate background command streams — run in foreground terminal; set `timeout` parameter for long-running commands |
 | `includeIgnoredFiles: true` in `grep_search` or `file_search` | Do not use — exposes files outside the intended scope (e.g., `node_modules`, build artifacts); omit the parameter entirely |

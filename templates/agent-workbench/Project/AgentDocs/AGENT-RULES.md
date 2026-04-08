@@ -158,7 +158,7 @@ del src\oldfile.py                           # Windows CMD equivalent
 | `git filter-branch` | Rewrites commit history globally |
 | `git gc --force` | Can corrupt the object store |
 | `git clean -f` | Permanently deletes untracked files |
-| `cd ..` / `Set-Location ..` / `Push-Location ..` (outward navigation) | Directory navigation above the workspace root is denied by the security gate — always stay within `{{WORKSPACE_NAME}}/` |
+| `cd ..` / `Set-Location ..` / `Push-Location ..` (above workspace root) | Navigation above the workspace root is blocked — navigation within `{{WORKSPACE_NAME}}/` directories is allowed; only leaving the workspace root is denied |
 | Any command targeting paths outside the workspace | Out of scope |
 
 ---
@@ -222,3 +222,4 @@ When you spawn a subagent (e.g. via `runSubagent`), any zone violations the suba
 | Temp files pollute workspace | Prefix with `tmp_`; delete in `finally` block or pytest fixture teardown |
 | `semantic_search` returns empty results (fresh workspace or indexing not yet complete) | VS Code must finish indexing before semantic search returns results. In fresh workspaces this may take a few minutes. Fall back to `grep_search` with a specific `includePattern` scoped to your project folder (e.g. `includePattern: "{{PROJECT_NAME}}/**"`) until indexing completes. |
 | `grep_search` denied with "requires includePattern" | Always provide `includePattern` scoped to your project folder; bare queries without `includePattern` are denied by the security gate |
+| `file_search` scoping | `file_search` uses the `query` parameter as a glob pattern (e.g. `{{PROJECT_NAME}}/**/*.py`) and works workspace-wide by default — it does **not** use `includePattern`; the `includePattern` requirement applies only to `grep_search` |

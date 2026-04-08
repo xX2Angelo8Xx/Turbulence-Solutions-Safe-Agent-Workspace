@@ -45,5 +45,4 @@ Read `{{PROJECT_NAME}}/AGENT-RULES.md` for your complete permissions, tool rules
 | Venv activation (`.\venv\Scripts\activate`) | Run `.venv\Scripts\python.exe` directly |
 | Venv python (`venv\Scripts\python.exe -c "..."`) | Use system `python` command |
 | `semantic_search` in a fresh workspace (no results before VS Code indexing completes) | Use `grep_search` with `includePattern: "{{PROJECT_NAME}}/**"` until indexing finishes |
-| `run_in_terminal` (`isBackground:true`) | Security gate cannot validate background command streams — run in foreground terminal; set `timeout` parameter for long-running commands |
-| `cd ..` / `Set-Location ..` / `Push-Location ..` (outward navigation) | Navigation above the workspace root is denied by the security gate — directory navigation commands that attempt to go above `{{WORKSPACE_NAME}}/` are blocked |
+| `cd ..` / `Set-Location ..` / `Push-Location ..` (above workspace root) | Navigation above the workspace root is denied — navigation within `{{WORKSPACE_NAME}}/` directories is allowed, but leaving the workspace root is blocked |
