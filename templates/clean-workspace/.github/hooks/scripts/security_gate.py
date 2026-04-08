@@ -125,7 +125,7 @@ _STDIN_MAX_BYTES: int = 1_048_576  # 1 MiB hard limit — fail closed if exceede
 # replaced by 64 zeros before hashing.  This makes the hash independent of
 # the stored value while detecting all other modifications.
 # Updated by running .github/hooks/scripts/update_hashes.py.
-_KNOWN_GOOD_GATE_HASH: str = "5e544143f554e87fe89e3834141c503bc67ee51c8ee984dd28748beca5a4679a"
+_KNOWN_GOOD_GATE_HASH: str = "4f2b0c9fe18694af4d0ad3f25259d4daaba8ec7ca018c58c653bc99aa15ff731"
 
 _INTEGRITY_WARNING: str = (
     "SECURITY ALERT: Integrity verification failed. The safety-critical file "
@@ -601,6 +601,14 @@ _COMMAND_ALLOWLIST: dict[str, CommandRule] = {
         path_args_restricted=True,
         allow_arbitrary_paths=False,
         notes="PowerShell alias for Set-Location",
+    ),
+    # SAF-079: Push-Location — workspace-scoped nav, same shape as cd/set-location/sl
+    "push-location": CommandRule(
+        denied_flags=frozenset(),
+        allowed_subcommands=frozenset(),
+        path_args_restricted=True,
+        allow_arbitrary_paths=False,
+        notes="PowerShell Push-Location; workspace-internal nav; path zone-checked",
     ),
     "which": CommandRule(
         denied_flags=frozenset(),
@@ -1613,6 +1621,65 @@ def _check_workspace_path_arg(token: str, ws_root: str) -> bool:
     return True
 
 
+def _check_nav_path_arg(token: str, ws_root: str) -> bool:
+    """Return True if *token* is a safe navigation target.
+
+    SAF-079: Navigation commands (cd, set-location, sl, push-location) are
+    workspace-scoped: they may navigate anywhere within the workspace root
+    provided the destination is not a deny zone (.github, .vscode, noagentzone).
+
+    Project-folder fallback: relative tokens (e.g. ``..``) that fail
+    workspace-root resolution are retried resolved against the project folder.
+    This allows ``cd ..`` from inside the project folder to reach the workspace
+    root, which is a valid and expected agent operation.
+    """
+    if "$" in token:
+        return False
+    if _wildcard_prefix_matches_deny_zone(token):
+        return False
+    # SAF-079: Bare directory names like 'noagentzone' are not caught by
+    # _is_path_like (no slashes, no leading dot, no '..').  For navigation
+    # commands the argument IS the destination — deny it if it matches a
+    # protected zone name directly.
+    if token.lower() in (".github", ".vscode", "noagentzone"):
+        return False
+    if not _is_path_like(token):
+        return True  # not a path; no zone concern
+    # Primary check: workspace-root resolution
+    if _check_workspace_path_arg(token, ws_root):
+        return True
+    # Project-folder fallback for relative paths only
+    norm = posixpath.normpath(token.replace("\\", "/"))
+    # Absolute paths and URL-like tokens cannot benefit from the fallback
+    if re.match(r"^[a-z]:", norm.lower()) or norm.startswith("/"):
+        return False
+    if re.match(r"^[a-z][a-z0-9+\-.]*:/", norm):
+        return False
+    # Never navigate into deny zones via the fallback
+    parts = [p for p in norm.split("/") if p and p not in (".", "..")]
+    if any(p.lower() in (".github", ".vscode", "noagentzone") for p in parts):
+        return False
+    try:
+        project_dir = zone_classifier.detect_project_folder(Path(ws_root))
+        resolved = posixpath.normpath(
+            ws_root.rstrip("/") + "/" + project_dir + "/" + norm
+        )
+        ws_clean = ws_root.rstrip("/")
+        ws_lower = ws_clean.lower()
+        res_lower = resolved.lower()
+        # Resolved destination must be within workspace root
+        if not (res_lower.startswith(ws_lower + "/") or res_lower == ws_lower):
+            return False
+        # Deny if any component of the relative portion is a protected zone
+        rel = res_lower[len(ws_lower):].strip("/")
+        for part in rel.split("/"):
+            if part in (".github", ".vscode", "noagentzone"):
+                return False
+        return True
+    except (RuntimeError, OSError):
+        return False
+
+
 # FIX-022: Verb category safe for project-folder fallback (read/execute only).
 # Destructive commands (rm, del, remove-item, etc.) are intentionally excluded
 # to prevent `rm ./root_config.json` from being mis-classified as project-local.
@@ -1637,6 +1704,12 @@ _PROJECT_FALLBACK_VERBS: frozenset[str] = frozenset({
     # SAF-047: git commands are workspace-scoped per AGENT-RULES §4
     "git",
 })
+
+# SAF-079: Navigation verbs that use workspace-scope checking instead of
+# project-folder scope checking.  These commands are allowed to navigate to
+# any path within the workspace root (excluding deny zones), including the
+# workspace root itself.
+_NAV_VERBS: frozenset[str] = frozenset({"cd", "set-location", "sl", "push-location"})
 
 # FIX-118: All delete verbs receive project-folder fallback for multi-segment
 # paths (src/file.py) and single-segment dot-prefix paths (.venv, .env).
@@ -1879,7 +1952,14 @@ def _validate_args(rule: CommandRule, verb: str, tokens: list[str],
             if not _prev_was_flag and ("*" in stripped or "?" in stripped or "[" in stripped) and _wildcard_prefix_matches_deny_zone(stripped):
                 return False
             _prev_was_flag = False
-            if _is_path_like(stripped):
+            # SAF-079: navigation verbs check ALL non-flag args (bare directory
+            # names like 'noagentzone' are valid nav destinations but not
+            # path-like by _is_path_like's definition).  Other verbs only
+            # zone-check args that look like file-system paths.
+            if verb.lower() in _NAV_VERBS:
+                if not _check_nav_path_arg(stripped, ws_root):
+                    return False
+            elif _is_path_like(stripped):
                 if not _check_path_arg(stripped, ws_root):
                     # FIX-022: For read/execute verbs, try project-folder fallback.
                     # Guards: no wildcards (already denied by _check_path_arg).
