@@ -283,3 +283,57 @@ def test_check_nav_path_arg_noagentzone_denied():
     assert not sg._check_nav_path_arg("noagentzone", WS), (
         "_check_nav_path_arg('noagentzone', ws_root) must return False"
     )
+
+
+# ===========================================================================
+# Tester edge cases — SAF-030 tilde bypass via project-folder fallback
+# These tests guard against the project-folder fallback in _check_nav_path_arg
+# incorrectly allowing tilde navigation (which expands to HOME at runtime).
+# ===========================================================================
+
+@_mock_pf
+def test_cd_tilde_denied():
+    """cd ~ must be denied — tilde expands to HOME (outside workspace) at runtime."""
+    assert deny("cd ~"), (
+        "cd ~ must be denied; tilde expands to HOME outside workspace"
+    )
+
+
+@_mock_pf
+def test_push_location_tilde_denied():
+    """push-location ~ must be denied — tilde expands to HOME at runtime."""
+    assert deny("push-location ~"), (
+        "push-location ~ must be denied"
+    )
+
+
+@_mock_pf
+def test_sl_tilde_denied():
+    """sl ~ must be denied — tilde expands to HOME at runtime."""
+    assert deny("sl ~"), (
+        "sl ~ must be denied"
+    )
+
+
+@_mock_pf
+def test_set_location_tilde_slash_denied():
+    """Set-Location ~/documents must be denied — tilde prefix targets HOME."""
+    assert deny("Set-Location ~/documents"), (
+        "Set-Location ~/documents must be denied"
+    )
+
+
+@_mock_pf
+def test_check_nav_path_arg_tilde_denied():
+    """_check_nav_path_arg must deny bare tilde (HOME reference)."""
+    assert not sg._check_nav_path_arg("~", WS), (
+        "_check_nav_path_arg('~', ws_root) must return False"
+    )
+
+
+@_mock_pf
+def test_check_nav_path_arg_tilde_slash_denied():
+    """_check_nav_path_arg must deny tilde-prefixed paths (HOME reference)."""
+    assert not sg._check_nav_path_arg("~/workspace", WS), (
+        "_check_nav_path_arg('~/workspace', ws_root) must return False"
+    )
