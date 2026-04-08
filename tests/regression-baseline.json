@@ -1,6 +1,6 @@
 {
   "_comment": "Known test failures tracked against specific bugs. CI will flag any NEW failure not listed here as a regression. Update this file when bugs are fixed or new known failures are identified.",
-  "_count": 221,
+  "_count": 235,
   "_updated": "2026-04-08",
   "known_failures": {
     "pytest.internal": {
@@ -662,6 +662,48 @@
     },
     "tests.DOC-064.test_doc064_tester_edge_cases.test_agent_workbench_agent_rules_single_isBackground_entry": {
       "reason": "DOC-065 supersedes DOC-064: isBackground:true removed from Blocked Commands (tool now works)"
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_clean_workspace_agent_rules_has_isBackground": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_clean_workspace_agent_rules_use_instead_guidance": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_agent_workbench_copilot_instructions_has_isBackground": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_clean_workspace_copilot_instructions_has_isBackground": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_agent_workbench_copilot_instructions_use_instead_guidance": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_clean_workspace_copilot_instructions_use_instead_guidance": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_background_terminal_docs.test_clean_workspace_agent_rules_security_gate_reason": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_tester_edge_cases.test_clean_workspace_agent_rules_isBackground_in_restricted_section": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_tester_edge_cases.test_agent_workbench_copilot_instructions_security_gate_reason": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_tester_edge_cases.test_clean_workspace_copilot_instructions_security_gate_reason": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_tester_edge_cases.test_agent_workbench_copilot_instructions_isBackground_in_known_limitations": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_tester_edge_cases.test_clean_workspace_copilot_instructions_isBackground_in_known_limitations": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-064.test_doc064_tester_edge_cases.test_clean_workspace_agent_rules_single_isBackground_entry": {
+      "reason": "DOC-066 intentionally removes isBackground:true from documentation — confirmed working across 3 audit iterations. DOC-064 tests superseded by DOC-066."
+    },
+    "tests.DOC-065.test_doc065_template_docs.TestIsBackgroundRemoved.test_isBackground_not_blocked_in_clean_workspace_agent_rules": {
+      "reason": "DOC-066 removed isBackground:true from CW AGENT-RULES Known Workarounds entirely (superseding DOC-064/DOC-065 partial removal). DOC-065 test expected the CW entry to remain; DOC-066 supersedes it."
     },
     "tests.FIX-125.test_fix125_build_fixes.TestFindIsccLocalAppData.test_find_iscc_localappdata_path_wins_over_absent_system_paths": {
       "reason": "CI environment difference: CI runner has Inno Setup pre-installed at system path, test expects only LocalAppData fallback to match"
